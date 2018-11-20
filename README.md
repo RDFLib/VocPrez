@@ -1,9 +1,13 @@
 # SKOS Styler
 Simple Knowledge Organization System (SKOS) read-only web delivery system.
 
-This tool is a SKOS-specific, specialised, implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats. pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. SKOS Styler is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them.
+This tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats. pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. SKOS Styler is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them.
 
-Since this tool is preconfigured for SKOS data, it is ready for use with SKSO-only vocabularies. Forks of this codebase can be made to enhance it for SKOS+ features. SKOS+ is a general term for SKOS data *plus some other bits*.
+This tool is *not* a SKOS data editor! It is expected to be used with a SKOS data source (any sort of datasource can be configured) and its only role is to publish that SKOS data online.
+
+the design goal for this tool was to provide an easily configurable template-based SKOS presenter since amny of the other SKOS editing and presentation tools available as of November 2018 are pretty complex instruments and make life difficult for normal web development tasks such as institutional branding of vocab data.
+
+Since this tool is preconfigured for SKOS data, it is ready for use with SKOS-only vocabularies. Forks of this codebase can be made to enhance it for SKOS+ features. SKOS+ is a general term for SKOS data *plus some other bits*.
 
 
 ## API & Templates
