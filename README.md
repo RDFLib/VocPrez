@@ -17,20 +17,20 @@ Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are
 
 
 ## Installation
-* follow the instructions as per pyLDAPI (see [its documentation]())
+* follow the instructions as per pyLDAPI (see [its documentation](https://pyldapi.readthedocs.io))
 * ensure your config file is correct
     * you need to copy the file `_config/template.py` to `_config/__init__.py` and configure carables within it. See the template.py` file for examples
 * configure your data source
     * you will need to supply this tool with SKOS data from any sort of data source: a triplestore, a relational database or even a test file
-    * see the [DATA_SOURCES.md](https://github.com/CSIRO-enviro-informatics/skos-styler/examples/DATA_SOURCES.md) file for examples
+    * see the [DATA_SOURCES.md](https://github.com/CSIRO-enviro-informatics/skos-styler/_examples/DATA_SOURCES.md) file for examples
 
 
 ## Dependencies
-See the [requirements.txt](https://github.com/CSIRO-enviro-informatics/skos-styler/requirements.txt) standard Python dependency listing file.
+See the [requirements.txt](https://github.com/CSIRO-enviro-informatics/skos-styler/blob/master/requirements.txt) standard Python dependency listing file.
 
 
 ## License
-The content of this API is licensed for use under the [Creative Commons 4.0 License](https://creativecommons.org/licenses/by/4.0/). See the [license deed](LICENSE) all details.
+This code is licensed using the GPL v3 licence. See the [LICENSE file](LICENSE) for the deed.
 
 
 ## Contacts
