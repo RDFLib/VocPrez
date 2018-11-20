@@ -1,0 +1,35 @@
+{% extends "page.html" %}
+
+{% block content %}
+<hr />
+<h3 id="{{ data['fragment'] }}">Concept: {{ data['pref_label'] }}</h3>
+<table class="concept">
+    <tr>
+        <th>URI</th><td><code>{{ data['uri'] }}</code></td>
+    </tr>
+    <tr>
+        <th>Alternative Labels</th>
+        <td class="list">
+            {% for alt_label in data['alt_labels'] -%}
+            {{ alt_label }}<br />
+            {% endfor %}
+        </td>
+    </tr>
+    <tr>
+        {% if data.definition is defined and data.definition != 'None' %}
+        <th>Definition</th><td>{{ data['definition'] }}</td>
+        {% endif -%}
+    </tr>
+    <tr>
+        <th>Source</th><td>{{ data['source'] }}</td>
+    </tr>
+    <tr>
+        <th>Contributor</th><td><a href="{{ data['contributor'] }}">{{ data['contributor'] }}</a></td>
+    </tr>
+    <tr>
+        {% if data.broader in defined %}
+        <th>Broader</th><td class="list"><a href="{{ data['broader_uri'] }}">{{ data['broader_pref_label'] }}</a></td>
+        {% endif %}
+    </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,96 @@
+footer-contenttable {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+    text-align: left;
+}
+
+h1 {
+    color: darkred;
+    font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
+    font-size: 3em;
+    letter-spacing: -0.045em;
+    font-weight: 100;
+}
+
+h2 {
+    font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
+    color: darkred;
+    font-size: 2em;
+    letter-spacing: -0.045em;
+    margin: 0;
+    padding: 0;
+    font-weight: 100;
+}
+
+h3 {
+    font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
+    color: darkred;
+    font-size: 1em;
+    letter-spacing: -0.045em;
+    margin: 0;
+    padding: 0;
+    font-weight: 100;
+    line-height: 2em;
+}
+
+p, a, li {
+    font-size: 100%;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+a {
+    color: darkblue;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: rgb(179, 0, 0);
+}
+
+body {
+    text-align: center;
+}
+#widther {
+    margin: 0 auto;
+    max-width: 1000px;
+    text-align: left;
+    padding: 20px;
+}
+#header {
+    background-color: lightgrey;
+    padding: 5px;
+}
+
+
+
+
+#container-content > table,
+#container-content > table > tbody > tr > td,
+#container-content > table > tfoot > tr > td,
+#container-content > table > tbody > tr > th {
+    border-collapse: collapse;
+    border: none;
+}
+
+table.alternates td {
+    vertical-align: top;
+    padding: 5px;
+}
+
+table.content td {
+    padding: 5px;
+}
+
+#box {
+    margin: 0 auto;
+    max-width: 1000px;
+    text-align: left;
+    box-shadow: 0px 10px 10px 10px rgba(0,0,0,0.34);
+}
+
+ul {
+    line-height: 1.5em;
+}

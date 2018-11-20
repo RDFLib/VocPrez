@@ -1,0 +1,6 @@
+flask
+rdflib
+rdflib-jsonld
+markdown
+pyldapi
+pytest

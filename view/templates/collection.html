@@ -1,0 +1,18 @@
+{% extends "page.html" %}
+
+{% block content %}
+<h2 id="{{ data['fragment'] }}">Collection: {{ data['pref_label'] }}</h2>
+<table class="collection">
+    <tr>
+        <th>URI</th><td><code>{{ data['uri'] }}</code></td>
+    </tr>
+    <tr>
+        <th>Members</th>
+        <td class="list">
+            {% for member in data['members'] -%}
+            <a href="{{ member['member_uri'] }}">{{ member['member_pref_label'] }}</a><br />
+            {% endfor %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

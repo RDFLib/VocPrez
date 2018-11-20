@@ -1,0 +1,27 @@
+{% extends "page.html" %}
+
+{% block content %}
+<h1>Concept Schema:<br />{{ data['pref_label'] }}</h1>
+<table class="concept_scheme">
+    <tr>
+        <th>URI</th><td><code>{{ data['uri'] }}</code></td>
+    </tr>
+    <tr>
+        <th>Contributor</th><td><a href="{{ data['contributor'] }}">{{ data['contributor'] }}</a></td>
+    </tr>
+    <tr>
+        <th>Publisher</th><td><a href="{{ data['publisher'] }}">{{ data['publisher'] }}</a></td>
+    </tr>
+    <tr>
+        <th>Issued</th><td>{{ data['issued'].strftime('%-d %b %Y') }}</td>
+    </tr>
+    <tr>
+        <th>Top Concepts</th>
+        <td class="list">
+            {% for top_concept in data['top_concepts'] -%}
+            <a href="{{ top_concept['top_concept_uri'] }}">{{ top_concept['top_concept_pref_label'] }}</a><br />
+            {% endfor %}
+        </td>
+    </tr>
+</table>
+{% endblock %}
