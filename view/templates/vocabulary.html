@@ -1,0 +1,22 @@
+{% extends "page.html" %}
+
+{% block content %}
+<h1>Vocabulary:<br />{{ title }}</h1>
+<table class="concept_scheme">
+    <tr>
+        <th>URI</th><td><code>{{ uri }}</code></td>
+    </tr>
+    <tr>
+        <th>Creator</th><td><a href="{{ creator_uri }}">{{ creator_label }}</a></td>
+    </tr>
+    <tr>
+        <th>Publisher</th><td><a href="{{ publisher_uri }}">{{ publisher_label }}</a></td>
+    </tr>
+    <tr>
+        <th>Create</th><td>{{ created }}</td>
+    </tr>
+    <tr>
+        <th>Modified</th><td>{{ modified }}</td>
+    </tr>
+</table>
+{% endblock %}

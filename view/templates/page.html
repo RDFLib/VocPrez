@@ -12,12 +12,13 @@
                 <em>Logo Placeholder</em>
             </div>
             <div style="float:right;">
+                {% for nav in navs %}
+                    {{ nav|safe }}
+                {% endfor %}
                 <a href="{{ url_for('routes.index') }}">System Home</a> |
-                <a href="{{ url_for('routes.vochome') }}">Vocab Home</a> |
-                <a href="{{ url_for('routes.conceptschemes') }}">All Concept Schemes home</a> |
-                <a href="{{ url_for('routes.collections') }}">All Collections</a> |
-                <a href="{{ url_for('routes.concepts' ) }}">All Concepts</a> |
+                <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a> |
                 <a href="{{ url_for('routes.about') }}">About</a>
+
             </div>
             <div style="clear:both;"></div>
         </div>

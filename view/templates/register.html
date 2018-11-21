@@ -2,28 +2,22 @@
 
 {% block content %}
     <h1>Register</h1>
-    <h2>Of <em>{{ register_class }}</em>  items</h2>
+    <h2>Of <em>{{ register_item_type_string }}</em></h2>
+    <p></p>
      <table>
         <tr>
             <td style="width:50%; vertical-align:top;">
-                <h2>Instances</h2>
+                <h3>Instances</h3>
                 <ul>
-                {% for instance in register_items %}
-                  <li><a href="{{ model.make_local_url(instance[2]) }}">{{ instance[2] }}</a></li>
-                {% endfor %}
+                {%- for item in register_items -%}
+                    {%- if item is not string %}
+                    <li><a href="{{ item[0] }}">{{ item[1] }}</a></li>
+                    {%- else %}
+                    <li><a href="{{ item }}">{{ item.split('#')[-1].split('/')[-1] }}</a></li>
+                    {%- endif %}
+                {%- endfor -%}
                 </ul>
-                <p>
-                    Pages:
-                    {% if prev_page is not none %}
-                    <a href="{{ '{base_url}?per_page={per_page}&page={page}'.format(base_url=request.base_url, per_page=per_page, page=prev_page) }}">Previous</a>
-                    {% endif %}
-                    {% if prev_page is not none or next_page is not none %}
-                    ...
-                    {%  endif %}
-                    {% if next_page is not none %}
-                    <a href="{{ '{base_url}?per_page={per_page}&page={page}'.format(base_url=request.base_url, per_page=per_page, page=next_page) }}">Next</a>
-                    {% endif %}
-                </p>
+                <!-- pagination links as per MediaTypes -->
             </td>
             <td style="width:50%; vertical-align:top;">
                 <h3>Alternate views</h3>
