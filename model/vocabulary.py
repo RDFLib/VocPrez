@@ -4,14 +4,17 @@ from rdflib import Graph
 
 
 class VocabularyRenderer(Renderer):
-    def __init__(self, request, navs, uri):
+    def __init__(self, request, navs, vocab_id):
         self.navs = navs
 
         self.views = self._add_dcat_view()
 
+        import model.sources_rva as rva
+        self.vocab_metadata = rva.RVA().get_vocabulary(vocab_id)
+
         super().__init__(
             request,
-            uri,
+            vocab_id,
             self.views,
             'dcat'
         )

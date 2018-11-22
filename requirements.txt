@@ -4,3 +4,4 @@ rdflib-jsonld
 markdown
 pyldapi
 pytest
+SPARQLWrapper

@@ -8,7 +8,7 @@ table, th, td {
 }
 
 h1 {
-    color: darkred;
+    color: darkgrey;
     font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
     font-size: 3em;
     letter-spacing: -0.045em;
@@ -17,7 +17,7 @@ h1 {
 
 h2 {
     font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
-    color: darkred;
+    color: darkgrey;
     font-size: 2em;
     letter-spacing: -0.045em;
     margin: 0;
@@ -27,7 +27,7 @@ h2 {
 
 h3 {
     font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
-    color: darkred;
+    color: darkgrey;
     font-size: 1em;
     letter-spacing: -0.045em;
     margin: 0;

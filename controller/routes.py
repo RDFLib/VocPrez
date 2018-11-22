@@ -1,5 +1,6 @@
 from flask import Blueprint, Response, request, render_template, url_for
 from pyldapi import *
+import model
 from model.vocabulary import VocabularyRenderer
 from model.skos_register import SkosRegisterRenderer
 import _config as config
@@ -20,17 +21,11 @@ def index():
 
 @routes.route('/vocabulary/')
 def vocabularies():
-    vocabs = [
-        ('http://localhost:5000/vocabulary/one', 'First Vocab'),
-        'http://exampl.com/voc/two',
-        ('http://example.com/voc/THREE', 'THIRD Vocab')
-    ]
-
-    navs = []
+    vocabs = model.rva().list_vocabularies()
 
     return SkosRegisterRenderer(
         request,
-        navs,
+        [],
         vocabs,
         'Vocabularies',
         len(vocabs)
@@ -39,6 +34,12 @@ def vocabularies():
 
 @routes.route('/vocabulary/<voc_id>')
 def vocabulary(voc_id):
+    # this is always true for this dummy code
+    if voc_id.startswith('rva-'):
+        vocab_metadata = model.rva().get_vocabulary(voc_id)
+    else:
+        # here is where other vocab IDs would trigger other model calls
+        pass
 
     navs = [
         '<a href="{{ url_for(\'routes.collections\') }}">Collections</a> |',
