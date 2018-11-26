@@ -17,7 +17,7 @@ h1 {
 
 h2 {
     font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
-    color: darkgrey;
+    color: #666666;
     font-size: 2em;
     letter-spacing: -0.045em;
     margin: 0;
@@ -27,7 +27,7 @@ h2 {
 
 h3 {
     font-family: 'FontSiteSans Light', Verdana, Arial, Helvetica, sans-serif;
-    color: darkgrey;
+    color: #666666;
     font-size: 1em;
     letter-spacing: -0.045em;
     margin: 0;
@@ -36,7 +36,7 @@ h3 {
     line-height: 2em;
 }
 
-p, a, li {
+p, a, li, td, th {
     font-size: 100%;
     font-family: Verdana, Arial, Helvetica, sans-serif;
 }
@@ -93,4 +93,9 @@ table.content td {
 
 ul {
     line-height: 1.5em;
+}
+
+.metadata td,
+.metadata th {
+    padding: 5px;
 }

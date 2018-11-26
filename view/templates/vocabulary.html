@@ -2,18 +2,45 @@
 
 {% block content %}
 <h1>Vocabulary:<br />{{ title }}</h1>
-<table class="concept_scheme">
+<h3>URI: <code>{{ uri }}</code></h3>
+<table class="metadata concept_scheme">
     <tr>
-        <th>URI</th><td><code>{{ uri }}</code></td>
+        <th>Title</th><td><a href="{{ vocab.title }}">{{ vocab.title }}</a></td>
     </tr>
+    <tr>
+        <th>Description</th><td>{{ vocab.description }}</td>
+    </tr>
+    {%  if vocab.creator is not none  %}
     <tr>
         <th>Creator</th><td><a href="{{ vocab.creator }}">{{ vocab.creator }}</a></td>
     </tr>
+    {% endif %}
+    {%  if vocab.created is not none  %}
     <tr>
-        <th>Create</th><td>{{ vocab.created }}</td>
+        <th>Created</th><td>{{ vocab.created }}</td>
     </tr>
+    {% endif %}
+    {%  if vocab.modified is not none  %}
     <tr>
         <th>Modified</th><td>{{ vocab.modified }}</td>
     </tr>
+    {% endif %}
+    {%  if vocab.versionInfo is not none  %}
+    <tr>
+        <th>Version Info</th><td>{{ vocab.versionInfo }}</td>
+    </tr>
+    <tr>
+        <th>Download</th><td><a href="{{ vocab.downloadURL }}">RDF (turtle)</a></td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Top Concepts</th>
+        <td>
+            {% for tc in vocab.hasTopConcepts %}
+                <a href="{{ tc[0] }}">{{ tc[1] }}</a><br />
+            {% endfor %}
+        </td>
+    </tr>
+
 </table>
 {% endblock %}

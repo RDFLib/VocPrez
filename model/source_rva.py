@@ -61,6 +61,7 @@ class RVA(Source):
         sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab_id).get('sparql'))
 
         # get the basic vocab metadata
+        # PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0APREFIX%20dct%3A%20%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0APREFIX%20owl%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0ASELECT%20*%0AWHERE%20%7B%0A%3Fs%20a%20skos%3AConceptScheme%20%3B%0Adct%3Atitle%20%3Ft%20%3B%0Adct%3Adescription%20%3Fd%20%3B%0Adct%3Acreator%20%3Fc%20%3B%0Adct%3Acreated%20%3Fcr%20%3B%0Adct%3Amodified%20%3Fm%20%3B%0Aowl%3AversionInfo%20%3Fv%20.%0A%7D
         sparql.setQuery('''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -68,11 +69,11 @@ class RVA(Source):
             WHERE {
               ?s a skos:ConceptScheme ;
               dct:title ?t ;
-              dct:description ?d ;
-              dct:creator ?c ;
-              dct:created ?cr ;
-              dct:modified ?m ;
-              owl:versionInfo ?v .
+              dct:description ?d .
+              OPTIONAL {?s dct:creator ?c }
+              OPTIONAL {?s dct:created ?cr }
+              OPTIONAL {?s dct:modified ?m }
+              OPTIONAL {?s owl:versionInfo ?v }
             }''')
         sparql.setReturnFormat(JSON)
         metadata = sparql.query().convert()
@@ -94,10 +95,10 @@ class RVA(Source):
             metadata['results']['bindings'][0]['s']['value'],
             metadata['results']['bindings'][0]['t']['value'],
             metadata['results']['bindings'][0]['d']['value'],
-            metadata['results']['bindings'][0]['c']['value'],
-            metadata['results']['bindings'][0]['cr']['value'],
-            metadata['results']['bindings'][0]['m']['value'],
-            metadata['results']['bindings'][0]['v']['value'],
+            metadata['results']['bindings'][0].get('c').get('value') if metadata['results']['bindings'][0].get('c') is not None else None,
+            metadata['results']['bindings'][0].get('cr').get('value') if metadata['results']['bindings'][0].get('cr') is not None else None,
+            metadata['results']['bindings'][0].get('m').get('value') if metadata['results']['bindings'][0].get('m') is not None else None,
+            metadata['results']['bindings'][0].get('v').get('value') if metadata['results']['bindings'][0].get('v') is not None else None,
             [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
             None,
             self.VOCAB_ENDPOINTS.get(vocab_id).get('download'),
