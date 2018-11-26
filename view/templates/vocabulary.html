@@ -7,16 +7,13 @@
         <th>URI</th><td><code>{{ uri }}</code></td>
     </tr>
     <tr>
-        <th>Creator</th><td><a href="{{ creator_uri }}">{{ creator_label }}</a></td>
+        <th>Creator</th><td><a href="{{ vocab.creator }}">{{ vocab.creator }}</a></td>
     </tr>
     <tr>
-        <th>Publisher</th><td><a href="{{ publisher_uri }}">{{ publisher_label }}</a></td>
+        <th>Create</th><td>{{ vocab.created }}</td>
     </tr>
     <tr>
-        <th>Create</th><td>{{ created }}</td>
-    </tr>
-    <tr>
-        <th>Modified</th><td>{{ modified }}</td>
+        <th>Modified</th><td>{{ vocab.modified }}</td>
     </tr>
 </table>
 {% endblock %}

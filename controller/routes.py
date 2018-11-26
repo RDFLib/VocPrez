@@ -34,22 +34,16 @@ def vocabularies():
 
 @routes.route('/vocabulary/<voc_id>')
 def vocabulary(voc_id):
-    # this is always true for this dummy code
+    # decide what source to use based on ID prefix, get vocab from appropriate source
     if voc_id.startswith('rva-'):
-        vocab_metadata = model.rva().get_vocabulary(voc_id)
+        vocab = model.rva().get_vocabulary(voc_id)
     else:
-        # here is where other vocab IDs would trigger other model calls
+        # no other sorts for now
         pass
-
-    navs = [
-        '<a href="{{ url_for(\'routes.collections\') }}">Collections</a> |',
-        '<a href="{{ url_for(\'routes.concepts\') }}">Concepts</a> |'
-    ]
 
     return VocabularyRenderer(
         request,
-        navs,
-        request.base_url
+        vocab
     ).render()
 
 

@@ -3,18 +3,47 @@ from flask import Response, render_template
 from rdflib import Graph
 
 
+class Vocabulary:
+    def __init__(
+            self,
+            id,
+            uri,            # DCAT
+            title,          # DCAT
+            description,    # DCAT
+            creator,        # DCAT
+            created,        # DCAT
+            modified,       # DCAT
+            versionInfo,
+            hasTopConcepts,
+            accessURL,
+            downloadURL
+    ):
+        self.id = id
+        self.uri = uri
+        self.title = title
+        self.description = description
+        self.creator = creator
+        self.created = created
+        self.modified = modified
+        self.versionInfo = versionInfo
+        self.hasTopConcepts = hasTopConcepts
+        self.accessURL = accessURL
+        self.downloadURL = downloadURL
+
+
 class VocabularyRenderer(Renderer):
-    def __init__(self, request, navs, vocab_id):
-        self.navs = navs
-
+    def __init__(self, request, vocab):
         self.views = self._add_dcat_view()
+        self.navs = [
+            '<a href="{{ url_for(\'routes.collections\') }}">Collections</a> |',
+            '<a href="{{ url_for(\'routes.concepts\') }}">Concepts</a> |'
+        ]
 
-        import model.sources_rva as rva
-        self.vocab_metadata = rva.RVA().get_vocabulary(vocab_id)
+        self.vocab = vocab
 
         super().__init__(
             request,
-            vocab_id,
+            self.vocab.uri,
             self.views,
             'dcat'
         )
@@ -33,52 +62,18 @@ class VocabularyRenderer(Renderer):
         }
 
     def render(self):
-        """
-        Renders the register view.
-
-        :return: A Flask Response object.
-        :rtype: :py:class:`flask.Response`
-        """
-        #response = super(Renderer, self).render()  # render Alternates view, if selected
-        #if not response:
         if self.view == 'alternates':
             return self._render_alternates_view()
-        if self.view == 'dcat':
+        elif self.view == 'dcat':
             if self.format in Renderer.RDF_MIMETYPES:
                 return self._render_dcat_rdf()
             else:
                 return self._render_dcat_html()
 
-        #return response  # returning from parent (Alternates View only)
-
     def _render_dcat_rdf(self):
-        # read vocab RDF from SPARQL endpoint
-        v = '''
-        @prefix dcat: <http://www.w3.org/ns/dcat#> .
-        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-        @prefix owl:  <http://www.w3.org/2002/07/owl#> .
-        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-        @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-        @prefix dct:  <http://purl.org/dc/terms/> .
-        @prefix dc:   <http://purl.org/dc/elements/1.1/> .
-        @prefix : <http://linked.data.gov.au/def/reg-status/> .
-        
-        
-        <http://linked.data.gov.au/def/reg-status> a dcat:Dataset ;
-            dct:title "Test Vocabulary"@en ;
-            dct:description """This vocabulary is a test vocabulary used just to show off vocabulary managment tools.
-        
-            This vocabulary is a a SKOS vocabulary implemented as a single skos:ConceptScheme, also an OWL Ontology and also a DCAT Dataset."""@en ;
-            dct:publisher <http://linked.data.qld.gov.au/org/gsq> ;
-            dc:publisher "Geological Survey of Queensland"@en ;
-            dct:creator <https://orcid.org/0000-0002-8742-7730> ;
-            dc:creator "Nicholas Car"@en ;                        
-            dct:created "2018-11-20"^^xsd:date ;
-            dct:modified "2018-11-20"@en ;
-            dct:rights "(c) Commonwealth of Australia (State of Queensland) 2018"@en ;            
-        .
-        '''
+        # get vocab RDF
+        import model.source_rva as rva
+        v = rva.RVA().get_vocabulary_rdf(self.vocab_id, self.uri)
         g = Graph().load(v, format='turtle')
 
         # serialise in the appropriate RDF format
@@ -90,17 +85,7 @@ class VocabularyRenderer(Renderer):
     def _render_dcat_html(self):
         _template_context = {
             'uri': self.uri,
-            'title': 'Test Vocabulary',
-            'description': """This vocabulary is a test vocabulary used just to show off vocabulary managment tools.
-        
-            This vocabulary is a a SKOS vocabulary implemented as a single skos:ConceptScheme, also an OWL Ontology and also a DCAT Dataset.""",
-            'publisher_uri': 'http://linked.data.qld.gov.au/org/gsq',
-            'publisher_label': 'Geological Survey of Queensland',
-            'creator_uri': 'https://orcid.org/0000-0002-8742-7730',
-            'creator_label': 'Nicholas Car',
-            'created': '2018-11-20',
-            'modified': '2018-11-20',
-            'rights': '(c) Commonwealth of Australia (State of Queensland) 2018',
+            'vocab': self.vocab,
             'navs': self.navs
         }
 
