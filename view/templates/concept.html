@@ -1,35 +1,61 @@
 {% extends "page.html" %}
 
 {% block content %}
-<hr />
-<h3 id="{{ data['fragment'] }}">Concept: {{ data['pref_label'] }}</h3>
-<table class="concept">
-    <tr>
-        <th>URI</th><td><code>{{ data['uri'] }}</code></td>
-    </tr>
+<h1>Concept: {{ concept.prefLabel }}</h1>
+<h3>URI: {{ uri }}</h3>
+<h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=concept.vocab.id) }}">{{ concept.vocab.title }}</a></h3>
+<table class="metadata concept">
+    {% if concept.altLabels|length > 0 %}
     <tr>
         <th>Alternative Labels</th>
         <td class="list">
-            {% for alt_label in data['alt_labels'] -%}
-            {{ alt_label }}<br />
+            {% for altLabel in concept.altLabels -%}
+                <a href="{{ altLabel.url }}">{{ altLabel.prefLabel }}</a><br />
             {% endfor %}
         </td>
     </tr>
+    {% endif %}
+    <!-- don't display hiddenLabels, duh! -->
+    {%  if concept.definition is not none  %}
     <tr>
-        {% if data.definition is defined and data.definition != 'None' %}
-        <th>Definition</th><td>{{ data['definition'] }}</td>
-        {% endif -%}
+        <th>Definition</th><td>{{ concept.definition }}</td>
     </tr>
+    {% endif %}
+    {%  if concept.source is not none  %}
     <tr>
-        <th>Source</th><td>{{ data['source'] }}</td>
+        <th>Source</th><td>{{ concept.source }}</td>
     </tr>
+    {% endif %}
+    {%  if concept.contributor is not none  %}
     <tr>
-        <th>Contributor</th><td><a href="{{ data['contributor'] }}">{{ data['contributor'] }}</a></td>
+        <th>Contributor</th><td><a href="{{ concept.contributor }}">{{ concept.contributor }}</a></td>
     </tr>
+    {% endif %}
+    {% if concept.broaders|length > 0 %}
     <tr>
-        {% if data.broader in defined %}
-        <th>Broader</th><td class="list"><a href="{{ data['broader_uri'] }}">{{ data['broader_pref_label'] }}</a></td>
+        {% if concept.broaders is defined %}
+        <th>Broader</th>
+        <td class="list">
+            {% for broader in concept.broaders -%}
+            <a href="{{ broader.url }}">{{ broader.prefLabel }}</a><br />
+            {% endfor %}
+        </td>
         {% endif %}
     </tr>
+    {% endif %}
+    {% if concept.narrowers|length > 0 %}
+    <tr>
+        {% if concept.narrowers is defined %}
+        <th>Narrower</th>
+        <td class="list">
+            {% for narrower in concept.narrowers -%}
+            <a href="{{ narrower.url }}">{{ narrowers.prefLabel }}</a><br />
+            {% endfor %}
+        </td>
+        {% endif %}
+    </tr>
+    {% endif %}
 </table>
+<h3>Alternate views</h3>
+<p>Other model views of this Concept are listed in the <a href="{{ request.url }}&_view=alternates">Alternates View</a>.</p>
 {% endblock %}

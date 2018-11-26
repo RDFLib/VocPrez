@@ -53,6 +53,7 @@ a:hover {
 body {
     text-align: center;
 }
+
 #widther {
     margin: 0 auto;
     max-width: 1000px;
@@ -95,6 +96,9 @@ ul {
     line-height: 1.5em;
 }
 
+.metadata {
+    margin-top: 10px;
+}
 .metadata td,
 .metadata th {
     padding: 5px;

@@ -73,7 +73,7 @@ class VocabularyRenderer(Renderer):
     def _render_dcat_rdf(self):
         # get vocab RDF
         import model.source_rva as rva
-        v = rva.RVA().get_vocabulary_rdf(self.vocab_id, self.uri)
+        v = rva.RVA().get_resource_rdf(self.vocab_id, self.uri)
         g = Graph().load(v, format='turtle')
 
         # serialise in the appropriate RDF format

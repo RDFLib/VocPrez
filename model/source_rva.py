@@ -1,6 +1,5 @@
 from model.source import Source
 from SPARQLWrapper import SPARQLWrapper, JSON, TURTLE
-import rdflib
 
 
 class RVA(Source):
@@ -50,14 +49,13 @@ class RVA(Source):
 
         return sorted(vocabs, key=lambda tup: tup[1])
 
-    def list_collections(self, vocab_id):
+    def list_collections(self, vocab):
         pass
 
-    def list_concepts(self, vocab_id):
+    def list_concepts(self, vocab):
         pass
 
     def get_vocabulary(self, vocab_id):
-        print('get_vocabulary')
         sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab_id).get('sparql'))
 
         # get the basic vocab metadata
@@ -89,38 +87,170 @@ class RVA(Source):
         sparql.setReturnFormat(JSON)
         top_concepts = sparql.query().convert()['results']['bindings']
 
+        # TODO: check if there are any common ways to ascertain if a vocab/ConceptScheme has any Collections
+        # # get the vocab's collections
+        # sparql.setQuery('''
+        #     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        #     SELECT *
+        #     WHERE {
+        #       ?s skos:hasTopConcept ?tc .
+        #       ?tc skos:prefLabel ?pl .
+        #     }''')
+        # sparql.setReturnFormat(JSON)
+        # top_concepts = sparql.query().convert()['results']['bindings']
+
         from model.vocabulary import Vocabulary
-        v = Vocabulary(
+        return Vocabulary(
             vocab_id,
             metadata['results']['bindings'][0]['s']['value'],
             metadata['results']['bindings'][0]['t']['value'],
             metadata['results']['bindings'][0]['d']['value'],
-            metadata['results']['bindings'][0].get('c').get('value') if metadata['results']['bindings'][0].get('c') is not None else None,
-            metadata['results']['bindings'][0].get('cr').get('value') if metadata['results']['bindings'][0].get('cr') is not None else None,
-            metadata['results']['bindings'][0].get('m').get('value') if metadata['results']['bindings'][0].get('m') is not None else None,
-            metadata['results']['bindings'][0].get('v').get('value') if metadata['results']['bindings'][0].get('v') is not None else None,
+            metadata['results']['bindings'][0].get('c').get('value')
+                if metadata['results']['bindings'][0].get('c') is not None else None,
+            metadata['results']['bindings'][0].get('cr').get('value')
+                if metadata['results']['bindings'][0].get('cr') is not None else None,
+            metadata['results']['bindings'][0].get('m').get('value')
+                if metadata['results']['bindings'][0].get('m') is not None else None,
+            metadata['results']['bindings'][0].get('v').get('value')
+                if metadata['results']['bindings'][0].get('v') is not None else None,
             [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
             None,
             self.VOCAB_ENDPOINTS.get(vocab_id).get('download'),
         )
-        return v
 
-    def get_vocabulary_rdf(self, vocab_id, uri):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab_id).get('sparql'))
+    def get_resource_rdf(self, vocab, uri):
+        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab.id).get('sparql'))
         sparql.setQuery('''DESCRIBE <{}>'''.format(uri))
         sparql.setReturnFormat(TURTLE)
 
         return sparql.query().convert()
 
-    def get_collection(self, collection_id):
+    def get_collection(self, vocab, uri):
+        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab.id).get('sparql'))
+        q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT *
+            WHERE {{
+              <{}> rdfs:label ?l .
+              OPTIONAL {{?s rdfs:comment ?c }}
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        metadata = sparql.query().convert()['results']['bindings']
+
+        # get the collection's members
+        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {{
+              <{}> skos:member ?m .
+              ?n skos:prefLabel ?pl .
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        members = sparql.query().convert()['results']['bindings']
+
+        from model.collection import Collection
+        return Collection(
+            vocab,
+            uri,
+            metadata[0]['l']['value'],
+            metadata[0].get('c').get('value') if metadata[0].get('c') is not None else None,
+            [(x.get('m').get('value'), x.get('m').get('value')) for x in members]
+        )
+
+    def get_concept(self, vocab, uri):
+        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab.id).get('sparql'))
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {{
+              <{}> skos:prefLabel ?pl .
+              OPTIONAL {{?s skos:definition ?d }}
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        metadata = sparql.query().convert()['results']['bindings']
+
+        # get the concept's altLabels
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {{
+              <{}> skos:altLabel ?al .
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        altLabels = sparql.query().convert()['results']['bindings']
+
+        # get the concept's hiddenLabels
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {{
+              <{}> skos:hiddenLabel ?hl .
+              ?hl skos:prefLabel ?pl .
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        hiddenLabels = sparql.query().convert()['results']['bindings']
+
+        # get the concept's broaders
+        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {{
+              <{}> skos:broader ?b .
+              ?b skos:prefLabel ?pl .
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        broaders = sparql.query().convert()['results']['bindings']
+
+        # get the concept's narrowers
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {{
+              <{}> skos:narrower ?n .
+              ?n skos:prefLabel ?pl .
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        narrowers = sparql.query().convert()['results']['bindings']
+
+        from model.concept import Concept
+        return Concept(
+            vocab,
+            uri,
+            metadata[0]['pl']['value'],
+            metadata[0].get('d').get('value') if metadata[0].get('d') is not None else None,
+            [x.get('al').get('value') for x in altLabels],
+            [x.get('hl').get('value') for x in hiddenLabels],
+            metadata[0].get('sc').get('value') if metadata[0].get('sc') is not None else None,
+            metadata[0].get('cn').get('value') if metadata[0].get('cn') is not None else None,
+            [(x.get('b').get('value'), x.get('pl').get('value')) for x in broaders],
+            [(x.get('n').get('value'), x.get('pl').get('value')) for x in narrowers],
+            None  # TODO: replace Sem Properties sub
+        )
+
+    def get_concept_hierarchy(self, vocab_id):
         pass
 
-    def get_concept(self, concept_id):
-        pass
+    def get_object_class(self, vocab_id, uri):
+        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab_id).get('sparql'))
+        q = '''
+            SELECT ?c
+            WHERE {{
+                <{}> a ?c .
+            }}
+        '''.format(uri)
+        sparql.setQuery(q)
 
-    def get_concept_hierarchy(self, concept_id):
-        pass
+        sparql.setReturnFormat(JSON)
+        for c in sparql.query().convert()['results']['bindings']:
+            if c.get('c')['value'] in self.VOC_TYPES:
+                return c.get('c')['value']
+
+        return None
 
 
 if __name__ == '__main__':
-    RVA().get_vocabulary('rva-177')
+    #RVA().get_vocabulary('rva-177')
+
+    print(
+        RVA().get_object_class('rva-177', 'http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/stereoMate')
+    )

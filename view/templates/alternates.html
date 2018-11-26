@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "page.html" %}
 
     {% block content %}
         <h1>Alternates View</h1>
@@ -15,16 +15,16 @@
             </tr>
         {% for token, vals in views.items() %}
             <tr>
-                <td><a href="{{ uri }}?_view={{ token }}&_format={{ vals['default_format'] }}">{{ token }}</a></td>
+                <td><a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&url={{ uri }}&_view={{ token }}&_format={{ vals['default_format'] }}">{{ token }}</a></td>
                 <td>{{ vals['label'] }}</td>
                 <td>
                 {% for f in vals['formats'] %}
-                    <a href="{{ uri }}?_view={{ token }}&_format={{ f }}">{{ f }}</a><br />
+                    <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&url={{ uri }}&_view={{ token }}&_format={{ f }}">{{ f }}</a><br />
                 {% endfor %}
                 </td>
                 <td style="text-align: center;">
                 {% for l in vals['languages'] %}
-                    <a href="{{ uri }}?_view={{ token }}&_lang={{ l }}">{{ l }}</a><br />
+                    <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&url={{ uri }}&_view={{ token }}&_lang={{ l }}">{{ l }}</a><br />
                 {% endfor %}
                 </td>
                 <td>{{ vals['comment'] }}</td>
