@@ -1,0 +1,388 @@
+@prefix cycAnnot: <http://sw.cyc.com/CycAnnotations_v1#> .
+@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix csw: <http://semantic-web.at/ontologies/csw.owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix freebase: <http://rdf.freebase.com/ns/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dbpedia: <http://dbpedia.org/resource/> .
+@prefix cyc: <http://sw.cyc.com/concept/> .
+@prefix tags: <http://www.holygoat.co.uk/owl/redwood/0.1/tags/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix opencyc: <http://sw.opencyc.org/concept/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix ctag: <http://commontag.org/ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+@prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+
+rdf:type a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Class ;
+	rdfs:subPropertyOf rdf:type .
+
+rdf:Property a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdf:Property , rdfs:Resource .
+
+rdf:subject a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:Statement ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdf:subject .
+
+rdf:predicate a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:Statement ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdf:predicate .
+
+rdf:object a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:Statement ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdf:object .
+
+rdf:first a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:List ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdf:first .
+
+rdf:rest a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:List ;
+	rdfs:range rdf:List ;
+	rdfs:subPropertyOf rdf:rest .
+
+rdf:value a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdf:value .
+
+rdf:nil a rdf:List , rdfs:Resource .
+
+rdf:List a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdf:List , rdfs:Resource .
+
+rdfs:domain a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:Property ;
+	rdfs:range rdfs:Class ;
+	rdfs:subPropertyOf rdfs:domain .
+
+rdfs:Resource a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource .
+
+rdfs:range a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:Property ;
+	rdfs:range rdfs:Class ;
+	rdfs:subPropertyOf rdfs:range .
+
+rdfs:subPropertyOf a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdf:Property ;
+	rdfs:range rdf:Property ;
+	rdfs:subPropertyOf rdfs:subPropertyOf .
+
+rdfs:subClassOf a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Class ;
+	rdfs:range rdfs:Class ;
+	rdfs:subPropertyOf rdfs:subClassOf .
+
+rdfs:Class a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdfs:Class .
+
+rdf:Statement a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdf:Statement .
+
+rdfs:member a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdfs:member .
+
+rdfs:seeAlso a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdfs:seeAlso .
+
+rdfs:isDefinedBy a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Resource ;
+	rdfs:subPropertyOf rdfs:seeAlso , rdfs:isDefinedBy .
+
+rdfs:comment a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Literal ;
+	rdfs:subPropertyOf rdfs:comment .
+
+rdfs:label a rdf:Property , rdfs:Resource ;
+	rdfs:domain rdfs:Resource ;
+	rdfs:range rdfs:Literal ;
+	rdfs:subPropertyOf rdfs:label .
+
+rdfs:Literal a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdfs:Literal .
+
+rdf:Alt a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdf:Alt , rdfs:Container .
+
+rdfs:Container a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdfs:Container .
+
+rdf:Bag a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdfs:Container , rdf:Bag .
+
+rdf:Seq a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdfs:Container , rdf:Seq .
+
+rdfs:ContainerMembershipProperty a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdf:Property , rdfs:Resource , rdfs:ContainerMembershipProperty .
+
+rdf:XMLLiteral a rdfs:Resource , rdfs:Class , rdfs:Datatype ;
+	rdfs:subClassOf rdfs:Resource , rdfs:Literal , rdf:XMLLiteral .
+
+rdfs:Datatype a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , rdfs:Class , rdfs:Datatype .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/series> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "associated through a common heritage such as produced to a common product specification"@en ;
+	skos:prefLabel "series"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime .
+
+dcterms:creator a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:creator .
+
+<http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> a rdfs:Resource , dcterms:Agent ;
+	foaf:name "GA_GA_Car.Nicholas" .
+
+dcterms:source a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:source .
+
+skos:Concept a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , skos:Concept .
+
+skos:definition a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf skos:definition .
+
+skos:prefLabel a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf skos:prefLabel .
+
+skos:topConceptOf a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf skos:topConceptOf .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype> a rdfs:Resource , skos:ConceptScheme ;
+	rdfs:label "Association Type"@en ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> , <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:created "2017-10-05T03:45:10Z"^^xsd:dateTime ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> , <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Aaron> ;
+	dcterms:modified "2017-10-05T04:34:26Z"^^xsd:dateTime ;
+	dcterms:description """A SKOS vocabulary version of the ISO19115-1 standard's AssociationType code list with code list extensions.
+
+This vocabulary re-uses URIs from another distribution of the ISO19115-1 standard's AssociationType code list as a Linked Data collection of terms at http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode"""@en ;
+	dcterms:publisher <http://editor.vocabs.ands.org.au/user/Geoscience-Australia> ;
+	dcterms:title "Association Type"@en ;
+	skos:hasTopConcept <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/series> , <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/stereoMate> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/dependency> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/generated> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/hadDerivation> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/informed> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/operatedOnBy> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/operatesOn> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/wasDerivedFrom> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/wasGeneratedBy> , <http://pid.geoscience.gov.au/def/voc/ga/associationtype/wasInformedBy> , <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/collectiveTitle> , <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/crossReference> , <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/isComposedOf> , <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/largerWorkCitation> , <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/partOfSeamlessDatabase> , <http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/revisionOf> ;
+	dcterms:issued "2018-11-23" ;
+	owl:versionInfo "v1.2" .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/stereoMate> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "part of a set of imagery that when used together, provides three-dimensional images"@en ;
+	skos:prefLabel "stereo mate"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime .
+
+dcterms:created a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:created .
+
+<http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> a rdfs:Resource , dcterms:Agent ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:modified "2017-10-05T04:33:38Z"^^xsd:dateTime ;
+	foaf:name "GA_Car.Nicholas" .
+
+dcterms:contributor a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:contributor .
+
+dcterms:modified a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:modified .
+
+<http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Aaron> a rdfs:Resource , dcterms:Agent ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:modified "2017-10-05T04:33:24Z"^^xsd:dateTime ;
+	foaf:name "GA_Sedgmen.Aaron" .
+
+<http://editor.vocabs.ands.org.au/user/Geoscience-Australia> a rdfs:Resource , dcterms:Agent ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:modified "2017-10-05T04:33:13Z"^^xsd:dateTime ;
+	foaf:name "Geoscience Australia" .
+
+<http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> a rdfs:Resource , dcterms:Agent ;
+	foaf:name "GA_Sedgmen.Lara_Admin" .
+
+dcterms:description a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:description .
+
+dcterms:publisher a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:publisher .
+
+dcterms:title a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:title .
+
+skos:ConceptScheme a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , skos:ConceptScheme .
+
+skos:hasTopConcept a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf skos:hasTopConcept .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/dependency> a rdfs:Resource , skos:Concept .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/generated> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:source "Geoscience Australia / PROV-O"@en ;
+	skos:definition "inverse of wasGeneratedBy where the domain resource generated the range resoure implying that the domain resource is a temporal event, such as a data processing action, and the range resource is an entity"@en ;
+	skos:prefLabel "generated"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-10-05T03:45:10Z"^^xsd:dateTime .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/hadDerivation> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:source "Geoscience Australia / PROV-O"@en ;
+	skos:definition "inverse of wasDerivedFrom where the range resource was derived from the domain resource"@en ;
+	skos:prefLabel "had derivation"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-10-05T03:45:10Z"^^xsd:dateTime .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/informed> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:source "Geoscience Australia / PROV-O"@en ;
+	skos:definition """inverse of wasInformedBy
+        """@en ;
+	skos:prefLabel "informed"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-12-21T00:59:42Z"^^xsd:dateTime ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:modified "2018-04-04T23:55:36Z"^^xsd:dateTime .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/operatedOnBy> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:source "Geoscience Australia"@en ;
+	skos:definition "inverse of operatesOn where the domain resource is, or can be, operated on (queried, subsetted etc.) by the range resource which must be an agent (i.e. is something that bears some form of responsibility for the operation taking place)"@en ;
+	skos:prefLabel "operated on by"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-10-05T03:45:10Z"^^xsd:dateTime .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/operatesOn> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:source "Geoscience Australia / ISO19115-1:2014"@en ;
+	skos:definition "an equivalent relationship to srv:operatesOn from a Service to a Dataset"@en ;
+	skos:prefLabel "operates on"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-10-05T03:45:10Z"^^xsd:dateTime .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/wasDerivedFrom> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:source "Geoscience Australia / PROV-O"@en ;
+	skos:definition "the domain resource was derived from the range resource which must have been an entity (i.e. not an actor with agency or a temporal event)"@en ;
+	skos:prefLabel "was derived from"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-10-05T03:45:10Z"^^xsd:dateTime .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/wasGeneratedBy> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:source "Geoscience Australia / PROV-O"@en ;
+	skos:definition "the domain resource was generated by the range resource which must have been a temporal event such as a data processing action or a field survey"@en ;
+	skos:prefLabel "was generated by"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-10-05T03:45:10Z"^^xsd:dateTime ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:modified "2018-03-23T04:36:53Z"^^xsd:dateTime .
+
+<http://pid.geoscience.gov.au/def/voc/ga/associationtype/wasInformedBy> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:source "Geoscience Australia / PROV-O"@en ;
+	skos:definition """The domain resource was informed by the range resource which must have been an Entity (i.e. not an Agent with agency or an Activity temporal event).
+
+This is a looser association than wasDerivedFrom and does not indicate direct derivation, as wasDerivedFrom does.
+        """@en ;
+	skos:prefLabel "was informed by"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2017-12-21T00:59:58Z"^^xsd:dateTime ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Car.Nicholas> ;
+	dcterms:modified "2018-11-11T14:13:10Z"^^xsd:dateTime .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/collectiveTitle> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "common title for a collection of resources where title identifies elements of a series collectively, combined with information about what volumes are available at the source cite"@en ;
+	skos:prefLabel "collective title"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:modified "2018-03-23T04:37:07Z"^^xsd:dateTime .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/crossReference> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "reference from one resource to another"@en ;
+	skos:prefLabel "cross reference"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:modified "2018-03-23T04:37:29Z"^^xsd:dateTime .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/isComposedOf> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "reference to resources that are parts of this resource"@en ;
+	skos:prefLabel "is composed of"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/largerWorkCitation> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition """reference to a master resource of which this one is a part
+        """@en ;
+	skos:prefLabel "larger work citation"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2018-04-04T05:46:13Z"^^xsd:dateTime ;
+	dcterms:contributor <http://editor.vocabs.ands.org.au/user/GA_Sedgmen.Lara_Admin> ;
+	dcterms:modified "2018-04-04T23:56:28Z"^^xsd:dateTime .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/partOfSeamlessDatabase> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "part of same structured set of data held in a computer"@en ;
+	skos:prefLabel "part of a seamless database"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/revisionOf> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "resource is a revision of associated resource"@en ;
+	skos:prefLabel "revision of"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime .
+
+<http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/dependency> a rdfs:Resource , skos:Concept ;
+	dcterms:creator <http://editor.vocabs.ands.org.au/user/GA_GA_Car.Nicholas> ;
+	dcterms:source "ISO19115-1:2014"@en ;
+	skos:definition "associated through a dependency"@en ;
+	skos:prefLabel "dependency"@en ;
+	skos:topConceptOf <http://pid.geoscience.gov.au/def/voc/ga/associationtype> ;
+	dcterms:created "2016-08-09T05:16:35.465Z"^^xsd:dateTime .
+
+dcterms:Agent a rdfs:Resource , rdfs:Class ;
+	rdfs:subClassOf rdfs:Resource , dcterms:Agent .
+
+foaf:name a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf foaf:name .
+
+<http://editor.vocabs.ands.org.au/user/Nicholas-Car> a rdfs:Resource , dcterms:Agent ;
+	foaf:name "Nicholas Car" .
+
+dcterms:issued a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf dcterms:issued .
+
+owl:versionInfo a rdf:Property , rdfs:Resource ;
+	rdfs:subPropertyOf owl:versionInfo .
