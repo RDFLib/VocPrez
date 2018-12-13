@@ -1,6 +1,7 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template
 from rdflib import Graph
+import model.source_selector as sel
 
 
 class Collection:
@@ -25,6 +26,7 @@ class CollectionRenderer(Renderer):
         self.navs = []  # TODO: add in other nav items for Collection
 
         self.collection = collection
+        self.vocab = sel.get_vocabulary(request.values.get('vocab_id'))
 
         super().__init__(
             request,

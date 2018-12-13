@@ -9,7 +9,7 @@
     </tr>
     {%  if vocab.creator is not none  %}
     <tr>
-        <th>Creator</th><td><a href="{{ vocab.creator }}">{{ vocab.creator }}</a></td>
+        <th>Creator</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
     </tr>
     {% endif %}
     {%  if vocab.created is not none  %}

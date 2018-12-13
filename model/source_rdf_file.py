@@ -14,10 +14,10 @@ class RDFFile(Source):
     def get_vocabulary(self, vocab_id):
         pass
 
-    def get_collection(self, collection_id):
+    def get_collection(self, vocab_id, collection_id):
         pass
 
-    def get_concept(self, concept_id):
+    def get_concept(self, vocab_id, concept_id):
         pass
 
     def get_concept_hierarchy(self, concept_id):

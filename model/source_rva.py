@@ -36,19 +36,6 @@ class RVA(Source):
         }
     }
 
-    def list_vocabularies(self):
-        vocabs = [
-            ('/vocabulary/rva-50', 'Geologic Unit Type'),
-            ('/vocabulary/rva-52', 'Contact Type'),
-            ('/vocabulary/rva-57', 'Stratigraphic Rank'),
-            ('/vocabulary/rva-177', 'Association Type'),
-            ('/vocabulary/rva-178', 'Feature of Interest Type'),
-            ('/vocabulary/rva-185', 'Sample Type'),
-            ('/vocabulary/rva-186', 'GA Data Classification')
-        ]
-
-        return sorted(vocabs, key=lambda tup: tup[1])
-
     def list_collections(self, vocab):
         pass
 
@@ -157,8 +144,8 @@ class RVA(Source):
             [(x.get('m').get('value'), x.get('m').get('value')) for x in members]
         )
 
-    def get_concept(self, vocab, uri):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab.id).get('sparql'))
+    def get_concept(self, vocab_id, uri):
+        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(vocab_id).get('sparql'))
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
             WHERE {{
@@ -214,7 +201,7 @@ class RVA(Source):
 
         from model.concept import Concept
         return Concept(
-            vocab,
+            vocab_id,
             uri,
             metadata[0]['pl']['value'],
             metadata[0].get('d').get('value') if metadata[0].get('d') is not None else None,

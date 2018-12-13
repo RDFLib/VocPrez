@@ -1,6 +1,7 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
 from rdflib import Graph
+import model.source_selector as sel
 
 
 class Concept:
@@ -38,6 +39,7 @@ class ConceptRenderer(Renderer):
         self.navs = []  # TODO: add in other nav items for Concept
 
         self.concept = concept
+        self.vocab = sel.get_vocabulary(request.values.get('vocab_id'))
 
         super().__init__(
             self.request,
@@ -71,7 +73,7 @@ class ConceptRenderer(Renderer):
     def _render_skos_rdf(self):
         # get Concept RDF
         import model.source_rva as rva
-        v = rva.RVA().get_resource_rdf(self.vocab_id, self.uri)
+        v = rva.RVA().get_resource_rdf(self.vocab.id, self.uri)
         g = Graph().load(v, format='turtle')
 
         # serialise in the appropriate RDF format

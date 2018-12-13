@@ -7,6 +7,7 @@ from model.skos_register import SkosRegisterRenderer
 import _config as config
 import markdown
 from flask import Markup
+import model.source_selector as sel
 
 routes = Blueprint('routes', __name__)
 
@@ -22,8 +23,13 @@ def index():
 
 @routes.route('/vocabulary/')
 def vocabularies():
-    vocabs = model.rva().list_vocabularies()
+    # get this instance's list of vocabs
+    vocabs = []
+    for k, v in config.VOCABS.items():
+        vocabs.append(('/vocabulary/' + k, v['title']))
+    vocabs.sort(key=lambda tup: tup[1])
 
+    # render the list of vocabs
     return SkosRegisterRenderer(
         request,
         [],
@@ -35,16 +41,21 @@ def vocabularies():
 
 @routes.route('/vocabulary/<vocab_id>')
 def vocabulary(vocab_id):
-    # decide what source to use based on ID prefix, get vocab from appropriate source
-    if vocab_id.startswith('rva-'):
-        vocab = model.rva().get_vocabulary(vocab_id)
-    else:
-        # no other sorts for now
-        pass
+    # check this vocab ID is known
+    if vocab_id not in config.VOCABS.keys():
+        return Response(
+            'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
+            '\n'.join(config.VOCABS.keys()),
+            status=400,
+            mimetype='text/plain'
+        )
+
+    # get vocab details using appropriate source handler
+    v = sel.get_vocabulary(vocab_id)
 
     return VocabularyRenderer(
         request,
-        vocab
+        v
     ).render()
 
 
@@ -96,20 +107,20 @@ def object():
         )
 
     vocab_id = request.values.get('vocab_id')
-    vocab = model.rva().get_vocabulary(vocab_id)
     uri = request.values.get('uri')
-    import model.source_rva as RVA
-    c = RVA.RVA().get_object_class(vocab_id, uri)
+
+    v = sel.get_vocabulary(vocab_id)
+    c = sel.get_object_class(vocab_id, uri)
 
     if c == 'http://www.w3.org/2004/02/skos/core#Concept':
-        concept = model.rva().get_concept(vocab, uri)
+        concept = model.rva().get_concept(v, uri)
 
         return ConceptRenderer(
             request,
             concept
         ).render()
     elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
-        collection = model.rva().get_collection(vocab, uri)
+        collection = model.rva().get_collection(v, uri)
 
         return CollectionRenderer(
             request,
@@ -121,7 +132,7 @@ def object():
         # vocab object already found above, so just render
         return VocabularyRenderer(
             request,
-            vocab
+            v
         ).render()
 
 
@@ -140,3 +151,5 @@ def about():
         navs={},
         content=content
     )
+
+
