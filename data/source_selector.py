@@ -1,15 +1,15 @@
 import _config as conf
-from model.source_rva import RVA
-from model.source_rdf_file import RDFFile
+from data.source_rva import RVA
+from data.source_rdf_file import RDFFile
 
 
 def get_vocabulary(vocab_id):
     source_type = conf.VOCABS[vocab_id].get('source')
 
     if source_type == conf.VocabSource.FILE:
-        v = RDFFile().get_vocabulary(vocab_id)
+        v = RDFFile(vocab_id).get_vocabulary()
     elif source_type == conf.VocabSource.RVA:
-        v = RVA().get_vocabulary(vocab_id)
+        v = RVA(vocab_id).get_vocabulary()
     # TODO: add other sources
     else:
         v = None
@@ -21,9 +21,9 @@ def get_object_class(vocab_id, uri):
     source_type = conf.VOCABS[vocab_id].get('source')
 
     if source_type == conf.VocabSource.FILE:
-        c = RVA().get_object_class(vocab_id, uri)
+        c = RDFFile(vocab_id).get_object_class(uri)
     elif source_type == conf.VocabSource.RVA:
-        c = RDFFile().get_object_class(vocab_id, uri)
+        c = RVA(vocab_id).get_object_class(uri)
     else:
         # no other sources for now
         c = None
@@ -35,11 +35,25 @@ def get_concept(vocab_id, uri):
     source_type = conf.VOCABS[vocab_id].get('source')
 
     if source_type == conf.VocabSource.FILE:
-        c = RVA().get_concept(vocab_id, uri)
+        c = RDFFile(vocab_id).get_concept(uri)
     elif source_type == conf.VocabSource.RVA:
-        c = RDFFile().get_concept(vocab_id, uri)
+        c = RVA(vocab_id).get_concept(uri)
     else:
         # no other sources for now
         c = None
 
     return c
+
+
+def list_concepts(vocab_id):
+    source_type = conf.VOCABS[vocab_id].get('source')
+
+    if source_type == conf.VocabSource.FILE:
+        v = RDFFile(vocab_id).list_concepts()
+    elif source_type == conf.VocabSource.RVA:
+        v = RVA(vocab_id).list_concepts()
+    # TODO: add other sources
+    else:
+        v = None
+
+    return v

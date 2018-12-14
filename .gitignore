@@ -115,4 +115,4 @@ venv.bak/
 _config/__init__.py
 
 # instnace data
-data/
+*.ttl

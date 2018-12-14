@@ -1,7 +1,7 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template
 from rdflib import Graph
-import model.source_selector as sel
+import data.source_selector as sel
 
 
 class Collection:
@@ -59,7 +59,7 @@ class CollectionRenderer(Renderer):
 
     def _render_skos_rdf(self):
         # get Collection RDF
-        import model.source_rva as rva
+        import data.source_rva as rva
         v = rva.RVA().get_resource_rdf(self.vocab_id, self.uri)
         g = Graph().load(v, format='turtle')
 

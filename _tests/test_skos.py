@@ -1,9 +1,12 @@
 # this file contains standard tests for SKOS content delivery that should pass for all SKOS Styler implementations
 
 # load the application home page
+    # test it for HTML (title)
 
 # load the vocabulary register
-    # test for a register property
+    # test vocabulary register alternated view
+    # test vocabulary register for HTML (title)
+    # test vocabulary register for RDF (title)
 
     # select random vocab
         # test vocab alternated view

@@ -1,5 +1,5 @@
 from pyldapi import Renderer, View
-from flask import Response, render_template
+from flask import Response, render_template, url_for
 from rdflib import Graph
 
 
@@ -35,8 +35,8 @@ class VocabularyRenderer(Renderer):
     def __init__(self, request, vocab):
         self.views = self._add_dcat_view()
         self.navs = [
-            '<a href="{{ url_for(\'routes.collections\') }}">Collections</a> |',
-            '<a href="{{ url_for(\'routes.concepts\') }}">Concepts</a> |'
+            '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
+            '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/concept/">Concepts</a> |'
         ]
 
         self.vocab = vocab
@@ -72,7 +72,7 @@ class VocabularyRenderer(Renderer):
 
     def _render_dcat_rdf(self):
         # get vocab RDF
-        import model.source_rva as rva
+        import data.source_rva as rva
         v = rva.RVA().get_resource_rdf(self.vocab_id, self.uri)
         g = Graph().load(v, format='turtle')
 

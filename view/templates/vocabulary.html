@@ -4,9 +4,11 @@
 <h1>Vocabulary: {{ vocab.title }}</h1>
 <h3>URI: {{ uri }}</h3>
 <table class="metadata concept_scheme">
+    {%  if vocab.description is not none  %}
     <tr>
         <th>Description</th><td>{{ vocab.description }}</td>
     </tr>
+    {% endif %}
     {%  if vocab.creator is not none  %}
     <tr>
         <th>Creator</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>

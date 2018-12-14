@@ -1,13 +1,14 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
+import _config as config
 from rdflib import Graph
-import model.source_selector as sel
+import data.source_selector as sel
 
 
 class Concept:
     def __init__(
             self,
-            vocab,
+            vocab_id,
             uri,
             prefLabel,
             definition,
@@ -19,7 +20,7 @@ class Concept:
             narrowers,
             semantic_properties
     ):
-        self.vocab = vocab
+        self.vocab_id = vocab_id
         self.uri = uri
         self.prefLabel = prefLabel
         self.definition = definition
@@ -39,7 +40,6 @@ class ConceptRenderer(Renderer):
         self.navs = []  # TODO: add in other nav items for Concept
 
         self.concept = concept
-        self.vocab = sel.get_vocabulary(request.values.get('vocab_id'))
 
         super().__init__(
             self.request,
@@ -72,9 +72,8 @@ class ConceptRenderer(Renderer):
 
     def _render_skos_rdf(self):
         # get Concept RDF
-        import model.source_rva as rva
-        v = rva.RVA().get_resource_rdf(self.vocab.id, self.uri)
-        g = Graph().load(v, format='turtle')
+        import data.source_selector as sel
+        rdf = sel.get_concept_rdf(self.request.values.get('vocab_id'), self.request.values.get('uri'))
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:
@@ -84,7 +83,9 @@ class ConceptRenderer(Renderer):
 
     def _render_skos_html(self):
         _template_context = {
-            'uri': self.uri,
+            'vocab_id': self.request.values.get('vocab_id'),
+            'vocab_title': config.VOCABS[self.request.values.get('vocab_id')].get('title'),
+            'uri': self.request.values.get('uri'),
             'concept': self.concept,
             'navs': self.navs
         }
