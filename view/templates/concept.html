@@ -43,16 +43,14 @@
         {% endif %}
     </tr>
     {% endif %}
-    {% if concept.narrowers|length > 0 %}
+    {% if concept.narrowers is defined %}
     <tr>
-        {% if concept.narrowers is defined %}
         <th>Narrower</th>
         <td class="list">
             {% for narrower in concept.narrowers -%}
-            <a href="{{ narrower.url }}">{{ narrowers.prefLabel }}</a><br />
+            <a href="{{ narrower.uri }}">{{ narrower.prefLabel }}</a><br />
             {% endfor %}
         </td>
-        {% endif %}
     </tr>
     {% endif %}
 </table>

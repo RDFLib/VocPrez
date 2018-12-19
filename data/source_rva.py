@@ -240,8 +240,8 @@ class RVA(Source):
             [x.get('hl').get('value') for x in hiddenLabels],
             metadata[0].get('sc').get('value') if metadata[0].get('sc') is not None else None,
             metadata[0].get('cn').get('value') if metadata[0].get('cn') is not None else None,
-            [(x.get('b').get('value'), x.get('pl').get('value')) for x in broaders],
-            [(x.get('n').get('value'), x.get('pl').get('value')) for x in narrowers],
+            [{'uri': x.get('b').get('value'), 'prefLabel': x.get('pl').get('value')} for x in broaders],
+            [{'uri': x.get('n').get('value'), 'prefLabel': x.get('pl').get('value')} for x in narrowers],
             None  # TODO: replace Sem Properties sub
         )
 

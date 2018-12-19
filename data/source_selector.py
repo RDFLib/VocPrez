@@ -28,7 +28,7 @@ def get_object_class(vocab_id, uri):
     elif source_type == conf.VocabSource.RVA:
         c = RVA(vocab_id).get_object_class(uri)
     elif source_type == conf.VocabSource.VOCBENCH:
-        v = VB(vocab_id).get_object_class()
+        c = VB(vocab_id).get_object_class(uri)
     else:
         # no other sources for now
         c = None
@@ -44,7 +44,7 @@ def get_concept(vocab_id, uri):
     elif source_type == conf.VocabSource.RVA:
         c = RVA(vocab_id).get_concept(uri)
     elif source_type == conf.VocabSource.VOCBENCH:
-        v = VB(vocab_id).get_concept()
+        c = VB(vocab_id).get_concept(uri)
     else:
         # no other sources for now
         c = None

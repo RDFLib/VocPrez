@@ -119,7 +119,6 @@ def object():
 
     if c == 'http://www.w3.org/2004/02/skos/core#Concept':
         concept = sel.get_concept(vocab_id, uri)
-
         return ConceptRenderer(
             request,
             concept
