@@ -1,0 +1,48 @@
+.content {
+    margin-bottom: 40px;
+    padding: 40px;
+    width: 75%;
+    box-shadow: 0 0 10px rgba(53, 52, 53, 0.1);
+    border: 1px solid rgba(53, 52, 53, 0.1);
+    border-radius: 2px;
+    background: white;
+    margin-left: 200px;
+}
+
+.content > h1 {
+    margin-bottom: 26px;
+    padding-bottom: 5px;
+    font-size: 40px;
+    line-height: 42px;
+    font-weight: 700;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+h2 {
+    margin: 25px 0 10px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 45px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+p, ul, td, th {
+    font-family: "Heebo", sans-serif;
+}
+
+a {
+    color: #4294B0;
+}
+
+ul {
+    list-style-position: inside;
+    list-style-type: disc;
+}
+ul > li {
+    margin-left: 25px;
+}
