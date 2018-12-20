@@ -14,9 +14,10 @@ class Vocabulary:
             created,        # DCAT
             modified,       # DCAT
             versionInfo,
-            hasTopConcepts,
-            accessURL,
-            downloadURL
+            hasTopConcepts=None,
+            conceptHierarchy=None,
+            accessURL=None,
+            downloadURL=None
     ):
         self.id = id
         self.uri = uri
@@ -27,6 +28,7 @@ class Vocabulary:
         self.modified = modified
         self.versionInfo = versionInfo
         self.hasTopConcepts = hasTopConcepts
+        self.conceptHierarchy = conceptHierarchy
         self.accessURL = accessURL
         self.downloadURL = downloadURL
 

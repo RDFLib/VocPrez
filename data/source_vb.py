@@ -13,6 +13,8 @@ class VbException(Exception):
 
 
 class VB(Source):
+    CONCEPT_HERARCHY = {}
+
     def __init__(self, vocab_id):
         self.vocab_id = vocab_id
         s = requests.session()
@@ -38,10 +40,44 @@ class VB(Source):
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
     def list_collections(self):
-        pass
+        r = self.s.post(
+            config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+            data={
+                'query':
+                    '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    SELECT *
+                    WHERE {
+                      ?c a skos:Collection ;
+                         skos:prefLabel ?pl .
+                    }''',
+                'ctx_project': self.vocab_id
+            }
+        )
+        concepts = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+        if r.status_code == 200:
+            return [(x.get('c').get('value'), x.get('pl').get('value')) for x in concepts]
+        else:
+            raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
     def list_concepts(self):
-        pass
+        r = self.s.post(
+            config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+            data={
+                'query':
+                    '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    SELECT *
+                    WHERE {
+                      ?c a skos:Concept ;
+                         skos:prefLabel ?pl .
+                    }''',
+                'ctx_project': self.vocab_id
+            }
+        )
+        concepts = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+        if r.status_code == 200:
+            return [(x.get('c').get('value'), x.get('pl').get('value')) for x in concepts]
+        else:
+            raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
     def get_vocabulary(self):
         r = self.s.post(
@@ -65,41 +101,22 @@ class VB(Source):
             }
         )
 
-        r2 = self.s.post(
-            config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
-            data={
-                'query':
-                    '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                    SELECT *
-                    WHERE {
-                      ?tc skos:topConceptOf ?s ;
-                          skos:prefLabel ?pl .
-                    }''',
-                'ctx_project': self.vocab_id
-            }
-        )
-        top_concepts = json.loads(r2.content.decode('utf-8'))['result']['sparql']['results']['bindings']
         if r.status_code == 200:
             metadata = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]
+
+            concept_hierarchy = self._get_concept_hierarchy(str(metadata['s']['value']))
 
             from model.vocabulary import Vocabulary
             return Vocabulary(
                 self.vocab_id,
                 metadata['s']['value'],
                 metadata['t']['value'],
-                metadata['d']['value']
-                if metadata.get('d') is not None else None,
-                metadata.get('c').get('value')
-                if metadata.get('c') is not None else None,
-                metadata.get('cr').get('value')
-                if metadata.get('cr') is not None else None,
-                metadata.get('m').get('value')
-                if metadata.get('m') is not None else None,
-                metadata.get('v').get('value')
-                if metadata.get('v') is not None else None,
-                [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
-                None,
-                None
+                metadata['d']['value'] if metadata.get('d') is not None else None,
+                metadata.get('c').get('value') if metadata.get('c') is not None else None,
+                metadata.get('cr').get('value') if metadata.get('cr') is not None else None,
+                metadata.get('m').get('value') if metadata.get('m') is not None else None,
+                metadata.get('v').get('value') if metadata.get('v') is not None else None,
+                conceptHierarchy=concept_hierarchy
             )
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
@@ -200,26 +217,8 @@ class VB(Source):
             None  # TODO: replace Sem Properties sub
         )
 
-    def _get_narrower(self, uri):
-        r = self.s.get(
-            config.VB_ENDPOINT + '/SKOS/getNarrowerConcepts',
-            params={
-                'concept': '<{}>'.format(uri),
-                'schemes': '<http://pid.geoscience.gov.au/def/voc/test-rock-types#conceptScheme_633df59e>',
-                'includeSubProperties': False,
-                'ctx_project': self.vocab_id
-            }
-        )
-        # http://13.54.176.245:1979/semanticturkey/it.uniroma2.art.semanticturkey/st-core-services/SKOS/getTopConcepts?schemes=<http://pid.geoscience.gov.au/def/voc/test-rock-types
-        if r.status_code == 200:
-            narrower = json.loads(r.content.decode('utf-8'))['result']
-            # return [(x['@id'], x['show'].replace(' (en)', '')) for x in narrower]
-            return narrower
-
-        else:
-            raise VbException('There was an error: ' + r.content.decode('utf-8'))
-
-    def get_concept_hierarchy(self, vocab):
+    # returns an ordered list of tuples, (hierarchy level, Concept URI, Concept prefLabel)
+    def _get_concept_hierarchy(self, concept_scheme_uri):
         r = self.s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
@@ -227,29 +226,75 @@ class VB(Source):
                     '''
                     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-                    SELECT ?super ?sub ?pl (COUNT(?mid) as ?dist) 
-                    WHERE { 
-                      ?super skos:narrower* ?mid .
-                      ?mid skos:narrower+ ?sub .
-                      ?sub skos:prefLabel ?pl .
-                    }
-                    GROUP BY ?super ?sub ?pl''',
+                    SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
+                    WHERE {{ 
+                        ?c      a                                       skos:Concept .   
+                        ?cs     (skos:hasTopConcept | skos:narrower)*   ?mid .
+                        ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
+                        ?c      skos:prefLabel                          ?pl .
+                        ?c		(skos:topConceptOf | skos:broader)		?parent .
+                        FILTER (?cs = <{}>)
+                    }}
+                    GROUP BY ?c ?pl ?parent
+                    ORDER BY ?length ?parent ?pl'''.format(concept_scheme_uri),
                 'ctx_project': self.vocab_id
             }
         )
 
         if r.status_code == 200:
             cs = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
-            return [
-                (
-                    c['super']['value'],
-                    c['sub']['value'],
-                    c['pl']['value'],
-                    c['dist']['value']
-                 ) for c in cs
-            ]
+            hierarchy = []
+            previous_parent_uri = None
+            last_index = 0
+
+            for c in cs:
+                # insert all topConceptOf directly
+                if str(c['c']['value']) == concept_scheme_uri:
+                    hierarchy.append((
+                        int(c['length']['value']),
+                        c['c']['value'],
+                        c['pl']['value']
+                    ))
+                else:
+                    # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
+                    # If so, use that Concept's index + 1
+                    this_parent = str(c['parent']['value'])
+                    if this_parent == previous_parent_uri:
+                        # use last inserted index
+                        hierarchy.insert(last_index + 1, (
+                            int(c['length']['value']),
+                            c['c']['value'],
+                            c['pl']['value']
+                        ))
+                        last_index += 1
+                    # This is not a TopConcept and it has a differnt parent from the previous insert
+                    # So insert it after it's parent
+                    else:
+                        i = 0
+                        parent_index = 0
+                        for t in hierarchy:
+                            if this_parent in t:
+                                parent_index = i
+                            i += 1
+
+                        hierarchy.insert(parent_index + 1, (
+                            int(c['length']['value']),
+                            c['c']['value'],
+                            c['pl']['value']
+                        ))
+
+                        last_index = parent_index + 1
+                    previous_parent_uri = this_parent
+
+            return hierarchy
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
+
+    def _add_to_hierarchy(self, concept_uri, concept_pref_label , parent_uri):
+        # if the concept's not in the hierarchy, recurse through parents until an ancestor is then add all the
+        # intermediates
+        if self.CONCEPT_HERARCHY.get(parent_uri) is not None:
+            pass
 
     def get_object_class(self, uri):
         """Gets the class of the object.
@@ -283,8 +328,5 @@ class VB(Source):
 
 
 if __name__ == '__main__':
-    # print(VB('Test_Rock_Types_Vocabulary').list_vocabularies())
-    import pprint
-    # pprint.pprint(VB('x').list_vocabularies())
-    pprint.pprint(VB('Test_Rock_Types_Vocabulary').get_vocabulary())
-    # pprint.pprint(VB('Test_Rock_Types')._get_narrower('http://pid.geoscience.gov.au/def/voc/test-rock-types/igneous'))
+    VB('Test_Rock_Types_Vocabulary').get_concept_hierarchy('http://pid.geoscience.gov.au/def/voc/test-rock-types/conceptScheme')
+
