@@ -140,7 +140,11 @@ def about():
     with open(os.path.join(config.APP_DIR, 'README.md')) as f:
         content = f.read()
 
+    # make images come from wed dir
+    content = content.replace('view/static/system.svg',
+                              '/static/system.svg')
     content = Markup(markdown.markdown(content))
+
     return render_template(
         'about.html',
         title='About',
