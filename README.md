@@ -1,11 +1,17 @@
-# SKOS Styler
-Simple Knowledge Organization System (SKOS) read-only web delivery system.
+# Vocabulator
+A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDf vocabularies.
 
-This tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats. pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. SKOS Styler is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them.
+![](_docs/system.svg)
+**Figure 1**: An overview diagram of where Vocabulator fits in relation to sources of vocab data.
 
-This tool is *not* a SKOS data editor! It is expected to be used with a SKOS data source (any sort of datasource can be configured) and its only role is to publish that SKOS data online.
+This tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats; it turns RDF data into *[Linked Data](https://www.w3.org/standards/semanticweb/data)*. 
 
-the design goal for this tool was to provide an easily configurable template-based SKOS presenter since amny of the other SKOS editing and presentation tools available as of November 2018 are pretty complex instruments and make life difficult for normal web development tasks such as institutional branding of vocab data.
+## SKOS
+pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. Vocabulator is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them. It also assumes that a `ConceptScheme` is synonymous with a *Vocabulary*.
+
+This tool is *not* a SKOS data editor! It is expected to be used with a SKOS data source (any sort of datasource can be configured and three come pre-loaded) and its only role is to publish that SKOS data online as Linked Data.
+
+The design goal for this tool was to provide an easily configurable template-based SKOS presenter since many of the other SKOS editing and presentation tools, available as of November 2018, are pretty complex instruments and make life difficult for normal web development tasks such as institutional branding of vocabulary data.
 
 Since this tool is preconfigured for SKOS data, it is ready for use with SKOS-only vocabularies. Forks of this codebase can be made to enhance it for SKOS+ features. SKOS+ is a general term for SKOS data *plus some other bits*.
 
@@ -13,7 +19,7 @@ Since this tool is preconfigured for SKOS data, it is ready for use with SKOS-on
 ## API & Templates
 As per other pyLDAPI deployments, this tool uses the [Jinja2 Python templating engine](http://jinja.pocoo.org/) to generate HTML and other files which are called fro use through Python's [Flask](http://flask.pocoo.org/), a small HTTP framework.
 
-Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are contained within this repository, as is a Model-View-Controller-style depolyment of Flask, pre-configures for SKOS.
+Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are contained within this repository, as is a Model-View-Controller-style deployment of Flask, pre-configures for SKOS.
 
 
 ## Installation
