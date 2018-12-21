@@ -1,7 +1,7 @@
 # Vocabulator
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDf vocabularies.
 
-![](_docs/system.svg)
+<img src="_docs/system.svg" style="width:50%;" />  
 **Figure 1**: An overview diagram of where Vocabulator fits in relation to sources of vocab data.
 
 This tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats; it turns RDF data into *[Linked Data](https://www.w3.org/standards/semanticweb/data)*. 
