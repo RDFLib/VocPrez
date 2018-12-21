@@ -1,14 +1,14 @@
-# Vocabulator
+# VocPrez
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDf vocabularies.
 
 <img src="_docs/system.svg" style="width:40%;" />  
 
-**Figure 1**: An overview diagram of where Vocabulator fits in relation to sources of vocab data.
+**Figure 1**: An overview diagram of where VocPrez fits in relation to sources of vocab data.
 
 This tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats; it turns RDF data into *[Linked Data](https://www.w3.org/standards/semanticweb/data)*. 
 
 ## SKOS
-pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. Vocabulator is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them. It also assumes that a `ConceptScheme` is synonymous with a *Vocabulary*.
+pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. VocPrez is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them. It also assumes that a `ConceptScheme` is synonymous with a *Vocabulary*.
 
 This tool is *not* a SKOS data editor! It is expected to be used with a SKOS data source (any sort of datasource can be configured and three come pre-loaded) and its only role is to publish that SKOS data online as Linked Data.
 
