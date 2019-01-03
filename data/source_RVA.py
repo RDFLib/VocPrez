@@ -264,11 +264,3 @@ class RVA(Source):
                 return c.get('c')['value']
 
         return None
-
-
-if __name__ == '__main__':
-    #RVA().get_vocabulary('rva-177')
-
-    print(
-        RVA().get_object_class('rva-177', 'http://registry.it.csiro.au/def/isotc211/DS_AssociationTypeCode/stereoMate')
-    )

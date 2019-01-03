@@ -12,7 +12,7 @@ class VbException(Exception):
     pass
 
 
-class VB(Source):
+class VOCBENCH(Source):
     CONCEPT_HERARCHY = {}
 
     def __init__(self, vocab_id):
@@ -325,8 +325,3 @@ class VB(Source):
                 return c.get('c')['value']
 
         return None
-
-
-if __name__ == '__main__':
-    VB('Test_Rock_Types_Vocabulary').get_concept_hierarchy('http://pid.geoscience.gov.au/def/voc/test-rock-types/conceptScheme')
-
