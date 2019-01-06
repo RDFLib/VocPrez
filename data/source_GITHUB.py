@@ -4,7 +4,8 @@ import _config as config
 from rdflib import Graph
 
 
-class RDFFile(Source):
+# TODO: implement GITHUB source
+class GITHUB(Source):
     def __init__(self, vocab_id):
         self.vocab_id = vocab_id
         self.g = Graph().parse(join(config.APP_DIR, 'data', self.vocab_id + '.ttl'), format='turtle')
