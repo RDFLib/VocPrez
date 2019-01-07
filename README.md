@@ -59,3 +59,8 @@ This code is licensed using the GPL v3 licence. See the [LICENSE file](LICENSE) 
 *Senior Experimental Scientist*<br />
 CSIRO Land & Water, Environmental Informatics Group<br />
 <nicholas.car@csiro.au>
+
+**Edmond Chuc**<br />
+*Software Engineer*<br />
+CSIRO Land & Water, Environmental Informatics Group<br />
+<edmond.chuc@csiro.au>
