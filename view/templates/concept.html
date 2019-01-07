@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Concept: {{ concept.prefLabel }}</h1>
-<h3>URI: {{ uri }}</h3>
+<h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata concept">
     {% if concept.altLabels|length > 0 %}
