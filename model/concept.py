@@ -36,7 +36,7 @@ class Concept:
 class ConceptRenderer(Renderer):
     def __init__(self, request, concept):
         self.request = request
-        self.views = self._add_skos_view()
+        self.views = self._add_views()
         self.navs = []  # TODO: add in other nav items for Concept
 
         self.concept = concept
@@ -48,7 +48,7 @@ class ConceptRenderer(Renderer):
             'skos'
         )
 
-    def _add_skos_view(self):
+    def _add_views(self):
         return {
             'skos': View(
                 'Simple Knowledge Organization System (SKOS)',

@@ -1,5 +1,5 @@
-from pyldapi import RegisterRenderer
-from flask import Response, render_template
+from pyldapi import RegisterRenderer, View
+from flask import Response, render_template, jsonify
 from flask_paginate import Pagination
 
 
@@ -7,14 +7,26 @@ class SkosRegisterRenderer(RegisterRenderer):
     def __init__(self, request, navs, items, register_item_type_string, total):
         self.navs = navs
         self.register_item_type_string = register_item_type_string
+        views = {
+            'ckan': View(
+                'Comprehensive Knowledge Archive Network',
+                'The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for '
+                'the storage and distribution of open data.',
+                ['application/json'],
+                'application/json',
+                languages=['en'],
+                namespace='https://ckan.org/'
+            )
+        }
         super().__init__(
             request,
-            "http://example.com",
+            request.base_url,
             "Test Label",
             "Test Comment",
             items,
             register_item_type_string,
-            total
+            total,
+            views=views
         )
 
     def render(self):
@@ -31,7 +43,45 @@ class SkosRegisterRenderer(RegisterRenderer):
                 response = self._render_reg_view()
             else:  # there is a paging error (e.g. page > last_page)
                 response = Response(self.paging_error, status=400, mimetype='text/plain')
+        elif not response and self.view == 'ckan':
+            if self.paging_error is None:
+                response = self._render_ckan_view()
         return response
+
+    def _render_ckan_view(self):
+        """
+        Render a CKAN view, which is formatted as an application/sparql-results+json response.
+
+        :return: A list of register items rendered as application/sparql-results+json.
+        :rtype: JSON
+        """
+        response = {
+            "head": {
+                "vars": [
+                    "s",
+                    "pl"
+                ]
+            },
+            "results": {
+                "bindings": []
+            }
+        }
+        for item in self.register_items:
+            response['results']['bindings'].append(
+                {
+                    "pl": {
+                        "xml:lang": "en",
+                        "type": "literal",
+                        "value": item[1]
+                    },
+                    "s": {
+                        "type": "uri",
+                        "value": item[0]
+                    }
+                }
+            )
+
+        return jsonify(response)
 
     def _render_reg_view_html(self, template_context=None):
         pagination = Pagination(page=self.page, per_page=self.per_page,
