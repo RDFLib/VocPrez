@@ -26,7 +26,7 @@ def vocabularies():
     # get this instance's list of vocabs
     vocabs = []
     for k, v in config.VOCABS.items():
-        vocabs.append(('/vocabulary/' + k, v['title']))
+        vocabs.append((k, v['title']))
     vocabs.sort(key=lambda tup: tup[1])
 
     # render the list of vocabs
