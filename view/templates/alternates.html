@@ -9,13 +9,13 @@
                 <th>Token</th>
                 <th>Name</th>
                 <th>Formats</th>
-                <th>Languages</th>
+                <th style="padding-right: 30px;">Languages</th>
                 <th>Description</th>
                 <th>Namespace</th>
             </tr>
         {% for token, vals in views.items() %}
             <tr>
-                <td><a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&url={{ uri }}&_view={{ token }}&_format={{ vals['default_format'] }}">{{ token }}</a></td>
+                <td style="padding-right: 30px;"><a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&url={{ uri }}&_view={{ token }}&_format={{ vals['default_format'] }}">{{ token }}</a></td>
                 <td>{{ vals['label'] }}</td>
                 <td>
                 {% for f in vals['formats'] %}
