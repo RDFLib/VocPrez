@@ -45,7 +45,7 @@
     {% endif %}
     {% if concept.narrowers is defined %}
     <tr>
-        <th>Narrower: </th>
+        <th style="padding-right: 10px;">Narrower: </th>
         <td class="list">
             {% for narrower in concept.narrowers -%}
             <a href="{{ narrower.uri }}">{{ narrower.prefLabel }}</a><br />
