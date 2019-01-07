@@ -58,6 +58,15 @@ class ConceptRenderer(Renderer):
                 'text/html',
                 languages=['en'],  # default 'en' only for now
                 namespace='http://www.w3.org/2004/02/skos/core#'
+            ),
+            'ckan': View(
+                'Comprehensive Knowledge Archive Network',
+                'The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for '
+                'the storage and distribution of open data.',
+                ['text/html', 'application/json'] + self.RDF_MIMETYPES,
+                'text/html',
+                languages=['en'],
+                namespace='https://ckan.org/'
             )
         }
 
