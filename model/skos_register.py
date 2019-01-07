@@ -82,7 +82,7 @@ class SkosRegisterRenderer(RegisterRenderer):
             )
 
         response = jsonify(response)
-        response.headers.add('Access-Control-Allow_origin', '*')
+        response.headers.add('Access-Control-Allow-origin', '*')
         return response
 
     def _render_reg_view_html(self, template_context=None):
