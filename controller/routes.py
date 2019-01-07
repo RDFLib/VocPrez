@@ -142,7 +142,7 @@ def about():
 
     # make images come from wed dir
     content = content.replace('view/static/system.svg',
-                              '/static/system.svg')
+                              request.host_url + 'static/system.svg')
     content = Markup(markdown.markdown(content))
 
     return render_template(
