@@ -72,15 +72,7 @@ class ConceptRenderer(Renderer):
                 return self._render_skos_html()
 
     def _render_skos_rdf(self):
-        # get Concept RDF
-        # import data.source_selector as sel
-        # rdf = sel.get_concept(self.request.values.get('vocab_id'), self.request.values.get('uri'))
-        #
-        # import data.source_RVA as rva
-        # g = Graph()
-        # g.parse(rva.RVA.VOCAB_ENDPOINTS[self.request.values.get('vocab_id')]['download'])
-
-        # Create a graph from the self.concept object
+        # Create a graph from the self.concept object for a SKOS view
         s = URIRef(self.concept.uri)
         g = Graph()
         if self.concept.prefLabel:
@@ -103,8 +95,6 @@ class ConceptRenderer(Renderer):
             for n in self.concept.narrowers:
                 g.add((s, SKOS.narrower, URIRef(n['uri'])))
                 g.add((URIRef(n['uri']), SKOS.prefLabel, Literal(n['prefLabel'])))
-
-
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:
