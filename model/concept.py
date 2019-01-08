@@ -66,7 +66,7 @@ class ConceptRenderer(Renderer):
         if self.view == 'alternates':
             return self._render_alternates_view()
         elif self.view == 'skos':
-            if self.format in Renderer.RDF_MIMETYPES:
+            if self.format in Renderer.RDF_MIMETYPES or self.format in Renderer.RDF_SERIALIZER_MAP:
                 return self._render_skos_rdf()
             else:
                 return self._render_skos_html()
