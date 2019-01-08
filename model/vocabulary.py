@@ -74,7 +74,7 @@ class VocabularyRenderer(Renderer):
 
     def _render_dcat_rdf(self):
         # get vocab RDF
-        import data.source_rva as rva
+        import data.source_RVA as rva
         v = rva.RVA()._get_resource_rdf(self.vocab_id, self.uri)
         g = Graph().load(v, format='turtle')
 
