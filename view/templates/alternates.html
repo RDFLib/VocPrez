@@ -15,11 +15,11 @@
             </tr>
         {% for token, vals in views.items() %}
             <tr style="border-bottom: 1px solid black; border-top: 1px solid black;">
-                <td style="padding-right: 30px;"><a href="{{ request.base_url }}?_view={{ token }}&_format={{ vals['default_format'] }}">{{ token }}</a></td>
+                <td style="padding-right: 30px;"><a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&_view={{ token }}&_format={{ vals['default_format'] }}&uri={{ uri }}">{{ token }}</a></td>
                 <td>{{ vals['label'] }}</td>
                 <td>
                 {% for f in vals['formats'] %}
-                    <a href="{{ request.base_url }}?_view={{ token }}&_format={{ f }}">{{ f }}</a><br />
+                    <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&_view={{ token }}&_format={{ f }}&uri={{ uri }}">{{ f }}</a><br />
                 {% endfor %}
                 </td>
                 <td style="text-align: center;">
