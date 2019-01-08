@@ -27,7 +27,7 @@ def vocabularies():
     # get this instance's list of vocabs
     vocabs = []
     for k, v in config.VOCABS.items():
-        vocabs.append(('/vocabulary/' + k, v['title']))
+        vocabs.append((k, v['title']))
     vocabs.sort(key=lambda tup: tup[1])
 
     # render the list of vocabs
@@ -134,7 +134,7 @@ def about():
 
     # make images come from wed dir
     content = content.replace('view/static/system.svg',
-                              '/static/system.svg')
+                              request.url_root + 'static/system.svg')
     content = Markup(markdown.markdown(content))
 
     return render_template(

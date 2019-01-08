@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Concept: {{ concept.prefLabel }}</h1>
-<h3>URI: {{ uri }}</h3>
+<h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata concept">
     {% if concept.altLabels|length > 0 %}
@@ -18,7 +18,7 @@
     <!-- don't display hiddenLabels, duh! -->
     {%  if concept.definition is not none  %}
     <tr>
-        <th>Definition</th><td>{{ concept.definition }}</td>
+        <th>Definition: </th><td>{{ concept.definition }}</td>
     </tr>
     {% endif %}
     {%  if concept.source is not none  %}
@@ -45,7 +45,7 @@
     {% endif %}
     {% if concept.narrowers is defined %}
     <tr>
-        <th>Narrower</th>
+        <th>Narrower: </th>
         <td class="list">
             {% for narrower in concept.narrowers -%}
             <a href="{{ narrower.uri }}">{{ narrower.prefLabel }}</a><br />

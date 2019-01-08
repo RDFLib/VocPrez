@@ -7,7 +7,7 @@ class SkosRegisterRenderer(RegisterRenderer):
     def __init__(self, request, navs, items, register_item_type_string, total):
         self.navs = navs
         self.register_item_type_string = register_item_type_string
-        self.views = {
+        views = {
             'ckan': View(
                 'Comprehensive Knowledge Archive Network',
                 'The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for '
@@ -25,8 +25,8 @@ class SkosRegisterRenderer(RegisterRenderer):
             "Test Comment",
             items,
             register_item_type_string,
-            total
-            # TODO: add in the ckan view above so it appears in the Alt Views
+            total,
+            views=views
         )
 
     def render(self):
@@ -43,6 +43,46 @@ class SkosRegisterRenderer(RegisterRenderer):
                 response = self._render_reg_view()
             else:  # there is a paging error (e.g. page > last_page)
                 response = Response(self.paging_error, status=400, mimetype='text/plain')
+        elif not response and self.view == 'ckan':
+            if self.paging_error is None:
+                response = self._render_ckan_view()
+        return response
+
+    def _render_ckan_view(self):
+        """
+        Render a CKAN view, which is formatted as an application/sparql-results+json response.
+
+        :return: A list of register items rendered as application/sparql-results+json.
+        :rtype: JSON
+        """
+        response = {
+            "head": {
+                "vars": [
+                    "s",
+                    "pl"
+                ]
+            },
+            "results": {
+                "bindings": []
+            }
+        }
+        for item in self.register_items:
+            response['results']['bindings'].append(
+                {
+                    "pl": {
+                        "xml:lang": "en",
+                        "type": "literal",
+                        "value": item[1]
+                    },
+                    "s": {
+                        "type": "uri",
+                        "value": item[0]
+                    }
+                }
+            )
+
+        response = jsonify(response)
+        response.headers.add('Access-Control-Allow-origin', '*')
         return response
 
     def _render_reg_view_html(self, template_context=None):
