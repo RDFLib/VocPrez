@@ -73,13 +73,17 @@ class ConceptRenderer(Renderer):
     def _render_skos_rdf(self):
         # get Concept RDF
         import data.source_selector as sel
-        rdf = sel.get_concept_rdf(self.request.values.get('vocab_id'), self.request.values.get('uri'))
+        rdf = sel.get_concept(self.request.values.get('vocab_id'), self.request.values.get('uri'))
+
+        import data.source_RVA as rva
+        g = Graph()
+        g.parse(rva.RVA.VOCAB_ENDPOINTS[self.request.values.get('vocab_id')]['download'])
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:
-            return g.serialize(format='json-ld')
+            return Response(g.serialize(format='json-ld'), mimetype=self.format)
         else:
-            return g.serialize(format=self.format)
+            return Response(g.serialize(format=self.format), mimetype=self.format)
 
     def _render_skos_html(self):
         _template_context = {
@@ -98,10 +102,14 @@ class ConceptRenderer(Renderer):
             headers=self.headers
         )
 
-    def _render_alternates_view(self):
-        super().__init__(
-            self.request,
-            url_for('routes.object') + '?vocab_uri=' + self.concept.vocab.id,
-            self.views,
-            self.default_view_token
-        )
+    def _render_alternates_view_html(self):
+        my_context  = {
+            'vocab_id': self.concept.vocab_id
+        }
+        return super(ConceptRenderer, self)._render_alternates_view_html(template_context=my_context)
+    #     super().__init__(
+    #         self.request,
+    #         url_for('routes.object') + '?vocab_uri=' + self.concept.vocab_id,
+    #         self.views,
+    #         self.default_view_token
+    #     )
