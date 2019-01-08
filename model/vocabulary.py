@@ -37,8 +37,8 @@ class VocabularyRenderer(Renderer):
     def __init__(self, request, vocab):
         self.views = self._add_dcat_view()
         self.navs = [
-            '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
-            '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/concept/">Concepts</a> |'
+            # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
+            # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/concept/">Concepts</a> |'
         ]
 
         self.vocab = vocab
@@ -74,8 +74,8 @@ class VocabularyRenderer(Renderer):
 
     def _render_dcat_rdf(self):
         # get vocab RDF
-        import data.source_rva as rva
-        v = rva.RVA().get_resource_rdf(self.vocab_id, self.uri)
+        import data.source_RVA as rva
+        v = rva.RVA()._get_resource_rdf(self.vocab_id, self.uri)
         g = Graph().load(v, format='turtle')
 
         # serialise in the appropriate RDF format

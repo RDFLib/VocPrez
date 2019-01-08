@@ -13,10 +13,11 @@ class VbException(Exception):
 
 
 class VOCBENCH(Source):
-    CONCEPT_HERARCHY = {}
-
     def __init__(self, vocab_id):
-        self.vocab_id = vocab_id
+        super().__init__(vocab_id)
+
+    @staticmethod
+    def _authed_request_object():
         s = requests.session()
         r = s.post(
             config.VB_ENDPOINT + '/Auth/login',
@@ -26,21 +27,31 @@ class VOCBENCH(Source):
             }
         )
         if r.status_code == 200:
-            self.s = s
+            return s
         else:
             raise VbAuthException('Not able to log in. Error from VB is: ' + r.content.decode('utf-8'))
 
+    @classmethod
     def list_vocabularies(self):
-        r = self.s.get(config.VB_ENDPOINT + '/Projects/listProjects', params={'consumer': 'SYSTEM'})
+        s = VOCBENCH('x')._authed_request_object()
+        r = s.get(config.VB_ENDPOINT + '/Projects/listProjects', params={'consumer': 'SYSTEM'})
         if r.status_code == 200:
             d = json.loads(r.content.decode('utf-8'))
 
-            return [(v['baseURI'], v['name']) for v in d['result']]
+            vocabs = {}
+            for v in d['result']:
+                vocabs[v['baseURI']] = {
+                    'source': config.VocabSource.VOCBENCH,
+                    'title': v['name']
+                }
+
+            return vocabs
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
     def list_collections(self):
-        r = self.s.post(
+        s = VOCBENCH('x')._authed_request_object()
+        r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
                 'query':
@@ -60,7 +71,8 @@ class VOCBENCH(Source):
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
     def list_concepts(self):
-        r = self.s.post(
+        s = VOCBENCH('x')._authed_request_object()
+        r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
                 'query':
@@ -80,7 +92,8 @@ class VOCBENCH(Source):
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
     def get_vocabulary(self):
-        r = self.s.post(
+        s = VOCBENCH('x')._authed_request_object()
+        r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
                 'query':
@@ -104,7 +117,7 @@ class VOCBENCH(Source):
         if r.status_code == 200:
             metadata = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]
 
-            concept_hierarchy = self._get_concept_hierarchy(str(metadata['s']['value']))
+            concept_hierarchy = self.get_concept_hierarchy(str(metadata['s']['value']))
 
             from model.vocabulary import Vocabulary
             return Vocabulary(
@@ -122,7 +135,7 @@ class VOCBENCH(Source):
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
     def get_collection(self, uri):
-        pass
+        return NotImplementedError
 
     def get_concept(self, uri):
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -131,7 +144,8 @@ class VOCBENCH(Source):
               <{0}> skos:prefLabel ?pl .
               OPTIONAL {{<{0}> skos:definition ?d }}
             }}'''.format(uri)
-        r = self.s.post(
+        s = VOCBENCH('x')._authed_request_object()
+        r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
                 'query': q,
@@ -217,9 +231,10 @@ class VOCBENCH(Source):
             None  # TODO: replace Sem Properties sub
         )
 
-    # returns an ordered list of tuples, (hierarchy level, Concept URI, Concept prefLabel)
-    def _get_concept_hierarchy(self, concept_scheme_uri):
-        r = self.s.post(
+    def get_concept_hierarchy(self, concept_scheme_uri):
+        # returns an ordered list of tuples, (hierarchy level, Concept URI, Concept prefLabel)
+        s = VOCBENCH('x')._authed_request_object()
+        r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
                 'query':
@@ -290,12 +305,6 @@ class VOCBENCH(Source):
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
-    def _add_to_hierarchy(self, concept_uri, concept_pref_label , parent_uri):
-        # if the concept's not in the hierarchy, recurse through parents until an ancestor is then add all the
-        # intermediates
-        if self.CONCEPT_HERARCHY.get(parent_uri) is not None:
-            pass
-
     def get_object_class(self, uri):
         """Gets the class of the object.
 
@@ -312,7 +321,8 @@ class VOCBENCH(Source):
                 <{}> a ?c .
             }}
         '''.format(uri)
-        r = self.s.post(
+        s = VOCBENCH('x')._authed_request_object()
+        r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
                 'query': q,
