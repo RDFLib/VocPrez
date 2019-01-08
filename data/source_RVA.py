@@ -1,50 +1,20 @@
 from data.source import Source
-from SPARQLWrapper import SPARQLWrapper, JSON, TURTLE
-
+from SPARQLWrapper import SPARQLWrapper, JSON
+import _config as config
 
 class RVA(Source):
     """Source for Research Vocabularies Australia
     """
-    VOCAB_ENDPOINTS = {
-        'rva-50': {
-            'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_geologic-unit-type_v0-1',
-            'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/196/ga_geologic-unit-type_v0-1.ttl'
-        },
-        'rva-52': {
-            'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_contact-type_v0-1',
-            'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/202/ga_contact-type_v0-1.ttl'
-        },
-        'rva-57': {
-            'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_stratigraphic-rank_v0-1',
-            'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/217/ga_stratigraphic-rank_v0-1.ttl'
-        },
-        'rva-177': {
-            'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_association-type_v1-2',
-            'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/741/assoc.ttl'
-        },
-        'rva-178': {
-            'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_feature-of-interest-type_v0-1',
-            'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/491/ga_feature-of-interest-type_v0-1.ttl'
-        },
-        'rva-185': {
-            'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_sample-type_v1-0',
-            'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/518/ga_sample-type_v1-0.ttl'
-        },
-        'rva-186': {
-            'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_ga-data-classification_v1-0',
-            'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/521/ga_ga-data-classification_v1-0.ttl'
-        }
-    }
-
     def __init__(self, vocab_id):
-        self.vocab_id = vocab_id
+        super().__init__(vocab_id)
 
+    @classmethod
     def list_vocabularies(self):
         # this needs to be a static list as we don't want all RVA vocabs
         pass
 
     def list_collections(self):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         sparql.setQuery('''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -59,7 +29,7 @@ class RVA(Source):
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in concepts]
 
     def list_concepts(self):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         sparql.setQuery('''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
@@ -73,7 +43,7 @@ class RVA(Source):
         return [(x.get('c').get('value'), x.get('pl').get('value')) for x in concepts]
 
     def get_vocabulary(self):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
 
         # get the basic vocab metadata
         # PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0APREFIX%20dct%3A%20%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0APREFIX%20owl%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0ASELECT%20*%0AWHERE%20%7B%0A%3Fs%20a%20skos%3AConceptScheme%20%3B%0Adct%3Atitle%20%3Ft%20%3B%0Adct%3Adescription%20%3Fd%20%3B%0Adct%3Acreator%20%3Fc%20%3B%0Adct%3Acreated%20%3Fcr%20%3B%0Adct%3Amodified%20%3Fm%20%3B%0Aowl%3AversionInfo%20%3Fv%20.%0A%7D
@@ -133,18 +103,11 @@ class RVA(Source):
                 if metadata['results']['bindings'][0].get('v') is not None else None,
             [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
             None,
-            self.VOCAB_ENDPOINTS.get(self.vocab_id).get('download')
+            config.VOCABS.get(self.vocab_id).get('download')
         )
 
-    def get_resource_rdf(self, uri):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(self.vocab_id).get('sparql'))
-        sparql.setQuery('''DESCRIBE <{}>'''.format(uri))
-        sparql.setReturnFormat(TURTLE)
-
-        return sparql.query().convert()
-
     def get_collection(self, uri):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
             WHERE {{
@@ -168,7 +131,7 @@ class RVA(Source):
 
         from model.collection import Collection
         return Collection(
-            vocab,
+            self.vocab_id,
             uri,
             metadata[0]['l']['value'],
             metadata[0].get('c').get('value') if metadata[0].get('c') is not None else None,
@@ -176,7 +139,7 @@ class RVA(Source):
         )
 
     def get_concept(self, uri):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
             WHERE {{
@@ -245,11 +208,11 @@ class RVA(Source):
             None  # TODO: replace Sem Properties sub
         )
 
-    def get_concept_hierarchy(self):
-        pass
+    def get_concept_hierarchy(self, concept_scheme_uri):
+        return NotImplementedError
 
     def get_object_class(self, uri):
-        sparql = SPARQLWrapper(self.VOCAB_ENDPOINTS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         q = '''
             SELECT ?c
             WHERE {{

@@ -6,14 +6,21 @@ from rdflib import Graph
 
 class FILE(Source):
     def __init__(self, vocab_id):
-        self.vocab_id = vocab_id
+        super().__init__(vocab_id)
         self.g = Graph().parse(join(config.APP_DIR, 'data', self.vocab_id + '.ttl'), format='turtle')
 
+    @classmethod
     def list_vocabularies(self):
-        # iterate through all the RDF files in data/
-        # extract vocab/ConceptScheme info from them
-        # make this the list
-        pass
+        # TODO: extract id (URI) & title from each file in data/
+        # def load_graph(graph_file):
+        #     # just return None if there's no file
+        #     try:
+        #         g = pickle.load(open(path.join(config.APP_DIR, graph_file), 'rb'))
+        #         return g
+        #     except IOError:
+        #
+        # return None
+        return {}
 
     def list_collections(self):
         q = '''
@@ -84,5 +91,8 @@ class FILE(Source):
     def get_concept(self, uri):
         pass
 
-    def get_concept_hierarchy(self, uri):
-        pass
+    def get_concept_hierarchy(self, concept_scheme_uri):
+        return NotImplementedError
+
+    def get_object_class(self, uri):
+        return NotImplementedError

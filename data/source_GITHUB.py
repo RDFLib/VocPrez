@@ -7,14 +7,16 @@ from rdflib import Graph
 # TODO: implement GITHUB source
 class GITHUB(Source):
     def __init__(self, vocab_id):
-        self.vocab_id = vocab_id
+        super().__init__(vocab_id)
+
+    def _parse_vocab(self):
         self.g = Graph().parse(join(config.APP_DIR, 'data', self.vocab_id + '.ttl'), format='turtle')
 
+    @classmethod
     def list_vocabularies(self):
-        # iterate through all the RDF files in data/
-        # extract vocab/ConceptScheme info from them
+        # iterate through all GitHub vocabs in some way
         # make this the list
-        pass
+        return NotImplementedError
 
     def list_collections(self):
         q = '''
@@ -80,10 +82,13 @@ class GITHUB(Source):
         return v
 
     def get_collection(self, uri):
-        pass
+        return NotImplementedError
 
     def get_concept(self, uri):
         pass
 
     def get_concept_hierarchy(self, uri):
-        pass
+        return NotImplementedError
+
+    def get_object_class(self, uri):
+        return NotImplementedError

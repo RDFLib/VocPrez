@@ -1,8 +1,8 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
 import _config as config
+import data.source as source
 from rdflib import Graph
-import data.source_selector as sel
 
 
 class Concept:
@@ -72,8 +72,8 @@ class ConceptRenderer(Renderer):
 
     def _render_skos_rdf(self):
         # get Concept RDF
-        import data.source_selector as sel
-        rdf = sel.get_concept_rdf(self.request.values.get('vocab_id'), self.request.values.get('uri'))
+        # TODO: re-assemble RDF from Concept object
+        g = Graph()
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:

@@ -1,5 +1,4 @@
 from flask import Blueprint, Response, request, render_template
-import model
 from model.vocabulary import VocabularyRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
@@ -7,7 +6,7 @@ from model.skos_register import SkosRegisterRenderer
 import _config as config
 import markdown
 from flask import Markup
-import data.source_selector as sel
+from data.source import Source
 
 routes = Blueprint('routes', __name__)
 
@@ -23,6 +22,8 @@ def index():
 
 @routes.route('/vocabulary/')
 def vocabularies():
+    # TODO: replace this logic with the following
+    #   1. read all static vocabs from config.VOCABS
     # get this instance's list of vocabs
     vocabs = []
     for k, v in config.VOCABS.items():
@@ -51,7 +52,8 @@ def vocabulary(vocab_id):
         )
 
     # get vocab details using appropriate source handler
-    v = sel.get_vocabulary(vocab_id)
+
+    v = Source(vocab_id).get_vocabulary()
 
     return VocabularyRenderer(
         request,
@@ -67,20 +69,6 @@ def collections():
         register_class='Collections',
         navs={}
     )
-
-
-@routes.route('/vocabulary/<vocab_id>/concept/')
-def concepts(vocab_id):
-    concepts = sel.list_concepts(vocab_id)
-
-    # render the list of vocabs
-    return SkosRegisterRenderer(
-        request,
-        [],
-        concepts,
-        'Concepts in Vocabulary \'{}\''.format(config.VOCABS[vocab_id].get('title')),
-        len(concepts)
-    ).render()
 
 
 @routes.route('/object')
@@ -111,20 +99,24 @@ def object():
     if uri is None:
         return Response(
             'A Query String Argument \'uri\' must be supplied for this endpoint, '
-            'indicating an object within a vocabulary'
+            'indicating an object within a vocabulary',
+            status=400,
+            mimetype='text/plain'
         )
 
     # TODO reuse object within if, rather than re-loading graph
-    c = sel.get_object_class(vocab_id, uri)
+    c = Source(vocab_id).get_object_class(uri)
 
     if c == 'http://www.w3.org/2004/02/skos/core#Concept':
-        concept = sel.get_concept(vocab_id, uri)
+        concept = Source(vocab_id).get_concept(uri)
+        print('concept')
+        print(concept)
         return ConceptRenderer(
             request,
             concept
         ).render()
     elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
-        collection = sel.get_collection(vocab_id, uri)
+        collection = Source(vocab_id).get_collection(uri)
 
         return CollectionRenderer(
             request,

@@ -1,5 +1,5 @@
-from pyldapi import RegisterRenderer
-from flask import Response, render_template
+from pyldapi import RegisterRenderer, View
+from flask import Response, render_template, jsonify
 from flask_paginate import Pagination
 
 
@@ -7,14 +7,26 @@ class SkosRegisterRenderer(RegisterRenderer):
     def __init__(self, request, navs, items, register_item_type_string, total):
         self.navs = navs
         self.register_item_type_string = register_item_type_string
+        self.views = {
+            'ckan': View(
+                'Comprehensive Knowledge Archive Network',
+                'The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for '
+                'the storage and distribution of open data.',
+                ['application/json'],
+                'application/json',
+                languages=['en'],
+                namespace='https://ckan.org/'
+            )
+        }
         super().__init__(
             request,
-            "http://example.com",
+            request.base_url,
             "Test Label",
             "Test Comment",
             items,
             register_item_type_string,
             total
+            # TODO: add in the ckan view above so it appears in the Alt Views
         )
 
     def render(self):
