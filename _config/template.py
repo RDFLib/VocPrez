@@ -80,10 +80,10 @@ VOCABS = {
 # -- Startup tasks -----------------------------------------------------------------------------------------------------
 #
 
-# read in vocab files on startup
+# read in RDF vocab files on startup in vocab_files directory
 FILE.init()
 
-# extend this intsnace's list of vocabs by using the known sources
+# extend this instances' list of vocabs by using the known sources
 VOCABS = {**VOCABS, **FILE.list_vocabularies()}  # picks up all vocab RDF (turtle) files in data/
 # VOCABS = {**VOCABS, **VOCBENCH.list_vocabularies()}  # picks up all vocabs at the relevant VocBench instance
 
