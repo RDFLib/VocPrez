@@ -2,7 +2,7 @@ from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
 import _config as config
 import data.source as source
-from rdflib import Graph, RDF, Literal, URIRef
+from rdflib import Graph, RDF, Literal, URIRef, XSD
 from rdflib.namespace import SKOS, DCTERMS
 
 
@@ -76,21 +76,22 @@ class ConceptRenderer(Renderer):
         s = URIRef(self.concept.uri)
         g = Graph()
         if self.concept.prefLabel:
-            g.add((s, SKOS.prefLabel, Literal(self.concept.prefLabel)))
+            g.add((s, SKOS.prefLabel, Literal(self.concept.prefLabel, datatype=XSD.string)))
         if self.concept.definition:
-            g.add((s, SKOS.definition, Literal(self.concept.definition)))
+            g.add((s, SKOS.definition, Literal(self.concept.definition, datatype=XSD.string)))
         if self.concept.altLabels:
             for label in self.concept.altLabels:
-                g.add((s, SKOS.altLabel, Literal(label)))
+                g.add((s, SKOS.altLabel, Literal(label, datatype=XSD.string)))
         if self.concept.hiddenLabels:
             for label in self.concept.hiddenLabels:
-                g.add((s, SKOS.hiddenLabel, Literal(label)))
+                g.add((s, SKOS.hiddenLabel, Literal(label, datatype=XSD.stringl)))
         if self.concept.source:
-            g.add((s, DCTERMS.source, Literal(self.concept.source)))
+            g.add((s, DCTERMS.source, Literal(self.concept.source, datatype=XSD.string))) # should the object be a XSD.string or a URIRef?
         if self.concept.contributor:
-            g.add((s, DCTERMS.contributor, Literal(self.concept.contributor)))
+            g.add((s, DCTERMS.contributor, Literal(self.concept.contributor, datatype=XSD.string)))
         if self.concept.broaders: #
-            g.add((s, SKOS.broader, Literal(self.concept.broaders)))
+            for n in self.concept.broaders:
+                g.add((s, SKOS.broader, Literal(self.concept.broaders)))
         if self.concept.narrowers:
             for n in self.concept.narrowers:
                 g.add((s, SKOS.narrower, URIRef(n['uri'])))
