@@ -26,7 +26,7 @@ class FILE(Source):
     @staticmethod
     def load_pickle(vocab_id):
         try:
-            with open(join(config.APP_DIR, 'vocab_files', 'pickles', vocab_id + '.p'), 'rb') as f:
+            with open(join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
                 g = pickle.load(f)
                 return g
         except PickleLoadException as e:
@@ -44,8 +44,8 @@ class FILE(Source):
                     # load graph
                     g = Graph().parse(file_path, format=file_format)
                     file_name = name.split('.')[0]
-                    # pickle to directory/vocab_files/pickles
-                    with open(join(path, 'pickles', file_name + '.p'), 'wb') as f:
+                    # pickle to directory/vocab_files/
+                    with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
 
     @classmethod
