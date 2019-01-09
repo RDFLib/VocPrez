@@ -2,12 +2,51 @@ from data.source import Source
 from os.path import dirname, realpath, join, abspath
 import _config as config
 from rdflib import Graph
+from rdflib.namespace import SKOS
+import os
+import pickle
 
+class PickleLoadException(Exception):
+    pass
 
 class FILE(Source):
+
+    # file extensions mapped to rdflib-supported formats
+    # see supported rdflib formats at https://rdflib.readthedocs.io/en/stable/plugin_parsers.html?highlight=format
+    MAPPER = {
+        'ttl': 'turtle',
+        'rdf': 'xml'
+    }
+
     def __init__(self, vocab_id):
         super().__init__(vocab_id)
-        self.g = Graph().parse(join(config.APP_DIR, 'data', self.vocab_id + '.ttl'), format='turtle')
+        self.g = FILE.load_pickle(vocab_id)
+
+
+    @staticmethod
+    def load_pickle(vocab_id):
+        try:
+            with open(join(config.APP_DIR, 'vocab_files', 'pickles', vocab_id + '.p'), 'rb') as f:
+                g = pickle.load(f)
+                return g
+        except PickleLoadException as e:
+            print(e)
+
+    @staticmethod
+    def init():
+        # find all files in project_directory/vocab_files
+        for path, subdirs, files in os.walk(join(config.APP_DIR, 'vocab_files')):
+            for name in files:
+                if name.split('.')[-1] in FILE.MAPPER:
+                    # load file
+                    file_path = os.path.join(path, name)
+                    file_format = FILE.MAPPER[name.split('.')[-1]]
+                    # load graph
+                    g = Graph().parse(file_path, format=file_format)
+                    file_name = name.split('.')[0]
+                    # pickle to directory/vocab_files/pickles
+                    with open(join(path, 'pickles', file_name + '.p'), 'wb') as f:
+                        pickle.dump(g, f)
 
     @classmethod
     def list_vocabularies(self):
@@ -20,7 +59,19 @@ class FILE(Source):
         #     except IOError:
         #
         # return None
-        return {}
+
+        vocabs = {}
+        for v in config.VOCABS:
+            if config.VOCABS[v]['source'] == config.VocabSource.FILE:
+                g = FILE.load_pickle(v)
+                for s, p, o in g.triples((None, SKOS.inScheme, None)):
+                    if s not in vocabs:
+                        vocabs[s] = {
+                            'source': config.VocabSource.RVA,
+                            'title': ' '.join(str(s).split('#')[-1].split('/')[-1].split('_')).title()
+                        }
+
+        return vocabs
 
     def list_collections(self):
         q = '''

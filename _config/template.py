@@ -21,7 +21,7 @@ class VocabSource:
     SPARQL = 2
     RVA = 3
     VOCBENCH = 4
-    # GITHUB = False
+    # GITHUB = 5
 
 # VOCBANCH credentials
 VB_ENDPOINT = ''
@@ -58,18 +58,33 @@ VOCABS = {
     #     'source': VocabSource.FILE,
     #     'title': 'ISO19115-1 Association Type Codes - File'
     # },
-    'tenement_type': {
-        'source': VocabSource.FILE,
-        'title': 'Tenement Type'
-    },
+    # 'tenement_type': {
+    #     'source': VocabSource.FILE,
+    #     'title': 'Tenement Type'
+    # },
     'Test_Rock_Types_Vocabulary': {
         'source': VocabSource.VOCBENCH,
         'title': 'Test Rock Types'
+    },
+    'contact_type': {
+        'source': VocabSource.FILE,
+        'title': 'Contact Type - File'
+    },
+    'stratigraphic_rank': {
+        'source': VocabSource.FILE,
+        'title': 'Stratigraphic Rank - File'
     }
 }
 
+#
+# -- Startup tasks -----------------------------------------------------------------------------------------------------
+#
+
+# read in vocab files on startup
+FILE.init()
+
 # extend this intsnace's list of vocabs by using the known sources
 VOCABS = {**VOCABS, **FILE.list_vocabularies()}  # picks up all vocab RDF (turtle) files in data/
-VOCABS = {**VOCABS, **VOCBENCH.list_vocabularies()}  # picks up all vocabs at the relevant VocBench instance
+# VOCABS = {**VOCABS, **VOCBENCH.list_vocabularies()}  # picks up all vocabs at the relevant VocBench instance
 
 
