@@ -3,7 +3,7 @@ from flask import Response, render_template, url_for
 import _config as config
 import data.source as source
 from rdflib import Graph, RDF, Literal, URIRef, XSD
-from rdflib.namespace import SKOS, DCTERMS
+from rdflib.namespace import SKOS, DCTERMS, NamespaceManager
 
 
 class Concept:
@@ -73,8 +73,13 @@ class ConceptRenderer(Renderer):
 
     def _render_skos_rdf(self):
         # Create a graph from the self.concept object for a SKOS view
+        namespace_manager = NamespaceManager(Graph())
+        namespace_manager.bind('dct', DCTERMS)
+        namespace_manager.bind('skos', SKOS)
+
         s = URIRef(self.concept.uri)
         g = Graph()
+        g.namespace_manager = namespace_manager
         if self.concept.prefLabel:
             g.add((s, SKOS.prefLabel, Literal(self.concept.prefLabel, datatype=XSD.string)))
         if self.concept.definition:
@@ -96,6 +101,7 @@ class ConceptRenderer(Renderer):
             for n in self.concept.narrowers:
                 g.add((s, SKOS.narrower, URIRef(n['uri'])))
                 g.add((URIRef(n['uri']), SKOS.prefLabel, Literal(n['prefLabel'])))
+        # TODO: vocab_id, uri, semantic_properties
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:
