@@ -2,8 +2,8 @@ from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
 import _config as config
 import data.source as source
-from rdflib import Graph, RDF, Literal, URIRef
-from rdflib.namespace import SKOS, DCTERMS
+from rdflib import Graph, RDF, Literal, URIRef, XSD
+from rdflib.namespace import SKOS, DCTERMS, NamespaceManager
 
 
 class Concept:
@@ -72,39 +72,36 @@ class ConceptRenderer(Renderer):
                 return self._render_skos_html()
 
     def _render_skos_rdf(self):
-        # get Concept RDF
-        # import data.source_selector as sel
-        # rdf = sel.get_concept(self.request.values.get('vocab_id'), self.request.values.get('uri'))
-        #
-        # import data.source_RVA as rva
-        # g = Graph()
-        # g.parse(rva.RVA.VOCAB_ENDPOINTS[self.request.values.get('vocab_id')]['download'])
+        # Create a graph from the self.concept object for a SKOS view
+        namespace_manager = NamespaceManager(Graph())
+        namespace_manager.bind('dct', DCTERMS)
+        namespace_manager.bind('skos', SKOS)
 
-        # Create a graph from the self.concept object
         s = URIRef(self.concept.uri)
         g = Graph()
+        g.namespace_manager = namespace_manager
         if self.concept.prefLabel:
-            g.add((s, SKOS.prefLabel, Literal(self.concept.prefLabel)))
+            g.add((s, SKOS.prefLabel, Literal(self.concept.prefLabel, datatype=XSD.string)))
         if self.concept.definition:
-            g.add((s, SKOS.definition, Literal(self.concept.definition)))
+            g.add((s, SKOS.definition, Literal(self.concept.definition, datatype=XSD.string)))
         if self.concept.altLabels:
             for label in self.concept.altLabels:
-                g.add((s, SKOS.altLabel, Literal(label)))
+                g.add((s, SKOS.altLabel, Literal(label, datatype=XSD.string)))
         if self.concept.hiddenLabels:
             for label in self.concept.hiddenLabels:
-                g.add((s, SKOS.hiddenLabel, Literal(label)))
+                g.add((s, SKOS.hiddenLabel, Literal(label, datatype=XSD.stringl)))
         if self.concept.source:
-            g.add((s, DCTERMS.source, Literal(self.concept.source)))
+            g.add((s, DCTERMS.source, Literal(self.concept.source, datatype=XSD.string))) # should the object be a XSD.string or a URIRef?
         if self.concept.contributor:
-            g.add((s, DCTERMS.contributor, Literal(self.concept.contributor)))
+            g.add((s, DCTERMS.contributor, Literal(self.concept.contributor, datatype=XSD.string)))
         if self.concept.broaders: #
-            g.add((s, SKOS.broader, Literal(self.concept.broaders)))
+            for n in self.concept.broaders:
+                g.add((s, SKOS.broader, Literal(self.concept.broaders)))
         if self.concept.narrowers:
             for n in self.concept.narrowers:
                 g.add((s, SKOS.narrower, URIRef(n['uri'])))
                 g.add((URIRef(n['uri']), SKOS.prefLabel, Literal(n['prefLabel'])))
-
-
+        # TODO: vocab_id, uri, semantic_properties
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:

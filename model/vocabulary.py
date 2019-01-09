@@ -1,6 +1,7 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
-from rdflib import Graph
+from rdflib import Graph, URIRef, Literal, XSD
+from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
 
 
 class Vocabulary:
@@ -67,22 +68,52 @@ class VocabularyRenderer(Renderer):
         if self.view == 'alternates':
             return self._render_alternates_view()
         elif self.view == 'dcat':
-            if self.format in Renderer.RDF_MIMETYPES:
+            if self.format in Renderer.RDF_MIMETYPES or self.format in Renderer.RDF_SERIALIZER_MAP:
                 return self._render_dcat_rdf()
             else:
                 return self._render_dcat_html()
 
     def _render_dcat_rdf(self):
         # get vocab RDF
-        import data.source_RVA as rva
-        v = rva.RVA()._get_resource_rdf(self.vocab_id, self.uri)
-        g = Graph().load(v, format='turtle')
+        # map nice prefixes to namespaces
+        DCAT = Namespace('https://www.w3.org/ns/dcat')
+        namespace_manager = NamespaceManager(Graph())
+        namespace_manager.bind('dcat', DCAT)
+        namespace_manager.bind('dct', DCTERMS)
+        namespace_manager.bind('owl', OWL)
+        namespace_manager.bind('skos', SKOS)
+
+        s = URIRef(self.vocab.uri)
+        g = Graph()
+        g.namespace_manager = namespace_manager
+
+        if self.vocab.title:
+            g.add((s, DCTERMS.title, Literal(self.vocab.title, datatype=XSD.string)))
+        if self.vocab.description:
+            g.add((s, DCTERMS.description, Literal(self.vocab.description, datatype=XSD.string)))
+        if self.vocab.creator:
+            g.add((s, DCTERMS.creator, Literal(self.vocab.creator, datatype=XSD.string)))
+        if self.vocab.created:
+            g.add((s, DCTERMS.created, Literal(self.vocab.created, datatype=XSD.date)))
+        if self.vocab.modified:
+            g.add((s, DCTERMS.modified, Literal(self.vocab.modified, datatype=XSD.date)))
+        if self.vocab.versionInfo:
+            g.add((s, OWL.versionInfo, Literal(self.vocab.versionInfo, datatype=XSD.string)))
+        if self.vocab.hasTopConcepts:
+            for c in self.vocab.hasTopConcepts:
+                g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
+                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1], datatype=XSD.string)))
+        # TODO: id, uri, conceptHierarchy
+        if self.vocab.accessURL:
+            g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
+        if self.vocab.downloadURL:
+            g.add((s, DCAT.downloadURL, URIRef(self.vocab.downloadURL)))
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:
-            return g.serialize(format='json-ld')
+            return Response(g.serialize(format='json-ld'), mimetype=self.format)
         else:
-            return g.serialize(format=self.format)
+            return Response(g.serialize(format=self.format), mimetype=self.format)
 
     def _render_dcat_html(self):
         _template_context = {
