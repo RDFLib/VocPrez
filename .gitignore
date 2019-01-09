@@ -114,5 +114,11 @@ venv.bak/
 # config
 _config/__init__.py
 
-# instnace data
+# instance data
 *.ttl
+*.rdf
+*.owl
+*.n3
+
+# pickle python files
+*.p
