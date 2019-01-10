@@ -29,7 +29,14 @@
         <th>Version Info</th><td>{{ vocab.versionInfo }}</td>
     </tr>
     <tr>
-        <th>Download</th><td><a href="{{ vocab.downloadURL }}">RDF (turtle)</a></td>
+        <th>Download</th>
+        <td>
+            {% if vocab.downloadURL %}
+                <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
+            {% else %}
+                <a href="{{ vocab.uri }}">RDF (turtle)</a>
+            {% endif %}
+        </td>
     </tr>
     {% endif %}
     {%  if vocab.hasTopConcepts is not none  %}
