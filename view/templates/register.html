@@ -18,6 +18,10 @@
                 {%- endfor -%}
                 </ul>
                 <!-- pagination links as per MediaTypes -->
+                {%  if pagination.links %}
+                    <h5>Paging</h5>
+                {%  endif %}
+                {{ pagination.links }}
             </td>
             <td style="width:50%; vertical-align:top;">
                 <h3>Alternate views</h3>

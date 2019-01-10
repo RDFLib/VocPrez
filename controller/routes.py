@@ -22,6 +22,11 @@ def index():
 
 @routes.route('/vocabulary/')
 def vocabularies():
+    page = request.values.get('page') if request.values.get('page') is not None else 1
+    page = int(page)
+    per_page = request.values.get('per_page') if request.values.get('per_page') is not None else 20
+    per_page = int(per_page)
+
     # TODO: replace this logic with the following
     #   1. read all static vocabs from config.VOCABS
     # get this instance's list of vocabs
@@ -29,6 +34,11 @@ def vocabularies():
     for k, v in config.VOCABS.items():
         vocabs.append((k, v['title']))
     vocabs.sort(key=lambda tup: tup[1])
+    total = len(config.VOCABS.items())
+
+    start = (page-1)*per_page
+    end = start + per_page
+    vocabs = vocabs[start:end]
 
     # render the list of vocabs
     return SkosRegisterRenderer(
@@ -36,7 +46,7 @@ def vocabularies():
         [],
         vocabs,
         'Vocabularies',
-        len(vocabs)
+        total
     ).render()
 
 

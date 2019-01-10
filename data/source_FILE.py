@@ -66,7 +66,7 @@ class FILE(Source):
                 g = FILE.load_pickle(v)
                 for s, p, o in g.triples((None, SKOS.inScheme, None)):
                     if s not in vocabs:
-                        vocabs[s] = {
+                        vocabs[str(s)] = {
                             'source': config.VocabSource.RVA,
                             'title': ' '.join(str(s).split('#')[-1].split('/')[-1].split('_')).title()
                         }
