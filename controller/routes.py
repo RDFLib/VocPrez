@@ -36,6 +36,7 @@ def vocabularies():
     vocabs.sort(key=lambda tup: tup[1])
     total = len(config.VOCABS.items())
 
+    # generate vocabs list for requested page and per_page
     start = (page-1)*per_page
     end = start + per_page
     vocabs = vocabs[start:end]
@@ -119,8 +120,6 @@ def object():
 
     if c == 'http://www.w3.org/2004/02/skos/core#Concept':
         concept = Source(vocab_id).get_concept(uri)
-        print('concept')
-        print(concept)
         return ConceptRenderer(
             request,
             concept
@@ -132,6 +131,8 @@ def object():
             request,
             collection
         ).render()
+    else:
+        return 'System error: Object Class URI not found. '
 
 
 @routes.route('/about')
