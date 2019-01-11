@@ -87,13 +87,20 @@ class FILE(Source):
         return [(x['c'], x['l']) for x in self.g.query(q)]
 
     def list_concepts(self):
-        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT *
-            WHERE {
-              ?c a skos:Concept .
-              ?c skos:prefLabel ?pl .
-            }'''
-        return [(x['c'], x['pl']) for x in self.g.query(q)]
+        # q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        #     SELECT *
+        #     WHERE {
+        #       ?c a skos:Concept .
+        #       ?c skos:prefLabel ?pl .
+        #     }'''
+        # return [(x['c'], x['pl']) for x in self.g.query(q)]
+
+        vocabs = []
+        for s, p, o in self.g.triples((None, SKOS.inScheme, None)):
+            label = ' '.join(str(s).split('#')[-1].split('/')[-1].split('_'))
+            vocabs.append((str(s), label))
+
+        return vocabs
 
     def get_vocabulary(self):
         from model.vocabulary import Vocabulary
@@ -158,8 +165,7 @@ class FILE(Source):
         broaders = []
         for s, p, o in g.triples((URIRef(uri), SKOS.broader, None)):
             if o:
-                temp_graph = Graph().parse(str(o) + '.ttl', format='turtle')
-                label = str(temp_graph.preferredLabel(o)[0][1])
+                label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
                 broaders.append(
                     {
                         'uri': o,
@@ -195,8 +201,7 @@ class FILE(Source):
         narrowers = []
         for s, p, o in g.triples((URIRef(uri), SKOS.narrower, None)):
             if o:
-                temp_graph = Graph().parse(str(o) + '.ttl', format='turtle')
-                label = str(temp_graph.preferredLabel(o)[0][1])
+                label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
                 narrowers.append(
                     {
                         'uri': o,
