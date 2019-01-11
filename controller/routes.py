@@ -24,7 +24,7 @@ def render_invalid_vocab_id_response():
 def index():
     return render_template(
         'index.html',
-        title='SKOS Styler',
+        title=config.TITLE,
         navs={}
     )
 
