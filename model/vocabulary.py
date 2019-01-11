@@ -1,6 +1,6 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
-from rdflib import Graph, URIRef, Literal, XSD
+from rdflib import Graph, URIRef, Literal, XSD, RDF
 from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
 
 
@@ -68,31 +68,33 @@ class VocabularyRenderer(Renderer):
         if self.view == 'alternates':
             return self._render_alternates_view()
         elif self.view == 'dcat':
-            if self.format in Renderer.RDF_MIMETYPES or self.format in Renderer.RDF_SERIALIZER_MAP:
+            if self.format in Renderer.RDF_SERIALIZER_MAP:
                 return self._render_dcat_rdf()
             else:
                 return self._render_dcat_html()
 
     def _render_dcat_rdf(self):
         # get vocab RDF
-        # map nice prefixes to namespaces
-        DCAT = Namespace('https://www.w3.org/ns/dcat')
-        namespace_manager = NamespaceManager(Graph())
-        namespace_manager.bind('dcat', DCAT)
-        namespace_manager.bind('dct', DCTERMS)
-        namespace_manager.bind('owl', OWL)
-        namespace_manager.bind('skos', SKOS)
-
-        s = URIRef(self.vocab.uri)
         g = Graph()
-        g.namespace_manager = namespace_manager
+        # map nice prefixes to namespaces
+        NamespaceManager(g)
+        DCAT = Namespace('https://www.w3.org/ns/dcat#')
+        g.namespace_manager.bind('dcat', DCAT)
+        g.namespace_manager.bind('dct', DCTERMS)
+        g.namespace_manager.bind('owl', OWL)
+        g.namespace_manager.bind('skos', SKOS)
+        s = URIRef(self.vocab.uri)
 
+        g.add((s, RDF.type, DCAT.Dataset))
         if self.vocab.title:
             g.add((s, DCTERMS.title, Literal(self.vocab.title, datatype=XSD.string)))
         if self.vocab.description:
             g.add((s, DCTERMS.description, Literal(self.vocab.description, datatype=XSD.string)))
         if self.vocab.creator:
-            g.add((s, DCTERMS.creator, Literal(self.vocab.creator, datatype=XSD.string)))
+            if self.vocab.creator[:7] == 'http://' or self.vocab.creator[:7] == 'https://': # if url
+                g.add((s, DCTERMS.creator, URIRef(self.vocab.creator)))
+            else: # else literal
+                g.add((s, DCTERMS.creator, Literal(self.vocab.creator, datatype=XSD.string)))
         if self.vocab.created:
             g.add((s, DCTERMS.created, Literal(self.vocab.created, datatype=XSD.date)))
         if self.vocab.modified:
@@ -103,7 +105,6 @@ class VocabularyRenderer(Renderer):
             for c in self.vocab.hasTopConcepts:
                 g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
                 g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1], datatype=XSD.string)))
-        # TODO: id, uri, conceptHierarchy
         if self.vocab.accessURL:
             g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
         if self.vocab.downloadURL:

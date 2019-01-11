@@ -20,12 +20,24 @@ def render_invalid_vocab_id_response():
     )
 
 
+def get_a_vocab_source_key():
+    """
+    Get the first key from the config.VOCABS dictionary.
+
+    :return: Key name
+    :rtype: str
+    """
+    return next(iter(config.VOCABS))
+
+
 @routes.route('/')
 def index():
     return render_template(
         'index.html',
-        title='SKOS Styler',
-        navs={}
+        title=config.TITLE,
+        navs={},
+        config=config,
+        voc_key=get_a_vocab_source_key()
     )
 
 

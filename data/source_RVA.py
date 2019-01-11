@@ -193,6 +193,16 @@ class RVA(Source):
         sparql.setReturnFormat(JSON)
         narrowers = sparql.query().convert()['results']['bindings']
 
+        # get the concept's source
+        q = '''PREFIX dct: <http://purl.org/dc/terms/>
+                    SELECT *
+                    WHERE {{
+                      <{}> dct:source ?source .
+                    }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        source = sparql.query().convert()['results']['bindings'][0]['source']['value']
+
         from model.concept import Concept
         return Concept(
             self.vocab_id,
