@@ -11,6 +11,15 @@ from data.source import Source
 routes = Blueprint('routes', __name__)
 
 
+def render_invalid_vocab_id_response():
+    return Response(
+        'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
+        '\n'.join(config.VOCABS.keys()),
+        status=400,
+        mimetype='text/plain'
+    )
+
+
 @routes.route('/')
 def index():
     return render_template(
@@ -22,10 +31,8 @@ def index():
 
 @routes.route('/vocabulary/')
 def vocabularies():
-    page = request.values.get('page') if request.values.get('page') is not None else 1
-    page = int(page)
-    per_page = request.values.get('per_page') if request.values.get('per_page') is not None else 20
-    per_page = int(per_page)
+    page = int(request.values.get('page')) if request.values.get('page') is not None else 1
+    per_page = int(request.values.get('per_page')) if request.values.get('per_page') is not None else 20
 
     # TODO: replace this logic with the following
     #   1. read all static vocabs from config.VOCABS
@@ -53,22 +60,40 @@ def vocabularies():
 
 @routes.route('/vocabulary/<vocab_id>')
 def vocabulary(vocab_id):
-    # check this vocab ID is known
     if vocab_id not in config.VOCABS.keys():
-        return Response(
-            'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-            '\n'.join(config.VOCABS.keys()),
-            status=400,
-            mimetype='text/plain'
-        )
+        return render_invalid_vocab_id_response()
 
     # get vocab details using appropriate source handler
-
     v = Source(vocab_id).get_vocabulary()
 
     return VocabularyRenderer(
         request,
         v
+    ).render()
+
+
+@routes.route('/vocabulary/<vocab_id>/concept/')
+def vocabulary_list(vocab_id):
+    if vocab_id not in config.VOCABS.keys():
+        return render_invalid_vocab_id_response()
+
+    v = Source(vocab_id)
+    concepts = v.list_concepts()
+    concepts.sort(key= lambda x: x[1])
+    total = len(concepts)
+
+    page = int(request.values.get('page')) if request.values.get('page') is not None else 1
+    per_page = int(request.values.get('per_page')) if request.values.get('per_page') is not None else 20
+    start = (page - 1) * per_page
+    end = start + per_page
+    concepts = concepts[start:end]
+
+    return SkosRegisterRenderer(
+        request,
+        [],
+        concepts,
+        'Concepts',
+        total
     ).render()
 
 
