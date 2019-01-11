@@ -11,6 +11,11 @@ from data.source import Source
 routes = Blueprint('routes', __name__)
 
 
+def vocab_exists(vocab_id):
+    if vocab_id in config.VOCABS.keys():
+        return True
+
+
 @routes.route('/')
 def index():
     return render_template(
@@ -54,7 +59,7 @@ def vocabularies():
 @routes.route('/vocabulary/<vocab_id>')
 def vocabulary(vocab_id):
     # check this vocab ID is known
-    if vocab_id not in config.VOCABS.keys():
+    if not vocab_exists(vocab_id):
         return Response(
             'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
             '\n'.join(config.VOCABS.keys()),
@@ -70,6 +75,11 @@ def vocabulary(vocab_id):
         request,
         v
     ).render()
+
+
+@routes.route('/vocabulary/<vocab_id>/concept')
+def vocabulary_list(vocab_id):
+    return vocab_id
 
 
 @routes.route('/collection/')
