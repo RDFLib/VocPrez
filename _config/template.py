@@ -11,6 +11,14 @@ DEBUG = True
 
 
 #
+# -- VocPrez Settings --------------------------------------------------------------------------------------------------
+#
+
+# Home title
+TITLE = 'VocPrez'
+
+
+#
 #   Vocabulary data sources
 #
 # Here is the list of vocabulary sources that this instance uses. FILE, SPARQL, RVA & VOCBENCH are implemented already
