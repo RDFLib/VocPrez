@@ -133,7 +133,10 @@ class FILE(Source):
               ?tc skos:prefLabel ?pl .
             }'''
         # add the top concepts to the Vocabulary class instance
-        v.hasTopConcepts = [(x['tc'], x['pl']) for x in self.g.query(q2)]
+        # v.hasTopConcepts = [(x['tc'], x['pl']) for x in self.g.query(q2)] # this doesn't work
+        for s, p, o in self.g.triples((v.uri, SKOS.hasTopConcept, None)):
+            v.hasTopConcepts.append((str(o), ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))))
+
         # sort the top concepts by prefLabel
         v.hasTopConcepts.sort(key=lambda tup: tup[1])
         return v
