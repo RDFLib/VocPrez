@@ -120,8 +120,6 @@ def object():
 
     if c == 'http://www.w3.org/2004/02/skos/core#Concept':
         concept = Source(vocab_id).get_concept(uri)
-        print('concept')
-        print(concept)
         return ConceptRenderer(
             request,
             concept
@@ -133,6 +131,8 @@ def object():
             request,
             collection
         ).render()
+    else:
+        return 'System error: Object Class URI not found. '
 
 
 @routes.route('/about')
