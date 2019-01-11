@@ -26,7 +26,7 @@ class FILE(Source):
     @staticmethod
     def load_pickle(vocab_id):
         try:
-            with open(join(config.APP_DIR, 'vocab_files', vocab_id + 's.p'), 'rb') as f:
+            with open(join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
                 g = pickle.load(f)
                 return g
         except Exception as e:
@@ -60,16 +60,18 @@ class FILE(Source):
         #
         # return None
 
+        # TODO: Move this to list_concepts() method
+        # list concepts
         vocabs = {}
-        for v in config.VOCABS:
-            if config.VOCABS[v]['source'] == config.VocabSource.FILE:
-                g = FILE.load_pickle(v)
-                for s, p, o in g.triples((None, SKOS.inScheme, None)):
-                    if s not in vocabs:
-                        vocabs[str(s)] = {
-                            'source': config.VocabSource.RVA,
-                            'title': ' '.join(str(s).split('#')[-1].split('/')[-1].split('_')).title()
-                        }
+        # for v in config.VOCABS:
+        #     if config.VOCABS[v]['source'] == config.VocabSource.FILE:
+        #         g = FILE.load_pickle(v)
+        #         for s, p, o in g.triples((None, SKOS.inScheme, None)):
+        #             if s not in vocabs:
+        #                 vocabs[str(s)] = {
+        #                     'source': config.VocabSource.RVA,
+        #                     'title': ' '.join(str(s).split('#')[-1].split('/')[-1].split('_')).title()
+        #                 }
 
         return vocabs
 

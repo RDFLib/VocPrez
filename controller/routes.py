@@ -36,6 +36,7 @@ def vocabularies():
     vocabs.sort(key=lambda tup: tup[1])
     total = len(config.VOCABS.items())
 
+    # generate vocabs list for requested page and per_page
     start = (page-1)*per_page
     end = start + per_page
     vocabs = vocabs[start:end]
