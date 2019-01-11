@@ -26,11 +26,11 @@ class FILE(Source):
     @staticmethod
     def load_pickle(vocab_id):
         try:
-            with open(join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
+            with open(join(config.APP_DIR, 'vocab_files', vocab_id + 's.p'), 'rb') as f:
                 g = pickle.load(f)
                 return g
-        except PickleLoadException as e:
-            print(e)
+        except Exception as e:
+            raise Exception(e)
 
     @staticmethod
     def init():
