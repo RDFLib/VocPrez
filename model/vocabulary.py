@@ -39,7 +39,7 @@ class VocabularyRenderer(Renderer):
         self.views = self._add_dcat_view()
         self.navs = [
             # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
-            # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/concept/">Concepts</a> |'
+            '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/concept/">Concepts</a> |'
         ]
 
         self.vocab = vocab
