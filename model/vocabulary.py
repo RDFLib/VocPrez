@@ -75,18 +75,16 @@ class VocabularyRenderer(Renderer):
 
     def _render_dcat_rdf(self):
         # get vocab RDF
-        # map nice prefixes to namespaces
-        DCAT = Namespace('https://www.w3.org/ns/dcat#')
-        namespace_manager = NamespaceManager(Graph())
-        namespace_manager.bind('dcat', DCAT)
-        namespace_manager.bind('dct', DCTERMS)
-        namespace_manager.bind('owl', OWL)
-        namespace_manager.bind('skos', SKOS)
-
-        s = URIRef(self.vocab.uri)
-        # TODO g.add(s) rdf:type dcat:Dataset
         g = Graph()
-        g.namespace_manager = namespace_manager
+        # map nice prefixes to namespaces
+        NamespaceManager(g)
+        DCAT = Namespace('https://www.w3.org/ns/dcat#')
+        g.namespace_manager.bind('dcat', DCAT)
+        g.namespace_manager.bind('dct', DCTERMS)
+        g.namespace_manager.bind('owl', OWL)
+        g.namespace_manager.bind('skos', SKOS)
+        s = URIRef(self.vocab.uri)
+
         g.add((s, RDF.type, DCAT.Dataset))
         if self.vocab.title:
             g.add((s, DCTERMS.title, Literal(self.vocab.title, datatype=XSD.string)))
@@ -107,7 +105,6 @@ class VocabularyRenderer(Renderer):
             for c in self.vocab.hasTopConcepts:
                 g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
                 g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1], datatype=XSD.string)))
-        # TODO: id, uri, conceptHierarchy
         if self.vocab.accessURL:
             g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
         if self.vocab.downloadURL:
