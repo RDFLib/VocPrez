@@ -1,8 +1,8 @@
 from data.source import Source
 from os.path import dirname, realpath, join, abspath
 import _config as config
-from rdflib import Graph
-from rdflib.namespace import SKOS
+from rdflib import Graph, URIRef, RDF
+from rdflib.namespace import SKOS, DCTERMS, DC
 import os
 import pickle
 
@@ -145,10 +145,104 @@ class FILE(Source):
         pass
 
     def get_concept(self, uri):
-        pass
+        g = Graph().parse(uri + '.ttl', format='turtle')
+
+        # -- altLabels
+        altLabels = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.altLabel, None)):
+            if o:
+                altLabels.append(str(o))
+        altLabels.sort()
+
+        # -- broaders
+        broaders = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.broader, None)):
+            if o:
+                temp_graph = Graph().parse(str(o) + '.ttl', format='turtle')
+                label = str(temp_graph.preferredLabel(o)[0][1])
+                broaders.append(
+                    {
+                        'uri': o,
+                        'prefLabel': label
+                    }
+                )
+        broaders.sort(key= lambda x: x['prefLabel'])
+
+        # -- contributor
+        contributor = None
+        for s, p, o in g.triples((URIRef(uri), DCTERMS.contributor, None)):
+            if o:
+                contributor = str(o)
+        if not contributor: # if we didn't find a dct:contributor, look for a dc:contributor
+            for s, p, o in g.triples((URIRef(uri), DC.contributor, None)):
+                if o:
+                    contributor = str(o)
+
+       # -- definition
+        definition = None
+        for s, p, o in g.triples((URIRef(uri), SKOS.definition, None)):
+            if o:
+                definition = str(o)
+
+        # -- hiddenLabels
+        hiddenLabels = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.hiddenLabel, None)):
+            if o:
+                hiddenLabels.append(str(o))
+        hiddenLabels.sort()
+
+        # -- narrowers
+        narrowers = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.narrower, None)):
+            if o:
+                temp_graph = Graph().parse(str(o) + '.ttl', format='turtle')
+                label = str(temp_graph.preferredLabel(o)[0][1])
+                narrowers.append(
+                    {
+                        'uri': o,
+                        'prefLabel': label
+                    }
+                )
+        narrowers.sort(key=lambda x:  x['prefLabel'])
+
+        # -- prefLabel
+        prefLabel = None
+        for s, p, o in g.triples((URIRef(uri), SKOS.prefLabel, None)):
+            if o:
+                prefLabel = str(o)
+                break
+
+        # -- semantic_properties TODO: Not sure what to do here
+        semantic_properties = None
+
+        # -- source
+        source = None
+        for s, p, o in g.triples((URIRef(uri), DCTERMS.source, None)):
+            if o:
+                source = str(o)
+                break
+
+        from model.concept import Concept
+        return Concept(
+            self.vocab_id,
+            uri,
+            prefLabel,
+            definition,
+            altLabels,
+            hiddenLabels,
+            source,
+            contributor,
+            broaders,
+            narrowers,
+            semantic_properties
+        )
 
     def get_concept_hierarchy(self, concept_scheme_uri):
         return NotImplementedError
 
     def get_object_class(self, uri):
-        return NotImplementedError
+        g = Graph()
+        g.parse(uri + '.ttl', format='turtle')
+        for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
+            if o:
+                return str(o)
