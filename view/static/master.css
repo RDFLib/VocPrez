@@ -18,6 +18,30 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
+.disabled a {
+    color: gray;
+}
+
+.active a {
+    font-weight: bold;
+}
+
+.pagination ul li {
+    display: inline;
+    margin-right: 20px;
+    border-style: outset;
+    border-width: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+h5 {
+    font-size: 16px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block; }
