@@ -1,3 +1,19 @@
+.disabled a {
+    color: gray;
+}
+
+.active a {
+    font-weight: bold;
+}
+
+.pagination ul li {
+    display: inline;
+    margin-right: 20px;
+    border-style: outset;
+    border-width: 1px;
+    padding: 5px;
+}
+
 footer-contenttable {
     border-collapse: collapse;
 }
