@@ -203,15 +203,35 @@ class RVA(Source):
         sparql.setReturnFormat(JSON)
         source = sparql.query().convert()['results']['bindings'][0]['source']['value']
 
+        # get the concept's definition
+        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                            SELECT *
+                            WHERE {{
+                              <{}> skos:definition ?definition .
+                            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        definition = sparql.query().convert()['results']['bindings'][0]['definition']['value']
+
+        # get the concept's prefLabel
+        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                                    SELECT *
+                                    WHERE {{
+                                      <{}> skos:prefLabel ?prefLabel .
+                                    }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        prefLabel = sparql.query().convert()['results']['bindings'][0]['prefLabel']['value']
+
         from model.concept import Concept
         return Concept(
             self.vocab_id,
             uri,
-            metadata[0]['pl']['value'],
-            metadata[0].get('d').get('value') if metadata[0].get('d') is not None else None,
+            prefLabel,
+            definition,
             [x.get('al').get('value') for x in altLabels],
             [x.get('hl').get('value') for x in hiddenLabels],
-            metadata[0].get('sc').get('value') if metadata[0].get('sc') is not None else None,
+            source,
             metadata[0].get('cn').get('value') if metadata[0].get('cn') is not None else None,
             [{'uri': x.get('b').get('value'), 'prefLabel': x.get('pl').get('value')} for x in broaders],
             [{'uri': x.get('n').get('value'), 'prefLabel': x.get('pl').get('value')} for x in narrowers],
