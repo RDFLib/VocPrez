@@ -10,6 +10,7 @@ class PickleLoadException(Exception):
     pass
 
 class FILE(Source):
+    hierarchy = {}
 
     # file extensions mapped to rdflib-supported formats
     # see supported rdflib formats at https://rdflib.readthedocs.io/en/stable/plugin_parsers.html?highlight=format
@@ -47,6 +48,11 @@ class FILE(Source):
                     # pickle to directory/vocab_files/
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
+
+        # build conceptHierarchy
+        for item in config.VOCABS:
+            if config.VOCABS[item]['source'] == config.VocabSource.FILE:
+                FILE.hierarchy[item] = FILE.build_concept_hierarchy(item)
 
     @classmethod
     def list_vocabularies(self):
@@ -256,9 +262,20 @@ class FILE(Source):
         )
 
     def get_concept_hierarchy(self):
+        return FILE.hierarchy[self.vocab_id]
+
+    @staticmethod
+    def build_concept_hierarchy(vocab_id):
+        g = FILE.load_pickle(vocab_id)
+
+        # get uri
+        uri = None
+        for s, p, o in g.triples((None, RDF.type, SKOS.ConceptScheme)):
+            uri = str(s)
+
         # get TopConcept
         topConcept = None
-        for s, p, o in self.g.triples((URIRef(self.uri), SKOS.hasTopConcept, None)):
+        for s, p, o in g.triples((URIRef(uri), SKOS.hasTopConcept, None)):
             topConcept = str(o)
             break
 
@@ -281,6 +298,7 @@ class FILE(Source):
 
         :param uri: URI node
         :param depth: The current depth
+        :param g: The graph
         :return: list of tuples(tree_depth, uri, prefLabel)
         :rtype: list
         """
@@ -299,8 +317,7 @@ class FILE(Source):
         return items
 
     def get_object_class(self, uri):
-        g = Graph()
-        g.parse(uri + '.ttl', format='turtle')
+        g = Graph().parse(uri + '.ttl', format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
             if o:
                 return str(o)
