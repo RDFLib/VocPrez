@@ -10,6 +10,7 @@ class PickleLoadException(Exception):
     pass
 
 class FILE(Source):
+    hierarchy = {}
 
     # file extensions mapped to rdflib-supported formats
     # see supported rdflib formats at https://rdflib.readthedocs.io/en/stable/plugin_parsers.html?highlight=format
@@ -47,6 +48,11 @@ class FILE(Source):
                     # pickle to directory/vocab_files/
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
+
+        # build conceptHierarchy
+        for item in config.VOCABS:
+            if config.VOCABS[item]['source'] == config.VocabSource.FILE:
+                FILE.hierarchy[item] = FILE.build_concept_hierarchy(item)
 
     @classmethod
     def list_vocabularies(self):
@@ -119,6 +125,7 @@ class FILE(Source):
               OPTIONAL {?s owl:versionInfo ?v }
             }'''
         for r in self.g.query(q):
+            self.uri = r['s']
             v = Vocabulary(
                 self.vocab_id,
                 r['s'],
@@ -146,6 +153,7 @@ class FILE(Source):
 
         # sort the top concepts by prefLabel
         v.hasTopConcepts.sort(key=lambda tup: tup[1])
+        v.conceptHierarchy = self.get_concept_hierarchy()
         return v
 
     def get_collection(self, uri):
@@ -220,12 +228,23 @@ class FILE(Source):
         # -- semantic_properties TODO: Not sure what to do here
         semantic_properties = None
 
-        # -- source
+        # # -- source
+        # source = None
+        # for s, p, o in g.triples((URIRef(uri), DCTERMS.source, None)):
+        #     if o:
+        #         source = str(o)
+        #         break
+
+        # get the concept's source
+        q = g.query('''PREFIX dct: <http://purl.org/dc/terms/>
+                            SELECT *
+                            WHERE {
+                              ?a dct:source ?source .
+                            }''')
         source = None
-        for s, p, o in g.triples((URIRef(uri), DCTERMS.source, None)):
-            if o:
-                source = str(o)
-                break
+        for row in q:
+            source = row['source']
+            break
 
         from model.concept import Concept
         return Concept(
@@ -242,12 +261,35 @@ class FILE(Source):
             semantic_properties
         )
 
-    def get_concept_hierarchy(self, concept_scheme_uri):
-        return NotImplementedError
+    def get_concept_hierarchy(self):
+        return FILE.hierarchy[self.vocab_id]
+
+    @staticmethod
+    def build_concept_hierarchy(vocab_id):
+        g = FILE.load_pickle(vocab_id)
+
+        # get uri
+        uri = None
+        for s, p, o in g.triples((None, RDF.type, SKOS.ConceptScheme)):
+            uri = str(s)
+
+        # get TopConcept
+        topConcepts = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.hasTopConcept, None)):
+            topConcepts.append(str(o))
+
+        hierarchy = []
+        if topConcepts:
+            topConcepts.sort()
+            for tc in topConcepts:
+                hierarchy.append((1, tc, Source.get_prefLabel_from_uri(tc)))
+                hierarchy += Source.get_narrowers(tc, 1)
+            return hierarchy
+        else:
+            raise Exception(f'topConcept not found')
 
     def get_object_class(self, uri):
-        g = Graph()
-        g.parse(uri + '.ttl', format='turtle')
+        g = Graph().parse(uri + '.ttl', format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
             if o:
                 return str(o)

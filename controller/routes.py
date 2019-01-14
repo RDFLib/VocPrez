@@ -169,7 +169,7 @@ def object():
             collection
         ).render()
     else:
-        return 'System error: Object Class URI not found. '
+        return 'System error at /object endpoint: Object Class URI not found. '
 
 
 @routes.route('/about')

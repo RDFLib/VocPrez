@@ -33,22 +33,22 @@
     {% endif %}
     {% if concept.broaders|length > 0 %}
     <tr>
-        {% if concept.broaders is defined %}
+        {% if concept.broaders %}
         <th>Broader</th>
         <td class="list">
             {% for broader in concept.broaders -%}
-            <a href="{{ broader.url }}">{{ broader.prefLabel }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ broader.uri }}">{{ broader.prefLabel }}</a><br />
             {% endfor %}
         </td>
         {% endif %}
     </tr>
     {% endif %}
-    {% if concept.narrowers is defined %}
+    {% if concept.narrowers %}
     <tr>
         <th style="padding-right: 10px;">Narrower: </th>
         <td class="list">
             {% for narrower in concept.narrowers -%}
-            <a href="{{ narrower.uri }}">{{ narrower.prefLabel }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ narrower.uri }}">{{ narrower.prefLabel }}</a><br />
             {% endfor %}
         </td>
     </tr>

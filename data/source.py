@@ -1,13 +1,15 @@
 import _config as config
 import sys
+from rdflib import Graph, URIRef
+from rdflib.namespace import SKOS
 
 
 class Source:
     VOC_TYPES = [
-        'http://purl.org/vocommons/voaf#Vocabulary'
+        'http://purl.org/vocommons/voaf#Vocabulary',
         'http://www.w3.org/2004/02/skos/core#ConceptScheme',
         'http://www.w3.org/2004/02/skos/core#ConceptCollection',
-        'http://www.w3.org/2004/02/skos/core#Concept'
+        'http://www.w3.org/2004/02/skos/core#Concept',
     ]
 
     def _delegator(self, function_name):
@@ -68,3 +70,32 @@ class Source:
         :rtype: :class:`string`
         """
         return self._delegator(sys._getframe().f_code.co_name)(uri)
+
+    @staticmethod
+    def get_prefLabel_from_uri(uri):
+        return ' '.join(str(uri).split('#')[-1].split('/')[-1].split('_'))
+
+    @staticmethod
+    def get_narrowers(uri, depth):
+        """
+        Recursively get all skos:narrower properties as a list.
+
+        :param uri: URI node
+        :param depth: The current depth
+        :param g: The graph
+        :return: list of tuples(tree_depth, uri, prefLabel)
+        :rtype: list
+        """
+        depth += 1
+        g = Graph().parse(uri + '.ttl', format='turtle')
+        items = []
+        for s, p, o in g.triples((None, SKOS.broader, URIRef(uri))):
+            items.append((depth, str(s), Source.get_prefLabel_from_uri(s)))
+        items.sort(key=lambda x: x[2])
+        count = 0
+        for item in items:
+            count += 1
+            new_items = Source.get_narrowers(item[1], item[0])
+            items = items[:count] + new_items + items[count:]
+            count += len(new_items)
+        return items
