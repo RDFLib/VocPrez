@@ -1,5 +1,6 @@
 from os import path
 from data.source_FILE import FILE
+from data.source_RVA import RVA
 # RVA doesnt need to be imported as it's list_vocabularies method isn't used- vocabs from that are statically listed
 from data.source_VOCBENCH import VOCBENCH
 
@@ -90,6 +91,7 @@ VOCABS = {
 
 # read in RDF vocab files on startup in vocab_files directory
 FILE.init()
+RVA.init()
 
 # extend this instances' list of vocabs by using the known sources
 VOCABS = {**VOCABS, **FILE.list_vocabularies()}  # picks up all vocab RDF (turtle) files in data/
