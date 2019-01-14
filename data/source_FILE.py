@@ -146,6 +146,7 @@ class FILE(Source):
 
         # sort the top concepts by prefLabel
         v.hasTopConcepts.sort(key=lambda tup: tup[1])
+        # v.conceptHierarchy = self.get_concept_hierarchy() # TODO
         return v
 
     def get_collection(self, uri):
@@ -220,12 +221,23 @@ class FILE(Source):
         # -- semantic_properties TODO: Not sure what to do here
         semantic_properties = None
 
-        # -- source
+        # # -- source
+        # source = None
+        # for s, p, o in g.triples((URIRef(uri), DCTERMS.source, None)):
+        #     if o:
+        #         source = str(o)
+        #         break
+
+        # get the concept's source
+        q = g.query('''PREFIX dct: <http://purl.org/dc/terms/>
+                            SELECT *
+                            WHERE {
+                              ?a dct:source ?source .
+                            }''')
         source = None
-        for s, p, o in g.triples((URIRef(uri), DCTERMS.source, None)):
-            if o:
-                source = str(o)
-                break
+        for row in q:
+            source = row['source']
+            break
 
         from model.concept import Concept
         return Concept(
@@ -242,7 +254,25 @@ class FILE(Source):
             semantic_properties
         )
 
-    def get_concept_hierarchy(self, concept_scheme_uri):
+    def get_concept_hierarchy(self):
+
+        # q = self.g.query(f'''
+        #             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        #
+        #             SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
+        #             WHERE {{
+        #                 ?c      a                                       skos:Concept .
+        #                 ?cs     (skos:hasTopConcept | skos:narrower)*   ?mid .
+        #                 ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .
+        #                 ?c      skos:prefLabel                          ?pl .
+        #                 ?c		(skos:topConceptOf | skos:broader)		?parent .
+        #                 FILTER (?cs = <http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype>)
+        #             }}
+        #             GROUP BY ?c ?pl ?parent
+        #             ORDER BY ?length ?parent ?pl''')
+        #
+        # for row in q:
+        #     print(row)
         return NotImplementedError
 
     def get_object_class(self, uri):
