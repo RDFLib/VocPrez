@@ -276,6 +276,14 @@ class FILE(Source):
 
     @staticmethod
     def get_narrowers(uri, depth):
+        """
+        Recursively get all skos:narrower properties as a list.
+
+        :param uri: URI node
+        :param depth: The current depth
+        :return: list of tuples(tree_depth, uri, prefLabel)
+        :rtype: list
+        """
         depth += 1
         g = Graph().parse(uri + '.ttl', format='turtle')
         items = []
