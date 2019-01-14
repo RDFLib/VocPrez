@@ -274,15 +274,16 @@ class FILE(Source):
             uri = str(s)
 
         # get TopConcept
-        topConcept = None
+        topConcepts = []
         for s, p, o in g.triples((URIRef(uri), SKOS.hasTopConcept, None)):
-            topConcept = str(o)
-            break
+            topConcepts.append(str(o))
 
         hierarchy = []
-        if topConcept:
-            hierarchy.append((1, topConcept, Source.get_prefLabel_from_uri(topConcept)))
-            hierarchy += Source.get_narrowers(topConcept, 1)
+        if topConcepts:
+            topConcepts.sort()
+            for tc in topConcepts:
+                hierarchy.append((1, tc, Source.get_prefLabel_from_uri(tc)))
+                hierarchy += Source.get_narrowers(tc, 1)
             return hierarchy
         else:
             raise Exception(f'topConcept not found')
