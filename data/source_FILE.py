@@ -119,6 +119,7 @@ class FILE(Source):
               OPTIONAL {?s owl:versionInfo ?v }
             }'''
         for r in self.g.query(q):
+            self.uri = r['s']
             v = Vocabulary(
                 self.vocab_id,
                 r['s'],
@@ -146,7 +147,7 @@ class FILE(Source):
 
         # sort the top concepts by prefLabel
         v.hasTopConcepts.sort(key=lambda tup: tup[1])
-        # v.conceptHierarchy = self.get_concept_hierarchy() # TODO
+        v.conceptHierarchy = self.get_concept_hierarchy()
         return v
 
     def get_collection(self, uri):
@@ -255,25 +256,39 @@ class FILE(Source):
         )
 
     def get_concept_hierarchy(self):
+        # get TopConcept
+        topConcept = None
+        for s, p, o in self.g.triples((URIRef(self.uri), SKOS.hasTopConcept, None)):
+            topConcept = str(o)
+            break
 
-        # q = self.g.query(f'''
-        #             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        #
-        #             SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
-        #             WHERE {{
-        #                 ?c      a                                       skos:Concept .
-        #                 ?cs     (skos:hasTopConcept | skos:narrower)*   ?mid .
-        #                 ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .
-        #                 ?c      skos:prefLabel                          ?pl .
-        #                 ?c		(skos:topConceptOf | skos:broader)		?parent .
-        #                 FILTER (?cs = <http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype>)
-        #             }}
-        #             GROUP BY ?c ?pl ?parent
-        #             ORDER BY ?length ?parent ?pl''')
-        #
-        # for row in q:
-        #     print(row)
-        return NotImplementedError
+        hierarchy = []
+        if topConcept:
+            hierarchy.append((1, topConcept, FILE.get_prefLabel_from_uri(topConcept)))
+            hierarchy += FILE.get_narrowers(topConcept, 1)
+            return hierarchy
+        else:
+            raise Exception(f'topConcept not found')
+
+    @staticmethod
+    def get_prefLabel_from_uri(uri):
+        return ' '.join(str(uri).split('#')[-1].split('/')[-1].split('_'))
+
+    @staticmethod
+    def get_narrowers(uri, depth):
+        depth += 1
+        g = Graph().parse(uri + '.ttl', format='turtle')
+        items = []
+        for s, p, o in g.triples((None, SKOS.broader, URIRef(uri))):
+            items.append((depth, str(s), FILE.get_prefLabel_from_uri(s)))
+        items.sort(key=lambda x: x[2])
+        count = 0
+        for item in items:
+            count += 1
+            new_items = FILE.get_narrowers(item[1], item[0])
+            items = items[:count] + new_items + items[count:]
+            count += len(new_items)
+        return items
 
     def get_object_class(self, uri):
         g = Graph()
