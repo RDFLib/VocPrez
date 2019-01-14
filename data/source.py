@@ -4,10 +4,10 @@ import sys
 
 class Source:
     VOC_TYPES = [
-        'http://purl.org/vocommons/voaf#Vocabulary'
+        'http://purl.org/vocommons/voaf#Vocabulary',
         'http://www.w3.org/2004/02/skos/core#ConceptScheme',
         'http://www.w3.org/2004/02/skos/core#ConceptCollection',
-        'http://www.w3.org/2004/02/skos/core#Concept'
+        'http://www.w3.org/2004/02/skos/core#Concept',
     ]
 
     def _delegator(self, function_name):
