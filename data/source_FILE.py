@@ -286,7 +286,7 @@ class FILE(Source):
                 hierarchy += Source.get_narrowers(tc, 1)
             return hierarchy
         else:
-            raise Exception(f'topConcept not found')
+            raise Exception('topConcept not found')
 
     def get_object_class(self, uri):
         g = Graph().parse(uri + '.ttl', format='turtle')
