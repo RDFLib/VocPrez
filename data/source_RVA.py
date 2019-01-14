@@ -1,12 +1,24 @@
 from data.source import Source
 from SPARQLWrapper import SPARQLWrapper, JSON
 import _config as config
+from rdflib import Graph, RDF, URIRef
+from rdflib.namespace import SKOS
 
 class RVA(Source):
     """Source for Research Vocabularies Australia
     """
+
+    hierarchy = {}
+
     def __init__(self, vocab_id):
         super().__init__(vocab_id)
+
+    @staticmethod
+    def init():
+        # build conceptHierarchy
+        for item in config.VOCABS:
+            if config.VOCABS[item]['source'] == config.VocabSource.RVA:
+                RVA.hierarchy[item] = RVA.build_concept_hierarchy(item)
 
     @classmethod
     def list_vocabularies(self):
@@ -87,6 +99,7 @@ class RVA(Source):
         # top_concepts = sparql.query().convert()['results']['bindings']
 
         from model.vocabulary import Vocabulary
+        self.uri = metadata['results']['bindings'][0]['s']['value']
         return Vocabulary(
             self.vocab_id,
             metadata['results']['bindings'][0]['s']['value'],
@@ -102,7 +115,7 @@ class RVA(Source):
             metadata['results']['bindings'][0].get('v').get('value')
                 if metadata['results']['bindings'][0].get('v') is not None else None,
             [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
-            None,
+            self.get_concept_hierarchy(),
             config.VOCABS.get(self.vocab_id).get('download')
         )
 
@@ -238,8 +251,32 @@ class RVA(Source):
             None  # TODO: replace Sem Properties sub
         )
 
-    def get_concept_hierarchy(self, concept_scheme_uri):
-        return NotImplementedError
+    def get_concept_hierarchy(self):
+        return RVA.hierarchy[self.vocab_id]
+
+    @staticmethod
+    def build_concept_hierarchy(vocab_id):
+        g = Graph().parse(config.VOCABS[vocab_id]['download'], format='turtle')
+
+        # get uri
+        uri = None
+        for s, p, o in g.triples((None, RDF.type, SKOS.ConceptScheme)):
+            uri = str(s)
+
+        # get TopConcept
+        topConcept = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.hasTopConcept, None)):
+            topConcept.append(str(o))
+
+        hierarchy = []
+        if topConcept:
+            topConcept.sort()
+            for tc in topConcept:
+                hierarchy.append((1, tc, Source.get_prefLabel_from_uri(tc)))
+                hierarchy += Source.get_narrowers(tc, 1)
+            return hierarchy
+        else:
+            raise Exception(f'topConcept not found')
 
     def get_object_class(self, uri):
         sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
