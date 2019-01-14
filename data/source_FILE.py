@@ -281,40 +281,11 @@ class FILE(Source):
 
         hierarchy = []
         if topConcept:
-            hierarchy.append((1, topConcept, FILE.get_prefLabel_from_uri(topConcept)))
-            hierarchy += FILE.get_narrowers(topConcept, 1)
+            hierarchy.append((1, topConcept, Source.get_prefLabel_from_uri(topConcept)))
+            hierarchy += Source.get_narrowers(topConcept, 1)
             return hierarchy
         else:
             raise Exception(f'topConcept not found')
-
-    @staticmethod
-    def get_prefLabel_from_uri(uri):
-        return ' '.join(str(uri).split('#')[-1].split('/')[-1].split('_'))
-
-    @staticmethod
-    def get_narrowers(uri, depth):
-        """
-        Recursively get all skos:narrower properties as a list.
-
-        :param uri: URI node
-        :param depth: The current depth
-        :param g: The graph
-        :return: list of tuples(tree_depth, uri, prefLabel)
-        :rtype: list
-        """
-        depth += 1
-        g = Graph().parse(uri + '.ttl', format='turtle')
-        items = []
-        for s, p, o in g.triples((None, SKOS.broader, URIRef(uri))):
-            items.append((depth, str(s), FILE.get_prefLabel_from_uri(s)))
-        items.sort(key=lambda x: x[2])
-        count = 0
-        for item in items:
-            count += 1
-            new_items = FILE.get_narrowers(item[1], item[0])
-            items = items[:count] + new_items + items[count:]
-            count += len(new_items)
-        return items
 
     def get_object_class(self, uri):
         g = Graph().parse(uri + '.ttl', format='turtle')
