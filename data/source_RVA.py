@@ -264,14 +264,14 @@ class RVA(Source):
             uri = str(s)
 
         # get TopConcept
-        topConcept = []
+        topConcepts = []
         for s, p, o in g.triples((URIRef(uri), SKOS.hasTopConcept, None)):
-            topConcept.append(str(o))
+            topConcepts.append(str(o))
 
         hierarchy = []
-        if topConcept:
-            topConcept.sort()
-            for tc in topConcept:
+        if topConcepts:
+            topConcepts.sort()
+            for tc in topConcepts:
                 hierarchy.append((1, tc, Source.get_prefLabel_from_uri(tc)))
                 hierarchy += Source.get_narrowers(tc, 1)
             return hierarchy
