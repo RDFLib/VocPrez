@@ -4,10 +4,21 @@
     <h1>Register</h1>
     <h2>Of <em>{{ register_item_type_string }}</em></h2>
     <p></p>
+    <form action="?query=">
+        Search:<br>
+        <input type="text" name="query">
+        <input type="submit" value="Submit">
+    </form>
      <table>
         <tr>
             <td style="width:50%; vertical-align:top;">
                 <h3>Instances</h3>
+                {% if query %}
+                <p><em>with search query "<strong>{{ query }}</strong>"</em></p>
+                <form action="">
+                    <input type="submit" value="Go back to all items">
+                </form>
+                {% endif %}
                 <ul>
                 {%- for item in register_items -%}
                     {%- if item is not string %}
