@@ -76,7 +76,7 @@ def vocabulary(vocab_id):
         return render_invalid_vocab_id_response()
 
     # get vocab details using appropriate source handler
-    v = Source(vocab_id).get_vocabulary()
+    v = Source(vocab_id, request).get_vocabulary()
 
     return VocabularyRenderer(
         request,
@@ -89,7 +89,7 @@ def vocabulary_list(vocab_id):
     if vocab_id not in config.VOCABS.keys():
         return render_invalid_vocab_id_response()
 
-    v = Source(vocab_id)
+    v = Source(vocab_id, request)
     concepts = v.list_concepts()
     concepts.sort(key= lambda x: x[1])
     total = len(concepts)
@@ -153,16 +153,16 @@ def object():
         )
 
     # TODO reuse object within if, rather than re-loading graph
-    c = Source(vocab_id).get_object_class(uri)
+    c = Source(vocab_id, request).get_object_class(uri)
 
     if c == 'http://www.w3.org/2004/02/skos/core#Concept':
-        concept = Source(vocab_id).get_concept(uri)
+        concept = Source(vocab_id, request).get_concept(uri)
         return ConceptRenderer(
             request,
             concept
         ).render()
     elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
-        collection = Source(vocab_id).get_collection(uri)
+        collection = Source(vocab_id, request).get_collection(uri)
 
         return CollectionRenderer(
             request,

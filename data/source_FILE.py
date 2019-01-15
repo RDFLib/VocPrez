@@ -19,8 +19,8 @@ class FILE(Source):
         'rdf': 'xml'
     }
 
-    def __init__(self, vocab_id):
-        super().__init__(vocab_id)
+    def __init__(self, vocab_id, request):
+        super().__init__(vocab_id, request)
         self.g = FILE.load_pickle_graph(vocab_id)
 
 
@@ -322,7 +322,7 @@ class FILE(Source):
                     last_index = parent_index + 1
                 previous_parent_uri = this_parent
 
-        return Source.draw_concept_hierarchy(hierarchy)
+        return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     @staticmethod
     def build_concept_hierarchy(vocab_id):

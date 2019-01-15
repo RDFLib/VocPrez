@@ -29,14 +29,15 @@ class Source:
 
         # delegate the constructor of this vocab's source the the specialised source, based on source_type
         if source_type == config.VocabSource.FILE:
-            return getattr(FILE(self.vocab_id), function_name)
+            return getattr(FILE(self.vocab_id, self.request), function_name)
         elif source_type == config.VocabSource.RVA:
-            return getattr(RVA(self.vocab_id), function_name)
+            return getattr(RVA(self.vocab_id, self.request), function_name)
         elif source_type == config.VocabSource.VOCBENCH:
-            return getattr(VOCBENCH(self.vocab_id), function_name)
+            return getattr(VOCBENCH(self.vocab_id, self.request), function_name)
 
-    def __init__(self, vocab_id):
+    def __init__(self, vocab_id, request):
         self.vocab_id = vocab_id
+        self.request = request
 
     @classmethod
     def list_vocabularies(self):
@@ -115,7 +116,7 @@ class Source:
         return items
 
     @staticmethod
-    def draw_concept_hierarchy(hierarchy):
+    def draw_concept_hierarchy(hierarchy, request, id):
         tab = '\t'
         previous_length = 1
 
@@ -125,7 +126,7 @@ class Source:
                 mult = item[0] - 2
             else: # everything is normal
                 mult = item[0] - 1
-            t = tab * mult + '* [' + item[2] + ']' + '(' + item[1] + ')\n'
+            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + item[1] + ')\n'
             text += t
             previous_length = item[0]
 
