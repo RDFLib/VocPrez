@@ -15,6 +15,7 @@ class RVA(Source):
 
     @staticmethod
     def init():
+        print('Building concept hierarchy for source type RVA ...')
         # build conceptHierarchy
         for item in config.VOCABS:
             if config.VOCABS[item]['source'] == config.VocabSource.RVA:
@@ -214,7 +215,13 @@ class RVA(Source):
                     }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        source = sparql.query().convert()['results']['bindings'][0]['source']['value']
+
+        # Some RVA sources don't have property dct:source
+        source = None
+        try:
+            source = sparql.query().convert()['results']['bindings'][0]['source']['value']
+        except:
+            pass
 
         # get the concept's definition
         q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
