@@ -10,8 +10,8 @@ class RVA(Source):
 
     hierarchy = {}
 
-    def __init__(self, vocab_id):
-        super().__init__(vocab_id)
+    def __init__(self, vocab_id, request):
+        super().__init__(vocab_id, request)
 
     @staticmethod
     def init():
@@ -260,7 +260,6 @@ class RVA(Source):
         )
 
     def get_concept_hierarchy(self):
-        # return RVA.hierarchy[self.vocab_id]
         sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         sparql.setQuery(
             """
@@ -324,7 +323,7 @@ class RVA(Source):
 
                     last_index = parent_index + 1
                 previous_parent_uri = this_parent
-        return Source.draw_concept_hierarchy(hierarchy)
+        return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     @staticmethod
     def build_concept_hierarchy(vocab_id):
