@@ -4,11 +4,13 @@
     <h1>Register</h1>
     <h2>Of <em>{{ register_item_type_string }}</em></h2>
     <p></p>
+    {% if search_enabled %}
     <form action="?query=">
         Search:<br>
         <input type="text" name="query">
         <input type="submit" value="Submit">
     </form>
+    {% endif %}
      <table>
         <tr>
             <td style="width:50%; vertical-align:top;">

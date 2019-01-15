@@ -119,6 +119,16 @@ def vocabulary_list(vocab_id):
     concepts.sort(key= lambda x: x[1])
     total = len(concepts)
 
+    # Search
+    query = request.values.get('query')
+    results = []
+    if query:
+        for m in match(concepts, query):
+            results.append(m)
+        concepts[:] = results
+        concepts.sort(key=lambda tup: tup[1])
+        total = len(concepts)
+
     page = int(request.values.get('page')) if request.values.get('page') is not None else 1
     per_page = int(request.values.get('per_page')) if request.values.get('per_page') is not None else 20
     start = (page - 1) * per_page
@@ -130,7 +140,9 @@ def vocabulary_list(vocab_id):
         [],
         concepts,
         'Concepts',
-        total
+        total,
+        query=query,
+        search_enabled=True
     ).render()
 
 
