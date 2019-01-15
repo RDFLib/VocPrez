@@ -87,7 +87,20 @@ class Source:
         :rtype: list
         """
         depth += 1
-        g = Graph().parse(uri + '.ttl', format='turtle')
+
+        # Some RVA sources won't load on first try, so ..
+        # if failed, try load again.
+        g = None
+        max_attempts = 10
+        for i in range(max_attempts):
+            try:
+                g = Graph().parse(uri + '.ttl', format='turtle')
+                break
+            except:
+                print('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i))
+        if not g:
+            raise Exception('Failed to load Graph from {}. Maximum attempts exceeded {}.'.format(uri, max_attempts))
+
         items = []
         for s, p, o in g.triples((None, SKOS.broader, URIRef(uri))):
             items.append((depth, str(s), Source.get_prefLabel_from_uri(s)))
