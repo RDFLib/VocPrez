@@ -91,7 +91,8 @@ def vocabularies():
         vocabs,
         'Vocabularies',
         total,
-        query=query
+        query=query,
+        search_enabled=True
     ).render()
 
 
