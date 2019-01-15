@@ -70,7 +70,7 @@ def vocabularies():
     total = len(config.VOCABS.items())
 
     # Search
-    query = request.values.get('query')
+    query = request.values.get('search')
     results = []
     if query:
         for m in match(vocabs, query):
@@ -91,7 +91,7 @@ def vocabularies():
         vocabs,
         'Vocabularies',
         total,
-        query=query,
+        search_query=query,
         search_enabled=True
     ).render()
 
@@ -121,7 +121,7 @@ def vocabulary_list(vocab_id):
     total = len(concepts)
 
     # Search
-    query = request.values.get('query')
+    query = request.values.get('search')
     results = []
     if query:
         for m in match(concepts, query):
@@ -142,7 +142,7 @@ def vocabulary_list(vocab_id):
         concepts,
         'Concepts',
         total,
-        query=query,
+        search_query=query,
         search_enabled=True
     ).render()
 
