@@ -35,6 +35,7 @@ class FILE(Source):
 
     @staticmethod
     def init():
+        print('Finding vocabulary files ...')
         # find all files in project_directory/vocab_files
         for path, subdirs, files in os.walk(join(config.APP_DIR, 'vocab_files')):
             for name in files:
@@ -49,6 +50,7 @@ class FILE(Source):
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
 
+        print('Building concept hierarchy for source type FILE ...')
         # build conceptHierarchy
         for item in config.VOCABS:
             if config.VOCABS[item]['source'] == config.VocabSource.FILE:
@@ -93,14 +95,6 @@ class FILE(Source):
         return [(x['c'], x['l']) for x in self.g.query(q)]
 
     def list_concepts(self):
-        # q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        #     SELECT *
-        #     WHERE {
-        #       ?c a skos:Concept .
-        #       ?c skos:prefLabel ?pl .
-        #     }'''
-        # return [(x['c'], x['pl']) for x in self.g.query(q)]
-
         vocabs = []
         for s, p, o in self.g.triples((None, SKOS.inScheme, None)):
             label = ' '.join(str(s).split('#')[-1].split('/')[-1].split('_'))
@@ -140,14 +134,7 @@ class FILE(Source):
                 None
             )
 
-        q2 = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT *
-            WHERE {
-              ?s skos:hasTopConcept ?tc .
-              ?tc skos:prefLabel ?pl .
-            }'''
-        # add the top concepts to the Vocabulary class instance
-        # v.hasTopConcepts = [(x['tc'], x['pl']) for x in self.g.query(q2)] # this doesn't work
+        # top concepts
         for s, p, o in self.g.triples((v.uri, SKOS.hasTopConcept, None)):
             v.hasTopConcepts.append((str(o), ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))))
 
