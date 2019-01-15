@@ -21,11 +21,11 @@ class FILE(Source):
 
     def __init__(self, vocab_id):
         super().__init__(vocab_id)
-        self.g = FILE.load_pickle(vocab_id)
+        self.g = FILE.load_pickle_graph(vocab_id)
 
 
     @staticmethod
-    def load_pickle(vocab_id):
+    def load_pickle_graph(vocab_id):
         try:
             with open(join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
                 g = pickle.load(f)
@@ -50,11 +50,11 @@ class FILE(Source):
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
 
-        print('Building concept hierarchy for source type FILE ...')
-        # build conceptHierarchy
-        for item in config.VOCABS:
-            if config.VOCABS[item]['source'] == config.VocabSource.FILE:
-                FILE.hierarchy[item] = FILE.build_concept_hierarchy(item)
+        # print('Building concept hierarchy for source type FILE ...')
+        # # build conceptHierarchy
+        # for item in config.VOCABS:
+        #     if config.VOCABS[item]['source'] == config.VocabSource.FILE:
+        #         FILE.hierarchy[item] = FILE.build_concept_hierarchy(item)
 
     @classmethod
     def list_vocabularies(self):
@@ -119,7 +119,7 @@ class FILE(Source):
               OPTIONAL {?s owl:versionInfo ?v }
             }'''
         for r in self.g.query(q):
-            self.uri = r['s']
+            self.uri = str(r['s'])
             v = Vocabulary(
                 self.vocab_id,
                 r['s'],
@@ -249,11 +249,84 @@ class FILE(Source):
         )
 
     def get_concept_hierarchy(self):
-        return FILE.hierarchy[self.vocab_id]
+        # return FILE.hierarchy[self.vocab_id]
+        pass
+        g = FILE.load_pickle_graph(self.vocab_id)
+        result = g.query(
+            """
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
+            WHERE {{ 
+                ?c      a                                       skos:Concept .   
+                ?cs     (skos:hasTopConcept | skos:narrower)*   ?mid .
+                ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
+                ?c      skos:prefLabel                          ?pl .
+                ?c		(skos:topConceptOf | skos:broader)		?parent .
+                FILTER (?cs = <{}>)
+            }}
+            GROUP BY ?c ?pl ?parent
+            ORDER BY ?length ?parent ?pl
+            """.format(self.uri)
+        )
+
+        cs = []
+        for row in result:
+            cs.append({
+                'length': {'value': row['length']},
+                'c': {'value': row['c']},
+                'pl': {'value': row['pl']},
+                'parent': {'value': row['parent']}
+            })
+
+        hierarchy = []
+        previous_parent_uri = None
+        last_index = 0
+
+        for c in cs:
+            # insert all topConceptOf directly
+            if str(c['parent']['value']) == self.uri:
+                hierarchy.append((
+                    int(c['length']['value']),
+                    c['c']['value'],
+                    c['pl']['value']
+                ))
+            else:
+                # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
+                # If so, use that Concept's index + 1
+                this_parent = c['parent']['value']
+                if this_parent == previous_parent_uri:
+                    # use last inserted index
+                    hierarchy.insert(last_index + 1, (
+                        int(c['length']['value']),
+                        c['c']['value'],
+                        c['pl']['value']
+                    ))
+                    last_index += 1
+                # This is not a TopConcept and it has a differnt parent from the previous insert
+                # So insert it after it's parent
+                else:
+                    i = 0
+                    parent_index = 0
+                    for t in hierarchy:
+                        if this_parent in t:
+                            parent_index = i
+                        i += 1
+
+                    hierarchy.insert(parent_index + 1, (
+                        int(c['length']['value']),
+                        c['c']['value'],
+                        c['pl']['value']
+                    ))
+
+                    last_index = parent_index + 1
+                previous_parent_uri = this_parent
+
+        return hierarchy
 
     @staticmethod
     def build_concept_hierarchy(vocab_id):
-        g = FILE.load_pickle(vocab_id)
+        g = FILE.load_pickle_graph(vocab_id)
 
         # get uri
         uri = None

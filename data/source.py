@@ -97,7 +97,7 @@ class Source:
                 g = Graph().parse(uri + '.ttl', format='turtle')
                 break
             except:
-                print('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i))
+                print('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i+1))
         if not g:
             raise Exception('Failed to load Graph from {}. Maximum attempts exceeded {}.'.format(uri, max_attempts))
 
