@@ -324,8 +324,7 @@ class RVA(Source):
 
                     last_index = parent_index + 1
                 previous_parent_uri = this_parent
-
-        return hierarchy
+        return Source.draw_concept_hierarchy(hierarchy)
 
     @staticmethod
     def build_concept_hierarchy(vocab_id):
