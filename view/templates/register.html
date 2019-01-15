@@ -5,9 +5,9 @@
     <h2>Of <em>{{ register_item_type_string }}</em></h2>
     <p></p>
     {% if search_enabled %}
-    <form action="?query=">
+    <form action="?search=">
         Search:<br>
-        <input type="text" name="query">
+        <input type="text" name="search">
         <input type="submit" value="Submit">
     </form>
     {% endif %}
