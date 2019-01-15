@@ -301,7 +301,7 @@ class VOCBENCH(Source):
                         last_index = parent_index + 1
                     previous_parent_uri = this_parent
 
-            return hierarchy
+            return Source.draw_concept_hierarchy(hierarchy)
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 

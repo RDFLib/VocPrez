@@ -2,6 +2,7 @@ import _config as config
 import sys
 from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS
+import markdown
 
 
 class Source:
@@ -97,7 +98,7 @@ class Source:
                 g = Graph().parse(uri + '.ttl', format='turtle')
                 break
             except:
-                print('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i))
+                print('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i+1))
         if not g:
             raise Exception('Failed to load Graph from {}. Maximum attempts exceeded {}.'.format(uri, max_attempts))
 
@@ -112,3 +113,20 @@ class Source:
             items = items[:count] + new_items + items[count:]
             count += len(new_items)
         return items
+
+    @staticmethod
+    def draw_concept_hierarchy(hierarchy):
+        tab = '\t'
+        previous_length = 1
+
+        text = ''
+        for item in hierarchy:
+            if item[0] == previous_length + 2: # SPARQL query error on length value
+                mult = item[0] - 2
+            else: # everything is normal
+                mult = item[0] - 1
+            t = tab * mult + '* [' + item[2] + ']' + '(' + item[1] + ')\n'
+            text += t
+            previous_length = item[0]
+
+        return markdown.markdown(text)

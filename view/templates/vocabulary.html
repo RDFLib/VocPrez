@@ -51,31 +51,7 @@
     <tr>
         <th>Concept Hierarchy</th>
         <td>
-                {% set count = namespace(a=0) %}
-                {% for c in vocab.conceptHierarchy %}
-                    {% if c[0] == count.a %}
-                        {% if loop.index > 1 %}
-                        </li>
-                        {% endif %}
-                        <li>
-                            <a href="{{ request.url_root }}object?vocab_id={{ vocab.id }}&uri={{ c[1] }}">{{ c[2] }}</a>
-                    {% else %}
-                        {% if c[0] > count.a %}
-                            <ul>
-                                <li>
-                                    <a href="{{ request.url_root }}object?vocab_id={{ vocab.id }}&uri={{ c[1] }}">{{ c[2] }}</a>
-                        {% else %}
-                                </li>
-                            </ul>
-                        {{ (count.a - (c[0] + 1)) *'</ul></li>'|safe }}
-                        <li>
-                            <a href="{{ request.url_root }}object?vocab_id={{ vocab.id }}&uri={{ c[1] }}">{{ c[2] }}</a>
-                        {% endif %}
-                    {% endif %}
-                    {% set count.a = c[0] %}
-                {% endfor %}
-                </li>
-            </ul>
+                {{ vocab.conceptHierarchy|safe }}
         </td>
     </tr>
     {% endif %}
