@@ -41,6 +41,20 @@ def index():
     )
 
 
+def match(vocabs, query):
+    """
+    Generate a generator of vocabulary items that match the search query
+
+    :param vocabs: The vocabulary list of items.
+    :param query: The search query string.
+    :return: A generator of words that match the search query.
+    :rtype: generator
+    """
+    for word in vocabs:
+        if query.lower() in word[1].lower():
+            yield word
+
+
 @routes.route('/vocabulary/')
 def vocabularies():
     page = int(request.values.get('page')) if request.values.get('page') is not None else 1
@@ -55,6 +69,16 @@ def vocabularies():
     vocabs.sort(key=lambda tup: tup[1])
     total = len(config.VOCABS.items())
 
+    # Search
+    query = request.values.get('query')
+    results = []
+    if query:
+        for m in match(vocabs, query):
+            results.append(m)
+        vocabs[:] = results
+        vocabs.sort(key=lambda tup: tup[1])
+        total = len(vocabs)
+
     # generate vocabs list for requested page and per_page
     start = (page-1)*per_page
     end = start + per_page
@@ -66,7 +90,8 @@ def vocabularies():
         [],
         vocabs,
         'Vocabularies',
-        total
+        total,
+        query=query
     ).render()
 
 
