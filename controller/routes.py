@@ -140,10 +140,11 @@ def vocabulary_list(vocab_id):
         request,
         [],
         concepts,
-        'Concepts',
+        config.VOCABS[vocab_id]['title'] + ' concepts',
         total,
         search_query=query,
-        search_enabled=True
+        search_enabled=True,
+        vocabulary_url=request.url_root + 'vocabulary/' + vocab_id
     ).render()
 
 

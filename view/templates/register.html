@@ -2,7 +2,14 @@
 
 {% block content %}
     <h1>Register</h1>
-    <h2>Of <em>{{ register_item_type_string }}</em></h2>
+    <h2>Of
+        {% if vocabulary_url %}
+        <a href="{{ vocabulary_url }}"><em>{{ register_item_type_string }}</em></a>
+        {% else %}
+        <em>{{ register_item_type_string }}</em>
+        {% endif %}
+
+    </h2>
     <p></p>
     {% if search_enabled %}
     <form action="?search=">
