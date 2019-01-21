@@ -152,65 +152,57 @@ class FILE(Source):
         # -- altLabels
         altLabels = []
         for s, p, o in g.triples((URIRef(uri), SKOS.altLabel, None)):
-            if o:
-                altLabels.append(str(o))
+            altLabels.append(str(o))
         altLabels.sort()
 
         # -- broaders
         broaders = []
         for s, p, o in g.triples((URIRef(uri), SKOS.broader, None)):
-            if o:
-                label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
-                broaders.append(
-                    {
-                        'uri': o,
-                        'prefLabel': label
-                    }
-                )
+            label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
+            broaders.append(
+                {
+                    'uri': o,
+                    'prefLabel': label
+                }
+            )
         broaders.sort(key= lambda x: x['prefLabel'])
 
         # -- contributor
         contributor = None
         for s, p, o in g.triples((URIRef(uri), DCTERMS.contributor, None)):
-            if o:
-                contributor = str(o)
+            contributor = str(o)
         if not contributor: # if we didn't find a dct:contributor, look for a dc:contributor
             for s, p, o in g.triples((URIRef(uri), DC.contributor, None)):
-                if o:
-                    contributor = str(o)
+                contributor = str(o)
 
        # -- definition
         definition = None
         for s, p, o in g.triples((URIRef(uri), SKOS.definition, None)):
-            if o:
-                definition = str(o)
+            definition = str(o)
 
         # -- hiddenLabels
         hiddenLabels = []
         for s, p, o in g.triples((URIRef(uri), SKOS.hiddenLabel, None)):
-            if o:
-                hiddenLabels.append(str(o))
+            hiddenLabels.append(str(o))
         hiddenLabels.sort()
 
         # -- narrowers
         narrowers = []
         for s, p, o in g.triples((URIRef(uri), SKOS.narrower, None)):
-            if o:
-                label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
-                narrowers.append(
-                    {
-                        'uri': o,
-                        'prefLabel': label
-                    }
-                )
+            label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
+            narrowers.append(
+                {
+                    'uri': o,
+                    'prefLabel': label
+                }
+            )
         narrowers.sort(key=lambda x:  x['prefLabel'])
 
         # -- prefLabel
         prefLabel = None
         for s, p, o in g.triples((URIRef(uri), SKOS.prefLabel, None)):
-            if o:
-                prefLabel = str(o)
-                break
+            prefLabel = str(o)
+            break
 
         # -- semantic_properties TODO: Not sure what to do here
         semantic_properties = None
@@ -289,7 +281,8 @@ class FILE(Source):
                 hierarchy.append((
                     int(c['length']['value']),
                     c['c']['value'],
-                    c['pl']['value']
+                    c['pl']['value'],
+                    None
                 ))
             else:
                 # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
@@ -300,7 +293,8 @@ class FILE(Source):
                     hierarchy.insert(last_index + 1, (
                         int(c['length']['value']),
                         c['c']['value'],
-                        c['pl']['value']
+                        c['pl']['value'],
+                        c['parent']['value']
                     ))
                     last_index += 1
                 # This is not a TopConcept and it has a differnt parent from the previous insert
@@ -309,19 +303,19 @@ class FILE(Source):
                     i = 0
                     parent_index = 0
                     for t in hierarchy:
-                        if this_parent in t:
+                        if this_parent in t[1]:
                             parent_index = i
                         i += 1
 
                     hierarchy.insert(parent_index + 1, (
                         int(c['length']['value']),
                         c['c']['value'],
-                        c['pl']['value']
+                        c['pl']['value'],
+                        c['parent']['value']
                     ))
 
                     last_index = parent_index + 1
                 previous_parent_uri = this_parent
-
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     @staticmethod
