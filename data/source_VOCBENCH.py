@@ -264,22 +264,24 @@ class VOCBENCH(Source):
 
             for c in cs:
                 # insert all topConceptOf directly
-                if str(c['c']['value']) == concept_scheme_uri:
+                if str(c['parent']['value']) == self.uri:
                     hierarchy.append((
                         int(c['length']['value']),
                         c['c']['value'],
-                        c['pl']['value']
+                        c['pl']['value'],
+                        None
                     ))
                 else:
                     # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
                     # If so, use that Concept's index + 1
-                    this_parent = str(c['parent']['value'])
+                    this_parent = c['parent']['value']
                     if this_parent == previous_parent_uri:
                         # use last inserted index
                         hierarchy.insert(last_index + 1, (
                             int(c['length']['value']),
                             c['c']['value'],
-                            c['pl']['value']
+                            c['pl']['value'],
+                            c['parent']['value']
                         ))
                         last_index += 1
                     # This is not a TopConcept and it has a differnt parent from the previous insert
@@ -288,19 +290,19 @@ class VOCBENCH(Source):
                         i = 0
                         parent_index = 0
                         for t in hierarchy:
-                            if this_parent in t:
+                            if this_parent in t[1]:
                                 parent_index = i
                             i += 1
 
                         hierarchy.insert(parent_index + 1, (
                             int(c['length']['value']),
                             c['c']['value'],
-                            c['pl']['value']
+                            c['pl']['value'],
+                            c['parent']['value']
                         ))
 
                         last_index = parent_index + 1
                     previous_parent_uri = this_parent
-
             return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))

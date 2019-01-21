@@ -121,13 +121,31 @@ class Source:
         previous_length = 1
 
         text = ''
+        tracked_items = []
         for item in hierarchy:
-            if item[0] == previous_length + 2: # SPARQL query error on length value
-                mult = item[0] - 2
-            else: # everything is normal
+            mult = None
+            parent_exists = False
+
+            if item[0] > previous_length + 2: # SPARQL query error on length value
+                for tracked_item in tracked_items:
+                    if tracked_item['name'] == item[3]:
+                        mult = tracked_item['indent'] + 1
+                        parent_exists = True
+
+            if mult is None:
+                found = False
+                for tracked_item in tracked_items:
+                    if tracked_item['name'] == item[3]:
+                        found = True
+                if not found:
+                    mult = 0
+
+            if mult is None:#else: # everything is normal
                 mult = item[0] - 1
+
             t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + item[1] + ')\n'
             text += t
-            previous_length = item[0]
+            previous_length = mult
+            tracked_items.append({'name': item[1], 'indent': mult})
 
         return markdown.markdown(text)

@@ -163,7 +163,11 @@ class RVA(Source):
             }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        metadata = sparql.query().convert()['results']['bindings']
+        metadata = None
+        try:
+            metadata = sparql.query().convert()['results']['bindings']
+        except:
+            pass
 
         # get the concept's altLabels
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -173,7 +177,11 @@ class RVA(Source):
             }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        altLabels = sparql.query().convert()['results']['bindings']
+        altLabels = None
+        try:
+            altLabels = sparql.query().convert()['results']['bindings']
+        except:
+            pass
 
         # get the concept's hiddenLabels
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -184,7 +192,11 @@ class RVA(Source):
             }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        hiddenLabels = sparql.query().convert()['results']['bindings']
+        hiddenLabels = None
+        try:
+            hiddenLabels = sparql.query().convert()['results']['bindings']
+        except:
+            pass
 
         # get the concept's broaders
         q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -195,7 +207,11 @@ class RVA(Source):
             }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        broaders = sparql.query().convert()['results']['bindings']
+        broaders = None
+        try:
+            broaders = sparql.query().convert()['results']['bindings']
+        except:
+            pass
 
         # get the concept's narrowers
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -206,7 +222,11 @@ class RVA(Source):
             }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        narrowers = sparql.query().convert()['results']['bindings']
+        narrowers = None
+        try:
+            narrowers = sparql.query().convert()['results']['bindings']
+        except:
+            pass
 
         # get the concept's source
         q = '''PREFIX dct: <http://purl.org/dc/terms/>
@@ -216,8 +236,6 @@ class RVA(Source):
                     }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-
-        # Some RVA sources don't have property dct:source
         source = None
         try:
             source = sparql.query().convert()['results']['bindings'][0]['source']['value']
@@ -232,7 +250,11 @@ class RVA(Source):
                             }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        definition = sparql.query().convert()['results']['bindings'][0]['definition']['value']
+        definition = None
+        try:
+            definition = sparql.query().convert()['results']['bindings'][0]['definition']['value']
+        except:
+            pass
 
         # get the concept's prefLabel
         q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -242,7 +264,10 @@ class RVA(Source):
                                     }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        prefLabel = sparql.query().convert()['results']['bindings'][0]['prefLabel']['value']
+        try:
+            prefLabel = sparql.query().convert()['results']['bindings'][0]['prefLabel']['value']
+        except:
+            pass
 
         from model.concept import Concept
         return Concept(
@@ -291,7 +316,8 @@ class RVA(Source):
                 hierarchy.append((
                     int(c['length']['value']),
                     c['c']['value'],
-                    c['pl']['value']
+                    c['pl']['value'],
+                    None
                 ))
             else:
                 # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
@@ -302,7 +328,8 @@ class RVA(Source):
                     hierarchy.insert(last_index + 1, (
                         int(c['length']['value']),
                         c['c']['value'],
-                        c['pl']['value']
+                        c['pl']['value'],
+                        c['parent']['value']
                     ))
                     last_index += 1
                 # This is not a TopConcept and it has a differnt parent from the previous insert
@@ -311,14 +338,15 @@ class RVA(Source):
                     i = 0
                     parent_index = 0
                     for t in hierarchy:
-                        if this_parent in t:
+                        if this_parent in t[1]:
                             parent_index = i
                         i += 1
 
                     hierarchy.insert(parent_index + 1, (
                         int(c['length']['value']),
                         c['c']['value'],
-                        c['pl']['value']
+                        c['pl']['value'],
+                        c['parent']['value']
                     ))
 
                     last_index = parent_index + 1
