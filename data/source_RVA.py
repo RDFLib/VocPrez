@@ -291,7 +291,8 @@ class RVA(Source):
                 hierarchy.append((
                     int(c['length']['value']),
                     c['c']['value'],
-                    c['pl']['value']
+                    c['pl']['value'],
+                    None
                 ))
             else:
                 # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
@@ -302,7 +303,8 @@ class RVA(Source):
                     hierarchy.insert(last_index + 1, (
                         int(c['length']['value']),
                         c['c']['value'],
-                        c['pl']['value']
+                        c['pl']['value'],
+                        c['parent']['value']
                     ))
                     last_index += 1
                 # This is not a TopConcept and it has a differnt parent from the previous insert
@@ -311,14 +313,15 @@ class RVA(Source):
                     i = 0
                     parent_index = 0
                     for t in hierarchy:
-                        if this_parent in t:
+                        if this_parent in t[1]:
                             parent_index = i
                         i += 1
 
                     hierarchy.insert(parent_index + 1, (
                         int(c['length']['value']),
                         c['c']['value'],
-                        c['pl']['value']
+                        c['pl']['value'],
+                        c['parent']['value']
                     ))
 
                     last_index = parent_index + 1
