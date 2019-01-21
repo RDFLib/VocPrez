@@ -124,13 +124,11 @@ class Source:
         tracked_items = []
         for item in hierarchy:
             mult = None
-            parent_exists = False
 
             if item[0] > previous_length + 2: # SPARQL query error on length value
                 for tracked_item in tracked_items:
                     if tracked_item['name'] == item[3]:
                         mult = tracked_item['indent'] + 1
-                        parent_exists = True
 
             if mult is None:
                 found = False
@@ -143,7 +141,9 @@ class Source:
             if mult is None:#else: # everything is normal
                 mult = item[0] - 1
 
-            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + item[1] + ')\n'
+            tag = str(mult+1) # indent info to be displayed
+
+            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + item[1] + ') (' + tag + ')\n'
             text += t
             previous_length = mult
             tracked_items.append({'name': item[1], 'indent': mult})
