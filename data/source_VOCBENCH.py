@@ -144,8 +144,8 @@ class VOCBENCH(Source):
               <{0}> skos:prefLabel ?pl .
               OPTIONAL {{<{0}> skos:definition ?d }}
             }}'''.format(uri)
-        s = VOCBENCH('x')._authed_request_object()
-        r = s.post(
+        self.s = VOCBENCH('x', self.request)._authed_request_object()
+        r = self.s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
                 'query': q,
@@ -264,6 +264,9 @@ class VOCBENCH(Source):
 
             for c in cs:
                 # insert all topConceptOf directly
+                test = c
+                if 'parent' not in c:
+                    continue
                 if str(c['parent']['value']) == concept_scheme_uri:
                     hierarchy.append((
                         int(c['length']['value']),
@@ -323,7 +326,7 @@ class VOCBENCH(Source):
                 <{}> a ?c .
             }}
         '''.format(uri)
-        s = VOCBENCH('x')._authed_request_object()
+        s = VOCBENCH('x', self.request)._authed_request_object()
         r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={

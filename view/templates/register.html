@@ -31,7 +31,9 @@
                 {% endif %}
                 <ul>
                 {%- for item in register_items -%}
-                    {%- if item is not string %}
+                    {% if vocab_id %}
+                    <li><a href="{{ request.url_root }}object?vocab_id={{ vocab_id }}&uri={{ item[0] }}">{{ item[1] }}</a></li>
+                    {%- elif item is not string %}
                     <li><a href="{{ item[0] }}">{{ item[1] }}</a></li>
                     {%- else %}
                     <li><a href="{{ item }}">{{ item.split('#')[-1].split('/')[-1] }}</a></li>

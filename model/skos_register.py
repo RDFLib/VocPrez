@@ -4,12 +4,13 @@ from flask_paginate import Pagination
 
 
 class SkosRegisterRenderer(RegisterRenderer):
-    def __init__(self, request, navs, items, register_item_type_string, total, search_enabled=None, search_query=None, vocabulary_url=None):
+    def __init__(self, request, navs, items, register_item_type_string, total, search_enabled=None, search_query=None, vocabulary_url=None, **kwargs):
         self.navs = navs
         self.register_item_type_string = register_item_type_string
         self.search_query = search_query
         self.search_enabled = search_enabled
         self.vocabulary_url = vocabulary_url
+        self.template_extras = kwargs
         views = {
             'ckan': View(
                 'Comprehensive Knowledge Archive Network',
@@ -110,6 +111,8 @@ class SkosRegisterRenderer(RegisterRenderer):
             'search_enabled': self.search_enabled,
             'vocabulary_url': self.vocabulary_url
         }
+        if self.template_extras is not None:
+            _template_context.update(self.template_extras)
         if template_context is not None and isinstance(template_context, dict):
             _template_context.update(template_context)
 
