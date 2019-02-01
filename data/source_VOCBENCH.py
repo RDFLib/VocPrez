@@ -264,7 +264,7 @@ class VOCBENCH(Source):
 
             for c in cs:
                 # insert all topConceptOf directly
-                if str(c['parent']['value']) == self.uri:
+                if str(c['parent']['value']) == concept_scheme_uri:
                     hierarchy.append((
                         int(c['length']['value']),
                         c['c']['value'],
