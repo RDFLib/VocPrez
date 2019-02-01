@@ -144,7 +144,8 @@ def vocabulary_list(vocab_id):
         total,
         search_query=query,
         search_enabled=True,
-        vocabulary_url=request.url_root + 'vocabulary/' + vocab_id
+        vocabulary_url=request.url_root + 'vocabulary/' + vocab_id,
+        vocab_id=vocab_id
     ).render()
 
 
