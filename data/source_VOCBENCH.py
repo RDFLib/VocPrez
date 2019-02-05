@@ -120,6 +120,8 @@ class VOCBENCH(Source):
             metadata = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
 
             concept_hierarchy = self.get_concept_hierarchy(str(metadata[0]['s']['value']))
+            if len(concept_hierarchy.strip()) == 0:
+                concept_hierarchy = None
 
             from model.vocabulary import Vocabulary
             return Vocabulary(
