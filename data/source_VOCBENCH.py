@@ -109,26 +109,31 @@ class VOCBENCH(Source):
                       OPTIONAL {?s dct:created ?cr }
                       OPTIONAL {?s dct:modified ?m }
                       OPTIONAL {?s owl:versionInfo ?v }
+                      OPTIONAL {?tc skos:topConceptOf ?s }
+                      OPTIONAL {?tc skos:prefLabel ?tcpl }
                     }''',
                 'ctx_project': self.vocab_id
             }
         )
 
         if r.status_code == 200:
-            metadata = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]
+            metadata = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
 
-            concept_hierarchy = self.get_concept_hierarchy(str(metadata['s']['value']))
+            concept_hierarchy = self.get_concept_hierarchy(str(metadata[0]['s']['value']))
+            if len(concept_hierarchy.strip()) == 0:
+                concept_hierarchy = None
 
             from model.vocabulary import Vocabulary
             return Vocabulary(
                 self.vocab_id,
-                metadata['s']['value'],
-                metadata['t']['value'],
-                metadata['d']['value'] if metadata.get('d') is not None else None,
-                metadata.get('c').get('value') if metadata.get('c') is not None else None,
-                metadata.get('cr').get('value') if metadata.get('cr') is not None else None,
-                metadata.get('m').get('value') if metadata.get('m') is not None else None,
-                metadata.get('v').get('value') if metadata.get('v') is not None else None,
+                metadata[0]['s']['value'],
+                metadata[0]['t']['value'],
+                metadata[0]['d']['value'] if metadata[0].get('d') is not None else None,
+                metadata[0].get('c').get('value') if metadata[0].get('c') is not None else None,
+                metadata[0].get('cr').get('value') if metadata[0].get('cr') is not None else None,
+                metadata[0].get('m').get('value') if metadata[0].get('m') is not None else None,
+                metadata[0].get('v').get('value') if metadata[0].get('v') is not None else None,
+                [(x.get('tc').get('value'), x.get('tcpl').get('value')) for x in metadata],
                 conceptHierarchy=concept_hierarchy
             )
         else:
@@ -257,6 +262,11 @@ class VOCBENCH(Source):
         )
 
         if r.status_code == 200:
+            test = r.content.decode('utf-8')
+            """<?xml version="1.0" encoding="UTF-8"?><stresponse request="evaluateQuery" type="error">
+  <msg>org.eclipse.rdf4j.repository.http.HTTPQueryEvaluationException: Query evaluation error: com.ontotext.trree.util.NotEnoughMemoryForDistinctGroupBy: Insufficient free Heap Memory 172Mb for group by and distinct, threshold:250Mb, reached 0Mb (HTTP status 500)</msg>
+</stresponse>
+"""
             cs = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
             hierarchy = []
             previous_parent_uri = None
