@@ -109,7 +109,8 @@ class SkosRegisterRenderer(RegisterRenderer):
             'navs': self.navs,
             'query': self.search_query,
             'search_enabled': self.search_enabled,
-            'vocabulary_url': self.vocabulary_url
+            'vocabulary_url': self.vocabulary_url,
+            'title': self.register_item_type_string
         }
         if self.template_extras is not None:
             _template_context.update(self.template_extras)
