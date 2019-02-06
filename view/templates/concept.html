@@ -35,7 +35,7 @@
     {% if concept.exactMatches %}
         <th>has exact match:</th>
         {% for exactMatch in concept.exactMatches %}
-            <td><a href="{{ exactMatch }}">{{ exactMatch }}</a></td>
+            <td><a href="{{ exactMatch }}">{{ h.make_title(exactMatch) }}</a></td>
         {% endfor %}
     {% endif %}
 
