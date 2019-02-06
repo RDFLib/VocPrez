@@ -20,6 +20,10 @@ class Concept:
             broaders,
             narrowers,
             exactMatches,
+            closeMatches,
+            broadMatches,
+            narrowMatches,
+            relatedMatches,
             semantic_properties
     ):
         self.vocab_id = vocab_id
@@ -33,6 +37,10 @@ class Concept:
         self.broaders = broaders
         self.narrowers = narrowers
         self.exactMatches = exactMatches
+        self.closeMatches = closeMatches
+        self.broadMatches = broadMatches
+        self.narrowMatches = narrowMatches
+        self.relatedMatches = relatedMatches
         self.semantic_properties = semantic_properties
 
 

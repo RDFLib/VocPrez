@@ -204,6 +204,31 @@ class FILE(Source):
             prefLabel = str(o)
             break
 
+        # -- exactMatches
+        exactMatches = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.exactMatch, None)):
+            exactMatches.append(str(o))
+
+        # -- closeMatches
+        closeMatches = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.closeMatch, None)):
+            closeMatches.append(str(o))
+
+        # -- broadMatches
+        broadMatches = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.broadMatch, None)):
+            broadMatches.append(str(o))
+
+        # -- narrowMatches
+        narrowMatches = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.narrowMatch, None)):
+            narrowMatches.append(str(o))
+
+        # -- relatedMatches
+        relatedMatches = []
+        for s, p, o in g.triples((URIRef(uri), SKOS.relatedMatch, None)):
+            relatedMatches.append(str(o))
+
         # -- semantic_properties TODO: Not sure what to do here
         semantic_properties = None
 
@@ -237,6 +262,11 @@ class FILE(Source):
             contributor,
             broaders,
             narrowers,
+            exactMatches,
+            closeMatches,
+            broadMatches,
+            narrowMatches,
+            relatedMatches,
             semantic_properties
         )
 

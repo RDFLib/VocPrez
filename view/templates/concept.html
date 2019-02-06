@@ -34,8 +34,36 @@
 
     {% if concept.exactMatches %}
         <th>has exact match:</th>
-        {% for exactMatch in concept.exactMatches %}
-            <td><a href="{{ exactMatch }}">{{ exactMatch }}</a></td>
+        {% for match in concept.exactMatches %}
+            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+        {% endfor %}
+    {% endif %}
+
+    {% if concept.closeMatches %}
+        <th>has close match:</th>
+        {% for match in concept.closeMatches %}
+            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+        {% endfor %}
+    {% endif %}
+
+    {% if concept.broadMatches %}
+        <th>has broad match:</th>
+        {% for match in concept.broadMatches %}
+            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+        {% endfor %}
+    {% endif %}
+
+    {% if concept.narrowMatches %}
+        <th>has narrow match:</th>
+        {% for match in concept.narrowMatches %}
+            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+        {% endfor %}
+    {% endif %}
+
+    {% if concept.relatedMatches %}
+        <th>has related match:</th>
+        {% for match in concept.relatedMatches %}
+            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
         {% endfor %}
     {% endif %}
 

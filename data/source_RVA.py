@@ -269,6 +269,71 @@ class RVA(Source):
         except:
             pass
 
+        # get exactMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                SELECT *
+                WHERE {{
+                    <{}> skos:exactMatch ?s .
+                }}""".format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        try:
+            exactMatches = sparql.query().convert()['results']['bindings']
+        except:
+            pass
+
+        # get closeMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                        SELECT *
+                        WHERE {{
+                            <{}> skos:closeMatch ?s .
+                        }}""".format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        try:
+            closeMatches = sparql.query().convert()['results']['bindings']
+        except:
+            pass
+
+        # get broadMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                                SELECT *
+                                WHERE {{
+                                    <{}> skos:broadMatch ?s .
+                                }}""".format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        try:
+            broadMatches = sparql.query().convert()['results']['bindings']
+        except:
+            pass
+
+        # get narrowMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                                        SELECT *
+                                        WHERE {{
+                                            <{}> skos:narrowMatch ?s .
+                                        }}""".format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        try:
+            narrowMatches = sparql.query().convert()['results']['bindings']
+        except:
+            pass
+
+        # get relatedMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                                                SELECT *
+                                                WHERE {{
+                                                    <{}> skos:relatedMatch ?s .
+                                                }}""".format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        try:
+            relatedMatches = sparql.query().convert()['results']['bindings']
+        except:
+            pass
+
         from model.concept import Concept
         return Concept(
             self.vocab_id,
@@ -281,6 +346,11 @@ class RVA(Source):
             metadata[0].get('cn').get('value') if metadata[0].get('cn') is not None else None,
             [{'uri': x.get('b').get('value'), 'prefLabel': x.get('pl').get('value')} for x in broaders],
             [{'uri': x.get('n').get('value'), 'prefLabel': x.get('pl').get('value')} for x in narrowers],
+            [x['s']['value'] for x in exactMatches],
+            [x['s']['value'] for x in closeMatches],
+            [x['s']['value'] for x in broadMatches],
+            [x['s']['value'] for x in narrowMatches],
+            [x['s']['value'] for x in relatedMatches],
             None  # TODO: replace Sem Properties sub
         )
 
