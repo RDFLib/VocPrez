@@ -143,7 +143,8 @@ class Source:
 
             tag = str(mult+1) # indent info to be displayed
 
-            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + item[1] + ') (' + tag + ')\n'
+            import helper as h
+            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + h.url_encode(item[1]) + ') (' + tag + ')\n'
             text += t
             previous_length = mult
             tracked_items.append({'name': item[1], 'indent': mult})
