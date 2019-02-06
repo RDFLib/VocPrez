@@ -125,7 +125,8 @@ class ConceptRenderer(Renderer):
             'vocab_title': config.VOCABS[self.request.values.get('vocab_id')].get('title'),
             'uri': self.request.values.get('uri'),
             'concept': self.concept,
-            'navs': self.navs
+            'navs': self.navs,
+            'title': 'Concept: ' + self.concept.prefLabel
         }
 
         return Response(
