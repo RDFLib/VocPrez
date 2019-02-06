@@ -42,7 +42,7 @@
         <th>Top Concepts</th>
         <td>
             {% for tc in vocab.hasTopConcepts %}
-                <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab.id }}&uri={{ tc[0] }}">{{ tc[1] }}</a><br />
+                <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab.id }}&uri={{ h.url_encode(tc[0]) }}">{{ tc[1] }}</a><br />
             {% endfor %}
         </td>
     </tr>

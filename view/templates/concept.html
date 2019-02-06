@@ -37,7 +37,7 @@
         <th>Broader</th>
         <td class="list">
             {% for broader in concept.broaders -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ broader.uri }}">{{ broader.prefLabel }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(broader.uri) }}">{{ broader.prefLabel }}</a><br />
             {% endfor %}
         </td>
         {% endif %}
@@ -48,7 +48,7 @@
         <th style="padding-right: 10px;">Narrower: </th>
         <td class="list">
             {% for narrower in concept.narrowers -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ narrower.uri }}">{{ narrower.prefLabel }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(narrower.uri) }}">{{ narrower.prefLabel }}</a><br />
             {% endfor %}
         </td>
     </tr>
