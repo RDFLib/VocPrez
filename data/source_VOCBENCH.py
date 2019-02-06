@@ -235,6 +235,67 @@ class VOCBENCH(Source):
             }
         )
         exactMatches = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+
+        # get closeMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    SELECT *
+                    WHERE {{
+                        <{}> skos:closeMatch ?s .
+                    }}""".format(uri)
+        r = self.s.post(
+            config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+            data={
+                'query': q,
+                'ctx_project': self.vocab_id
+            }
+        )
+        closeMatches = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+
+        # get broadMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                            SELECT *
+                            WHERE {{
+                                <{}> skos:broadMatch ?s .
+                            }}""".format(uri)
+        r = self.s.post(
+            config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+            data={
+                'query': q,
+                'ctx_project': self.vocab_id
+            }
+        )
+        broadMatches = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+
+        # get narrowMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                                    SELECT *
+                                    WHERE {{
+                                        <{}> skos:narrowMatch ?s .
+                                    }}""".format(uri)
+        r = self.s.post(
+            config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+            data={
+                'query': q,
+                'ctx_project': self.vocab_id
+            }
+        )
+        narrowMatches = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+
+        # get relatedMatch
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                                            SELECT *
+                                            WHERE {{
+                                                <{}> skos:relatedMatch ?s .
+                                            }}""".format(uri)
+        r = self.s.post(
+            config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+            data={
+                'query': q,
+                'ctx_project': self.vocab_id
+            }
+        )
+        relatedMatches = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+
         from model.concept import Concept
         return Concept(
             self.vocab_id,
@@ -248,6 +309,10 @@ class VOCBENCH(Source):
             [{'uri': x.get('b').get('value'), 'prefLabel': x.get('pl').get('value')} for x in broaders],
             [{'uri': x.get('n').get('value'), 'prefLabel': x.get('pl').get('value')} for x in narrowers],
             [x['s']['value'] for x in exactMatches],
+            [x['s']['value'] for x in closeMatches],
+            [x['s']['value'] for x in broadMatches],
+            [x['s']['value'] for x in narrowMatches],
+            [x['s']['value'] for x in relatedMatches],
             None  # TODO: replace Sem Properties sub
         )
 
