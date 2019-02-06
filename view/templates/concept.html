@@ -31,6 +31,14 @@
         <th>Contributor</th><td><a href="{{ concept.contributor }}">{{ concept.contributor }}</a></td>
     </tr>
     {% endif %}
+
+    {% if concept.exactMatches %}
+        <th>has exact match:</th>
+        {% for exactMatch in concept.exactMatches %}
+            <td><a href="{{ exactMatch }}">{{ exactMatch }}</a></td>
+        {% endfor %}
+    {% endif %}
+
     {% if concept.broaders|length > 0 %}
     <tr>
         {% if concept.broaders %}

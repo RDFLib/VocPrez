@@ -19,6 +19,7 @@ class Concept:
             contributor,
             broaders,
             narrowers,
+            exactMatches,
             semantic_properties
     ):
         self.vocab_id = vocab_id
@@ -31,6 +32,7 @@ class Concept:
         self.contributor = contributor
         self.broaders = broaders
         self.narrowers = narrowers
+        self.exactMatches = exactMatches
         self.semantic_properties = semantic_properties
 
 
