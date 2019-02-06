@@ -6,6 +6,4 @@ def url_encode(s):
 
 
 def make_title(s):
-    result = s.split('#')[-1].split('/')[-1]
-    result = result.replace('_', ' ')
-    return result.title()
+    return ' '.join(s.split('#')[-1].split('/')[-1].split('_')).title()
