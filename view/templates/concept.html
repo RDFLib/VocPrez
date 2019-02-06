@@ -10,7 +10,7 @@
         <th>Alternative Labels</th>
         <td class="list">
             {% for altLabel in concept.altLabels -%}
-                <a href="{{ altLabel.url }}">{{ altLabel.prefLabel }}</a><br />
+                {{ altLabel }}
             {% endfor %}
         </td>
     </tr>
