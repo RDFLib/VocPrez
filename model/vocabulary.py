@@ -28,6 +28,8 @@ class Vocabulary:
         self.created = created
         self.modified = modified
         self.versionInfo = versionInfo
+        if hasTopConcepts:
+            hasTopConcepts.sort()
         self.hasTopConcepts = hasTopConcepts
         self.conceptHierarchy = conceptHierarchy
         self.accessURL = accessURL
@@ -66,6 +68,8 @@ class VocabularyRenderer(Renderer):
 
     def render(self):
         if self.view == 'alternates':
+            if self.format == 'text/html':
+                return self._render_alternates_view_html({'title': 'Alternates View of ' + self.vocab.title, 'name': self.vocab.title})
             return self._render_alternates_view()
         elif self.view == 'dcat':
             if self.format in Renderer.RDF_SERIALIZER_MAP:

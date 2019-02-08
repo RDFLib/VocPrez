@@ -74,6 +74,8 @@ class ConceptRenderer(Renderer):
 
     def render(self):
         if self.view == 'alternates':
+            if self.format == 'text/html':
+                return self._render_alternates_view_html({'title': 'Alternates View of ' + self.concept.prefLabel, 'name': self.concept.prefLabel, 'vocab_id': self.concept.vocab_id})
             return self._render_alternates_view()
         elif self.view == 'skos':
             if self.format in Renderer.RDF_MIMETYPES or self.format in Renderer.RDF_SERIALIZER_MAP:
@@ -136,15 +138,3 @@ class ConceptRenderer(Renderer):
             ),
             headers=self.headers
         )
-
-    def _render_alternates_view_html(self):
-        my_context  = {
-            'vocab_id': self.concept.vocab_id
-        }
-        return super(ConceptRenderer, self)._render_alternates_view_html(template_context=my_context)
-    #     super().__init__(
-    #         self.request,
-    #         url_for('routes.object') + '?vocab_uri=' + self.concept.vocab_id,
-    #         self.views,
-    #         self.default_view_token
-    #     )
