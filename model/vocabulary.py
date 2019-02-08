@@ -28,6 +28,8 @@ class Vocabulary:
         self.created = created
         self.modified = modified
         self.versionInfo = versionInfo
+        if hasTopConcepts:
+            hasTopConcepts.sort()
         self.hasTopConcepts = hasTopConcepts
         self.conceptHierarchy = conceptHierarchy
         self.accessURL = accessURL
