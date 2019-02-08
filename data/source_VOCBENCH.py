@@ -117,7 +117,10 @@ class VOCBENCH(Source):
         )
 
         if r.status_code == 200:
-            metadata = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+            try:
+                metadata = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+            except:
+                raise VbException(r.content.decode('utf-8'))
 
             concept_hierarchy = self.get_concept_hierarchy(str(metadata[0]['s']['value']))
             if len(concept_hierarchy.strip()) == 0:
@@ -425,8 +428,11 @@ class VOCBENCH(Source):
             }
         )
 
-        for c in json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']:
-            if c.get('c')['value'] in self.VOC_TYPES:
-                return c.get('c')['value']
+        try:
+            for c in json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']:
+                if c.get('c')['value'] in self.VOC_TYPES:
+                    return c.get('c')['value']
+        except:
+            raise VbException(r.content.decode('utf-8'))
 
         return None
