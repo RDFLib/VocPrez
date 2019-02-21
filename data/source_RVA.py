@@ -113,7 +113,7 @@ class RVA(Source):
         sparql.setReturnFormat(JSON)
         concepts = sparql.query().convert()['results']['bindings']
 
-        return [(x.get('c').get('value'), x.get('pl').get('value')) for x in concepts]
+        return [{'uri': x.get('c').get('value'), 'title': x.get('pl').get('value')} for x in concepts]
 
     def get_vocabulary(self):
         sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))

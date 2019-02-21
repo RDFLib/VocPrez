@@ -180,7 +180,7 @@ class VOCBENCH(Source):
         )
         concepts = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
         if r.status_code == 200:
-            return [(x.get('c').get('value'), x.get('pl').get('value')) for x in concepts]
+            return [{'uri': x.get('c').get('value'), 'title': x.get('pl').get('value')} for x in concepts]
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 

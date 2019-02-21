@@ -34,11 +34,13 @@
 
                 {%- for item in register_items -%}
                     <div class="card">
-                        {% if vocab_id %}
-                        <h4><a href="{{ request.url_root }}object?vocab_id={{ vocab_id }}&uri={{ h.url_encode(item['key']) }}">{{ item['title'] }}</a></h4>
-                        {% endif %}
 
-                        {%- if item is not string %}
+                        {# This is the concept register. #}
+                        {% if vocab_id %}
+                            <h4><a href="{{ request.url_root }}object?vocab_id={{ vocab_id }}&uri={{ h.url_encode(item['uri']) }}">{{ item['title'] }}</a></h4>
+
+                        {# This is the vocabulary register. #}
+                        {%- elif item is not string %}
                             <h4><a href="{{ h.url_encode(item['key']) }}">{{ item['title'] }}</a></h4>
                         {%- else %}
                             <h4><a href="{{ h.url_encode(item) }}">{{ item.split('#')[-1].split('/')[-1] }}</a></h4>
