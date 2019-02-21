@@ -47,7 +47,7 @@
         </td>
     </tr>
     {% endif %}
-    {%  if vocab.conceptHierarchy is not none  %}
+    {%  if vocab.conceptHierarchy is not none and vocab.conceptHierarchy|length > 0  %}
     <tr>
         <th>Concept Hierarchy</th>
         <td>
