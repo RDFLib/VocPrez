@@ -52,7 +52,7 @@ def match(vocabs, query):
     :rtype: generator
     """
     for word in vocabs:
-        if query.lower() in word[1].lower():
+        if query.lower() in word['title'].lower():
             yield word
 
 
@@ -85,7 +85,7 @@ def vocabularies():
         for m in match(vocabs, query):
             results.append(m)
         vocabs[:] = results
-        vocabs.sort(key=lambda tup: tup[1])
+        vocabs.sort(key=lambda item: item['title'])
         total = len(vocabs)
 
     # generate vocabs list for requested page and per_page
