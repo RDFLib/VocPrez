@@ -67,7 +67,6 @@ def vocabularies():
     vocabs = []
     for k, v in config.VOCABS.items():
         vocabs.append({
-            # Make it a dict instead of a tuple
             'key': k,
             'title': v['title'],
             'creators': [creator for creator in v['creators']] if isinstance(v['creators'], list) else None,
@@ -129,7 +128,7 @@ def vocabulary_list(vocab_id):
 
     v = Source(vocab_id, request)
     concepts = v.list_concepts()
-    concepts.sort(key= lambda x: x[1])
+    concepts.sort(key= lambda x: x['title'])
     total = len(concepts)
 
     # Search
@@ -139,7 +138,7 @@ def vocabulary_list(vocab_id):
         for m in match(concepts, query):
             results.append(m)
         concepts[:] = results
-        concepts.sort(key=lambda tup: tup[1])
+        concepts.sort(key=lambda x: x['title'])
         total = len(concepts)
 
     page = int(request.values.get('page')) if request.values.get('page') is not None else 1

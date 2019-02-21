@@ -2,7 +2,10 @@ import urllib
 
 
 def url_encode(s):
-    return urllib.parse.quote(s)
+    try:
+        return urllib.parse.quote(s)
+    except:
+        print(s)
 
 
 def make_title(s):

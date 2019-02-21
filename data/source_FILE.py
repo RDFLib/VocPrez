@@ -130,7 +130,7 @@ class FILE(Source):
         vocabs = []
         for s, p, o in self.g.triples((None, SKOS.inScheme, None)):
             label = ' '.join(str(s).split('#')[-1].split('/')[-1].split('_'))
-            vocabs.append((str(s), label))
+            vocabs.append({'uri': str(s), 'title': label})
 
         return vocabs
 
