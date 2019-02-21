@@ -18,7 +18,8 @@
         <input type="submit" value="Submit">
     </form>
     {% endif %}
-     <table>
+
+    <table>
         <tr>
             <td style="width:50%; vertical-align:top;">
                 <h3>Instances</h3>
@@ -29,17 +30,58 @@
                 </form>
                 <br>
                 {% endif %}
-                <ul>
+
+
                 {%- for item in register_items -%}
-                    {% if vocab_id %}
-                    <li><a href="{{ request.url_root }}object?vocab_id={{ vocab_id }}&uri={{ h.url_encode(item[0]) }}">{{ item[1] }}</a></li>
-                    {%- elif item is not string %}
-                    <li><a href="{{ h.url_encode(item[0]) }}">{{ item[1] }}</a></li>
-                    {%- else %}
-                    <li><a href="{{ h.url_encode(item) }}">{{ item.split('#')[-1].split('/')[-1] }}</a></li>
-                    {%- endif %}
+                    <div class="card">
+                        {% if vocab_id %}
+                        <h4><a href="{{ request.url_root }}object?vocab_id={{ vocab_id }}&uri={{ h.url_encode(item['key']) }}">{{ item['title'] }}</a></h4>
+                        {% endif %}
+
+                        {%- if item is not string %}
+                            <h4><a href="{{ h.url_encode(item['key']) }}">{{ item['title'] }}</a></h4>
+                        {%- else %}
+                            <h4><a href="{{ h.url_encode(item) }}">{{ item.split('#')[-1].split('/')[-1] }}</a></h4>
+                        {%- endif %}
+
+                        <hr>
+                        <table>
+
+                            {% if item['date_created'] %}
+                                <tr>
+                                    <th>Date created:</th>
+                                    <td>{{ item['date_created'] }}</td>
+                                </tr>
+                            {% endif %}
+
+                            {% if item['date_modified'] %}
+                                <tr>
+                                    <th>Date modified:</th>
+                                    <td>{{ item['date_modified'] }}</td>
+                                </tr>
+                            {% endif %}
+
+                            {% if item['creators'] %}
+                                <tr>
+                                    <th>Creators:</th>
+                                    {% for creator in item['creators'] %}
+                                        <td><a href="{{ creator }}">{{ h.make_title(creator) }}</a></td>
+                                    {% endfor %}
+                                </tr>
+                            {% endif %}
+
+                            {% if item['version'] %}
+                                <tr>
+                                    <th>Version:</th>
+                                    <td>{{ item['version'] }}</td>
+                                </tr>
+                            {% endif %}
+
+                        </table>
+                    </div>
+
                 {%- endfor -%}
-                </ul>
+
                 <!-- pagination links as per MediaTypes -->
                 {%  if pagination.links %}
                     <h5>Paging</h5>

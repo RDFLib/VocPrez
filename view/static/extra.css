@@ -1,0 +1,39 @@
+
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
+    transition: 0.3s;
+    width: 90%;
+    background-color: #93c3d4;
+    padding: 1px 1em 0.2em 1em;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    background-color: #a5d1e0;
+}
+
+.card > table {
+    border: none;
+}
+
+.card > table > tbody > tr > th, .card > table > tbody > tr > td {
+    border: none;
+    font-size: 12px;
+}
+
+.card > table > tbody> tr > th {
+    vertical-align: baseline;
+}
+
+.card > h4 {
+    margin-bottom: 6px;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+hr {
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
