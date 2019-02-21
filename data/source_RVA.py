@@ -15,12 +15,71 @@ class RVA(Source):
 
     @staticmethod
     def init():
-        # print('Building concept hierarchy for source type RVA ...')
-        # # build conceptHierarchy
-        # for item in config.VOCABS:
-        #     if config.VOCABS[item]['source'] == config.VocabSource.RVA:
-        #         RVA.hierarchy[item] = RVA.build_concept_hierarchy(item)
-        pass
+        # Get register item metadata
+        for vocab_id in config.VOCABS:
+            if config.VOCABS[vocab_id]['source'] == config.VocabSource.RVA:
+
+                # Creators
+                sparql = SPARQLWrapper(config.VOCABS.get(vocab_id).get('sparql'))
+                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    SELECT *
+                    WHERE {{
+                        ?s a skos:ConceptScheme .
+                        ?s dct:creator ?o .
+                    }}
+                    """)
+                sparql.setReturnFormat(JSON)
+                try:
+                    creators = sparql.query().convert()['results']['bindings']
+                    config.VOCABS[vocab_id]['creators'] = list(set([creator['o']['value'] for creator in creators]))
+                except:
+                    config.VOCABS[vocab_id]['creators'] = None
+
+                # Date Created
+                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    SELECT *
+                    WHERE {
+                        ?s a skos:ConceptScheme .
+                        ?s (dct:created | dct:date) ?o .
+                    }""")
+                sparql.setReturnFormat(JSON)
+                try:
+                    date_created = sparql.query().convert()['results']['bindings'][0]['o']['value'][:10]
+                    config.VOCABS[vocab_id]['date_created'] = date_created
+                except:
+                    config.VOCABS[vocab_id]['date_created'] = None
+
+                # Date Modified
+                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    SELECT *
+                    WHERE {
+                        ?s a skos:ConceptScheme .
+                        ?s dct:modified ?o .
+                    }""")
+                sparql.setReturnFormat(JSON)
+                try:
+                    date_modified = sparql.query().convert()['results']['bindings'][0]['o']['value'][:10]
+                    config.VOCABS[vocab_id]['date_modified'] = date_modified
+                except:
+                    config.VOCABS[vocab_id]['date_modified'] = None
+
+                # Version
+                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
+                                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                                    SELECT *
+                                    WHERE {
+                                        ?s a skos:ConceptScheme .
+                                        ?s owl:versionInfo ?o .
+                                    }""")
+                sparql.setReturnFormat(JSON)
+                try:
+                    version = sparql.query().convert()['results']['bindings'][0]['o']['value'][:10]
+                    config.VOCABS[vocab_id]['version'] = version
+                except:
+                    config.VOCABS[vocab_id]['version'] = None
 
     @classmethod
     def list_vocabularies(self):

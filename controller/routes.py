@@ -66,8 +66,16 @@ def vocabularies():
     # get this instance's list of vocabs
     vocabs = []
     for k, v in config.VOCABS.items():
-        vocabs.append((k, v['title']))
-    vocabs.sort(key=lambda tup: tup[1])
+        vocabs.append({
+            # Make it a dict instead of a tuple
+            'key': k,
+            'title': v['title'],
+            'creators': [creator for creator in v['creators']] if isinstance(v['creators'], list) else None,
+            'date_created': v['date_created'],
+            'date_modified': v['date_modified'],
+            'version': v['version']
+        })
+    vocabs.sort(key=lambda item: item['title'])
     total = len(config.VOCABS.items())
 
     # Search

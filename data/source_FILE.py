@@ -2,7 +2,7 @@ from data.source import Source
 from os.path import dirname, realpath, join, abspath
 import _config as config
 from rdflib import Graph, URIRef, RDF
-from rdflib.namespace import SKOS, DCTERMS, DC
+from rdflib.namespace import SKOS, DCTERMS, DC, OWL
 import os
 import pickle
 
@@ -50,11 +50,43 @@ class FILE(Source):
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
 
-        # print('Building concept hierarchy for source type FILE ...')
-        # # build conceptHierarchy
-        # for item in config.VOCABS:
-        #     if config.VOCABS[item]['source'] == config.VocabSource.FILE:
-        #         FILE.hierarchy[item] = FILE.build_concept_hierarchy(item)
+                    # Get register item metadata
+                    if file_name in config.VOCABS:
+                        # Creators
+                        creators = []
+                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                            for creator in g.objects(uri, DCTERMS.creator):
+                                creators.append(str(creator))
+                            break
+                        config.VOCABS[file_name]['creators'] = creators
+
+                        # Date Created
+                        date_created = None
+                        # dct:created
+                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                            for date in g.objects(uri, DCTERMS.created):
+                                date_created = str(date)[:10]
+                        if not date_created:
+                            # dct:date
+                            for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                                for date in g.objects(uri, DCTERMS.date):
+                                    date_created = str(date)[:10]
+                        config.VOCABS[file_name]['date_created'] = date_created
+
+                        # Date Modified
+                        date_modified = None
+                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                            for date in g.objects(uri, DCTERMS.modified):
+                                date_modified = str(date)[:10]
+                        config.VOCABS[file_name]['date_modified'] = date_modified
+
+                        # Version
+                        version = None
+                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                            for versionInfo in g.objects(uri, OWL.versionInfo):
+                                version = versionInfo
+                        config.VOCABS[file_name]['version'] = version
+
 
     @classmethod
     def list_vocabularies(self):
