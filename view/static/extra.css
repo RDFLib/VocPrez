@@ -52,23 +52,28 @@ ul > li {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
     transition: 0.3s;
     width: 90%;
-    background-color: #93c3d4;
+    /*background-color: #93c3d4;*/
+    background-color: white;
     padding: 1px 1em 0.2em 1em;
     margin-bottom: 20px;
 }
 
 .card:hover {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    background-color: #a5d1e0;
+    /*background-color: #a5d1e0;*/
 }
 
 .card > table {
     border: none;
 }
 
+.card > h4 > a {
+    font-weight: bold;
+}
+
 .card > table > tbody > tr > th, .card > table > tbody > tr > td {
     border: none;
-    font-size: 12px;
+    font-size: 15px;
 }
 
 .card > table > tbody> tr > th {
