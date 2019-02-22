@@ -72,14 +72,8 @@ def vocabularies():
     # get this instance's list of vocabs
     vocabs = []
     for k, v in config.VOCABS.items():
-        vocabs.append({
-            'key': k,
-            'title': v['title'],
-            'creators': [creator for creator in v['creators']] if isinstance(v['creators'], list) else None,
-            'date_created': v['date_created'],
-            'date_modified': v['date_modified'],
-            'version': v['version']
-        })
+        v['key'] = k
+        vocabs.append(v)
     vocabs.sort(key=lambda item: item['title'])
     total = len(config.VOCABS.items())
 
