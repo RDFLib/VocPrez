@@ -78,7 +78,7 @@ class SkosRegisterRenderer(RegisterRenderer):
                 "bindings": []
             }
         }
-        for item in self.register_items:
+        for item in self.template_items:
             response['results']['bindings'].append({
                 "pl": {
                     "xml:lang": "en",
