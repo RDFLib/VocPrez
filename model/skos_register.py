@@ -22,16 +22,24 @@ class SkosRegisterRenderer(RegisterRenderer):
                 namespace='https://ckan.org/'
             )
         }
+
+        # Due to pyLDAPI limitation where it only accepts a certain tuple schema, change our dicts to conform to
+        # that schema.
+        tuple_items = []
+        for item in items:
+            tuple_items.append((request.base_url + item['key'], item['title']))
+
         super().__init__(
             request,
             request.base_url,
             "Test Label",
             "Test Comment",
-            items,
+            tuple_items,
             register_item_type_string,
             total,
             views=views
         )
+        self.template_items = items
 
     def render(self):
         """
@@ -71,19 +79,17 @@ class SkosRegisterRenderer(RegisterRenderer):
             }
         }
         for item in self.register_items:
-            response['results']['bindings'].append(
-                {
-                    "pl": {
-                        "xml:lang": "en",
-                        "type": "literal",
-                        "value": item[1]
-                    },
-                    "s": {
-                        "type": "uri",
-                        "value": item[0]
-                    }
+            response['results']['bindings'].append({
+                "pl": {
+                    "xml:lang": "en",
+                    "type": "literal",
+                    "value": item['title']
+                },
+                "s": {
+                    "type": "uri",
+                    "value": self.request.base_url + item['key']
                 }
-            )
+            })
 
         response = jsonify(response)
         response.headers.add('Access-Control-Allow-origin', '*')
@@ -97,7 +103,7 @@ class SkosRegisterRenderer(RegisterRenderer):
             'label': self.label,
             'comment': self.comment,
             'register_item_type_string': self.register_item_type_string,
-            'register_items': self.register_items,
+            'register_items': self.template_items,
             'page': self.page,
             'per_page': self.per_page,
             'first_page': self.first_page,
