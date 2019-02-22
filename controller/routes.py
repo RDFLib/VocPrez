@@ -14,17 +14,33 @@ routes = Blueprint('routes', __name__)
 
 
 def render_invalid_vocab_id_response():
-    return Response(
-        'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-        '\n'.join(config.VOCABS.keys()),
-        status=400,
-        mimetype='text/plain'
-    )
+    msg = """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """ + '\n* '.join(config.VOCABS.keys())
+    msg = Markup(markdown.markdown(msg))
+    return render_template('error.html', title='Error - invalid vocab id', heading='Invalid Vocab ID', msg=msg)
+    # return Response(
+    #     'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
+    #     '\n'.join(config.VOCABS.keys()),
+    #     status=400,
+    #     mimetype='text/plain'
+    # )
 
 
 def render_vb_exception_response(e):
     e = json.loads(str(e))
-    return render_template('error.html', title='Error', heading='VocBench Error', msg=e['stresponse']['msg'])
+    msg = e['stresponse']['msg']
+    if 'not an open project' in msg:
+        invalid_vocab_id = msg.split('not an open project:')[-1]
+        msg = 'The VocBench instance returned with an error: **{}** is not an open project.'.format(invalid_vocab_id)
+        msg = Markup(markdown.markdown(msg))
+    return render_template('error.html', title='Error', heading='VocBench Error', msg=msg)
+
+
+def render_invalid_object_class_response(vocab_id, uri, c_type):
+    msg = """No valid *Object Class URI* found for vocab_id **{}** and uri **{}** 
+    
+Instead, found **{}**.""".format(vocab_id, uri, c_type)
+    msg = Markup(markdown.markdown(msg))
+    return render_template('error.html', title='Error - Object Class URI', heading='Concept Class Type Error', msg=msg)
 
 
 def get_a_vocab_source_key():
@@ -221,7 +237,7 @@ def object():
                 collection
             ).render()
         else:
-            return 'System error at /object endpoint: Object Class URI not found. '
+            return render_invalid_object_class_response(vocab_id, uri, c)
     except VbException as e:
         return render_vb_exception_response(e)
 

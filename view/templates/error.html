@@ -2,7 +2,5 @@
 
 {% block content %}
     <h1>{{ heading }}</h1>
-    <p><h2>Message:</h2>{{ msg }}</p>
-
-    <p>Please contact the administrator of this system for support.</p>
+    <p><h2>Message:</h2>{{ msg|safe }}</p>
 {% endblock %}
