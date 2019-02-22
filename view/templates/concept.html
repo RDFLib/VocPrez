@@ -7,8 +7,15 @@
 <table class="metadata concept">
     {% if concept.date_created %}
     <tr>
-        <th>Date Created:</th>
+        <th>Date created:</th>
         <td>{{ concept.date_created }}</td>
+    </tr>
+    {% endif %}
+
+    {% if concept.date_modified %}
+    <tr>
+        <th>Date modified:</th>
+        <td>{{ concept.date_modified }}</td>
     </tr>
     {% endif %}
     {% if concept.altLabels|length > 0 %}
@@ -21,17 +28,20 @@
         </td>
     </tr>
     {% endif %}
+
     <!-- don't display hiddenLabels, duh! -->
     {%  if concept.definition is not none  %}
     <tr>
         <th>Definition: </th><td>{{ concept.definition }}</td>
     </tr>
     {% endif %}
+
     {%  if concept.source is not none  %}
     <tr>
         <th>Source</th><td>{{ format(concept.source) }}</td>
     </tr>
     {% endif %}
+
     {%  if concept.contributor is not none  %}
     <tr>
         <th>Contributor</th><td><a href="{{ concept.contributor }}">{{ concept.contributor }}</a></td>
@@ -39,38 +49,48 @@
     {% endif %}
 
     {% if concept.exactMatches %}
-        <th>has exact match:</th>
-        {% for match in concept.exactMatches %}
-            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-        {% endfor %}
+        <tr>
+            <th>has exact match:</th>
+            {% for match in concept.exactMatches %}
+                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+            {% endfor %}
+        </tr>
     {% endif %}
 
     {% if concept.closeMatches %}
-        <th>has close match:</th>
-        {% for match in concept.closeMatches %}
-            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-        {% endfor %}
+        <tr>
+            <th>has close match:</th>
+            {% for match in concept.closeMatches %}
+                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+            {% endfor %}
+        </tr>
     {% endif %}
 
     {% if concept.broadMatches %}
-        <th>has broad match:</th>
-        {% for match in concept.broadMatches %}
-            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-        {% endfor %}
+        <tr>
+            <th>has broad match:</th>
+            {% for match in concept.broadMatches %}
+                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+            {% endfor %}
+        </tr>
     {% endif %}
 
     {% if concept.narrowMatches %}
-        <th>has narrow match:</th>
-        {% for match in concept.narrowMatches %}
-            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-        {% endfor %}
+        <tr>
+            <th>has narrow match:</th>
+            {% for match in concept.narrowMatches %}
+                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+            {% endfor %}
+        </tr>
     {% endif %}
 
     {% if concept.relatedMatches %}
-        <th>has related match:</th>
-        {% for match in concept.relatedMatches %}
-            <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-        {% endfor %}
+        <tr>
+            <th>has related match:</th>
+            {% for match in concept.relatedMatches %}
+                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
+            {% endfor %}
+        </tr>
     {% endif %}
 
     {% if concept.broaders|length > 0 %}
