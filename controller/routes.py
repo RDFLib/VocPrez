@@ -8,6 +8,7 @@ import markdown
 from flask import Markup
 from data.source import Source
 from data.source_VOCBENCH import VbException
+import json
 
 routes = Blueprint('routes', __name__)
 
@@ -19,6 +20,11 @@ def render_invalid_vocab_id_response():
         status=400,
         mimetype='text/plain'
     )
+
+
+def render_vb_exception_response(e):
+    e = json.loads(str(e))
+    return render_template('error.html', title='Error', heading='VocBench Error', msg=e['stresponse']['msg'])
 
 
 def get_a_vocab_source_key():
@@ -113,7 +119,7 @@ def vocabulary(vocab_id):
     try:
         v = Source(vocab_id, request).get_vocabulary()
     except VbException as e:
-        return Response(response=str(e), status=400, mimetype='text/xml')
+        return render_vb_exception_response(e)
 
     return VocabularyRenderer(
         request,
@@ -223,7 +229,7 @@ def object():
         else:
             return 'System error at /object endpoint: Object Class URI not found. '
     except VbException as e:
-        return Response(response=str(e), status=400, mimetype='text/xml')
+        return render_vb_exception_response(e)
 
 
 @routes.route('/about')
