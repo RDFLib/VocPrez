@@ -6,32 +6,32 @@
 <table class="metadata concept_scheme">
     {%  if vocab.description is not none  %}
     <tr>
-        <th>Description</th><td>{{ vocab.description }}</td>
+        <th>Description:</th><td>{{ vocab.description }}</td>
     </tr>
     {% endif %}
     {%  if vocab.creator is not none  %}
     <tr>
-        <th>Creator</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
+        <th>Creator:</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
     </tr>
     {% endif %}
     {%  if vocab.created is not none  %}
     <tr>
-        <th>Created</th><td>{{ vocab.created }}</td>
+        <th>Created:</th><td>{{ vocab.created }}</td>
     </tr>
     {% endif %}
     {%  if vocab.modified is not none  %}
     <tr>
-        <th>Modified</th><td>{{ vocab.modified }}</td>
+        <th>Modified:</th><td>{{ vocab.modified }}</td>
     </tr>
     {% endif %}
     {%  if vocab.versionInfo is not none  %}
     <tr>
-        <th>Version Info</th><td>{{ vocab.versionInfo }}</td>
+        <th>Version Info:</th><td>{{ vocab.versionInfo }}</td>
     </tr>
     {% endif %}
     {% if vocab.downloadURL %}
     <tr>
-        <th>Download</th>
+        <th>Download:</th>
         <td>
                 <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
         </td>
@@ -39,7 +39,7 @@
     {% endif %}
     {%  if vocab.hasTopConcepts is not none  %}
     <tr>
-        <th>Top Concepts</th>
+        <th>Top Concepts:</th>
         <td>
             {% for tc in vocab.hasTopConcepts %}
                 <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab.id }}&uri={{ h.url_encode(tc[0]) }}">{{ tc[1] }}</a><br />
@@ -49,7 +49,7 @@
     {% endif %}
     {%  if vocab.conceptHierarchy is not none and vocab.conceptHierarchy|length > 0  %}
     <tr>
-        <th>Concept Hierarchy</th>
+        <th>Concept Hierarchy:</th>
         <td>
                 {{ vocab.conceptHierarchy|safe }}
         </td>
