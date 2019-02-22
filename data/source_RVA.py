@@ -434,7 +434,7 @@ class RVA(Source):
             [x.get('al').get('value') for x in altLabels],
             [x.get('hl').get('value') for x in hiddenLabels],
             source,
-            metadata[0].get('cn').get('value') if metadata[0].get('cn') is not None else None,
+            metadata.get('cn').get('value') if metadata[0].get('cn') is not None else None,
             [{'uri': x.get('b').get('value'), 'prefLabel': x.get('pl').get('value')} for x in broaders],
             [{'uri': x.get('n').get('value'), 'prefLabel': x.get('pl').get('value')} for x in narrowers],
             [x['s']['value'] for x in exactMatches],
