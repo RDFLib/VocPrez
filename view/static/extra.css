@@ -37,6 +37,11 @@ p, ul, td, th {
 
 a {
     color: #4294B0;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 ul {
@@ -71,9 +76,14 @@ ul > li {
     font-weight: bold;
 }
 
+.card > table > tbody > tr > th {
+    font-weight: bold;
+}
+
 .card > table > tbody > tr > th, .card > table > tbody > tr > td {
     border: none;
     font-size: 15px;
+    padding-right: 10px;
 }
 
 .card > table > tbody> tr > th {
