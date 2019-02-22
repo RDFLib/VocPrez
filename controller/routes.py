@@ -35,6 +35,14 @@ def render_vb_exception_response(e):
     return render_template('error.html', title='Error', heading='VocBench Error', msg=msg)
 
 
+def render_invalid_object_class_response(vocab_id, uri, c_type):
+    msg = """No valid *Object Class URI* found for vocab_id **{}** and uri **{}** 
+    
+Instead, found **{}**.""".format(vocab_id, uri, c_type)
+    msg = Markup(markdown.markdown(msg))
+    return render_template('error.html', title='Error - Object Class URI', heading='Concept Class Type Error', msg=msg)
+
+
 def get_a_vocab_source_key():
     """
     Get the first key from the config.VOCABS dictionary.
@@ -229,7 +237,7 @@ def object():
                 collection
             ).render()
         else:
-            return 'System error at /object endpoint: Object Class URI not found. '
+            return render_invalid_object_class_response(vocab_id, uri, c)
     except VbException as e:
         return render_vb_exception_response(e)
 
