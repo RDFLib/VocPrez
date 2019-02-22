@@ -25,8 +25,14 @@ class Vocabulary:
         self.title = title
         self.description = description
         self.creator = creator
-        self.created = created
-        self.modified = modified
+        try:
+            self.created = created[:10]
+        except:
+            self.created = created
+        try:
+            self.modified = modified[:10]
+        except:
+            self.modified = modified
         self.versionInfo = versionInfo
         if hasTopConcepts:
             hasTopConcepts.sort()

@@ -2,6 +2,7 @@
 
 {% block content %}
 <h1>Vocabulary: {{ vocab.title }}</h1>
+<p>View this vocabulary's register of <a href="{{ url_for('routes.vocabulary', vocab_id=vocab.id) }}/concept/">concepts</a>.</p>
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <table class="metadata concept_scheme">
     {%  if vocab.description is not none  %}

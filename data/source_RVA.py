@@ -105,15 +105,44 @@ class RVA(Source):
         sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         sparql.setQuery('''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dct: <http://purl.org/dc/terms/>
             SELECT *
             WHERE {
               ?c a skos:Concept .
               ?c skos:prefLabel ?pl .
+              OPTIONAL {{
+                ?c dct:created ?date_created .
+            }}
+            OPTIONAL {{
+                ?c dct:modified ?date_modified .
+            }}
             }''')
         sparql.setReturnFormat(JSON)
         concepts = sparql.query().convert()['results']['bindings']
 
-        return [{'uri': x.get('c').get('value'), 'title': x.get('pl').get('value')} for x in concepts]
+        concept_items = []
+        for concept in concepts:
+            metadata = {}
+            try:
+                metadata.update({'uri': concept['uri']['value']})
+            except:
+                metadata.update({'uri': None})
+            try:
+                metadata.update({'title': concept['pl']['value']})
+            except:
+                metadata.update({'title': None})
+            try:
+                metadata.update({'date_created': concept['date_created']['value'][:10]})
+            except:
+                metadata.update({'date_created': None})
+            try:
+                metadata.update({'date_modified': concept['date_modified']['value'][:10]})
+            except:
+                metadata.update({'date_modified': None})
+
+            concept_items.append(metadata)
+
+        return concept_items
 
     def get_vocabulary(self):
         sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))

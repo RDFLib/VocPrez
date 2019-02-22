@@ -23,7 +23,7 @@
     {% endif %}
     {%  if concept.source is not none  %}
     <tr>
-        <th>Source</th><td>{{ concept.source }}</td>
+        <th>Source</th><td>{{ format(concept.source) }}</td>
     </tr>
     {% endif %}
     {%  if concept.contributor is not none  %}
