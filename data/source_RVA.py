@@ -124,7 +124,7 @@ class RVA(Source):
         for concept in concepts:
             metadata = {}
             try:
-                metadata.update({'uri': concept['uri']['value']})
+                metadata.update({'uri': concept['c']['value']})
             except:
                 metadata.update({'uri': None})
             try:
@@ -244,16 +244,19 @@ class RVA(Source):
     def get_concept(self, uri):
         sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dct: <http://purl.org/dc/terms/>
             SELECT *
             WHERE {{
-              <{}> skos:prefLabel ?pl .
-              OPTIONAL {{?s skos:definition ?d }}
+              <{0}> skos:prefLabel ?pl .
+              OPTIONAL {{ <{0}> skos:definition ?d }}
+              OPTIONAL {{ <{0}> dct:created ?date_created }}
+              OPTIONAL {{ <{0}> dct:modifieid ?date_modified }}
             }}'''.format(uri)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
         metadata = None
         try:
-            metadata = sparql.query().convert()['results']['bindings']
+            metadata = sparql.query().convert()['results']['bindings'][0]
         except:
             pass
 
@@ -439,7 +442,9 @@ class RVA(Source):
             [x['s']['value'] for x in broadMatches],
             [x['s']['value'] for x in narrowMatches],
             [x['s']['value'] for x in relatedMatches],
-            None  # TODO: replace Sem Properties sub
+            None,  # TODO: replace Sem Properties sub
+            metadata.get('date_created').get('value')[:10] if metadata.get('date_created') else None,
+            metadata.get('date_modified').get('value')[:10] if metadata.get('date_modified') else None,
         )
 
     def get_concept_hierarchy(self):

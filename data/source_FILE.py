@@ -327,7 +327,9 @@ class FILE(Source):
             broadMatches,
             narrowMatches,
             relatedMatches,
-            semantic_properties
+            semantic_properties,
+            None,
+            None,
         )
 
     def get_concept_hierarchy(self):

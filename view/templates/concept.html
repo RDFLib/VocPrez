@@ -5,6 +5,12 @@
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata concept">
+    {% if concept.date_created %}
+    <tr>
+        <th>Date Created:</th>
+        <td>{{ concept.date_created }}</td>
+    </tr>
+    {% endif %}
     {% if concept.altLabels|length > 0 %}
     <tr>
         <th>Alternative Labels</th>

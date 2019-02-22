@@ -250,10 +250,13 @@ class VOCBENCH(Source):
 
     def get_concept(self, uri):
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dct: <http://purl.org/dc/terms/>
             SELECT *
             WHERE {{
               <{0}> skos:prefLabel ?pl .
-              OPTIONAL {{<{0}> skos:definition ?d }}
+              OPTIONAL {{ <{0}> skos:definition ?d }}
+              OPTIONAL {{ <{0}> dct:created ?date_created }}
+              OPTIONAL {{ <{0}> dct:modified ?date_modified }}
             }}'''.format(uri)
         self.s = VOCBENCH('x', self.request)._authed_request_object()
         r = self.s.post(
@@ -419,7 +422,9 @@ class VOCBENCH(Source):
             [x['s']['value'] for x in broadMatches],
             [x['s']['value'] for x in narrowMatches],
             [x['s']['value'] for x in relatedMatches],
-            None  # TODO: replace Sem Properties sub
+            None, # TODO: replace Sem Properties sub,
+            metadata.get('date_created').get('value')[:10] if metadata.get('date_created') else None,
+            metadata.get('date_modified').get('value')[:10] if metadata.get('date_modified') else None,
         )
 
     def get_concept_hierarchy(self, concept_scheme_uri):
