@@ -128,9 +128,37 @@ class FILE(Source):
 
     def list_concepts(self):
         vocabs = []
-        for s, p, o in self.g.triples((None, SKOS.inScheme, None)):
-            label = ' '.join(str(s).split('#')[-1].split('/')[-1].split('_'))
-            vocabs.append({'uri': str(s), 'title': label})
+        # for s, p, o in self.g.triples((None, SKOS.inScheme, None)):
+        #     label = ' '.join(str(s).split('#')[-1].split('/')[-1].split('_'))
+        #     vocabs.append({
+        #         'uri': str(s),
+        #         'title': label
+        #     })
+        result = self.g.query("""
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dct: <http://purl.org/dc/terms/>
+            SELECT * 
+            WHERE {{
+                ?c skos:inScheme ?s .
+                OPTIONAL {{
+                    ?s skos:prefLabel ?title .
+                }}
+                OPTIONAL {{
+                    ?s dct:created ?date_created .
+                }}
+                OPTIONAL {{
+                    ?s dct:modified ?date_modified .
+                }}
+            }}
+            """)
+
+        for row in result:
+            vocabs.append({
+                'uri': str(row['c']),
+                'title': row['title'] if row['title'] is not None else ' '.join(str(row['c']).split('#')[-1].split('/')[-1].split('_')),
+                'date_created': row['date_created'][:10] if row['date_created'] is not None else None,
+                'date_modified': row['date_modified'][:10] if row['date_modified'] is not None else None,
+            })
 
         return vocabs
 

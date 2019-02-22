@@ -170,17 +170,27 @@ class VOCBENCH(Source):
             data={
                 'query':
                     '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    PREFIX dct: <http://purl.org/dc/terms/>
                     SELECT *
                     WHERE {
-                      ?c a skos:Concept ;
-                         skos:prefLabel ?pl .
+                        ?c  a skos:Concept ;
+                            skos:prefLabel ?pl .
+                            ?c dct:created ?date_created .
+                        OPTIONAL {{
+                            ?c dct:modified ?date_modified .
+                        }}
                     }''',
                 'ctx_project': self.vocab_id
             }
         )
         concepts = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
         if r.status_code == 200:
-            return [{'uri': x.get('c').get('value'), 'title': x.get('pl').get('value')} for x in concepts]
+            return [{
+                'uri': x['c']['value'],
+                'title': x['pl']['value'],
+                'date_created': x['date_created']['value'][:10],
+                'date_modified': x['date_modified'][:10] if 'date_modified' in x else None
+            } for x in concepts]
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
