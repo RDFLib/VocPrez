@@ -14,12 +14,15 @@ routes = Blueprint('routes', __name__)
 
 
 def render_invalid_vocab_id_response():
-    return Response(
-        'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-        '\n'.join(config.VOCABS.keys()),
-        status=400,
-        mimetype='text/plain'
-    )
+    msg = """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """ + '\n* '.join(config.VOCABS.keys())
+    msg = Markup(markdown.markdown(msg))
+    return render_template('error.html', title='Error - invalid vocab id', heading='Invalid Vocab ID', msg=msg)
+    # return Response(
+    #     'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
+    #     '\n'.join(config.VOCABS.keys()),
+    #     status=400,
+    #     mimetype='text/plain'
+    # )
 
 
 def render_vb_exception_response(e):
