@@ -26,6 +26,7 @@ class SkosRegisterRenderer(RegisterRenderer):
         # Due to pyLDAPI limitation where it only accepts a certain tuple schema, change our dicts to conform to
         # that schema.
         tuple_items = []
+        print(items)
         for item in items:
             tuple_items.append((request.base_url + item['key'], item['title']))
 
