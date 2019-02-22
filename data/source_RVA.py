@@ -123,6 +123,7 @@ class RVA(Source):
         concept_items = []
         for concept in concepts:
             metadata = {}
+            metadata.update({'key': self.vocab_id})
             try:
                 metadata.update({'uri': concept['c']['value']})
             except:

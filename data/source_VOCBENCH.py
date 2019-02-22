@@ -189,6 +189,7 @@ class VOCBENCH(Source):
             concept_items = []
             for concept in concepts:
                 metadata = {}
+                metadata.update({'key': self.vocab_id})
                 metadata.update({'uri': concept.get('c').get('value')})
                 metadata.update({'title': concept.get('pl').get('value')})
                 metadata.update({'date_created': concept.get('date_created').get('value')[:10]})
