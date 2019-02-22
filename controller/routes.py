@@ -27,7 +27,12 @@ def render_invalid_vocab_id_response():
 
 def render_vb_exception_response(e):
     e = json.loads(str(e))
-    return render_template('error.html', title='Error', heading='VocBench Error', msg=e['stresponse']['msg'])
+    msg = e['stresponse']['msg']
+    if 'not an open project' in msg:
+        invalid_vocab_id = msg.split('not an open project:')[-1]
+        msg = 'The VocBench instance returned with an error: **{}** is not an open project.'.format(invalid_vocab_id)
+        msg = Markup(markdown.markdown(msg))
+    return render_template('error.html', title='Error', heading='VocBench Error', msg=msg)
 
 
 def get_a_vocab_source_key():
