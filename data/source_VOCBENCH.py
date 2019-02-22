@@ -184,13 +184,22 @@ class VOCBENCH(Source):
             }
         )
         concepts = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+
         if r.status_code == 200:
-            return [{
-                'uri': x['c']['value'],
-                'title': x['pl']['value'],
-                'date_created': x['date_created']['value'][:10],
-                'date_modified': x['date_modified'][:10] if 'date_modified' in x else None
-            } for x in concepts]
+            concept_items = []
+            for concept in concepts:
+                metadata = {}
+                metadata.update({'uri': concept.get('c').get('value')})
+                metadata.update({'title': concept.get('pl').get('value')})
+                metadata.update({'date_created': concept.get('date_created').get('value')[:10]})
+                try:
+                    metadata.update({'date_modified': concept.get('date_modified').get('value')[:10]})
+                except:
+                    metadata.update({'date_modified': None})
+
+                concept_items.append(metadata)
+
+            return concept_items
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
 
