@@ -79,6 +79,7 @@ ul > li {
 
 .card > h4 > a {
     font-weight: bold;
+    font-size: 16px;
 }
 
 .card > table > tbody > tr > th {
