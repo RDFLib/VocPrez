@@ -6,15 +6,19 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ title }}</title>
+
     <link rel="stylesheet" href="{{url_for('static', filename='master.css')}}" />
     <link rel="stylesheet" href="{{url_for('static', filename='extra.css')}}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-grid.css') }}" />
+
     <link href="https://fonts.googleapis.com/css?family=Heebo:300,700" rel="stylesheet">
     <link rel="shortcut icon" type="image/png" href="https://static.qgov.net.au/assets/v2/images/skin/favicon.ico">
 </head>
 <body>
     <header>
-      <div class="inner flex">
+      <div class="container">
         <div class="branding">
           <a href="http://www.qld.gov.au">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 347.33 59.75">
@@ -72,12 +76,13 @@
                   <path d="M346.68,29.41H343.9V38c0,1.47.4,2,1.71,2a2.66,2.66,0,0,0,1.31-.27l.29,1.34a5,5,0,0,1-2.36.54,3.88,3.88,0,0,1-1.74-.38c-.94-.45-1.28-1.31-1.28-2.65V29.41H340.1V27.83h1.74c0-1.29.21-3.37.21-3.37l2.19-.48a35.9,35.9,0,0,0-.27,3.86h3.35Z"/>
                 </svg>
           </a>
-          <h1><a href="https://www.dnrme.qld.gov.au/home">Department of <strong>Natural Resources, Mines and Energy</strong></a></h1>
+          <div><a href="https://www.dnrme.qld.gov.au/home" style="font-size: 22px;">Department of <strong>Natural Resources, Mines and Energy</strong></a></div>
         </div>
         <!--<div class="contact-search">-->
           <!--<p class="find-contacts">Contact us</p>-->
           <!--<p class="show-search">Search</p>-->
           <!--<p class="show-menu">Menu</p>-->
+
 
           <!--<form action="https://www.dnrme.qld.gov.au/search" method="GET">-->
             <!--<input type="hidden" name="collection" value="dnrme" class="form-control">-->
@@ -90,8 +95,8 @@
       </div>
     </header>
 
-    <div class="breadcrumbs" style="height:75px; padding-top:30px; text-align:center;">
-        <div id="inner flex" style="margin: 0 auto; width:1245px; text-align:left;">
+    <div class="breadcrumbs" style="height:75px; padding-top:30px;">
+        <div class="container">
             {% for nav in navs %}
                 {{ nav|safe }}
             {% endfor %}
@@ -101,28 +106,28 @@
         </div>
     </div>
 
-    <div id="container-content" style="text-align:center;">
-        <div style="margin: 0 auto; width:1245px; text-align:left;" class="content">
+    <div class="container" style="padding-bottom: 20px;">
+        <div class="content">
             {% block content %}{% endblock %}
         </div>
     </div>
 
     <div class="footer-connect">
-        <div class="inner flex">
-            <div class="feedback">
-                <!--<p>Feedback</p>-->
+                <div class="inner flex">
+                    <div class="feedback">
+                        <!--<p>Feedback</p>-->
+                    </div>
+                    <div class="enquiries">
+                        <p>General enquiries <a href="tel:137468">13 QGOV</a> (<a href="tel:137468">13 74 68</a>)</p>
+                    </div>
+                    <div class="share">
+                        <p>Share</p>
+                        <a href="https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.dnrme.qld.gov.au%2Fmining-resources%2Finitiatives%2Fqld-mine-safety-framework" target="_blank"><svg class="facebook" viewBox="0 0 100 100" width="100" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path d="M 66.7735 17.9688 C 65.7188 17.8125 62.086 17.5 57.8672 17.5 C 49.077 17.5 43.0625 22.8906 43.0625 32.7734 L 43.0625 41.2891 L 33.1016 41.2891 L 33.1016 52.8516 L 43.0625 52.8516 L 43.0625 82.5 L 54.9375 82.5 L 54.9375 52.8516 L 64.8594 52.8516 L 66.3828 41.2891 L 54.9375 41.2891 L 54.9375 33.9063 C 54.9375 30.5859 55.836 28.2813 60.6406 28.2813 L 66.7735 28.2813 L 66.7735 17.9688 L 66.7735 17.9688 Z"></path></svg></a>
+                        <a href="https://twitter.com/intent/tweet/?url=https%3A%2F%2Fwww.dnrme.qld.gov.au%2Fmining-resources%2Finitiatives%2Fqld-mine-safety-framework" target="_blank"><svg class="twitter" viewBox="0 0 100 100" width="100" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path d="M 80.8438 30.9375 C 78.5689 31.9141 76.1032 32.6172 73.5592 32.8906 C 76.1815 31.3281 78.1776 28.8672 79.1169 25.9375 C 76.6903 27.3828 73.9506 28.4375 71.0934 28.9844 C 68.7842 26.5234 65.4966 25 61.8567 25 C 54.8508 25 49.2148 30.6641 49.2148 37.6172 C 49.2148 38.5938 49.3323 39.5703 49.528 40.5078 C 39.0388 39.9609 29.6846 34.9609 23.4615 27.3047 C 22.3656 29.1797 21.7394 31.3281 21.7394 33.6719 C 21.7394 38.0469 23.9703 41.9141 27.3754 44.1797 C 25.301 44.1016 23.3441 43.5156 21.6611 42.5781 L 21.6611 42.7344 C 21.6611 48.8672 26.0055 53.9453 31.7981 55.1172 C 30.7413 55.3906 29.6063 55.5469 28.4713 55.5469 C 27.6494 55.5469 26.8666 55.4688 26.0838 55.3516 C 27.6885 60.3516 32.346 63.9844 37.9037 64.1016 C 33.5593 67.5 28.119 69.4922 22.2091 69.4922 C 21.1523 69.4922 20.1739 69.4531 19.1563 69.3359 C 24.7531 72.9297 31.4067 75 38.5691 75 C 61.8175 75 74.5376 55.7813 74.5376 39.1016 C 74.5376 38.5547 74.5376 38.0078 74.4985 37.4609 C 76.9642 35.6641 79.1169 33.4375 80.8438 30.9375 L 80.8438 30.9375 Z"></path></svg></a>
+                        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.dnrme.qld.gov.au%2Fmining-resources%2Finitiatives%2Fqld-mine-safety-framework" target="_blank"><svg class="linkedin" viewBox="0 0 100 100" width="100" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path d="M 33.9375 39.9141 L 21.0625 39.9141 L 21.0625 78.625 L 33.9375 78.625 L 33.9375 39.9141 L 33.9375 39.9141 ZM 34.7485 27.9609 C 34.7099 24.1719 31.9872 21.2813 27.5783 21.2813 C 23.2084 21.2813 20.3203 24.1719 20.3203 27.9609 C 20.3203 31.6719 23.0914 34.6406 27.4222 34.6406 L 27.5003 34.6406 C 31.9872 34.6406 34.7872 31.6719 34.7485 27.9609 L 34.7485 27.9609 ZM 79.9258 56.4375 C 79.9258 44.5625 73.5977 39.0156 65.1425 39.0156 C 58.2681 39.0156 55.2558 42.8828 53.5951 45.5391 L 53.6723 45.5391 L 53.6723 39.9141 L 40.9664 39.9141 C 40.9664 39.9141 41.1208 43.5469 40.9664 78.625 L 53.6723 78.625 L 53.6723 57.0234 C 53.6723 55.8516 53.7882 54.7188 54.0972 53.8594 C 55.024 51.5547 57.1095 49.1719 60.6239 49.1719 C 65.2197 49.1719 67.0742 52.7266 67.0742 57.9219 L 67.0742 78.625 L 79.9258 78.625 L 79.9258 56.4375 L 79.9258 56.4375 Z"></path></svg></a>
+                    </div>
+                </div>
             </div>
-            <div class="enquiries">
-                <p>General enquiries <a href="tel:137468">13 QGOV</a> (<a href="tel:137468">13 74 68</a>)</p>
-            </div>
-            <div class="share">
-                <p>Share</p>
-                <a href="https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.dnrme.qld.gov.au%2Fmining-resources%2Finitiatives%2Fqld-mine-safety-framework" target="_blank"><svg class="facebook" viewBox="0 0 100 100" width="100" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path d="M 66.7735 17.9688 C 65.7188 17.8125 62.086 17.5 57.8672 17.5 C 49.077 17.5 43.0625 22.8906 43.0625 32.7734 L 43.0625 41.2891 L 33.1016 41.2891 L 33.1016 52.8516 L 43.0625 52.8516 L 43.0625 82.5 L 54.9375 82.5 L 54.9375 52.8516 L 64.8594 52.8516 L 66.3828 41.2891 L 54.9375 41.2891 L 54.9375 33.9063 C 54.9375 30.5859 55.836 28.2813 60.6406 28.2813 L 66.7735 28.2813 L 66.7735 17.9688 L 66.7735 17.9688 Z"></path></svg></a>
-                <a href="https://twitter.com/intent/tweet/?url=https%3A%2F%2Fwww.dnrme.qld.gov.au%2Fmining-resources%2Finitiatives%2Fqld-mine-safety-framework" target="_blank"><svg class="twitter" viewBox="0 0 100 100" width="100" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path d="M 80.8438 30.9375 C 78.5689 31.9141 76.1032 32.6172 73.5592 32.8906 C 76.1815 31.3281 78.1776 28.8672 79.1169 25.9375 C 76.6903 27.3828 73.9506 28.4375 71.0934 28.9844 C 68.7842 26.5234 65.4966 25 61.8567 25 C 54.8508 25 49.2148 30.6641 49.2148 37.6172 C 49.2148 38.5938 49.3323 39.5703 49.528 40.5078 C 39.0388 39.9609 29.6846 34.9609 23.4615 27.3047 C 22.3656 29.1797 21.7394 31.3281 21.7394 33.6719 C 21.7394 38.0469 23.9703 41.9141 27.3754 44.1797 C 25.301 44.1016 23.3441 43.5156 21.6611 42.5781 L 21.6611 42.7344 C 21.6611 48.8672 26.0055 53.9453 31.7981 55.1172 C 30.7413 55.3906 29.6063 55.5469 28.4713 55.5469 C 27.6494 55.5469 26.8666 55.4688 26.0838 55.3516 C 27.6885 60.3516 32.346 63.9844 37.9037 64.1016 C 33.5593 67.5 28.119 69.4922 22.2091 69.4922 C 21.1523 69.4922 20.1739 69.4531 19.1563 69.3359 C 24.7531 72.9297 31.4067 75 38.5691 75 C 61.8175 75 74.5376 55.7813 74.5376 39.1016 C 74.5376 38.5547 74.5376 38.0078 74.4985 37.4609 C 76.9642 35.6641 79.1169 33.4375 80.8438 30.9375 L 80.8438 30.9375 Z"></path></svg></a>
-                <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.dnrme.qld.gov.au%2Fmining-resources%2Finitiatives%2Fqld-mine-safety-framework" target="_blank"><svg class="linkedin" viewBox="0 0 100 100" width="100" height="100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"><path d="M 33.9375 39.9141 L 21.0625 39.9141 L 21.0625 78.625 L 33.9375 78.625 L 33.9375 39.9141 L 33.9375 39.9141 ZM 34.7485 27.9609 C 34.7099 24.1719 31.9872 21.2813 27.5783 21.2813 C 23.2084 21.2813 20.3203 24.1719 20.3203 27.9609 C 20.3203 31.6719 23.0914 34.6406 27.4222 34.6406 L 27.5003 34.6406 C 31.9872 34.6406 34.7872 31.6719 34.7485 27.9609 L 34.7485 27.9609 ZM 79.9258 56.4375 C 79.9258 44.5625 73.5977 39.0156 65.1425 39.0156 C 58.2681 39.0156 55.2558 42.8828 53.5951 45.5391 L 53.6723 45.5391 L 53.6723 39.9141 L 40.9664 39.9141 C 40.9664 39.9141 41.1208 43.5469 40.9664 78.625 L 53.6723 78.625 L 53.6723 57.0234 C 53.6723 55.8516 53.7882 54.7188 54.0972 53.8594 C 55.024 51.5547 57.1095 49.1719 60.6239 49.1719 C 65.2197 49.1719 67.0742 52.7266 67.0742 57.9219 L 67.0742 78.625 L 79.9258 78.625 L 79.9258 56.4375 L 79.9258 56.4375 Z"></path></svg></a>
-            </div>
-        </div>
-    </div>
 
     <div class="footer-content">
         <div class="inner flex">
@@ -159,26 +164,26 @@
     </div>
 
     <footer>
-      <div class="inner">
-        <div class="links">
-          <ul>
-            <li class="find-contacts">Contact us</li>
-            <li><a href="https://www.qld.gov.au/help">Help</a></li>
-            <li><a href="https://www.dnrme.qld.gov.au/home/legal/copyright">Copyright</a></li>
-            <li><a href="https://www.dnrme.qld.gov.au/home/legal/disclaimer">Disclaimer</a></li>
-            <li><a href="https://www.dnrme.qld.gov.au/home/legal/privacy">Privacy</a></li>
-            <li><a href="https://www.dnrme.qld.gov.au/home/right-to-information">Right to information</a></li>
-            <li><a href="https://www.qld.gov.au/help/accessibility">Accessibility</a></li>
-            <li><a href="https://smartjobs.qld.gov.au/">Jobs in Queensland Government</a></li>
-            <li><a href="https://www.qld.gov.au/help/languages">Other languages</a></li>
-          </ul>
-        </div>
+              <div class="inner">
+                <div class="links">
+                  <ul>
+                    <li class="find-contacts">Contact us</li>
+                    <li><a href="https://www.qld.gov.au/help">Help</a></li>
+                    <li><a href="https://www.dnrme.qld.gov.au/home/legal/copyright">Copyright</a></li>
+                    <li><a href="https://www.dnrme.qld.gov.au/home/legal/disclaimer">Disclaimer</a></li>
+                    <li><a href="https://www.dnrme.qld.gov.au/home/legal/privacy">Privacy</a></li>
+                    <li><a href="https://www.dnrme.qld.gov.au/home/right-to-information">Right to information</a></li>
+                    <li><a href="https://www.qld.gov.au/help/accessibility">Accessibility</a></li>
+                    <li><a href="https://smartjobs.qld.gov.au/">Jobs in Queensland Government</a></li>
+                    <li><a href="https://www.qld.gov.au/help/languages">Other languages</a></li>
+                  </ul>
+                </div>
 
-        <div class="copyright">
-          <p>&copy; The State of Queensland 1995-2018</p>
-          <p><a href="https://www.qld.gov.au">Queensland Government</a></p>
-        </div>
-      </div>
-    </footer>
+                <div class="copyright">
+                  <p>&copy; The State of Queensland 1995-2018</p>
+                  <p><a href="https://www.qld.gov.au">Queensland Government</a></p>
+                </div>
+              </div>
+            </footer>
 </body>
 </html>

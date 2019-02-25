@@ -1,15 +1,13 @@
 .content {
     margin-bottom: 40px;
     padding: 40px;
-    width: 75%;
     box-shadow: 0 0 10px rgba(53, 52, 53, 0.1);
     border: 1px solid rgba(53, 52, 53, 0.1);
     border-radius: 2px;
     background: white;
-    margin-left: 200px;
 }
 
-.content > h1 {
+h1 {
     margin-bottom: 26px;
     padding-bottom: 5px;
     font-size: 40px;
@@ -26,6 +24,12 @@ h2 {
 }
 
 h3 {
+    margin: 20px 0 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+h4 {
     margin: 20px 0 10px;
     font-size: 20px;
     font-weight: 700;
@@ -61,11 +65,11 @@ ul > li {
 .card {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
     transition: 0.3s;
-    width: 90%;
     /*background-color: #93c3d4;*/
     background-color: white;
     padding: 1px 1em 0.2em 1em;
     margin-bottom: 20px;
+    min-height: 110px;
 }
 
 .card:hover {
@@ -105,4 +109,17 @@ ul > li {
 hr {
     margin-top: 1px;
     margin-bottom: 1px;
+}
+
+.collapsible {
+    font-weight: normal;
+    color: #4294B0;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.collapsible-content {
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
 }
