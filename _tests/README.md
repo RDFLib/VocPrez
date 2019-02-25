@@ -16,8 +16,8 @@ See [pytest](https://docs.pytest.org/en/latest/) for more information on how to 
 ### File Source
 
 #### Vocabulary Instance
-- [ ] DCAT view and its formats
-- [ ] Alternates view and its formats
+- [x] DCAT view and its formats
+- [x] Alternates view and its formats
 
 #### Vocabulary Instance's Concept Register
 - [ ] CKAN view and its formats
