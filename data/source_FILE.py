@@ -154,6 +154,7 @@ class FILE(Source):
 
         for row in result:
             vocabs.append({
+                'key': self.vocab_id,
                 'uri': str(row['c']),
                 'title': row['title'] if row['title'] is not None else ' '.join(str(row['c']).split('#')[-1].split('/')[-1].split('_')),
                 'date_created': row['date_created'][:10] if row['date_created'] is not None else None,
