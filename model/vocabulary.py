@@ -97,9 +97,9 @@ class VocabularyRenderer(Renderer):
 
         g.add((s, RDF.type, DCAT.Dataset))
         if self.vocab.title:
-            g.add((s, DCTERMS.title, Literal(self.vocab.title, datatype=XSD.string)))
+            g.add((s, DCTERMS.title, Literal(self.vocab.title)))
         if self.vocab.description:
-            g.add((s, DCTERMS.description, Literal(self.vocab.description, datatype=XSD.string)))
+            g.add((s, DCTERMS.description, Literal(self.vocab.description)))
         if self.vocab.creator:
             if self.vocab.creator[:7] == 'http://' or self.vocab.creator[:7] == 'https://': # if url
                 g.add((s, DCTERMS.creator, URIRef(self.vocab.creator)))
