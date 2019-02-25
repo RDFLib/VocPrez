@@ -94,6 +94,7 @@ ul > li {
     border: none;
     font-size: 15px;
     padding-right: 10px;
+    text-align: left;
 }
 
 .card > table > tbody> tr > th {
