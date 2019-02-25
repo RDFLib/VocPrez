@@ -140,5 +140,15 @@
           });
 
     </script>
+
+    <script>
+        let cards = document.getElementsByClassName("card")
+        let i;
+        for (i = 0; i < cards.length; i++) {
+            if (cards[i].children[1].children[0] === undefined) {
+                cards[i].children[1].innerHTML = "<em>No metadata found.</em>";
+            }
+        }
+    </script>
 {% endblock %}
 
