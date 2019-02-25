@@ -19,7 +19,7 @@ footer-contenttable {
 }
 
 table, th, td {
-    border: 1px solid black;
+    border: 1px solid #e4e4e4;
     text-align: left;
 }
 
@@ -64,10 +64,6 @@ a {
 a:hover {
     text-decoration: underline;
     color: rgb(179, 0, 0);
-}
-
-body {
-    text-align: center;
 }
 
 #widther {

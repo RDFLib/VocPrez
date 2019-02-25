@@ -5,12 +5,14 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{{url_for('static', filename='vanilla_theme.css')}}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='extra.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-grid.css') }}" />
 </head>
-<body>
-    <div id="widther">
+<body class="container">
+    <div>
         <div id="header">
             <div style="float:left;">
                 <em>Logo Placeholder</em>
@@ -27,7 +29,7 @@
             <div style="clear:both;"></div>
         </div>
 
-        <div id="container-content">
+        <div>
             {% block content %}{% endblock %}
         </div>
         <div id="footer">

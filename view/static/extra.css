@@ -51,11 +51,11 @@ ul > li {
 .card {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
     transition: 0.3s;
-    width: 90%;
     /*background-color: #93c3d4;*/
     background-color: white;
     padding: 1px 1em 0.2em 1em;
     margin-bottom: 20px;
+    min-height: 110px;
 }
 
 .card:hover {
@@ -89,4 +89,17 @@ ul > li {
 hr {
     margin-top: 1px;
     margin-bottom: 1px;
+}
+
+.collapsible {
+    font-weight: normal;
+    color: #4294B0;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.collapsible-content {
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
 }
