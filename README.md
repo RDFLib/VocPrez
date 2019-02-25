@@ -41,7 +41,8 @@ This code is licensed using the GPL v3 licence. See the [LICENSE file](LICENSE) 
 
 
 ## Tests
-We use [pytest](https://docs.pytest.org/en/latest/) as our testing framework. Tests live in the [tests directory](_tests). These tests ensure that the endpoints are functioning as intended. 
+We use [pytest](https://docs.pytest.org/en/latest/) as our testing framework. Tests live in the [tests directory](_tests). These tests ensure that the endpoints are functioning as intended. See the [README.md](_tests/README.md) for the tests for more information.
+
 
 
 ## Contacts
