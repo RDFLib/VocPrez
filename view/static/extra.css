@@ -108,3 +108,8 @@ hr {
     overflow: auto;
     min-height: 28px;
 }
+
+.content-footer {
+    margin-top: 40px;
+    border-top: 2px solid #f0f0f0;
+}
