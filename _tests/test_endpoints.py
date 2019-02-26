@@ -298,47 +298,9 @@ def test_file_vocabulary_instance_dcat_view_app_json():
         content = requests.get(BASE_URL + '/vocabulary/contact_type?_view=dcat&_format=application/json&uri='
                                           'http%3A//resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype')\
             .content.decode('utf-8')
-        assert """[
-  {
-    "@id": "http://resource.geosciml.org/classifier/cgi/contacttype/contact",
-    "http://www.w3.org/2004/02/skos/core#prefLabel": [
-      {
-        "@value": "contact"
-      }
-    ]
-  },
-  {
-    "@id": "http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype",
-    "@type": [
-      "https://www.w3.org/ns/dcat#Dataset"
-    ],
-    "http://purl.org/dc/terms/creator": [
-      {
-        "@id": "http://editor.vocabs.ands.org.au/user/CGI-Concept-Definition-Task-Group"
-      }
-    ],
-    "http://purl.org/dc/terms/description": [
-      {
-        "@value": "This scheme describes the concept space for Contact Type concepts, as defined by the IUGS Commission for Geoscience Information (CGI) Geoscience Terminology Working Group. By extension, it includes all concepts in this conceptScheme, as well as concepts in any previous versions of the scheme. Designed for use in the contactType property in GeoSciML Contact elements."
-      }
-    ],
-    "http://purl.org/dc/terms/title": [
-      {
-        "@value": "Contact Type"
-      }
-    ],
-    "http://www.w3.org/2002/07/owl#versionInfo": [
-      {
-        "@value": "v0.1"
-      }
-    ],
-    "http://www.w3.org/2004/02/skos/core#hasTopConcept": [
-      {
-        "@id": "http://resource.geosciml.org/classifier/cgi/contacttype/contact"
-      }
-    ]
-  }
-]""" in content, BASE_URL
+        content = json.loads(content)
+        assert content[1]['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact", BASE_URL
+        assert content[1]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] == 'contact'
 
 
 def test_file_vocabulary_instance_dcat_view_turtle():
@@ -386,8 +348,8 @@ def test_file_vocabulary_instance_dcat_view_ld_json():
                                           'http%3A//resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype')\
             .content.decode('utf-8')
         content = json.loads(content)
-        assert content[0]['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact", BASE_URL
-        assert content[0]["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == 'contact', BASE_URL
+        assert content[1]['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact", BASE_URL
+        assert content[1]["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == 'contact', BASE_URL
 
 
 def test_file_vocabulary_instance_dcat_view_turtle():
@@ -408,10 +370,10 @@ def test_file_vocabulary_instance_dcat_view_turtle():
     dct:creator <http://editor.vocabs.ands.org.au/user/CGI-Concept-Definition-Task-Group> ;
     dct:description "This scheme describes the concept space for Contact Type concepts, as defined by the IUGS Commission for Geoscience Information (CGI) Geoscience Terminology Working Group. By extension, it includes all concepts in this conceptScheme, as well as concepts in any previous versions of the scheme. Designed for use in the contactType property in GeoSciML Contact elements."@en ;
     dct:title "Contact Type"@en ;
-    owl:versionInfo "v0.1"^^xsd:string ;
+    owl:versionInfo "v0.1" ;
     skos:hasTopConcept <http://resource.geosciml.org/classifier/cgi/contacttype/contact> .
 
-<http://resource.geosciml.org/classifier/cgi/contacttype/contact> skos:prefLabel "contact"^^xsd:string .
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> skos:prefLabel "contact" .
 """ in content, BASE_URL
 
 
@@ -444,8 +406,532 @@ def test_file_vocabulary_instance_alternates_view_app_json():
                                           'http%3A//resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype') \
             .content.decode('utf-8')
         content = json.loads(content)
-        assert content['uri'] == "http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype"
-        assert content['views'] == ["dcat", "alternates"]
-        assert content['default_view'] == 'dcat'
+        assert content['uri'] == "http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype", BASE_URL
+        assert content['views'] == ["dcat", "alternates"], BASE_URL
+        assert content['default_view'] == 'dcat', BASE_URL
 
 
+#
+# -- Test Vocabulary Instance's Concept Register -----------------------------------------------------------------------
+#
+
+def test_file_vocabulary_instance_concept_register_ckan_view_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=ckan&_format=application/json&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        content = json.loads(content)
+        assert content['results']['bindings'][0]['pl']['value'] == "alteration facies contact", BASE_URL
+        assert content['results']['bindings'][0]['s']['value'] == "{}/vocabulary/contact_type/concept/contact_type"\
+            .format(BASE_URL)
+
+
+def test_file_vocabulary_instance_concept_register_reg_view_html():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=reg&_format=text/html&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """    <div class="row">
+        <div class="col-md-8">
+            <h1>Register</h1>
+            <h2>Of
+                
+                <a href="{}/vocabulary/contact_type"><em>Contact Type - File concepts</em></a>""".format(BASE_URL) \
+        in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_reg_view_app_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=reg&_format=application/json&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        content = json.loads(content)
+        assert content['uri'] == '{}/vocabulary/contact_type/concept/'.format(BASE_URL), BASE_URL
+        assert content['views'] == ['ckan', 'reg', 'alternates'], BASE_URL
+        assert content['default_view'] == 'reg', BASE_URL
+        assert content['register_items'][0][1] == 'alteration facies contact', BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_reg_view_turtle():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=reg&_format=text/turtle&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """@prefix ereg: <https://promsns.org/def/eregistry#> .
+@prefix ldp: <http://www.w3.org/ns/ldp#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix reg: <http://purl.org/linked-data/registry#> .
+@prefix xhv: <https://www.w3.org/1999/xhtml/vocab#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<{0}/vocabulary/contact_type/concept/contact_type> a <{0}/vocabulary/contact_type> ;
+    rdfs:label "alteration facies contact"^^xsd:string,
+        "angular unconformable contact"^^xsd:string,
+        "buttress unconformity"^^xsd:string,
+        "chronostratigraphic zone contact"^^xsd:string,
+        "conductivity contact"^^xsd:string,
+        "conformable contact"^^xsd:string,
+        "contact"^^xsd:string,
+        "deformation zone contact"^^xsd:string,
+        "density contact"^^xsd:string,
+        "depositional contact"^^xsd:string,
+        "disconformable contact"^^xsd:string,
+        "faulted contact"^^xsd:string,
+        "geologic province contact"^^xsd:string,
+        "geophysical contact"^^xsd:string,
+        "glacial stationary line"^^xsd:string,
+        "igneous intrusive contact"^^xsd:string,
+        "igneous phase contact"^^xsd:string,
+        "impact structure boundary"^^xsd:string,
+        "lithogenetic contact"^^xsd:string,
+        "magnetic contact"^^xsd:string ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .""".format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_reg_view_xml():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=reg&_format=application/rdf+xml&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:ldp="http://www.w3.org/ns/ldp#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:reg="http://purl.org/linked-data/registry#"
+   xmlns:xhv="https://www.w3.org/1999/xhtml/vocab#"
+>""".format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_reg_view_ld_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=reg&_format=application/ld+json&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        content = json.loads(content)
+        count = 0
+        for c in content:
+            if c['@id'] == '{}/vocabulary/contact_type/concept/contact_type'.format(BASE_URL):
+                count += 1
+            if c['@type'] == ["{}/vocabulary/contact_type".format(BASE_URL)]:
+                count += 1
+            if c.get('http://purl.org/linked-data/registry#register'):
+                if c.get('http://purl.org/linked-data/registry#register')[0]['@id'] == \
+               '{}/vocabulary/contact_type/concept/'.format(BASE_URL):
+                    count += 1
+        assert count == 3, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_reg_view_text_n3():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=reg&_format=text/n3&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """@prefix ereg: <https://promsns.org/def/eregistry#> .
+@prefix ldp: <http://www.w3.org/ns/ldp#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix reg: <http://purl.org/linked-data/registry#> .
+@prefix xhv: <https://www.w3.org/1999/xhtml/vocab#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<{0}/vocabulary/contact_type/concept/contact_type> a <{0}/vocabulary/contact_type> ;
+    rdfs:label "alteration facies contact"^^xsd:string,
+        "angular unconformable contact"^^xsd:string,
+        "buttress unconformity"^^xsd:string,
+        "chronostratigraphic zone contact"^^xsd:string,
+        "conductivity contact"^^xsd:string,
+        "conformable contact"^^xsd:string,
+        "contact"^^xsd:string,
+        "deformation zone contact"^^xsd:string,
+        "density contact"^^xsd:string,
+        "depositional contact"^^xsd:string,
+        "disconformable contact"^^xsd:string,
+        "faulted contact"^^xsd:string,
+        "geologic province contact"^^xsd:string,
+        "geophysical contact"^^xsd:string,
+        "glacial stationary line"^^xsd:string,
+        "igneous intrusive contact"^^xsd:string,
+        "igneous phase contact"^^xsd:string,
+        "impact structure boundary"^^xsd:string,
+        "lithogenetic contact"^^xsd:string,
+        "magnetic contact"^^xsd:string ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .""".format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_reg_view_app_n_triples():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=reg&_format=application/n-triples&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        content = content.split('\n')
+        for line in content:
+            line = line.strip()
+            if line != '':
+                result = re.search(N_TRIPLES_PATTERN, line)
+                assert result is not None, 'URL: {} \n\nLine: {}'.format(BASE_URL, line)
+
+
+def test_file_vocabulary_instance_concept_register_alternates_view_html():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=alternates&_format=text/html&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """        <h1>Alternates View</h1>
+        <h2>Instance <a href="{0}/vocabulary/contact_type/concept/"></a></h2>
+        <h4>Default view: <a href="{0}/vocabulary/contact_type/concept/?vocab_id=&_view=reg&uri="""\
+                   .format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_alternates_view_app_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=alternates&_format=application/json&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        content = json.loads(content)
+        assert content['uri'] == '{}/vocabulary/contact_type/concept/'.format(BASE_URL), BASE_URL
+        assert content['views'] == ['ckan', 'reg', 'alternates'], BASE_URL
+        assert content['default_view'] == 'reg', BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_alternates_view_turtle():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=alternates&_format=text/turtle&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """@prefix alt: <http://promsns.org/def/alt#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prof: <https://w3c.github.io/dxwg/profiledesc#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<{}/vocabulary/contact_type/concept/> alt:hasDefaultView""".format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_alternates_view_xml():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=alternates&_format=application/rdf+xml&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:alt="http://promsns.org/def/alt#"
+   xmlns:dct="http://purl.org/dc/terms/"
+   xmlns:prof="https://w3c.github.io/dxwg/profiledesc#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>""" in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_alternates_view_ld_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=alternates&_format=application/ld+json&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        content = json.loads(content)
+        assert content[0]['@id'] == "{}/vocabulary/contact_type/concept/".format(BASE_URL), BASE_URL
+        assert len(content) > 0, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_alternates_view_text_n3():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=alternates&_format=text/n3&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        assert """@prefix alt: <http://promsns.org/def/alt#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prof: <https://w3c.github.io/dxwg/profiledesc#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<{}/vocabulary/contact_type/concept/> alt:hasDefaultView""".format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_register_alternates_view_app_n_triples():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/vocabulary/contact_type/concept/?_view=alternates&_format=application/n-triples&uri='
+                                          + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
+        content = content.split('\n')
+        for line in content:
+            line = line.strip()
+            if line != '':
+                result = re.search(N_TRIPLES_PATTERN, line)
+                assert result is not None, 'URL: {} \n\nLine: {}'.format(BASE_URL, line)
+
+
+#
+# -- Test Vocabulary Instance's Concept Instance -----------------------------------------------------------------------
+#
+
+def test_file_vocabulary_instance_concept_instance_skos_view_html():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=skos&_format=text/html&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+
+        assert """<h1>Concept: contact</h1>
+<h3>URI: <a href="http://resource.geosciml.org/classifier/cgi/contacttype/contact">http://resource.geosciml.org/classifier/cgi/contacttype/contact</a></h3>
+<h3>Within vocab <a href="/vocabulary/contact_type">Contact Type - File</a></h3>""" in content, BASE_URL
+
+        assert """        <th>Definition: </th><td>A surface that separates geologic units. Very general concept representing any kind of surface separating two geologic units, including primary boundaries such as depositional contacts, all kinds of unconformities, intrusive contacts, and gradational contacts, as well as faults that separate geologic units.</td>""" in content, BASE_URL
+
+        assert """        <th>Source</th><td>
+    
+        adapted from Jackson, 1997, page 137, NADM C1 2004""" in content, BASE_URL
+
+        # Narrowers
+        assert """            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact">chronostratigraphic zone contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/faulted_contact">faulted contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact">geologic province contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact">geophysical contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line">glacial stationary line</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact">lithogenetic contact</a><br />"""\
+                   .format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_skos_view_app_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=skos&_format=application/json&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        content = json.loads(content)
+        count = 0
+        for c in content:
+            if c.get('@id'):
+                if c['@id'] ==  "http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact":
+                    count += 1
+            if c.get("http://www.w3.org/2004/02/skos/core#prefLabel"):
+                if c["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == "geophysical contact":
+                    count += 1
+        assert count == 2, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_skos_view_turtle():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=skos&_format=text/turtle&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        assert """@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> dct:source "adapted from Jackson, 1997, page 137, NADM C1 2004"@en ;
+    skos:definition "A surface that separates geologic units. Very general concept representing any kind of surface separating two geologic units, including primary boundaries such as depositional contacts, all kinds of unconformities, intrusive contacts, and gradational contacts, as well as faults that separate geologic units." ;
+    skos:narrower <http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> ;
+    skos:prefLabel "contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact> skos:prefLabel "chronostratigraphic zone contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact> skos:prefLabel "faulted contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact> skos:prefLabel "geologic province contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact> skos:prefLabel "geophysical contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line> skos:prefLabel "glacial stationary line" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> skos:prefLabel "lithogenetic contact" .
+""" in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_skos_view_xml():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=skos&_format=application/rdf+xml&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        assert """<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:dct="http://purl.org/dc/terms/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+>""" in content, content
+
+
+def test_file_vocabulary_instance_concept_instance_skos_view_ld_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=skos&_format=application/ld+json&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        content = json.loads(content)
+        count = 0
+        for c in content:
+            if c.get('@id'):
+                if c['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact":
+                    count += 1
+            if c.get('http://www.w3.org/2004/02/skos/core#prefLabel'):
+                if c["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == 'geophysical contact':
+                    count += 1
+        assert count == 2
+
+
+def test_file_vocabulary_instance_concept_instance_skos_view_text_n3():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=skos&_format=text/n3&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        assert """@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> dct:source "adapted from Jackson, 1997, page 137, NADM C1 2004"@en ;
+    skos:definition "A surface that separates geologic units. Very general concept representing any kind of surface separating two geologic units, including primary boundaries such as depositional contacts, all kinds of unconformities, intrusive contacts, and gradational contacts, as well as faults that separate geologic units." ;
+    skos:narrower <http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line>,
+        <http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> ;
+    skos:prefLabel "contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact> skos:prefLabel "chronostratigraphic zone contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact> skos:prefLabel "faulted contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact> skos:prefLabel "geologic province contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact> skos:prefLabel "geophysical contact" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line> skos:prefLabel "glacial stationary line" .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> skos:prefLabel "lithogenetic contact" .
+""" in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_skos_view_app_n3():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=skos&_format=application/n-triples&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        content = content.split('\n')
+        for line in content:
+            line = line.strip()
+            if line != '':
+                result = re.search(N_TRIPLES_PATTERN, line)
+                assert result is not None, 'URL: {} \n\nLine: {}'.format(BASE_URL, line)
+
+
+def test_file_vocabulary_instance_concept_instance_alternates_view_html():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=alternates&_format=text/html&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        assert """        <h1>Alternates View</h1>
+        <h2>Instance <a href="http://resource.geosciml.org/classifier/cgi/contacttype/contact">contact</a></h2>
+        <h4>Default view: <a href="{0}/object?vocab_id=contact_type&_view=skos&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact">skos</a></h4>""".format(BASE_URL) in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_alternates_view_app_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=alternates&_format=application/json&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        content = json.loads(content)
+        assert content['uri'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact", BASE_URL
+        assert content['views'] == ["skos", "alternates"], BASE_URL
+        assert content['default_view'] == 'skos'
+
+
+def test_file_vocabulary_instance_concept_instance_alternates_view_turtle():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=alternates&_format=text/turtle&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        assert """@prefix alt: <http://promsns.org/def/alt#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prof: <https://w3c.github.io/dxwg/profiledesc#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact>""" in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_alternates_view_turtle():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=alternates&_format=application/rdf+xml&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        assert """<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:alt="http://promsns.org/def/alt#"
+   xmlns:dct="http://purl.org/dc/terms/"
+   xmlns:prof="https://w3c.github.io/dxwg/profiledesc#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+  <rdf:Description""" in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_alternates_view_ld_json():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=alternates&_format=application/ld+json&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        content = json.loads(content)
+        count = 0
+        for c in content:
+            if c.get('@id'):
+                if c['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact":
+                    count += 1
+            if c.get('http://www.w3.org/2000/01/rdf-schema#comment'):
+                if c['http://www.w3.org/2000/01/rdf-schema#comment'][0]['@value'] == "SKOS is a W3C recommendation " \
+"designed for representation of thesauri, classification schemes, taxonomies, subject-heading systems, or any other " \
+                                                                         "type of structured controlled vocabulary.":
+                    count += 1
+        assert count == 2, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_alternates_view_text_n3():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=alternates&_format=text/n3&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        assert """@prefix alt: <http://promsns.org/def/alt#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prof: <https://w3c.github.io/dxwg/profiledesc#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> alt:hasDefaultView""" in content, BASE_URL
+
+
+def test_file_vocabulary_instance_concept_instance_alternates_view_app_n_triples():
+    for BASE_URL in BASE_URLS:
+        content = requests.get(BASE_URL +
+                               '/object?vocab_id=contact_type&_view=alternates&_format=application/n-triples&uri='
+                                          'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
+            .content.decode('utf-8')
+        content = content.split('\n')
+        for line in content:
+            line = line.strip()
+            if line != '':
+                result = re.search(N_TRIPLES_PATTERN, line)
+                assert result is not None, 'URL: {} \n\nLine: {}'.format(BASE_URL, line)

@@ -20,14 +20,14 @@ See [pytest](https://docs.pytest.org/en/latest/) for more information on how to 
 - [x] Alternates view and its formats
 
 #### Vocabulary Instance's Concept Register
-- [ ] CKAN view and its formats
-- [ ] Reg view and its formats
-- [ ] Alternates view and its formats
+- [x] CKAN view and its formats
+- [x] Reg view and its formats
+- [x] Alternates view and its formats
 - [ ] Search
 
 #### Concept Instance
-- [ ] SKOS view and its formats
-- [ ] Alternates view and its formats
+- [x] SKOS view and its formats
+- [x] Alternates view and its formats
 
 
 ### RVA Source
