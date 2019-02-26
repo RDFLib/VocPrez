@@ -97,19 +97,19 @@ class ConceptRenderer(Renderer):
         g = Graph()
         g.namespace_manager = namespace_manager
         if self.concept.prefLabel:
-            g.add((s, SKOS.prefLabel, Literal(self.concept.prefLabel, datatype=XSD.string)))
+            g.add((s, SKOS.prefLabel, Literal(self.concept.prefLabel)))
         if self.concept.definition:
-            g.add((s, SKOS.definition, Literal(self.concept.definition, datatype=XSD.string)))
+            g.add((s, SKOS.definition, Literal(self.concept.definition)))
         if self.concept.altLabels:
             for label in self.concept.altLabels:
-                g.add((s, SKOS.altLabel, Literal(label, datatype=XSD.string)))
+                g.add((s, SKOS.altLabel, Literal(label)))
         if self.concept.hiddenLabels:
             for label in self.concept.hiddenLabels:
-                g.add((s, SKOS.hiddenLabel, Literal(label, datatype=XSD.stringl)))
+                g.add((s, SKOS.hiddenLabel, Literal(label)))
         if self.concept.source:
-            g.add((s, DCTERMS.source, Literal(self.concept.source, datatype=XSD.string))) # should the object be a XSD.string or a URIRef?
+            g.add((s, DCTERMS.source, Literal(self.concept.source)))
         if self.concept.contributor:
-            g.add((s, DCTERMS.contributor, Literal(self.concept.contributor, datatype=XSD.string)))
+            g.add((s, DCTERMS.contributor, Literal(self.concept.contributor)))
         if self.concept.broaders: #
             for n in self.concept.broaders:
                 g.add((s, SKOS.broader, Literal(self.concept.broaders)))

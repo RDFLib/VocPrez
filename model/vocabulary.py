@@ -97,24 +97,24 @@ class VocabularyRenderer(Renderer):
 
         g.add((s, RDF.type, DCAT.Dataset))
         if self.vocab.title:
-            g.add((s, DCTERMS.title, Literal(self.vocab.title, datatype=XSD.string)))
+            g.add((s, DCTERMS.title, Literal(self.vocab.title)))
         if self.vocab.description:
-            g.add((s, DCTERMS.description, Literal(self.vocab.description, datatype=XSD.string)))
+            g.add((s, DCTERMS.description, Literal(self.vocab.description)))
         if self.vocab.creator:
             if self.vocab.creator[:7] == 'http://' or self.vocab.creator[:7] == 'https://': # if url
                 g.add((s, DCTERMS.creator, URIRef(self.vocab.creator)))
             else: # else literal
-                g.add((s, DCTERMS.creator, Literal(self.vocab.creator, datatype=XSD.string)))
+                g.add((s, DCTERMS.creator, Literal(self.vocab.creator)))
         if self.vocab.created:
             g.add((s, DCTERMS.created, Literal(self.vocab.created, datatype=XSD.date)))
         if self.vocab.modified:
             g.add((s, DCTERMS.modified, Literal(self.vocab.modified, datatype=XSD.date)))
         if self.vocab.versionInfo:
-            g.add((s, OWL.versionInfo, Literal(self.vocab.versionInfo, datatype=XSD.string)))
+            g.add((s, OWL.versionInfo, Literal(self.vocab.versionInfo)))
         if self.vocab.hasTopConcepts:
             for c in self.vocab.hasTopConcepts:
                 g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
-                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1], datatype=XSD.string)))
+                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
         if self.vocab.accessURL:
             g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
         if self.vocab.downloadURL:

@@ -6,7 +6,7 @@
             <h1>Register</h1>
             <h2>Of
                 {% if vocabulary_url %}
-                <a href="{{ vocabulary_url }}"><em>{{ register_item_type_string }}</em></a>
+                <a href="{{ vocabulary_url[0] }}"><em>{{ register_item_type_string }}</em></a>
                 {% else %}
                 <em>{{ register_item_type_string }}</em>
                 {% endif %}
