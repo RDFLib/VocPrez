@@ -4,7 +4,7 @@ from flask_paginate import Pagination
 
 
 class SkosRegisterRenderer(RegisterRenderer):
-    def __init__(self, request, navs, items, register_item_type_string, total, search_enabled=None, search_query=None, vocabulary_url=None, **kwargs):
+    def __init__(self, request, navs, items, register_item_type_string, total, search_enabled=None, search_query=None, vocabulary_url=[], **kwargs):
         self.navs = navs
         self.register_item_type_string = register_item_type_string
         self.search_query = search_query
@@ -35,7 +35,7 @@ class SkosRegisterRenderer(RegisterRenderer):
             "Test Label",
             "Test Comment",
             tuple_items,
-            register_item_type_string,
+            vocabulary_url,
             total,
             views=views
         )

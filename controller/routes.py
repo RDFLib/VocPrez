@@ -116,7 +116,8 @@ def vocabularies():
         'Vocabularies',
         total,
         search_query=query,
-        search_enabled=True
+        search_enabled=True,
+        vocabulary_url=['http://www.w3.org/2004/02/skos/core#ConceptScheme']
     ).render()
 
 
@@ -163,7 +164,7 @@ def vocabulary_list(vocab_id):
     end = start + per_page
     concepts = concepts[start:end]
 
-    return SkosRegisterRenderer(
+    test = SkosRegisterRenderer(
         request,
         [],
         concepts,
@@ -171,9 +172,10 @@ def vocabulary_list(vocab_id):
         total,
         search_query=query,
         search_enabled=True,
-        vocabulary_url=request.url_root + 'vocabulary/' + vocab_id,
+        vocabulary_url=[request.url_root + 'vocabulary/' + vocab_id],
         vocab_id=vocab_id
-    ).render()
+    )
+    return test.render()
 
 
 @routes.route('/collection/')
