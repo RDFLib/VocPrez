@@ -106,4 +106,5 @@ hr {
 
 .overflow {
     overflow: auto;
+    min-height: 28px;
 }
