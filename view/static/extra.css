@@ -133,3 +133,8 @@ hr {
 body {
     text-align: left;
 }
+
+.content-footer {
+    margin-top: 40px;
+    border-top: 2px solid #f0f0f0;
+}
