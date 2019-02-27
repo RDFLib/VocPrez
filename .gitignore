@@ -122,3 +122,5 @@ _config/__init__.py
 
 # pickle python files
 *.p
+
+_config/server__init__.py

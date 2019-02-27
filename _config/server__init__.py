@@ -45,29 +45,35 @@ VB_PASSWORD = 'vocaliser'
 # be listed here. FILE vocabularies too don't need to be listed here as they are automatically picked up by the system
 # if the files are added to the data/ folder, as described in the DATA_SOURCES.md documentation file.
 VOCABS = {
+'rva-178': {
+        'source': VocabSource.RVA,
+        'title': 'Feature of Interest Type',
+        'turtle': 'https://vocabs.ands.org.au/registry/api/resource/downloads/491/ga_feature-of-interest-type_v0-1.ttl',
+        'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_feature-of-interest-type_v0-1',
+    },
     'rva-50': {
         'source': VocabSource.RVA,
         'title': 'GA Geologic Unit Type',
         'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_geologic-unit-type_v0-1',
-        'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/196/ga_geologic-unit-type_v0-1.ttl'
+        'turtle': 'https://vocabs.ands.org.au/registry/api/resource/downloads/196/ga_geologic-unit-type_v0-1.ttl'
     },
     #'rva-55': {
     #    'source': VocabSource.RVA,
     #    'title': 'CGI Stratigraphic Rank',
     #    'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_stratigraphic-rank_v0-1',
-    #    'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/217/ga_stratigraphic-rank_v0-1.ttl'
+    #    'turtle': 'https://vocabs.ands.org.au/registry/api/resource/downloads/217/ga_stratigraphic-rank_v0-1.ttl'
     #},
     'rva-57': {
         'source': VocabSource.RVA,
         'title': 'CGI Stratigraphic Rank',
         'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_stratigraphic-rank_v0-1',
-        'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/217/ga_stratigraphic-rank_v0-1.ttl'
+        'turtle': 'https://vocabs.ands.org.au/registry/api/resource/downloads/217/ga_stratigraphic-rank_v0-1.ttl'
     },
     #'rva-196': {
     #    'source': VocabSource.RVA,
     #    'title': 'CGI Stratigraphic Rank',
     #    'sparql': 'http://vocabs.ands.org.au/repository/api/sparql/ga_stratigraphic-rank_v0-1',
-    #    'download': 'https://vocabs.ands.org.au/registry/api/resource/downloads/217/ga_stratigraphic-rank_v0-1.ttl'
+    #    'turtle': 'https://vocabs.ands.org.au/registry/api/resource/downloads/217/ga_stratigraphic-rank_v0-1.ttl'
     #},
     'age-units': {
         'source': VocabSource.VOCBENCH,
@@ -131,8 +137,8 @@ VOCABS = {
     },
 
     # Used by pytest
-    'contact_type': {
-        'source': VocabSource.FILE,
-        'title': 'Contact Type (file)'
-    }
+#    'contact_type': {
+#        'source': VocabSource.FILE,
+#       'title': 'Contact Type (file)'
+#    }
 }
