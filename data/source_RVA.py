@@ -5,6 +5,7 @@ from rdflib import Graph, RDF, URIRef
 from rdflib.namespace import SKOS
 import pickle
 import os
+from helper import APP_DIR
 
 class RVA(Source):
     """Source for Research Vocabularies Australia
@@ -26,7 +27,7 @@ class RVA(Source):
                 if config.VOCABS[vocab_id].get('turtle'):
                     print('Creating pickle file for {}'.format(vocab_id))
                     g = Graph().parse(config.VOCABS[vocab_id]['turtle'], format='turtle')
-                    file_path = os.path.join('vocab_files', vocab_id + '.p')
+                    file_path = os.path.join(APP_DIR, 'vocab_files', vocab_id + '.p')
                     with open(file_path, 'wb') as f:
                         pickle.dump(g, f)
                         f.close()
