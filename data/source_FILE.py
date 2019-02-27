@@ -52,8 +52,12 @@ class FILE(Source):
         # Get register item metadata
         for vocab_id in config.VOCABS:
             if vocab_id in config.VOCABS:
+                if config.VOCABS[vocab_id]['source'] != config.VocabSource.FILE:
+                    continue
+                
                 # Creators
                 creators = []
+                g = FILE.load_pickle_graph(vocab_id)
                 for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                     for creator in g.objects(uri, DCTERMS.creator):
                         creators.append(str(creator))
