@@ -4,7 +4,7 @@ import re
 
 BASE_URLS = [
     'http://localhost:5000',
-    # 'http://vocabs.gsq.cat'
+    'http://vocabs.gsq.cat'
 ]
 
 N_TRIPLES_PATTERN = r'(_:(.+)|<.+>) (_:(.+)|<.+>) ("(.+)"@en)|(_:(.+)|(".+"\^\^)?<.+>) .'

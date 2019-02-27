@@ -46,6 +46,7 @@ class FILE(Source):
                     g = Graph().parse(file_path, format=file_format)
                     file_name = name.split('.')[0]
                     # pickle to directory/vocab_files/
+                    print('Pickling file: {}'.format(file_name))
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
 
