@@ -4,12 +4,13 @@ from flask_paginate import Pagination
 
 
 class SkosRegisterRenderer(RegisterRenderer):
-    def __init__(self, request, navs, items, register_item_type_string, total, search_enabled=None, search_query=None, vocabulary_url=[], **kwargs):
+    def __init__(self, request, navs, items, register_item_type_string, total, search_enabled=None, search_query=None, contained_item_classes=[], **kwargs):
         self.navs = navs
+        self.items = items
         self.register_item_type_string = register_item_type_string
         self.search_query = search_query
         self.search_enabled = search_enabled
-        self.vocabulary_url = vocabulary_url
+        self.vocabulary_url = contained_item_classes
         self.template_extras = kwargs
         views = {
             'ckan': View(
@@ -23,23 +24,16 @@ class SkosRegisterRenderer(RegisterRenderer):
             )
         }
 
-        # Due to pyLDAPI limitation where it only accepts a certain tuple schema, change our dicts to conform to
-        # that schema.
-        tuple_items = []
-        for item in items:
-            tuple_items.append((request.base_url + item['vocab_id'], item['title']))
-
         super().__init__(
             request,
             request.base_url,
             "Test Label",
             "Test Comment",
-            tuple_items,
-            vocabulary_url,
+            items,
+            contained_item_classes,
             total,
             views=views
         )
-        self.template_items = items
 
     def render(self):
         """
@@ -78,7 +72,7 @@ class SkosRegisterRenderer(RegisterRenderer):
                 "bindings": []
             }
         }
-        for item in self.template_items:
+        for item in self.items:
             response['results']['bindings'].append({
                 "pl": {
                     "xml:lang": "en",
@@ -103,7 +97,7 @@ class SkosRegisterRenderer(RegisterRenderer):
             'label': self.label,
             'comment': self.comment,
             'register_item_type_string': self.register_item_type_string,
-            'register_items': self.template_items,
+            'register_items': self.items,
             'page': self.page,
             'per_page': self.per_page,
             'first_page': self.first_page,
