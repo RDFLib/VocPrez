@@ -35,6 +35,7 @@ class FILE(Source):
 
     @staticmethod
     def init():
+        print('File init ...')
         # find all files in project_directory/vocab_files
         for path, subdirs, files in os.walk(join(config.APP_DIR, 'vocab_files')):
             for name in files:
