@@ -89,6 +89,7 @@ def vocabularies():
     vocabs = []
     for k, v in config.VOCABS.items():
         v['vocab_id'] = k
+        v['uri'] = request.base_url + k
         vocabs.append(v)
     vocabs.sort(key=lambda item: item['title'])
     total = len(config.VOCABS.items())
