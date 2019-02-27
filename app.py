@@ -5,7 +5,7 @@ from controller import routes
 import helper
 from data.source_FILE import FILE
 from data.source_RVA import RVA
-from data.source_GITHUB import GITHUB
+from data.source_VOCBENCH import VOCBENCH
 
 app = Flask(__name__, template_folder=_config.TEMPLATES_DIR, static_folder=_config.STATIC_DIR)
 
@@ -14,7 +14,7 @@ app.register_blueprint(routes.routes)
 
 @app.before_first_request
 def start_up_tasks():
-    # VOCBENCH.init()
+    VOCBENCH.init()
     RVA.init()
     FILE.init()
     # extend this instances' list of vocabs by using the known sources
