@@ -50,6 +50,7 @@ class FILE(Source):
                     print('Pickling file: {}'.format(file_name))
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
+                        f.close()
 
         # Get register item metadata
         for vocab_id in config.VOCABS:

@@ -29,6 +29,7 @@ class RVA(Source):
                     file_path = os.path.join('vocab_files', vocab_id + '.p')
                     with open(file_path, 'wb') as f:
                         pickle.dump(g, f)
+                        f.close()
 
                     # Since we've cached it, change this vocab_id to source type of file
                     config.VOCABS[vocab_id]['source'] = config.VocabSource.FILE
