@@ -35,7 +35,6 @@ class FILE(Source):
 
     @staticmethod
     def init():
-        print('Finding vocabulary files ...')
         # find all files in project_directory/vocab_files
         for path, subdirs, files in os.walk(join(config.APP_DIR, 'vocab_files')):
             for name in files:
@@ -50,42 +49,43 @@ class FILE(Source):
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
 
-                    # Get register item metadata
-                    if file_name in config.VOCABS:
-                        # Creators
-                        creators = []
-                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                            for creator in g.objects(uri, DCTERMS.creator):
-                                creators.append(str(creator))
-                            break
-                        config.VOCABS[file_name]['creators'] = creators
+        # Get register item metadata
+        for vocab_id in config.VOCABS:
+            if vocab_id in config.VOCABS:
+                # Creators
+                creators = []
+                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                    for creator in g.objects(uri, DCTERMS.creator):
+                        creators.append(str(creator))
+                    break
+                config.VOCABS[vocab_id]['creators'] = creators
 
-                        # Date Created
-                        date_created = None
-                        # dct:created
-                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                            for date in g.objects(uri, DCTERMS.created):
-                                date_created = str(date)[:10]
-                        if not date_created:
-                            # dct:date
-                            for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                                for date in g.objects(uri, DCTERMS.date):
-                                    date_created = str(date)[:10]
-                        config.VOCABS[file_name]['date_created'] = date_created
+                # Date Created
+                date_created = None
+                # dct:created
+                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                    for date in g.objects(uri, DCTERMS.created):
+                        date_created = str(date)[:10]
+                if not date_created:
+                    # dct:date
+                    for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                        for date in g.objects(uri, DCTERMS.date):
+                            date_created = str(date)[:10]
+                config.VOCABS[vocab_id]['date_created'] = date_created
 
-                        # Date Modified
-                        date_modified = None
-                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                            for date in g.objects(uri, DCTERMS.modified):
-                                date_modified = str(date)[:10]
-                        config.VOCABS[file_name]['date_modified'] = date_modified
+                # Date Modified
+                date_modified = None
+                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                    for date in g.objects(uri, DCTERMS.modified):
+                        date_modified = str(date)[:10]
+                config.VOCABS[vocab_id]['date_modified'] = date_modified
 
-                        # Version
-                        version = None
-                        for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                            for versionInfo in g.objects(uri, OWL.versionInfo):
-                                version = versionInfo
-                        config.VOCABS[file_name]['version'] = version
+                # Version
+                version = None
+                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+                    for versionInfo in g.objects(uri, OWL.versionInfo):
+                        version = versionInfo
+                config.VOCABS[vocab_id]['version'] = version
 
 
     @classmethod
@@ -139,7 +139,7 @@ class FILE(Source):
             PREFIX dct: <http://purl.org/dc/terms/>
             SELECT * 
             WHERE {{
-                ?c skos:inScheme ?s .
+                ?s a skos:Concept .
                 OPTIONAL {{
                     ?s skos:prefLabel ?title .
                 }}
@@ -154,9 +154,9 @@ class FILE(Source):
 
         for row in result:
             vocabs.append({
-                'key': self.vocab_id,
-                'uri': str(row['c']),
-                'title': row['title'] if row['title'] is not None else ' '.join(str(row['c']).split('#')[-1].split('/')[-1].split('_')),
+                'vocab_id': self.vocab_id,
+                'uri': str(row['s']),
+                'title': row['title'] if row['title'] is not None else ' '.join(str(row['s']).split('#')[-1].split('/')[-1].split('_')),
                 'date_created': row['date_created'][:10] if row['date_created'] is not None else None,
                 'date_modified': row['date_modified'][:10] if row['date_modified'] is not None else None,
             })
@@ -208,7 +208,10 @@ class FILE(Source):
         pass
 
     def get_concept(self, uri):
-        g = Graph().parse(uri + '.ttl', format='turtle')
+        if config.VOCABS[self.vocab_id].get('turtle'):
+            g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'])
+        else:
+            g = Graph().parse(uri + '.ttl', format='turtle')
 
         # -- altLabels
         altLabels = []
@@ -436,7 +439,10 @@ class FILE(Source):
             raise Exception('topConcept not found')
 
     def get_object_class(self, uri):
-        g = Graph().parse(uri + '.ttl', format='turtle')
+        if config.VOCABS[self.vocab_id].get('turtle'):
+            g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'], format='turtle')
+        else:
+            g = Graph().parse(uri + '.ttl', format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
             if o:
                 return str(o)
