@@ -2,6 +2,9 @@ import urllib
 import re
 from rdflib import URIRef
 import markdown
+import os
+
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def url_encode(s):
