@@ -24,6 +24,7 @@ class RVA(Source):
                 # TODO: Check if pickle file exists before caching
                 # Cache it as a pickle
                 if config.VOCABS[vocab_id].get('turtle'):
+                    print('Creating pickle file for {}'.format(vocab_id))
                     g = Graph().parse(config.VOCABS[vocab_id]['turtle'], format='turtle')
                     file_path = os.path.join('vocab_files', vocab_id + '.p')
                     with open(file_path, 'wb') as f:
