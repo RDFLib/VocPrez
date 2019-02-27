@@ -1,5 +1,17 @@
 # Pytest Tests
-See [pytest](https://docs.pytest.org/en/latest/) for more information on how to run these tests.
+Before running the tests, make sure that the config file contains an entry for `contact_type`
+```python
+VOCABS = {
+    'contact_type': {
+        'source': VocabSource.FILE,
+        'title': 'Contact Type (file)'
+    }
+}
+``` 
+
+To run the tests, simply type `pytest <path-to-test-directory>` in your virtualenv. 
+
+See [pytest](https://docs.pytest.org/en/latest/) for more information.
 
 ## Coverage
 

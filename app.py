@@ -3,10 +3,24 @@ import _config
 from flask import Flask
 from controller import routes
 import helper
+from data.source_FILE import FILE
+from data.source_RVA import RVA
+from data.source_GITHUB import GITHUB
 
 app = Flask(__name__, template_folder=_config.TEMPLATES_DIR, static_folder=_config.STATIC_DIR)
 
 app.register_blueprint(routes.routes)
+
+
+@app.before_first_request
+def start_up_tasks():
+    # VOCBENCH.init()
+    RVA.init()
+    FILE.init()
+    # extend this instances' list of vocabs by using the known sources
+    VOCABS = {**_config.VOCABS, **FILE.list_vocabularies()}  # picks up all vocab RDF (turtle) files in data/
+    # VOCABS = {**VOCABS, **VOCBENCH.list_vocabularies()}  # picks up all vocabs at the relevant VocBench instance
+    print('Finished startup tasks.')
 
 
 @app.context_processor

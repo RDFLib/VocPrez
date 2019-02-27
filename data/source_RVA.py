@@ -17,6 +17,7 @@ class RVA(Source):
 
     @staticmethod
     def init():
+        print('RVA init ...')
         # Get register item metadata
         for vocab_id in config.VOCABS:
             if config.VOCABS[vocab_id]['source'] == config.VocabSource.RVA:

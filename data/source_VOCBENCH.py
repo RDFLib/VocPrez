@@ -19,6 +19,7 @@ class VOCBENCH(Source):
 
     @staticmethod
     def init():
+        print('VocBench init ...')
         s = VOCBENCH._authed_request_object()
 
         # Get register item metadata
