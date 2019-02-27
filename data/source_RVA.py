@@ -3,6 +3,8 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import _config as config
 from rdflib import Graph, RDF, URIRef
 from rdflib.namespace import SKOS
+import pickle
+import os
 
 class RVA(Source):
     """Source for Research Vocabularies Australia
@@ -18,6 +20,17 @@ class RVA(Source):
         # Get register item metadata
         for vocab_id in config.VOCABS:
             if config.VOCABS[vocab_id]['source'] == config.VocabSource.RVA:
+                # TODO: Check if pickle file exists before caching
+                # Cache it as a pickle
+                if config.VOCABS[vocab_id].get('turtle'):
+                    g = Graph().parse(config.VOCABS[vocab_id]['turtle'], format='turtle')
+                    file_path = os.path.join('vocab_files', vocab_id + '.p')
+                    with open(file_path, 'wb') as f:
+                        pickle.dump(g, f)
+
+                    # Since we've cached it, change this vocab_id to source type of file
+                    config.VOCABS[vocab_id]['source'] = config.VocabSource.FILE
+                    continue
 
                 # Creators
                 sparql = SPARQLWrapper(config.VOCABS.get(vocab_id).get('sparql'))
