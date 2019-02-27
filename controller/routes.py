@@ -88,7 +88,7 @@ def vocabularies():
     # get this instance's list of vocabs
     vocabs = []
     for k, v in config.VOCABS.items():
-        v['key'] = k
+        v['vocab_id'] = k
         vocabs.append(v)
     vocabs.sort(key=lambda item: item['title'])
     total = len(config.VOCABS.items())

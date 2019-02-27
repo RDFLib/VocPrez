@@ -27,7 +27,7 @@ class SkosRegisterRenderer(RegisterRenderer):
         # that schema.
         tuple_items = []
         for item in items:
-            tuple_items.append((request.base_url + item['key'], item['title']))
+            tuple_items.append((request.base_url + item['vocab_id'], item['title']))
 
         super().__init__(
             request,
@@ -87,7 +87,7 @@ class SkosRegisterRenderer(RegisterRenderer):
                 },
                 "s": {
                     "type": "uri",
-                    "value": self.request.base_url + item['key']
+                    "value": self.request.base_url + item['vocab_id']
                 }
             })
 
