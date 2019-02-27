@@ -223,22 +223,24 @@ def test_file_vocabulary_instance_dcat_view_html():
 
         # Version
         assert """<tr>
-        <th>Version Info:</th><td>v0.1</td>
-    </tr>""" in content, BASE_URL
+            <th>Version Info:</th><td>v0.1</td>
+        </tr>""" in content, BASE_URL
 
         # Top Concepts
-        assert """<tr>
-        <th>Top Concepts:</th>
-        <td>
-            
-                <a href="/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact">contact</a><br />
-            
-        </td>
-    </tr>""" in content, BASE_URL
+        assert """        <tr>
+            <th>Top Concepts:</th>
+            <td>
+                
+                    <a href="/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact">contact</a><br />
+                
+            </td>
+        </tr>""" in content, BASE_URL
 
         # Concept Hierarchy
-        assert """<td>
-                <ul>
+        assert """        <tr>
+            <th>Concept Hierarchy:</th>
+            <td>
+                    <ul>
 <li><a href="{0}/object?vocab_id=contact_type&amp;uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact">contact</a> (1)<ul>
 <li><a href="{0}/object?vocab_id=contact_type&amp;uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact">chronostratigraphic-zone contact</a> (2)</li>
 <li><a href="{0}/object?vocab_id=contact_type&amp;uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/faulted_contact">faulted contact</a> (2)</li>
@@ -290,7 +292,8 @@ def test_file_vocabulary_instance_dcat_view_html():
 </ul>
 </li>
 </ul>
-        </td>""".format(BASE_URL) in content, BASE_URL
+            </td>
+        </tr>""".format(BASE_URL) in content, BASE_URL
 
 
 def test_file_vocabulary_instance_dcat_view_app_json():
@@ -299,8 +302,15 @@ def test_file_vocabulary_instance_dcat_view_app_json():
                                           'http%3A//resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype')\
             .content.decode('utf-8')
         content = json.loads(content)
-        assert content[1]['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact", BASE_URL
-        assert content[1]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] == 'contact'
+        count = 0
+        for c in content:
+            if c.get('@id'):
+                if c['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact":
+                    count += 1
+            if c.get('http://www.w3.org/2004/02/skos/core#prefLabel'):
+                if c['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'] == 'contact':
+                    count += 1
+        assert count == 2, BASE_URL
 
 
 def test_file_vocabulary_instance_dcat_view_turtle():
@@ -348,8 +358,14 @@ def test_file_vocabulary_instance_dcat_view_ld_json():
                                           'http%3A//resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype')\
             .content.decode('utf-8')
         content = json.loads(content)
-        assert content[1]['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/contact", BASE_URL
-        assert content[1]["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == 'contact', BASE_URL
+        count = 0
+        for c in content:
+            if c.get('@id') == "http://resource.geosciml.org/classifier/cgi/contacttype/contact":
+                count += 1
+            if c.get('http://www.w3.org/2004/02/skos/core#prefLabel'):
+                if c["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == 'contact':
+                    count += 1
+        assert count == 2
 
 
 def test_file_vocabulary_instance_dcat_view_turtle():
@@ -443,10 +459,11 @@ def test_file_vocabulary_instance_concept_register_reg_view_app_json():
         content = requests.get(BASE_URL + '/vocabulary/contact_type/concept/?_view=reg&_format=application/json&uri='
                                           + BASE_URL + '/vocabulary/contact_type/concept/').content.decode('utf-8')
         content = json.loads(content)
-        assert content['uri'] == '{}/vocabulary/contact_type/concept/'.format(BASE_URL), BASE_URL
-        assert content['views'] == ['ckan', 'reg', 'alternates'], BASE_URL
-        assert content['default_view'] == 'reg', BASE_URL
-        assert content['register_items'][0][1] == 'alteration facies contact', BASE_URL
+
+        assert content.get('uri') == '{}/vocabulary/contact_type/concept/'.format(BASE_URL)
+        assert content.get('views') == ['ckan', 'reg', 'alternates'], BASE_URL
+        assert content.get('default_view') == 'reg', BASE_URL
+        assert content.get('register_items') is not None and len(content['register_items']) == 20, BASE_URL
 
 
 def test_file_vocabulary_instance_concept_register_reg_view_turtle():
@@ -462,28 +479,75 @@ def test_file_vocabulary_instance_concept_register_reg_view_turtle():
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<{0}/vocabulary/contact_type/concept/contact_type> a <{0}/vocabulary/contact_type> ;
-    rdfs:label "alteration facies contact"^^xsd:string,
-        "angular unconformable contact"^^xsd:string,
-        "buttress unconformity"^^xsd:string,
-        "chronostratigraphic zone contact"^^xsd:string,
-        "conductivity contact"^^xsd:string,
-        "conformable contact"^^xsd:string,
-        "contact"^^xsd:string,
-        "deformation zone contact"^^xsd:string,
-        "density contact"^^xsd:string,
-        "depositional contact"^^xsd:string,
-        "disconformable contact"^^xsd:string,
-        "faulted contact"^^xsd:string,
-        "geologic province contact"^^xsd:string,
-        "geophysical contact"^^xsd:string,
-        "glacial stationary line"^^xsd:string,
-        "igneous intrusive contact"^^xsd:string,
-        "igneous phase contact"^^xsd:string,
-        "impact structure boundary"^^xsd:string,
-        "lithogenetic contact"^^xsd:string,
-        "magnetic contact"^^xsd:string ;
-    reg:register <{0}/vocabulary/contact_type/concept/> .""".format(BASE_URL) in content, BASE_URL
+<http://resource.geosciml.org/classifier/cgi/contacttype/alteration_facies_contact> rdfs:label "alteration facies contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/angular_unconformable_contact> rdfs:label "angular unconformable contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/buttress_unconformity> rdfs:label "buttress unconformity"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact> rdfs:label "chronostratigraphic-zone contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/conductivity_contact> rdfs:label "conductivity contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/conformable_contact> rdfs:label "conformable contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> rdfs:label "contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/deformation_zone_contact> rdfs:label "deformation zone contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/density_contact> rdfs:label "density contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/depositional_contact> rdfs:label "depositional contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/disconformable_contact> rdfs:label "disconformable contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact> rdfs:label "faulted contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact> rdfs:label "geologic province contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact> rdfs:label "geophysical contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line> rdfs:label "glacial stationary line"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/igneous_intrusive_contact> rdfs:label "igneous intrusive contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/igneous_phase_contact> rdfs:label "igneous phase contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/impact_structure_boundary> rdfs:label "impact structure boundary"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> rdfs:label "lithogenetic contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/magnetic_contact> rdfs:label "magnetic contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<{0}/vocabulary/contact_type/concept/?per_page=20&page=1> a ldp:Page ;
+    ldp:pageOf <{0}/vocabulary/contact_type/concept/> ;
+    xhv:first <{0}/vocabulary/contact_type/concept/?per_page=20&page=1> ;
+    xhv:last <{0}/vocabulary/contact_type/concept/?per_page=20&page=3> ;
+    xhv:next <{0}/vocabulary/contact_type/concept/?per_page=20&page=2> .
+
+<{0}/vocabulary/contact_type/concept/> a reg:Register ;
+    rdfs:label "Test Label"^^xsd:string ;
+    rdfs:comment "Test Comment"^^xsd:string .""".format(BASE_URL) in content, BASE_URL
 
 
 def test_file_vocabulary_instance_concept_register_reg_view_xml():
@@ -507,15 +571,14 @@ def test_file_vocabulary_instance_concept_register_reg_view_ld_json():
         content = json.loads(content)
         count = 0
         for c in content:
-            if c['@id'] == '{}/vocabulary/contact_type/concept/contact_type'.format(BASE_URL):
+            if c.get('@id') == 'http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact':
                 count += 1
-            if c['@type'] == ["{}/vocabulary/contact_type".format(BASE_URL)]:
+            if c.get('@type') == ["http://purl.org/linked-data/registry#Register"]:
                 count += 1
             if c.get('http://purl.org/linked-data/registry#register'):
-                if c.get('http://purl.org/linked-data/registry#register')[0]['@id'] == \
-               '{}/vocabulary/contact_type/concept/'.format(BASE_URL):
-                    count += 1
-        assert count == 3, BASE_URL
+                assert c['http://purl.org/linked-data/registry#register'][0]['@id'] == \
+                       '{}/vocabulary/contact_type/concept/'.format(BASE_URL)
+        assert count == 2
 
 
 def test_file_vocabulary_instance_concept_register_reg_view_text_n3():
@@ -531,28 +594,75 @@ def test_file_vocabulary_instance_concept_register_reg_view_text_n3():
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<{0}/vocabulary/contact_type/concept/contact_type> a <{0}/vocabulary/contact_type> ;
-    rdfs:label "alteration facies contact"^^xsd:string,
-        "angular unconformable contact"^^xsd:string,
-        "buttress unconformity"^^xsd:string,
-        "chronostratigraphic zone contact"^^xsd:string,
-        "conductivity contact"^^xsd:string,
-        "conformable contact"^^xsd:string,
-        "contact"^^xsd:string,
-        "deformation zone contact"^^xsd:string,
-        "density contact"^^xsd:string,
-        "depositional contact"^^xsd:string,
-        "disconformable contact"^^xsd:string,
-        "faulted contact"^^xsd:string,
-        "geologic province contact"^^xsd:string,
-        "geophysical contact"^^xsd:string,
-        "glacial stationary line"^^xsd:string,
-        "igneous intrusive contact"^^xsd:string,
-        "igneous phase contact"^^xsd:string,
-        "impact structure boundary"^^xsd:string,
-        "lithogenetic contact"^^xsd:string,
-        "magnetic contact"^^xsd:string ;
-    reg:register <{0}/vocabulary/contact_type/concept/> .""".format(BASE_URL) in content, BASE_URL
+<http://resource.geosciml.org/classifier/cgi/contacttype/alteration_facies_contact> rdfs:label "alteration facies contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/angular_unconformable_contact> rdfs:label "angular unconformable contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/buttress_unconformity> rdfs:label "buttress unconformity"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact> rdfs:label "chronostratigraphic-zone contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/conductivity_contact> rdfs:label "conductivity contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/conformable_contact> rdfs:label "conformable contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> rdfs:label "contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/deformation_zone_contact> rdfs:label "deformation zone contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/density_contact> rdfs:label "density contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/depositional_contact> rdfs:label "depositional contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/disconformable_contact> rdfs:label "disconformable contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact> rdfs:label "faulted contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact> rdfs:label "geologic province contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact> rdfs:label "geophysical contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line> rdfs:label "glacial stationary line"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/igneous_intrusive_contact> rdfs:label "igneous intrusive contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/igneous_phase_contact> rdfs:label "igneous phase contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/impact_structure_boundary> rdfs:label "impact structure boundary"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> rdfs:label "lithogenetic contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<http://resource.geosciml.org/classifier/cgi/contacttype/magnetic_contact> rdfs:label "magnetic contact"@en ;
+    reg:register <{0}/vocabulary/contact_type/concept/> .
+
+<{0}/vocabulary/contact_type/concept/?per_page=20&page=1> a ldp:Page ;
+    ldp:pageOf <{0}/vocabulary/contact_type/concept/> ;
+    xhv:first <{0}/vocabulary/contact_type/concept/?per_page=20&page=1> ;
+    xhv:last <{0}/vocabulary/contact_type/concept/?per_page=20&page=3> ;
+    xhv:next <{0}/vocabulary/contact_type/concept/?per_page=20&page=2> .
+
+<{0}/vocabulary/contact_type/concept/> a reg:Register ;
+    rdfs:label "Test Label"^^xsd:string ;
+    rdfs:comment "Test Comment"^^xsd:string .""".format(BASE_URL) in content, BASE_URL
 
 
 def test_file_vocabulary_instance_concept_register_reg_view_app_n_triples():

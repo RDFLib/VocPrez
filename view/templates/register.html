@@ -43,7 +43,7 @@
 
                     {# This is the vocabulary register. #}
                     {%- elif item is not string %}
-                        <h4><a href="{{ h.url_encode(item['key']) }}">{{ item['title'] }}</a></h4>
+                        <h4><a href="{{ h.url_encode(item['vocab_id']) }}">{{ item['title'] }}</a></h4>
                     {%- else %}
                         <h4><a href="{{ h.url_encode(item) }}">{{ item.split('#')[-1].split('/')[-1] }}</a></h4>
                     {%- endif %}
