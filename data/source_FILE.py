@@ -216,16 +216,13 @@ class FILE(Source):
                 None,
                 None
             )
-            topConcepts.append((r['hasTopConcept'], r['topConceptLabel']))
-        v.hasTopConcepts = topConcepts
-
-        # # top concepts
-        # for s, p, o in self.g.triples((v.uri, SKOS.hasTopConcept, None)):
-        #     v.hasTopConcepts.append((str(o), ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))))
+            if r['hasTopConcept'] and r['topConceptLabel'] is not None:
+                topConcepts.append((r['hasTopConcept'], r['topConceptLabel']))
 
         # sort the top concepts by prefLabel
-        v.hasTopConcepts.sort(key=lambda tup: tup[1])
-        print(v.hasTopConcepts)
+        v.hasTopConcepts = topConcepts
+        if v.hasTopConcepts:
+            v.hasTopConcepts.sort(key=lambda tup: tup[1])
         v.conceptHierarchy = self.get_concept_hierarchy()
         return v
 
@@ -469,5 +466,4 @@ class FILE(Source):
         else:
             g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
-            if o:
                 return str(o)
