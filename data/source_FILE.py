@@ -184,7 +184,7 @@ class FILE(Source):
             SELECT DISTINCT ?s ?t ?d ?c ?cr ?m ?v ?hasTopConcept ?topConceptLabel
             WHERE {{
               ?s a skos:ConceptScheme .
-              OPTIONAL {{ ?s (dct:title | skos:prefLabel | rdfs:label) ?t }}
+              OPTIONAL {{ ?s skos:prefLabel ?t }}
               OPTIONAL {{ ?s dct:description ?d }}
               OPTIONAL {{ ?s dct:creator ?c }}
               OPTIONAL {{ ?s dct:created ?cr }}
@@ -192,7 +192,7 @@ class FILE(Source):
               OPTIONAL {{ ?s owl:versionInfo ?v }}
               OPTIONAL {{ 
                 ?s skos:hasTopConcept ?hasTopConcept .
-                ?hasTopConcept (dct:title | skos:prefLabel | rdfs:label) ?topConceptLabel .
+                ?hasTopConcept skos:prefLabel ?topConceptLabel .
               }}
             }}''')
 
