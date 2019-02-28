@@ -3,6 +3,8 @@ import requests
 import json
 import _config as config
 from rdflib import Graph, Literal, URIRef
+from vocbench import Vocbench
+import owlrl
 
 
 class VbAuthException(Exception):
@@ -20,95 +22,103 @@ class VOCBENCH(Source):
     @staticmethod
     def init():
         print('VocBench init ...')
-        s = VOCBENCH._authed_request_object()
+        VOCBENCH.voc = Vocbench(config.VB_USER, config.VB_PASSWORD, config.VB_ENDPOINT)
 
         # Get register item metadata
         for k in config.VOCABS:
             if config.VOCABS[k]['source'] == config.VocabSource.VOCBENCH:
-                # Creators
-                r = s.post(
-                    config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
-                    data={
-                        'query':
-                            '''PREFIX dct: <http://purl.org/dc/terms/>
-                            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                            SELECT *
-                            WHERE {
-                                ?s a skos:ConceptScheme .
-                                ?s dct:creator ?o .
-                            }''',
-                        'ctx_project': k
-                    }
-                )
-                try:
-                    creators = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
-                    config.VOCABS[k]['creators'] = list(set([creator['o']['value'] for creator in creators]))
-                except:
-                    config.VOCABS[k]['creators'] = None
+                g = Graph().parse(data=VOCBENCH.voc.export_project(k), format='turtle')
 
-                # Date Created
-                r = s.post(
-                    config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
-                    data={
-                        'query':
-                            '''PREFIX dct: <http://purl.org/dc/terms/>
-                            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                            SELECT *
-                            WHERE {
-                                ?s a skos:ConceptScheme .
-                                ?s (dct:created | dct:date) ?o .
-                            }''',
-                        'ctx_project': k
-                    }
-                )
-                # Get the date in the format like '2019-01-01'.
-                try:
-                    date_created = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                    config.VOCABS[k]['date_created'] = date_created
-                except:
-                    config.VOCABS[k]['date_created'] = None
+                # Apply inferencing based on owl-rl.
+                owlrl.DeductiveClosure(owlrl.OWLRL_Semantics).expand(g)
 
-                # Date Modified
-                r = s.post(
-                    config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
-                    data={
-                        'query':
-                            '''PREFIX dct: <http://purl.org/dc/terms/>
-                            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                            SELECT *
-                            WHERE {
-                                ?s a skos:ConceptScheme .
-                                ?s dct:modified ?o .
-                            }''',
-                        'ctx_project': k
-                    }
-                )
-                try:
-                    date_modified = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                    config.VOCABS[k]['date_modified'] = date_modified
-                except:
-                    config.VOCABS[k]['date_modified'] = None
+                VOCBENCH.pickle_to_file(k, g)
+                config.VOCABS[k]['source'] = config.VocabSource.FILE
 
-                # Version
-                r = s.post(
-                    config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
-                    data={
-                        'query':
-                            '''PREFIX dct: <http://purl.org/dc/terms/>
-                            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                            SELECT *
-                            WHERE {
-                                ?s a skos:ConceptScheme .
-                                ?s owl:versionInfo?o .
-                            }''',
-                        'ctx_project': k
-                    }
-                )
-                try:
-                    version = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                    config.VOCABS[k]['version'] = version
-                except:
-                    config.VOCABS[k]['version'] = None
+                # # Creators
+                # r = s.post(
+                #     config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+                #     data={
+                #         'query':
+                #             '''PREFIX dct: <http://purl.org/dc/terms/>
+                #             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                #             SELECT *
+                #             WHERE {
+                #                 ?s a skos:ConceptScheme .
+                #                 ?s dct:creator ?o .
+                #             }''',
+                #         'ctx_project': k
+                #     }
+                # )
+                # try:
+                #     creators = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
+                #     config.VOCABS[k]['creators'] = list(set([creator['o']['value'] for creator in creators]))
+                # except:
+                #     config.VOCABS[k]['creators'] = None
+                #
+                # # Date Created
+                # r = s.post(
+                #     config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+                #     data={
+                #         'query':
+                #             '''PREFIX dct: <http://purl.org/dc/terms/>
+                #             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                #             SELECT *
+                #             WHERE {
+                #                 ?s a skos:ConceptScheme .
+                #                 ?s (dct:created | dct:date) ?o .
+                #             }''',
+                #         'ctx_project': k
+                #     }
+                # )
+                # # Get the date in the format like '2019-01-01'.
+                # try:
+                #     date_created = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
+                #     config.VOCABS[k]['date_created'] = date_created
+                # except:
+                #     config.VOCABS[k]['date_created'] = None
+                #
+                # # Date Modified
+                # r = s.post(
+                #     config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+                #     data={
+                #         'query':
+                #             '''PREFIX dct: <http://purl.org/dc/terms/>
+                #             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                #             SELECT *
+                #             WHERE {
+                #                 ?s a skos:ConceptScheme .
+                #                 ?s dct:modified ?o .
+                #             }''',
+                #         'ctx_project': k
+                #     }
+                # )
+                # try:
+                #     date_modified = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
+                #     config.VOCABS[k]['date_modified'] = date_modified
+                # except:
+                #     config.VOCABS[k]['date_modified'] = None
+                #
+                # # Version
+                # r = s.post(
+                #     config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
+                #     data={
+                #         'query':
+                #             '''PREFIX dct: <http://purl.org/dc/terms/>
+                #             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                #             SELECT *
+                #             WHERE {
+                #                 ?s a skos:ConceptScheme .
+                #                 ?s owl:versionInfo?o .
+                #             }''',
+                #         'ctx_project': k
+                #     }
+                # )
+                # try:
+                #     version = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
+                #     config.VOCABS[k]['version'] = version
+                # except:
+                #     config.VOCABS[k]['version'] = None
 
     @staticmethod
     def _authed_request_object():
