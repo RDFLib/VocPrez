@@ -5,9 +5,12 @@ from rdflib import Graph, URIRef, RDF
 from rdflib.namespace import SKOS, DCTERMS, DC, OWL
 import os
 import pickle
+from helper import APP_DIR
+
 
 class PickleLoadException(Exception):
     pass
+
 
 class FILE(Source):
     hierarchy = {}
@@ -29,6 +32,7 @@ class FILE(Source):
         try:
             with open(join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
                 g = pickle.load(f)
+                f.close()
                 return g
         except Exception as e:
             raise Exception(e)
@@ -173,20 +177,31 @@ class FILE(Source):
     def get_vocabulary(self):
         from model.vocabulary import Vocabulary
 
-        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        result = self.g.query('''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            SELECT *
-            WHERE {
-              ?s a skos:ConceptScheme ;
-              dct:title ?t ;
-              dct:description ?d .
-              OPTIONAL {?s dct:creator ?c }
-              OPTIONAL {?s dct:created ?cr }
-              OPTIONAL {?s dct:modified ?m }
-              OPTIONAL {?s owl:versionInfo ?v }
-            }'''
-        for r in self.g.query(q):
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT DISTINCT ?s ?t ?d ?c ?cr ?m ?v ?hasTopConcept ?topConceptLabel
+            WHERE {{
+              ?s a skos:ConceptScheme .
+              OPTIONAL {{ ?s (dct:title | skos:prefLabel | rdfs:label) ?t }}
+              OPTIONAL {{ ?s dct:description ?d }}
+              OPTIONAL {{ ?s dct:creator ?c }}
+              OPTIONAL {{ ?s dct:created ?cr }}
+              OPTIONAL {{ ?s dct:modified ?m }}
+              OPTIONAL {{ ?s owl:versionInfo ?v }}
+              OPTIONAL {{ 
+                ?s skos:hasTopConcept ?hasTopConcept .
+                ?hasTopConcept (dct:title | skos:prefLabel | rdfs:label) ?topConceptLabel .
+              }}
+            }}''')
+
+        # from helper import APP_DIR
+        # print('writing to disk ' + self.vocab_id)
+        # self.g.serialize(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
+
+        topConcepts = []
+        for r in result:
             self.uri = str(r['s'])
             v = Vocabulary(
                 self.vocab_id,
@@ -197,17 +212,20 @@ class FILE(Source):
                 r['cr'],
                 r['m'],
                 r['v'],
-                [],
+                None,
                 None,
                 None
             )
+            topConcepts.append((r['hasTopConcept'], r['topConceptLabel']))
+        v.hasTopConcepts = topConcepts
 
-        # top concepts
-        for s, p, o in self.g.triples((v.uri, SKOS.hasTopConcept, None)):
-            v.hasTopConcepts.append((str(o), ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))))
+        # # top concepts
+        # for s, p, o in self.g.triples((v.uri, SKOS.hasTopConcept, None)):
+        #     v.hasTopConcepts.append((str(o), ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))))
 
         # sort the top concepts by prefLabel
         v.hasTopConcepts.sort(key=lambda tup: tup[1])
+        print(v.hasTopConcepts)
         v.conceptHierarchy = self.get_concept_hierarchy()
         return v
 
@@ -218,7 +236,7 @@ class FILE(Source):
         if config.VOCABS[self.vocab_id].get('turtle'):
             g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'])
         else:
-            g = Graph().parse(uri + '.ttl', format='turtle')
+            g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
 
         # -- altLabels
         altLabels = []
@@ -313,9 +331,9 @@ class FILE(Source):
         # get the concept's source
         q = g.query('''PREFIX dct: <http://purl.org/dc/terms/>
                             SELECT *
-                            WHERE {
-                              ?a dct:source ?source .
-                            }''')
+                            WHERE {{
+                              <{}> dct:source ?source .
+                            }}'''.format(uri))
         source = None
         for row in q:
             source = row['source']
@@ -449,7 +467,7 @@ class FILE(Source):
         if config.VOCABS[self.vocab_id].get('turtle'):
             g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'], format='turtle')
         else:
-            g = Graph().parse(uri + '.ttl', format='turtle')
+            g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
             if o:
                 return str(o)

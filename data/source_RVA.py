@@ -7,6 +7,7 @@ import pickle
 import os
 from helper import APP_DIR
 
+
 class RVA(Source):
     """Source for Research Vocabularies Australia
     """
@@ -34,6 +35,8 @@ class RVA(Source):
 
                     # Since we've cached it, change this vocab_id to source type of file
                     config.VOCABS[vocab_id]['source'] = config.VocabSource.FILE
+
+                    # Don't find metadata, let the File source class handle it.
                     continue
 
                 # Creators

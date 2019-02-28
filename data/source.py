@@ -3,6 +3,8 @@ import sys
 from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS
 import markdown
+import pickle
+import os
 
 
 class Source:
@@ -12,6 +14,17 @@ class Source:
         'http://www.w3.org/2004/02/skos/core#ConceptCollection',
         'http://www.w3.org/2004/02/skos/core#Concept',
     ]
+
+    @staticmethod
+    def pickle_to_file(vocab_id, g):
+        print('Pickling file: {}'.format(vocab_id))
+        path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
+        # TODO: Check if file_name already has extension
+        with open(path + '.p', 'wb') as f:
+            pickle.dump(g, f)
+            f.close()
+
+        g.serialize(path + '.ttl', format='turtle')
 
     def _delegator(self, function_name):
         """
