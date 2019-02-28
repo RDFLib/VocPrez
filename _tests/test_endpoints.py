@@ -331,11 +331,10 @@ def test_file_vocabulary_instance_dcat_view_turtle():
     dct:creator <http://editor.vocabs.ands.org.au/user/CGI-Concept-Definition-Task-Group> ;
     dct:description "This scheme describes the concept space for Contact Type concepts, as defined by the IUGS Commission for Geoscience Information (CGI) Geoscience Terminology Working Group. By extension, it includes all concepts in this conceptScheme, as well as concepts in any previous versions of the scheme. Designed for use in the contactType property in GeoSciML Contact elements."@en ;
     dct:title "Contact Type"@en ;
-    owl:versionInfo "v0.1"^^xsd:string ;
+    owl:versionInfo "v0.1" ;
     skos:hasTopConcept <http://resource.geosciml.org/classifier/cgi/contacttype/contact> .
 
-<http://resource.geosciml.org/classifier/cgi/contacttype/contact> skos:prefLabel "contact"^^xsd:string .
-""" in content, BASE_URL
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> skos:prefLabel "contact"@en .""" in content, BASE_URL
 
 
 def test_file_vocabulary_instance_dcat_view_xml():
@@ -368,7 +367,7 @@ def test_file_vocabulary_instance_dcat_view_ld_json():
         assert count == 2
 
 
-def test_file_vocabulary_instance_dcat_view_turtle():
+def test_file_vocabulary_instance_dcat_view_text_n3():
     for BASE_URL in BASE_URLS:
         content = requests.get(BASE_URL + '/vocabulary/contact_type?_view=dcat&_format=text/n3&uri='
                                           'http%3A//resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype') \
@@ -389,7 +388,7 @@ def test_file_vocabulary_instance_dcat_view_turtle():
     owl:versionInfo "v0.1" ;
     skos:hasTopConcept <http://resource.geosciml.org/classifier/cgi/contacttype/contact> .
 
-<http://resource.geosciml.org/classifier/cgi/contacttype/contact> skos:prefLabel "contact" .
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> skos:prefLabel "contact"@en .
 """ in content, BASE_URL
 
 
