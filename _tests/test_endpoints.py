@@ -791,12 +791,12 @@ def test_file_vocabulary_instance_concept_instance_skos_view_html():
         adapted from Jackson, 1997, page 137, NADM C1 2004""" in content, BASE_URL
 
         # Narrowers
-        assert """            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact">chronostratigraphic zone contact</a><br />
-            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/faulted_contact">faulted contact</a><br />
-            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact">geologic province contact</a><br />
-            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact">geophysical contact</a><br />
-            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line">glacial stationary line</a><br />
-            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact">lithogenetic contact</a><br />"""\
+        assert """<a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact">Chronostratigraphic Zone Contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/faulted_contact">Faulted Contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact">Geologic Province Contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact">Geophysical Contact</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line">Glacial Stationary Line</a><br />
+            <a href="{0}/object?vocab_id=contact_type&uri=http%3A//resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact">Lithogenetic Contact</a><br />"""\
                    .format(BASE_URL) in content, BASE_URL
 
 
@@ -810,10 +810,10 @@ def test_file_vocabulary_instance_concept_instance_skos_view_app_json():
         count = 0
         for c in content:
             if c.get('@id'):
-                if c['@id'] ==  "http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact":
+                if c['@id'] ==  "http://resource.geosciml.org/classifier/cgi/contacttype/contact":
                     count += 1
             if c.get("http://www.w3.org/2004/02/skos/core#prefLabel"):
-                if c["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == "geophysical contact":
+                if c["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == "contact":
                     count += 1
         assert count == 2, BASE_URL
 
@@ -831,27 +831,19 @@ def test_file_vocabulary_instance_concept_instance_skos_view_turtle():
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://resource.geosciml.org/classifier/cgi/contacttype/contact> dct:source "adapted from Jackson, 1997, page 137, NADM C1 2004"@en ;
-    skos:definition "A surface that separates geologic units. Very general concept representing any kind of surface separating two geologic units, including primary boundaries such as depositional contacts, all kinds of unconformities, intrusive contacts, and gradational contacts, as well as faults that separate geologic units." ;
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> a rdfs:Resource,
+        skos:Concept ;
+    dct:source "adapted from Jackson, 1997, page 137, NADM C1 2004"@en ;
+    skos:definition "A surface that separates geologic units. Very general concept representing any kind of surface separating two geologic units, including primary boundaries such as depositional contacts, all kinds of unconformities, intrusive contacts, and gradational contacts, as well as faults that separate geologic units."@en ;
+    skos:inScheme <http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype> ;
     skos:narrower <http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> ;
-    skos:prefLabel "contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact> skos:prefLabel "chronostratigraphic zone contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact> skos:prefLabel "faulted contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact> skos:prefLabel "geologic province contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact> skos:prefLabel "geophysical contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line> skos:prefLabel "glacial stationary line" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> skos:prefLabel "lithogenetic contact" .
+    skos:prefLabel "contact"@en ;
+    skos:topConceptOf <http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype> .
 """ in content, BASE_URL
 
 
@@ -872,19 +864,19 @@ def test_file_vocabulary_instance_concept_instance_skos_view_xml():
 def test_file_vocabulary_instance_concept_instance_skos_view_ld_json():
     for BASE_URL in BASE_URLS:
         content = requests.get(BASE_URL +
-                               '/object?vocab_id=contact_type&_view=skos&_format=application/ld+json&uri='
+                               '/object?vocab_id=contact_type&_view=skos&_format=application/json&uri='
                                           'http%3A//resource.geosciml.org/classifier/cgi/contacttype/contact')\
             .content.decode('utf-8')
         content = json.loads(content)
         count = 0
         for c in content:
             if c.get('@id'):
-                if c['@id'] == "http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact":
+                if c['@id'] ==  "http://resource.geosciml.org/classifier/cgi/contacttype/contact":
                     count += 1
-            if c.get('http://www.w3.org/2004/02/skos/core#prefLabel'):
-                if c["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == 'geophysical contact':
+            if c.get("http://www.w3.org/2004/02/skos/core#prefLabel"):
+                if c["http://www.w3.org/2004/02/skos/core#prefLabel"][0]['@value'] == "contact":
                     count += 1
-        assert count == 2
+        assert count == 2, BASE_URL
 
 
 def test_file_vocabulary_instance_concept_instance_skos_view_text_n3():
@@ -900,27 +892,19 @@ def test_file_vocabulary_instance_concept_instance_skos_view_text_n3():
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://resource.geosciml.org/classifier/cgi/contacttype/contact> dct:source "adapted from Jackson, 1997, page 137, NADM C1 2004"@en ;
-    skos:definition "A surface that separates geologic units. Very general concept representing any kind of surface separating two geologic units, including primary boundaries such as depositional contacts, all kinds of unconformities, intrusive contacts, and gradational contacts, as well as faults that separate geologic units." ;
+<http://resource.geosciml.org/classifier/cgi/contacttype/contact> a rdfs:Resource,
+        skos:Concept ;
+    dct:source "adapted from Jackson, 1997, page 137, NADM C1 2004"@en ;
+    skos:definition "A surface that separates geologic units. Very general concept representing any kind of surface separating two geologic units, including primary boundaries such as depositional contacts, all kinds of unconformities, intrusive contacts, and gradational contacts, as well as faults that separate geologic units."@en ;
+    skos:inScheme <http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype> ;
     skos:narrower <http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line>,
         <http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> ;
-    skos:prefLabel "contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/chronostratigraphic_zone_contact> skos:prefLabel "chronostratigraphic zone contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/faulted_contact> skos:prefLabel "faulted contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/geologic_province_contact> skos:prefLabel "geologic province contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/geophysical_contact> skos:prefLabel "geophysical contact" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/glacial_stationary_line> skos:prefLabel "glacial stationary line" .
-
-<http://resource.geosciml.org/classifier/cgi/contacttype/lithogenetic_contact> skos:prefLabel "lithogenetic contact" .
+    skos:prefLabel "contact"@en ;
+    skos:topConceptOf <http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype> .
 """ in content, BASE_URL
 
 

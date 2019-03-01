@@ -16,6 +16,16 @@ class Source:
     ]
 
     @staticmethod
+    def load_pickle_graph(vocab_id):
+        try:
+            with open(os.path.join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
+                g = pickle.load(f)
+                f.close()
+                return g
+        except Exception as e:
+            raise Exception(e)
+
+    @staticmethod
     def pickle_to_file(vocab_id, g):
         print('Pickling file: {}'.format(vocab_id))
         path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
