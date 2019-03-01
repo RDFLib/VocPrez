@@ -148,11 +148,25 @@ class FILE(Source):
         result = self.g.query("""
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT * 
             WHERE {{
-                ?s a skos:Concept .
-                OPTIONAL {{
-                    ?s skos:prefLabel ?title .
+                {{
+                    ?s a skos:Concept .
+                    ?s skos:prefLabel ?title .                    
+                }}
+                UNION
+                {{
+                    ?s a skos:Concept .
+                    ?s dct:title ?title . 
+                    MINUS { ?s skos:prefLabel ?prefLabel }
+                }}
+                UNION
+                {{
+                    ?s a skos:Concept .
+                    ?s rdfs:label ?title . 
+                    MINUS { ?s skos:prefLabel ?prefLabel }
+                    MINUS { ?s dct:title ?prefLabel }
                 }}
                 OPTIONAL {{
                     ?s dct:created ?date_created .
@@ -181,18 +195,33 @@ class FILE(Source):
             PREFIX dct: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT DISTINCT ?s ?t ?d ?c ?cr ?m ?v ?hasTopConcept ?topConceptLabel
+            SELECT DISTINCT ?s ?title ?description ?creator ?created ?modified ?version ?hasTopConcept ?topConceptLabel
             WHERE {{
-              ?s a skos:ConceptScheme .
-              OPTIONAL {{ ?s skos:prefLabel ?t }}
-              OPTIONAL {{ ?s dct:description ?d }}
-              OPTIONAL {{ ?s dct:creator ?c }}
-              OPTIONAL {{ ?s dct:created ?cr }}
-              OPTIONAL {{ ?s dct:modified ?m }}
-              OPTIONAL {{ ?s owl:versionInfo ?v }}
-              OPTIONAL {{ 
-                ?s skos:hasTopConcept ?hasTopConcept .
-                ?hasTopConcept skos:prefLabel ?topConceptLabel .
+                {{
+                    ?s a skos:ConceptScheme .
+                    ?s skos:prefLabel ?title .                    
+                }}
+                UNION
+                {{
+                    ?s a skos:ConceptScheme .
+                    ?s dct:title ?title . 
+                    MINUS { ?s skos:prefLabel ?prefLabel }
+                }}
+                UNION
+                {{
+                    ?s a skos:ConceptScheme .
+                    ?s rdfs:label ?title . 
+                    MINUS { ?s skos:prefLabel ?prefLabel }
+                    MINUS { ?s dct:title ?prefLabel }
+                }}
+                OPTIONAL {{ ?s dct:description ?description }}
+                OPTIONAL {{ ?s dct:creator ?creator }}
+                OPTIONAL {{ ?s dct:created ?created }}
+                OPTIONAL {{ ?s dct:modified ?modified }}
+                OPTIONAL {{ ?s owl:versionInfo ?version }}
+                OPTIONAL {{ 
+                    ?s skos:hasTopConcept ?hasTopConcept .
+                    ?hasTopConcept skos:prefLabel ?topConceptLabel .
               }}
             }}''')
 
@@ -200,24 +229,43 @@ class FILE(Source):
         # print('writing to disk ' + self.vocab_id)
         # self.g.serialize(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
 
+        title = None
+        description = None
+        creator = None
+        created = None
+        modified = None
+        version = None
+
         topConcepts = []
+
         for r in result:
             self.uri = str(r['s'])
-            v = Vocabulary(
-                self.vocab_id,
-                r['s'],
-                r['t'],
-                r['d'],
-                r['c'],
-                r['cr'],
-                r['m'],
-                r['v'],
-                None,
-                None,
-                None
-            )
+            if title is None:
+                title = r['title']
+            if description is None:
+                description = r['description']
+            if creator is None:
+                creator = r['creator']
+            if created is None:
+                created = r['created']
+            if modified is None:
+                modified = r['modified']
+            if version is None:
+                version = r['version']
             if r['hasTopConcept'] and r['topConceptLabel'] is not None:
                 topConcepts.append((r['hasTopConcept'], r['topConceptLabel']))
+
+        v = Vocabulary(
+            self.vocab_id,
+            self.uri,
+            title,
+            description,
+            creator,
+            created,
+            modified,
+            version,
+            topConcepts
+        )
 
         # sort the top concepts by prefLabel
         v.hasTopConcepts = topConcepts
