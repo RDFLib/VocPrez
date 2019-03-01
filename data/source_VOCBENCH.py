@@ -5,6 +5,8 @@ import _config as config
 from rdflib import Graph, Literal, URIRef
 from vocbench import Vocbench
 import owlrl
+import os
+from helper import APP_DIR
 
 
 class VbAuthException(Exception):
@@ -27,12 +29,15 @@ class VOCBENCH(Source):
         # Get register item metadata
         for k in config.VOCABS:
             if config.VOCABS[k]['source'] == config.VocabSource.VOCBENCH:
-                g = Graph().parse(data=VOCBENCH.voc.export_project(k), format='turtle')
+                if not os.path.isfile(os.path.join(APP_DIR, 'vocab_files', k + '.p')):
+                    g = Graph().parse(data=VOCBENCH.voc.export_project(k), format='turtle')
 
-                # Apply inferencing based on owl-rl.
-                owlrl.DeductiveClosure(owlrl.OWLRL_Semantics).expand(g)
+                    # Apply inferencing based on owl-rl.
+                    owlrl.DeductiveClosure(owlrl.OWLRL_Semantics).expand(g)
 
-                VOCBENCH.pickle_to_file(k, g)
+                    VOCBENCH.pickle_to_file(k, g)
+                else:
+                    print('File {}.p exists, skipping pickling step.'.format(k))
                 config.VOCABS[k]['source'] = config.VocabSource.FILE
 
                 # # Creators
