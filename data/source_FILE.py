@@ -5,9 +5,12 @@ from rdflib import Graph, URIRef, RDF
 from rdflib.namespace import SKOS, DCTERMS, DC, OWL
 import os
 import pickle
+from helper import APP_DIR, make_title
+
 
 class PickleLoadException(Exception):
     pass
+
 
 class FILE(Source):
     hierarchy = {}
@@ -22,16 +25,6 @@ class FILE(Source):
     def __init__(self, vocab_id, request):
         super().__init__(vocab_id, request)
         self.g = FILE.load_pickle_graph(vocab_id)
-
-
-    @staticmethod
-    def load_pickle_graph(vocab_id):
-        try:
-            with open(join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
-                g = pickle.load(f)
-                return g
-        except Exception as e:
-            raise Exception(e)
 
     @staticmethod
     def init():
@@ -144,11 +137,25 @@ class FILE(Source):
         result = self.g.query("""
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT * 
             WHERE {{
-                ?s a skos:Concept .
-                OPTIONAL {{
-                    ?s skos:prefLabel ?title .
+                {{
+                    ?s a skos:Concept .
+                    ?s skos:prefLabel ?title .                    
+                }}
+                UNION
+                {{
+                    ?s a skos:Concept .
+                    ?s dct:title ?title . 
+                    MINUS { ?s skos:prefLabel ?prefLabel }
+                }}
+                UNION
+                {{
+                    ?s a skos:Concept .
+                    ?s rdfs:label ?title . 
+                    MINUS { ?s skos:prefLabel ?prefLabel }
+                    MINUS { ?s dct:title ?prefLabel }
                 }}
                 OPTIONAL {{
                     ?s dct:created ?date_created .
@@ -173,41 +180,86 @@ class FILE(Source):
     def get_vocabulary(self):
         from model.vocabulary import Vocabulary
 
-        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        result = self.g.query('''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            SELECT *
-            WHERE {
-              ?s a skos:ConceptScheme ;
-              dct:title ?t ;
-              dct:description ?d .
-              OPTIONAL {?s dct:creator ?c }
-              OPTIONAL {?s dct:created ?cr }
-              OPTIONAL {?s dct:modified ?m }
-              OPTIONAL {?s owl:versionInfo ?v }
-            }'''
-        for r in self.g.query(q):
-            self.uri = str(r['s'])
-            v = Vocabulary(
-                self.vocab_id,
-                r['s'],
-                r['t'],
-                r['d'],
-                r['c'],
-                r['cr'],
-                r['m'],
-                r['v'],
-                [],
-                None,
-                None
-            )
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT DISTINCT ?s ?title ?description ?creator ?created ?modified ?version ?hasTopConcept ?topConceptLabel
+            WHERE {{
+                {{
+                    ?s a skos:ConceptScheme .
+                    ?s skos:prefLabel ?title .                    
+                }}
+                UNION
+                {{
+                    ?s a skos:ConceptScheme .
+                    ?s dct:title ?title . 
+                    MINUS {{ ?s skos:prefLabel ?prefLabel }}
+                }}
+                UNION
+                {{
+                    ?s a skos:ConceptScheme .
+                    ?s rdfs:label ?title . 
+                    MINUS {{ ?s skos:prefLabel ?prefLabel }}
+                    MINUS {{ ?s dct:title ?prefLabel }}
+                }}
+                OPTIONAL {{ ?s dct:description ?description }}
+                OPTIONAL {{ ?s dct:creator ?creator }}
+                OPTIONAL {{ ?s dct:created ?created }}
+                OPTIONAL {{ ?s dct:modified ?modified }}
+                OPTIONAL {{ ?s owl:versionInfo ?version }}
+                OPTIONAL {{ 
+                    ?s skos:hasTopConcept ?hasTopConcept .
+                    ?hasTopConcept skos:prefLabel ?topConceptLabel .
+              }}
+            }}''')
 
-        # top concepts
-        for s, p, o in self.g.triples((v.uri, SKOS.hasTopConcept, None)):
-            v.hasTopConcepts.append((str(o), ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))))
+        # from helper import APP_DIR
+        # print('writing to disk ' + self.vocab_id)
+        # self.g.serialize(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
+
+        title = None
+        description = None
+        creator = None
+        created = None
+        modified = None
+        version = None
+
+        topConcepts = []
+
+        for r in result:
+            self.uri = str(r['s'])
+            if title is None:
+                title = r['title']
+            if description is None:
+                description = r['description']
+            if creator is None:
+                creator = r['creator']
+            if created is None:
+                created = r['created']
+            if modified is None:
+                modified = r['modified']
+            if version is None:
+                version = r['version']
+            if r['hasTopConcept'] and r['topConceptLabel'] is not None:
+                topConcepts.append((r['hasTopConcept'], r['topConceptLabel']))
+
+        v = Vocabulary(
+            self.vocab_id,
+            self.uri,
+            title,
+            description,
+            creator,
+            created,
+            modified,
+            version,
+            topConcepts
+        )
 
         # sort the top concepts by prefLabel
-        v.hasTopConcepts.sort(key=lambda tup: tup[1])
+        v.hasTopConcepts = topConcepts
+        if v.hasTopConcepts:
+            v.hasTopConcepts.sort(key=lambda tup: tup[1])
         v.conceptHierarchy = self.get_concept_hierarchy()
         return v
 
@@ -218,108 +270,131 @@ class FILE(Source):
         if config.VOCABS[self.vocab_id].get('turtle'):
             g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'])
         else:
-            g = Graph().parse(uri + '.ttl', format='turtle')
+            g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
 
-        # -- altLabels
-        altLabels = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.altLabel, None)):
-            altLabels.append(str(o))
-        altLabels.sort()
+        query = """
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dct: <http://purl.org/dc/terms/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            SELECT DISTINCT ?s ?prefLabel ?definition ?altLabel ?hiddenLabel ?source ?contributor ?broader ?narrower ?exactMatch ?closeMatch ?broadMatch ?narrowMatch ?relatedMatch ?created ?modified
+            WHERE 
+            {{
+                {{
+                    <{0}> a skos:Concept .
+                    <{0}> skos:prefLabel ?prefLabel .
+                }} UNION {{
+                    <{0}> a skos:Concept .
+                    <{0}> dct:title ?prefLabel .
+                    MINUS {{ <{0}> skos:prefLabel ?pl }}
+                }} UNION {{
+                    <{0}> a skos:Concept .
+                    <{0}> rdfs:label ?prefLabel .
+                    MINUS {{ <{0}> skos:prefLabel ?pl }}
+                    MINUS {{ <{0}> dct:title ?pl }}
+                }}
+                
+            }}""".format(uri)
+        result = g.query(query)
 
-        # -- broaders
-        broaders = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.broader, None)):
-            label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
-            broaders.append(
-                {
-                    'uri': o,
-                    'prefLabel': label
-                }
-            )
-        broaders.sort(key= lambda x: x['prefLabel'])
-
-        # -- contributor
-        contributor = None
-        for s, p, o in g.triples((URIRef(uri), DCTERMS.contributor, None)):
-            contributor = str(o)
-        if not contributor: # if we didn't find a dct:contributor, look for a dc:contributor
-            for s, p, o in g.triples((URIRef(uri), DC.contributor, None)):
-                contributor = str(o)
-
-       # -- definition
-        definition = None
-        for s, p, o in g.triples((URIRef(uri), SKOS.definition, None)):
-            definition = str(o)
-
-        # -- hiddenLabels
-        hiddenLabels = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.hiddenLabel, None)):
-            hiddenLabels.append(str(o))
-        hiddenLabels.sort()
-
-        # -- narrowers
-        narrowers = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.narrower, None)):
-            label = ' '.join(str(o).split('#')[-1].split('/')[-1].split('_'))
-            narrowers.append(
-                {
-                    'uri': o,
-                    'prefLabel': label
-                }
-            )
-        narrowers.sort(key=lambda x:  x['prefLabel'])
-
-        # -- prefLabel
         prefLabel = None
-        for s, p, o in g.triples((URIRef(uri), SKOS.prefLabel, None)):
-            prefLabel = str(o)
-            break
+        for row in result:
+            prefLabel = row['prefLabel']
+        if prefLabel is None:
+            prefLabel = make_title(uri)
 
-        # -- exactMatches
-        exactMatches = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.exactMatch, None)):
-            exactMatches.append(str(o))
+        # TODO: Get the prefLabels of the concept's narrowers, broaders, etc. Currently we are just making the
+        #       label from the URI in the jinja template.
+        query = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dct: <http://purl.org/dc/terms/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            SELECT DISTINCT ?s ?prefLabel ?definition ?altLabel ?hiddenLabel ?source ?contributor ?broader ?narrower ?exactMatch ?closeMatch ?broadMatch ?narrowMatch ?relatedMatch ?created ?modified
+            WHERE  {{
+                    
+                    <{0}> a skos:Concept .
+                    OPTIONAL {{ <{0}> skos:definition ?definition }}
+                    OPTIONAL {{ <{0}> skos:altLabel ?altLabel }}
+                    OPTIONAL {{ <{0}> skos:hiddenLabel ?hiddenLabel }}
+                    OPTIONAL {{ <{0}> dct:source ?source }}
+                    OPTIONAL {{ <{0}> dct:contributor ?contributor }}
+                    OPTIONAL {{ <{0}> skos:broader ?broader }}
+                    OPTIONAL {{ <{0}> skos:narrower ?narrower }}
+                    OPTIONAL {{ <{0}> skos:exactMatch ?exactMatch }}
+                    OPTIONAL {{ <{0}> skos:closeMatch ?closeMatch }}
+                    OPTIONAL {{ <{0}> skos:broadMatch ?broadMatch }}
+                    OPTIONAL {{ <{0}> skos:narrowMatch ?narrowMatch }}
+                    OPTIONAL {{ <{0}> skos:relatedMatch ?relatedMatch }}
+                    OPTIONAL {{ <{0}> dct:created ?created }}
+                    OPTIONAL {{ <{0}> dct:modified ?modified }}
+            }}""".format(uri)
+        result = g.query(query)
 
-        # -- closeMatches
-        closeMatches = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.closeMatch, None)):
-            closeMatches.append(str(o))
-
-        # -- broadMatches
-        broadMatches = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.broadMatch, None)):
-            broadMatches.append(str(o))
-
-        # -- narrowMatches
-        narrowMatches = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.narrowMatch, None)):
-            narrowMatches.append(str(o))
-
-        # -- relatedMatches
-        relatedMatches = []
-        for s, p, o in g.triples((URIRef(uri), SKOS.relatedMatch, None)):
-            relatedMatches.append(str(o))
-
-        # -- semantic_properties TODO: Not sure what to do here
-        semantic_properties = None
-
-        # # -- source
-        # source = None
-        # for s, p, o in g.triples((URIRef(uri), DCTERMS.source, None)):
-        #     if o:
-        #         source = str(o)
-        #         break
-
-        # get the concept's source
-        q = g.query('''PREFIX dct: <http://purl.org/dc/terms/>
-                            SELECT *
-                            WHERE {
-                              ?a dct:source ?source .
-                            }''')
+        definition = None
+        altLabels = []
+        hiddenLabels = []
         source = None
-        for row in q:
-            source = row['source']
-            break
+        contributors = []
+        broaders = []
+        narrowers = []
+        exactMatches = []
+        closeMatches = []
+        broadMatches = []
+        narrowMatches = []
+        relatedMatches = []
+        for row in result:
+            if prefLabel is None:
+                prefLabel = row['prefLabel']
+
+            if definition is None:
+                definition = row['definition']
+
+            if row['altLabel'] is not None and row['altLabel'] not in altLabels:
+                altLabels.append(row['altLabel'])
+
+            if row['hiddenLabel'] is not None and row['hiddenLabel'] not in hiddenLabels:
+                hiddenLabels.append(row['hiddenLabel'])
+
+            if source is None:
+                source = row['source']
+
+            if row['contributor'] is not None and row['contributor'] not in contributors:
+                contributors.append(row['contributor'])
+
+            if row['broader'] is not None and row['broader'] not in broaders:
+                broaders.append(row['broader'])
+
+            if row['narrower'] is not None and row['narrower'] not in narrowers:
+                narrowers.append(row['narrower'])
+
+            if row['exactMatch'] is not None and row['exactMatch'] not in exactMatches:
+                exactMatches.append(row['exactMatch'])
+
+            if row['closeMatch'] is not None and row['closeMatch'] not in closeMatches:
+                closeMatches.append(row['closeMatch'])
+
+            if row['broadMatch'] is not None and row['broadMatch'] not in broadMatches:
+                broadMatches.append(row['broadMatch'])
+
+            if row['narrowMatch'] is not None and row['narrowMatch'] not in narrowMatches:
+                narrowMatches.append(row['narrowMatch'])
+
+            if row['relatedMatch'] is not None and row['relatedMatch'] not in relatedMatches:
+                relatedMatches.append(row['relatedMatch'])
+
+        altLabels.sort()
+        hiddenLabels.sort()
+        contributors.sort()
+        broaders.sort()
+        narrowers.sort()
+        exactMatches.sort()
+        closeMatches.sort()
+        broadMatches.sort()
+        narrowMatches.sort()
+        relatedMatches.sort()
+
 
         from model.concept import Concept
         return Concept(
@@ -330,7 +405,7 @@ class FILE(Source):
             altLabels,
             hiddenLabels,
             source,
-            contributor,
+            contributors,
             broaders,
             narrowers,
             exactMatches,
@@ -338,7 +413,7 @@ class FILE(Source):
             broadMatches,
             narrowMatches,
             relatedMatches,
-            semantic_properties,
+            None,
             None,
             None,
         )
@@ -449,7 +524,6 @@ class FILE(Source):
         if config.VOCABS[self.vocab_id].get('turtle'):
             g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'], format='turtle')
         else:
-            g = Graph().parse(uri + '.ttl', format='turtle')
+            g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
-            if o:
                 return str(o)

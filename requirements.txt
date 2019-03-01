@@ -6,3 +6,5 @@ pyldapi
 pytest
 SPARQLWrapper
 requests
+git+https://github.com/edmondchuc/vocbench-python-lib.git#egg=vocbench
+owlrl

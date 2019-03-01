@@ -42,10 +42,13 @@
     </tr>
     {% endif %}
 
-    {%  if concept.contributor is not none  %}
-    <tr>
-        <th>Contributor</th><td><a href="{{ concept.contributor }}">{{ concept.contributor }}</a></td>
-    </tr>
+    {%  if concept.contributor  %}
+        {% for cont in concept.contributor %}
+            <tr>
+                <th>Contributor</th><td>{{ format(cont) }}</td>
+            </tr>
+        {% endfor %}
+
     {% endif %}
 
     {% if concept.exactMatches %}
@@ -99,7 +102,7 @@
         <th>Broader</th>
         <td class="list">
             {% for broader in concept.broaders -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(broader.uri) }}">{{ broader.prefLabel }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(broader) }}">{{ h.make_title(broader) }}</a><br />
             {% endfor %}
         </td>
         {% endif %}
@@ -110,7 +113,7 @@
         <th style="padding-right: 10px;">Narrower: </th>
         <td class="list">
             {% for narrower in concept.narrowers -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(narrower.uri) }}">{{ narrower.prefLabel }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(narrower) }}">{{ h.make_title(narrower) }}</a><br />
             {% endfor %}
         </td>
     </tr>
