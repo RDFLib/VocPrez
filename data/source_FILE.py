@@ -295,7 +295,8 @@ class FILE(Source):
                     MINUS {{ <{0}> dct:title ?pl }}
                 }}
                 
-            }}""".format(uri)
+            }} LIMIT 1
+            """.format(uri)
         result = g.query(query)
 
         prefLabel = None
@@ -303,6 +304,7 @@ class FILE(Source):
             prefLabel = row['prefLabel']
         if prefLabel is None:
             prefLabel = make_title(uri)
+        print('prefLabel: {}'.format(prefLabel))
 
         # TODO: Get the prefLabels of the concept's narrowers, broaders, etc. Currently we are just making the
         #       label from the URI in the jinja template.
