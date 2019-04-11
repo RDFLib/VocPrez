@@ -1,4 +1,4 @@
-from data.source import Source
+from data.source._source import Source
 from os.path import dirname, realpath, join, abspath
 import _config as config
 from rdflib import Graph

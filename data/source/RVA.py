@@ -1,11 +1,13 @@
-from data.source import Source
+import logging
+import dateutil.parser
+from data.source._source import Source
+from flask import g
 from SPARQLWrapper import SPARQLWrapper, JSON
 import _config as config
 from rdflib import Graph, RDF, URIRef
 from rdflib.namespace import SKOS
-import pickle
-import os
-from helper import APP_DIR
+import requests
+import json
 
 
 class RVA(Source):
@@ -18,96 +20,36 @@ class RVA(Source):
         super().__init__(vocab_id, request)
 
     @staticmethod
-    def init():
-        print('RVA init ...')
-        # Get register item metadata
-        for vocab_id in config.VOCABS:
-            if config.VOCABS[vocab_id]['source'] == config.VocabSource.RVA:
-                # TODO: Check if pickle file exists before caching
-                # Cache it as a pickle
-                if config.VOCABS[vocab_id].get('turtle'):
-                    print('Creating pickle file for {}'.format(vocab_id))
-                    g = Graph().parse(config.VOCABS[vocab_id]['turtle'], format='turtle')
-                    file_path = os.path.join(APP_DIR, 'vocab_files', vocab_id + '.p')
-                    with open(file_path, 'wb') as f:
-                        pickle.dump(g, f)
-                        f.close()
-
-                    # Since we've cached it, change this vocab_id to source type of file
-                    config.VOCABS[vocab_id]['source'] = config.VocabSource.FILE
-
-                    # Don't find metadata, let the File source class handle it.
-                    continue
-
-                # Creators
-                sparql = SPARQLWrapper(config.VOCABS.get(vocab_id).get('sparql'))
-                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
-                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                    SELECT *
-                    WHERE {{
-                        ?s a skos:ConceptScheme .
-                        ?s dct:creator ?o .
-                    }}
-                    """)
-                sparql.setReturnFormat(JSON)
-                try:
-                    creators = sparql.query().convert()['results']['bindings']
-                    config.VOCABS[vocab_id]['creators'] = list(set([creator['o']['value'] for creator in creators]))
-                except:
-                    config.VOCABS[vocab_id]['creators'] = None
-
-                # Date Created
-                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
-                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                    SELECT *
-                    WHERE {
-                        ?s a skos:ConceptScheme .
-                        ?s (dct:created | dct:date) ?o .
-                    }""")
-                sparql.setReturnFormat(JSON)
-                try:
-                    date_created = sparql.query().convert()['results']['bindings'][0]['o']['value'][:10]
-                    config.VOCABS[vocab_id]['date_created'] = date_created
-                except:
-                    config.VOCABS[vocab_id]['date_created'] = None
-
-                # Date Modified
-                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
-                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                    SELECT *
-                    WHERE {
-                        ?s a skos:ConceptScheme .
-                        ?s dct:modified ?o .
-                    }""")
-                sparql.setReturnFormat(JSON)
-                try:
-                    date_modified = sparql.query().convert()['results']['bindings'][0]['o']['value'][:10]
-                    config.VOCABS[vocab_id]['date_modified'] = date_modified
-                except:
-                    config.VOCABS[vocab_id]['date_modified'] = None
-
-                # Version
-                sparql.setQuery("""PREFIX dct: <http://purl.org/dc/terms/>
-                                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                                    SELECT *
-                                    WHERE {
-                                        ?s a skos:ConceptScheme .
-                                        ?s owl:versionInfo ?o .
-                                    }""")
-                sparql.setReturnFormat(JSON)
-                try:
-                    version = sparql.query().convert()['results']['bindings'][0]['o']['value'][:10]
-                    config.VOCABS[vocab_id]['version'] = version
-                except:
-                    config.VOCABS[vocab_id]['version'] = None
-
-    @classmethod
-    def list_vocabularies(self):
-        # this needs to be a static list as we don't want all RVA vocabs
-        pass
+    def collect(details):
+        logging.debug('RVA collect()...')
+        # For this source, vocabs must be nominated via their ID (a number) in details['vocab_ids']
+        rva_vocabs = {}
+        for vocab_id in details['vocab_ids']:
+            r = requests.get(
+                'https://vocabs.ands.org.au/registry/api/resource/vocabularies/{}?includeAccessPoints=true'
+                    .format(vocab_id),
+                headers={'Accept': 'application/json'}
+            )
+            if r.status_code == 200:
+                j = json.loads(r.text)
+                rva_vocabs['rva-' + str(vocab_id)] = {
+                    'source': config.VocabSource.RVA,
+                    'title': j.get('title'),
+                    'date_created': dateutil.parser.parse(j.get('creation-date')),
+                    'date_issued': None,
+                    'date_modified': None,
+                    'description': j.get('description'),
+                    # version
+                    # creators
+                    'sparql_endpoint': j['version'][0]['access-point'][0]['ap-api-sparql']['url']
+                }
+            else:
+                logging.error('Could not get vocab {} from RVA'.format(vocab_id))
+        g.VOCABS = {**g.VOCABS, **rva_vocabs}
+        logging.debug('RVA collect() complete')
 
     def list_collections(self):
-        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
         sparql.setQuery('''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -122,7 +64,7 @@ class RVA(Source):
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in concepts]
 
     def list_concepts(self):
-        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
         sparql.setQuery('''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
@@ -166,7 +108,9 @@ class RVA(Source):
         return concept_items
 
     def get_vocabulary(self):
-        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
+        print(g.VOCABS.get(self.vocab_id))
+        print('SPARQL endpoint: ' + str(g.VOCABS.get(self.vocab_id).get('sparql_endpoint')))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
 
         # get the basic vocab metadata
         # PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0APREFIX%20dct%3A%20%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0APREFIX%20owl%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0ASELECT%20*%0AWHERE%20%7B%0A%3Fs%20a%20skos%3AConceptScheme%20%3B%0Adct%3Atitle%20%3Ft%20%3B%0Adct%3Adescription%20%3Fd%20%3B%0Adct%3Acreator%20%3Fc%20%3B%0Adct%3Acreated%20%3Fcr%20%3B%0Adct%3Amodified%20%3Fm%20%3B%0Aowl%3AversionInfo%20%3Fv%20.%0A%7D
@@ -227,11 +171,11 @@ class RVA(Source):
                 if metadata['results']['bindings'][0].get('v') is not None else None,
             [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
             self.get_concept_hierarchy(),
-            config.VOCABS.get(self.vocab_id).get('download')
+            g.VOCABS.get(self.vocab_id).get('download')
         )
 
     def get_collection(self, uri):
-        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
             WHERE {{
@@ -263,7 +207,7 @@ class RVA(Source):
         )
 
     def get_concept(self, uri):
-        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
             SELECT *
@@ -469,7 +413,7 @@ class RVA(Source):
         )
 
     def get_concept_hierarchy(self):
-        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
         sparql.setQuery(
             """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -539,7 +483,7 @@ class RVA(Source):
 
     @staticmethod
     def build_concept_hierarchy(vocab_id):
-        g = Graph().parse(config.VOCABS[vocab_id]['download'], format='turtle')
+        g = Graph().parse(g.VOCABS[vocab_id]['download'], format='turtle')
 
         # get uri
         uri = None
@@ -562,7 +506,7 @@ class RVA(Source):
             raise Exception('topConcept not found')
 
     def get_object_class(self, uri):
-        sparql = SPARQLWrapper(config.VOCABS.get(self.vocab_id).get('sparql'))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
         q = '''
             SELECT ?c
             WHERE {{

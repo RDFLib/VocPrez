@@ -1,7 +1,7 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
 import _config as config
-import data.source as source
+import data.source._source as source
 from rdflib import Graph, RDF, Literal, URIRef, XSD
 from rdflib.namespace import SKOS, DCTERMS, NamespaceManager
 
@@ -146,7 +146,7 @@ class ConceptRenderer(Renderer):
     def _render_skos_html(self):
         _template_context = {
             'vocab_id': self.request.values.get('vocab_id'),
-            'vocab_title': config.VOCABS[self.request.values.get('vocab_id')].get('title'),
+            'vocab_title': g.VOCABS[self.request.values.get('vocab_id')].get('title'),
             'uri': self.request.values.get('uri'),
             'concept': self.concept,
             'navs': self.navs,

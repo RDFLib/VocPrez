@@ -1,8 +1,6 @@
 from os import path
-from data.source_FILE import FILE
-from data.source_RVA import RVA
+
 # RVA doesnt need to be imported as it's list_vocabularies method isn't used- vocabs from that are statically listed
-from data.source_VOCBENCH import VOCBENCH
 
 APP_DIR = path.dirname(path.dirname(path.realpath(__file__)))
 TEMPLATES_DIR = path.join(APP_DIR, 'view', 'templates')

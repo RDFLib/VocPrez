@@ -1,8 +1,8 @@
-from data.source import Source
-from os.path import dirname, realpath, join, abspath
+from data.source._source import Source
+from os.path import join
 import _config as config
 from rdflib import Graph, URIRef, RDF
-from rdflib.namespace import SKOS, DCTERMS, DC, OWL
+from rdflib.namespace import SKOS, DCTERMS, OWL
 import os
 import pickle
 from helper import APP_DIR, make_title
@@ -46,9 +46,9 @@ class FILE(Source):
                         f.close()
 
         # Get register item metadata
-        for vocab_id in config.VOCABS:
-            if vocab_id in config.VOCABS:
-                if config.VOCABS[vocab_id]['source'] != config.VocabSource.FILE:
+        for vocab_id in g.VOCABS:
+            if vocab_id in g.VOCABS:
+                if g.VOCABS[vocab_id]['source'] != config.VocabSource.FILE:
                     continue
                 
                 # Creators
@@ -58,7 +58,7 @@ class FILE(Source):
                     for creator in g.objects(uri, DCTERMS.creator):
                         creators.append(str(creator))
                     break
-                config.VOCABS[vocab_id]['creators'] = creators
+                g.VOCABS[vocab_id]['creators'] = creators
 
                 # Date Created
                 date_created = None
@@ -71,22 +71,21 @@ class FILE(Source):
                     for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                         for date in g.objects(uri, DCTERMS.date):
                             date_created = str(date)[:10]
-                config.VOCABS[vocab_id]['date_created'] = date_created
+                g.VOCABS[vocab_id]['date_created'] = date_created
 
                 # Date Modified
                 date_modified = None
                 for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                     for date in g.objects(uri, DCTERMS.modified):
                         date_modified = str(date)[:10]
-                config.VOCABS[vocab_id]['date_modified'] = date_modified
+                g.VOCABS[vocab_id]['date_modified'] = date_modified
 
                 # Version
                 version = None
                 for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                     for versionInfo in g.objects(uri, OWL.versionInfo):
                         version = versionInfo
-                config.VOCABS[vocab_id]['version'] = version
-
+                g.VOCABS[vocab_id]['version'] = version
 
     @classmethod
     def list_vocabularies(self):
@@ -103,8 +102,8 @@ class FILE(Source):
         # TODO: Move this to list_concepts() method
         # list concepts
         vocabs = {}
-        # for v in config.VOCABS:
-        #     if config.VOCABS[v]['source'] == config.VocabSource.FILE:
+        # for v in g.VOCABS:
+        #     if g.VOCABS[v]['source'] == config.VocabSource.FILE:
         #         g = FILE.load_pickle(v)
         #         for s, p, o in g.triples((None, SKOS.inScheme, None)):
         #             if s not in vocabs:
@@ -267,8 +266,8 @@ class FILE(Source):
         pass
 
     def get_concept(self, uri):
-        if config.VOCABS[self.vocab_id].get('turtle'):
-            g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'])
+        if g.VOCABS[self.vocab_id].get('turtle'):
+            g = Graph().parse(g.VOCABS[self.vocab_id]['turtle'])
         else:
             g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
 
@@ -523,8 +522,8 @@ class FILE(Source):
             raise Exception('topConcept not found')
 
     def get_object_class(self, uri):
-        if config.VOCABS[self.vocab_id].get('turtle'):
-            g = Graph().parse(config.VOCABS[self.vocab_id]['turtle'], format='turtle')
+        if g.VOCABS[self.vocab_id].get('turtle'):
+            g = Graph().parse(g.VOCABS[self.vocab_id]['turtle'], format='turtle')
         else:
             g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):

@@ -5,6 +5,7 @@ from rdflib.namespace import SKOS
 import markdown
 import pickle
 import os
+from flask import g
 
 
 class Source:
@@ -14,6 +15,10 @@ class Source:
         'http://www.w3.org/2004/02/skos/core#ConceptCollection',
         'http://www.w3.org/2004/02/skos/core#Concept',
     ]
+
+    @staticmethod
+    def collect(details):
+        pass
 
     @staticmethod
     def load_pickle_graph(vocab_id):
@@ -43,12 +48,12 @@ class Source:
         :return: a call to a specialised method of a class inheriting from this class
         """
         # specialised sources that this instance knows about
-        from data.source_RVA import RVA
-        from data.source_FILE import FILE
-        from data.source_VOCBENCH import VOCBENCH
+        from data.source.RVA import RVA
+        from data.source.FILE import FILE
+        from data.source.SPARQL import SPARQL
 
         # for this vocab, identified by vocab_id, find its source type
-        source_type = config.VOCABS[self.vocab_id].get('source')
+        source_type = g.VOCABS[self.vocab_id].get('source')
 
         # delegate the constructor of this vocab's source the the specialised source, based on source_type
         if source_type == config.VocabSource.FILE:
@@ -56,15 +61,11 @@ class Source:
         elif source_type == config.VocabSource.RVA:
             return getattr(RVA(self.vocab_id, self.request), function_name)
         elif source_type == config.VocabSource.VOCBENCH:
-            return getattr(VOCBENCH(self.vocab_id, self.request), function_name)
+            return getattr(SPARQL(self.vocab_id, self.request), function_name)
 
     def __init__(self, vocab_id, request):
         self.vocab_id = vocab_id
         self.request = request
-
-    @classmethod
-    def list_vocabularies(self):
-        pass
 
     def list_collections(self):
         return self._delegator(sys._getframe().f_code.co_name)()
