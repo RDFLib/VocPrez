@@ -3,10 +3,7 @@ import sys
 from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS
 import markdown
-import pickle
-import os
 from flask import g
-import logging
 from SPARQLWrapper import SPARQLWrapper, JSON
 import dateutil
 
@@ -50,7 +47,17 @@ class Source:
         self.request = request
 
     def list_collections(self):
-        return self._delegator(sys._getframe().f_code.co_name)()
+        q = '''
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT *
+            WHERE {
+                ?c a skos:Collection .
+                ?c (rdfs:label | skos:prefLabel) ?l .
+            }'''
+        collections = Source.sparql_query(g.VOCABS[self.vocab_id]['details']['sparql_endpoint'], q)
+
+        return [(x.get('c').get('value'), x.get('l').get('value')) for x in collections]
 
     def list_concepts(self):
         q = '''
@@ -84,7 +91,36 @@ class Source:
         return self._delegator(sys._getframe().f_code.co_name)()
 
     def get_collection(self, uri):
-        return self._delegator(sys._getframe().f_code.co_name)(uri)
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
+        q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT *
+            WHERE {{
+              <{}> rdfs:label ?l .
+              OPTIONAL {{?s rdfs:comment ?c }}
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        metadata = sparql.query().convert()['results']['bindings']
+
+        # get the collection's members
+        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {{
+              <{}> skos:member ?m .
+              ?n skos:prefLabel ?pl .
+            }}'''.format(uri)
+        sparql.setQuery(q)
+        sparql.setReturnFormat(JSON)
+        members = sparql.query().convert()['results']['bindings']
+
+        from model.collection import Collection
+        return Collection(
+            self.vocab_id,
+            uri,
+            metadata[0]['l']['value'],
+            metadata[0].get('c').get('value') if metadata[0].get('c') is not None else None,
+            [(x.get('m').get('value'), x.get('m').get('value')) for x in members]
+        )
 
     def get_concept(self):
         q = """
@@ -127,7 +163,6 @@ class Source:
         narrowMatches = []
         relatedMatches = []
         for row in result:
-            print(row)
             prefLabel = row['prefLabel']['value']
             definition = row['definition']['value']
 
@@ -270,17 +305,21 @@ class Source:
                 previous_parent_uri = this_parent
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
-    def get_object_class(self, uri):
-        """Gets the class of the object.
+    def get_object_class(self):
+        q = '''
+            SELECT * 
+            WHERE {{
+                <{}> a ?c .
+            }}
+            '''.format(self.request.values.get('uri'))
+        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'), q)
 
-        Classes restricted to being one of voaf:Vocabulary, skos:ConceptScheme, skos:Collection or skos:Collection
+        # look for classes we understand (SKOS)
+        for cls in clses:
+            if cls['c']['value'] in Source.VOC_TYPES:
+                return cls['c']['value']
 
-        :param uri: the URI of the object
-
-        :return: the URI of the class of the object
-        :rtype: :class:`string`
-        """
-        return self._delegator(sys._getframe().f_code.co_name)(uri)
+        return None
 
     @staticmethod
     def get_prefLabel_from_uri(uri):
@@ -371,29 +410,6 @@ class Source:
         top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'), q)
 
         return [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts]
-
-    @staticmethod
-    def load_pickle_graph(vocab_id):
-        pickled_file_path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id + '.p')
-
-        try:
-            with open(pickled_file_path, 'rb') as f:
-                g = pickle.load(f)
-                f.close()
-                return g
-        except Exception:
-            return None
-
-    @staticmethod
-    def pickle_to_file(vocab_id, g):
-        logging.debug('Pickling file: {}'.format(vocab_id))
-        path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
-        # TODO: Check if file_name already has extension
-        with open(path + '.p', 'wb') as f:
-            pickle.dump(g, f)
-            f.close()
-
-        g.serialize(path + '.ttl', format='turtle')
 
     @staticmethod
     def sparql_query(endpoint, q):

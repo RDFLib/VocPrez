@@ -5,7 +5,8 @@ from rdflib import Graph, URIRef, RDF
 from rdflib.namespace import SKOS, DCTERMS, OWL
 import os
 import pickle
-from helper import APP_DIR, make_title
+import logging
+from helper import APP_DIR
 
 
 class PickleLoadException(Exception):
@@ -374,3 +375,26 @@ class FILE(Source):
             g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
                 return str(o)
+
+    @staticmethod
+    def load_pickle_graph(vocab_id):
+        pickled_file_path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id + '.p')
+
+        try:
+            with open(pickled_file_path, 'rb') as f:
+                g = pickle.load(f)
+                f.close()
+                return g
+        except Exception:
+            return None
+
+    @staticmethod
+    def pickle_to_file(vocab_id, g):
+        logging.debug('Pickling file: {}'.format(vocab_id))
+        path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
+        # TODO: Check if file_name already has extension
+        with open(path + '.p', 'wb') as f:
+            pickle.dump(g, f)
+            f.close()
+
+        g.serialize(path + '.ttl', format='turtle')

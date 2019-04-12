@@ -233,7 +233,7 @@ def object():
 
     try:
         # TODO reuse object within if, rather than re-loading graph
-        c = Source(vocab_id, request).get_object_class(uri)
+        c = Source(vocab_id, request).get_object_class()
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
             concept = Source(vocab_id, request).get_concept()

@@ -1,16 +1,13 @@
 import logging
 import dateutil.parser
+from flask import g
 from data.source._source import Source
 import _config as config
-from flask import g
-
-
-class PickleLoadException(Exception):
-    pass
 
 
 class SPARQL(Source):
-    hierarchy = {}
+    """Source for a generic SPARQL endpoint
+    """
 
     def __init__(self, vocab_id, request):
         super().__init__(vocab_id, request)
@@ -63,17 +60,6 @@ class SPARQL(Source):
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
         logging.debug('SPARQL collect() complete.')
 
-    def list_collections(self):
-        q = '''
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT *
-            WHERE {
-              ?c a skos:Concept .
-              ?c rdfs:label ?l .
-            }'''
-        return [(x['c'], x['l']) for x in self.g.query(q)]
-
     def get_vocabulary(self):
         from model.vocabulary import Vocabulary
 
@@ -89,26 +75,3 @@ class SPARQL(Source):
             hasTopConcepts=self.get_top_concepts(),
             conceptHierarchy=self.get_concept_hierarchy()
         )
-
-    def get_collection(self, uri):
-        pass
-
-    def get_object_class(self, uri):
-        q = '''
-            SELECT * 
-            WHERE {{
-                <{}> a ?c .
-            }}
-            '''.format(uri)
-        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'), q)
-
-        # look for classes we understand (SKOS)
-        for cls in clses:
-            if cls['c']['value'] in [
-                'http://www.w3.org/2004/02/skos/core#Concept',
-                'http://www.w3.org/2004/02/skos/core#ConceptScheme',
-                'http://www.w3.org/2004/02/skos/core#Collection'
-            ]:
-                return cls['c']['value']
-
-        return None
