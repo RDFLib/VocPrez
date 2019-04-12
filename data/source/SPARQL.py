@@ -49,13 +49,14 @@ class SPARQL(Source):
                 'concept_scheme': cs['cs']['value'],
                 'source': config.VocabSource.SPARQL,
                 'title': cs.get('title').get('value') if cs.get('title') is not None else None,
+                'description': cs.get('description').get('value') if cs.get('description') is not None else None,
+                # owner
                 'date_created': dateutil.parser.parse(cs.get('created').get('value')) if cs.get('created') is not None else None,
                 'date_issued': dateutil.parser.parse(cs.get('issued').get('value')) if cs.get('issued') is not None else None,
                 'date_modified': dateutil.parser.parse(cs.get('modified').get('value')) if cs.get('modified') is not None else None,
-                'description': cs.get('description').get('value') if cs.get('description') is not None else None,
-                'sparql_endpoint': details['sparql_endpoint']
                 # version
                 # creators
+                'sparql_endpoint': details['sparql_endpoint']
             }
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
         logging.debug('SPARQL collect() complete.')

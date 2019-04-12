@@ -27,9 +27,9 @@ class RVA(Source):
             if r.status_code == 200:
                 j = json.loads(r.text)
                 rva_vocabs['rva-' + str(vocab['ardc_id'])] = {
-                    'source': config.VocabSource.RVA,
                     'uri': vocab['uri'],
                     'concept_scheme': vocab['uri'],
+                    'source': config.VocabSource.RVA,
                     'title': j.get('title'),
                     'description': j.get('description'),
                     'owner': j.get('owner'),
