@@ -9,6 +9,7 @@ import os
 import json
 from helper import APP_DIR, make_title
 from flask import g
+from SPARQLWrapper import SPARQLWrapper, JSON
 
 
 class PickleLoadException(Exception):
@@ -19,7 +20,7 @@ class SPARQL(Source):
     hierarchy = {}
 
     def __init__(self, vocab_id, request):
-        pass
+        super().__init__(vocab_id, request)
 
     @staticmethod
     def collect(details):
@@ -54,12 +55,14 @@ class SPARQL(Source):
                 vocab_id = cs['cs']['value'].split('/')[-2]
 
             sparql_vocabs[vocab_id] = {
+                'uri': cs['cs']['value'],
                 'source': config.VocabSource.SPARQL,
                 'title': cs.get('title').get('value') if cs.get('title') is not None else None,
                 'date_created': dateutil.parser.parse(cs.get('created').get('value')) if cs.get('created') is not None else None,
                 'date_issued': dateutil.parser.parse(cs.get('issued').get('value')) if cs.get('issued') is not None else None,
                 'date_modified': dateutil.parser.parse(cs.get('modified').get('value')) if cs.get('modified') is not None else None,
                 'description': cs.get('description').get('value') if cs.get('description') is not None else None,
+                'sparql_endpoint': details['endpoint']
                 # version
                 # creators
             }
@@ -131,88 +134,98 @@ class SPARQL(Source):
     def get_vocabulary(self):
         from model.vocabulary import Vocabulary
 
-        result = self.g.query('''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX dct: <http://purl.org/dc/terms/>
-            PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT DISTINCT ?s ?title ?description ?creator ?created ?modified ?version ?hasTopConcept ?topConceptLabel
-            WHERE {{
-                {{
-                    ?s a skos:ConceptScheme .
-                    ?s skos:prefLabel ?title .                    
-                }}
-                UNION
-                {{
-                    ?s a skos:ConceptScheme .
-                    ?s dct:title ?title . 
-                    MINUS {{ ?s skos:prefLabel ?prefLabel }}
-                }}
-                UNION
-                {{
-                    ?s a skos:ConceptScheme .
-                    ?s rdfs:label ?title . 
-                    MINUS {{ ?s skos:prefLabel ?prefLabel }}
-                    MINUS {{ ?s dct:title ?prefLabel }}
-                }}
-                OPTIONAL {{ ?s dct:description ?description }}
-                OPTIONAL {{ ?s dct:creator ?creator }}
-                OPTIONAL {{ ?s dct:created ?created }}
-                OPTIONAL {{ ?s dct:modified ?modified }}
-                OPTIONAL {{ ?s owl:versionInfo ?version }}
-                OPTIONAL {{ 
-                    ?s skos:hasTopConcept ?hasTopConcept .
-                    ?hasTopConcept skos:prefLabel ?topConceptLabel .
-              }}
-            }}''')
+        # get the vocab's top concepts
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
+        sparql.setQuery('''
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT *
+            WHERE {
+              ?s skos:hasTopConcept ?tc .
+              ?tc skos:prefLabel ?pl .
+            }''')
+        sparql.setReturnFormat(JSON)
+        top_concepts = sparql.query().convert()['results']['bindings']
 
-        # from helper import APP_DIR
-        # print('writing to disk ' + self.vocab_id)
-        # self.g.serialize(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
-
-        title = None
-        description = None
-        creator = None
-        created = None
-        modified = None
-        version = None
-
-        topConcepts = []
-
-        for r in result:
-            self.uri = str(r['s'])
-            if title is None:
-                title = r['title']
-            if description is None:
-                description = r['description']
-            if creator is None:
-                creator = r['creator']
-            if created is None:
-                created = r['created']
-            if modified is None:
-                modified = r['modified']
-            if version is None:
-                version = r['version']
-            if r['hasTopConcept'] and r['topConceptLabel'] is not None:
-                topConcepts.append((r['hasTopConcept'], r['topConceptLabel']))
-
-        v = Vocabulary(
+        return Vocabulary(
             self.vocab_id,
-            self.uri,
-            title,
-            description,
-            creator,
-            created,
-            modified,
-            version,
-            topConcepts
+            g.VOCABS[self.vocab_id]['uri'],
+            g.VOCABS[self.vocab_id]['title'],
+            g.VOCABS[self.vocab_id].get('description'),
+            '',
+            g.VOCABS[self.vocab_id].get('date_created'),
+            g.VOCABS[self.vocab_id].get('date_modified'),
+            g.VOCABS[self.vocab_id].get('version'),
+            hasTopConcepts=[(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
+            conceptHierarchy=self.get_concept_hierarchy()
         )
 
-        # sort the top concepts by prefLabel
-        v.hasTopConcepts = topConcepts
-        if v.hasTopConcepts:
-            v.hasTopConcepts.sort(key=lambda tup: tup[1])
-        v.conceptHierarchy = self.get_concept_hierarchy()
-        return v
+    def get_concept_hierarchy(self):
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
+        sparql.setQuery(
+            """
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
+            WHERE {{ 
+                ?c      a                                       skos:Concept .   
+                <{}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
+                ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
+                ?c      skos:prefLabel                          ?pl .
+                ?c		(skos:topConceptOf | skos:broader)		?parent .
+            }}
+            GROUP BY ?c ?pl ?parent
+            ORDER BY ?length ?parent ?pl
+            """.format(g.VOCABS.get(self.vocab_id).get('uri'))
+        )
+        sparql.setReturnFormat(JSON)
+        cs = sparql.query().convert()['results']['bindings']
+
+        hierarchy = []
+        previous_parent_uri = None
+        last_index = 0
+
+        for c in cs:
+            # insert all topConceptOf directly
+            if str(c['parent']['value']) == g.VOCABS.get(self.vocab_id).get('uri'):
+                hierarchy.append((
+                    int(c['length']['value']),
+                    c['c']['value'],
+                    c['pl']['value'],
+                    None
+                ))
+            else:
+                # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
+                # If so, use that Concept's index + 1
+                this_parent = c['parent']['value']
+                if this_parent == previous_parent_uri:
+                    # use last inserted index
+                    hierarchy.insert(last_index + 1, (
+                        int(c['length']['value']),
+                        c['c']['value'],
+                        c['pl']['value'],
+                        c['parent']['value']
+                    ))
+                    last_index += 1
+                # This is not a TopConcept and it has a differnt parent from the previous insert
+                # So insert it after it's parent
+                else:
+                    i = 0
+                    parent_index = 0
+                    for t in hierarchy:
+                        if this_parent in t[1]:
+                            parent_index = i
+                        i += 1
+
+                    hierarchy.insert(parent_index + 1, (
+                        int(c['length']['value']),
+                        c['c']['value'],
+                        c['pl']['value'],
+                        c['parent']['value']
+                    ))
+
+                    last_index = parent_index + 1
+                previous_parent_uri = this_parent
+        return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     def get_collection(self, uri):
         pass
@@ -371,84 +384,6 @@ class SPARQL(Source):
             None,
         )
 
-    def get_concept_hierarchy(self):
-        # return FILE.hierarchy[self.vocab_id]
-        pass
-        g = SPARQL.load_pickle_graph(self.vocab_id)
-        result = g.query(
-            """
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-            SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
-            WHERE {{ 
-                ?c      a                                       skos:Concept .   
-                ?cs     (skos:hasTopConcept | skos:narrower)*   ?mid .
-                ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
-                ?c      skos:prefLabel                          ?pl .
-                ?c		(skos:topConceptOf | skos:broader)		?parent .
-                FILTER (?cs = <{}>)
-            }}
-            GROUP BY ?c ?pl ?parent
-            ORDER BY ?length ?parent ?pl
-            """.format(self.uri)
-        )
-
-        cs = []
-        for row in result:
-            cs.append({
-                'length': {'value': row['length']},
-                'c': {'value': row['c']},
-                'pl': {'value': row['pl']},
-                'parent': {'value': row['parent']}
-            })
-
-        hierarchy = []
-        previous_parent_uri = None
-        last_index = 0
-
-        for c in cs:
-            # insert all topConceptOf directly
-            if str(c['parent']['value']) == self.uri:
-                hierarchy.append((
-                    int(c['length']['value']),
-                    c['c']['value'],
-                    c['pl']['value'],
-                    None
-                ))
-            else:
-                # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
-                # If so, use that Concept's index + 1
-                this_parent = c['parent']['value']
-                if this_parent == previous_parent_uri:
-                    # use last inserted index
-                    hierarchy.insert(last_index + 1, (
-                        int(c['length']['value']),
-                        c['c']['value'],
-                        c['pl']['value'],
-                        c['parent']['value']
-                    ))
-                    last_index += 1
-                # This is not a TopConcept and it has a differnt parent from the previous insert
-                # So insert it after it's parent
-                else:
-                    i = 0
-                    parent_index = 0
-                    for t in hierarchy:
-                        if this_parent in t[1]:
-                            parent_index = i
-                        i += 1
-
-                    hierarchy.insert(parent_index + 1, (
-                        int(c['length']['value']),
-                        c['c']['value'],
-                        c['pl']['value'],
-                        c['parent']['value']
-                    ))
-
-                    last_index = parent_index + 1
-                previous_parent_uri = this_parent
-        return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
-
     @staticmethod
     def build_concept_hierarchy(vocab_id):
         g = SPARQL.load_pickle_graph(vocab_id)
@@ -493,9 +428,3 @@ class SPARQL(Source):
             return ConnectionError('The query {} did not return a result from endpoint {}'.format(q, endpoint))
         else:
             return json.loads(r.content.decode('utf-8'))['results']['bindings']
-
-
-if __name__ == '__main__':
-    for name, details in config.VOCAB_SOURCES.items():
-        if details['source'] == config.VocabSource.SPARQL:
-            SPARQL.collect(details['endpoint'])

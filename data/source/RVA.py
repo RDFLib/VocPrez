@@ -108,12 +108,8 @@ class RVA(Source):
         return concept_items
 
     def get_vocabulary(self):
-        print(g.VOCABS.get(self.vocab_id))
-        print('SPARQL endpoint: ' + str(g.VOCABS.get(self.vocab_id).get('sparql_endpoint')))
         sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
 
-        # get the basic vocab metadata
-        # PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0APREFIX%20dct%3A%20%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0APREFIX%20owl%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0ASELECT%20*%0AWHERE%20%7B%0A%3Fs%20a%20skos%3AConceptScheme%20%3B%0Adct%3Atitle%20%3Ft%20%3B%0Adct%3Adescription%20%3Fd%20%3B%0Adct%3Acreator%20%3Fc%20%3B%0Adct%3Acreated%20%3Fcr%20%3B%0Adct%3Amodified%20%3Fm%20%3B%0Aowl%3AversionInfo%20%3Fv%20.%0A%7D
         sparql.setQuery('''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -128,7 +124,7 @@ class RVA(Source):
               OPTIONAL {?s owl:versionInfo ?v }
             }''')
         sparql.setReturnFormat(JSON)
-        metadata = sparql.query().convert()
+        metadata = sparql.query().convert()['results']['bindings'][0]
 
         # get the vocab's top concepts
         sparql.setQuery('''
@@ -141,34 +137,17 @@ class RVA(Source):
         sparql.setReturnFormat(JSON)
         top_concepts = sparql.query().convert()['results']['bindings']
 
-        # TODO: check if there are any common ways to ascertain if a vocab/ConceptScheme has any Collections
-        # # get the vocab's collections
-        # sparql.setQuery('''
-        #     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        #     SELECT *
-        #     WHERE {
-        #       ?s skos:hasTopConcept ?tc .
-        #       ?tc skos:prefLabel ?pl .
-        #     }''')
-        # sparql.setReturnFormat(JSON)
-        # top_concepts = sparql.query().convert()['results']['bindings']
-
         from model.vocabulary import Vocabulary
-        self.uri = metadata['results']['bindings'][0]['s']['value']
+        self.uri = metadata['s']['value']
         return Vocabulary(
             self.vocab_id,
-            metadata['results']['bindings'][0]['s']['value'],
-            metadata['results']['bindings'][0]['t']['value'],
-            metadata['results']['bindings'][0]['d']['value']
-                if metadata['results']['bindings'][0].get('d') is not None else None,
-            metadata['results']['bindings'][0].get('c').get('value')
-                if metadata['results']['bindings'][0].get('c') is not None else None,
-            metadata['results']['bindings'][0].get('cr').get('value')
-                if metadata['results']['bindings'][0].get('cr') is not None else None,
-            metadata['results']['bindings'][0].get('m').get('value')
-                if metadata['results']['bindings'][0].get('m') is not None else None,
-            metadata['results']['bindings'][0].get('v').get('value')
-                if metadata['results']['bindings'][0].get('v') is not None else None,
+            metadata['s']['value'],
+            metadata['t']['value'],
+            metadata['d']['value'] if metadata.get('d') is not None else None,
+            metadata.get('c').get('value') if metadata.get('c') is not None else None,
+            metadata.get('cr').get('value') if metadata.get('cr') is not None else None,
+            metadata.get('m').get('value') if metadata.get('m') is not None else None,
+            metadata.get('v').get('value') if metadata.get('v') is not None else None,
             [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts],
             self.get_concept_hierarchy(),
             g.VOCABS.get(self.vocab_id).get('download')
