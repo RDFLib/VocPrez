@@ -1,10 +1,8 @@
-from data.source import Source
+from data.source._source import Source
 import requests
 import json
 import _config as config
 from rdflib import Graph, Literal, URIRef
-from vocbench import Vocbench
-import owlrl
 import os
 from helper import APP_DIR
 
@@ -27,18 +25,15 @@ class VOCBENCH(Source):
         VOCBENCH.voc = Vocbench(config.VB_USER, config.VB_PASSWORD, config.VB_ENDPOINT)
 
         # Get register item metadata
-        for k in config.VOCABS:
-            if config.VOCABS[k]['source'] == config.VocabSource.VOCBENCH:
+        for k in g.VOCABS:
+            if g.VOCABS[k]['source'] == config.VocabSource.VOCBENCH:
                 if not os.path.isfile(os.path.join(APP_DIR, 'vocab_files', k + '.p')):
                     g = Graph().parse(data=VOCBENCH.voc.export_project(k), format='turtle')
-
-                    # Apply inferencing based on owl-rl.
-                    owlrl.DeductiveClosure(owlrl.OWLRL_Semantics).expand(g)
 
                     VOCBENCH.pickle_to_file(k, g)
                 else:
                     print('File {}.p exists, skipping pickling step.'.format(k))
-                config.VOCABS[k]['source'] = config.VocabSource.FILE
+                g.VOCABS[k]['source'] = config.VocabSource.FILE
 
                 # # Creators
                 # r = s.post(
@@ -57,9 +52,9 @@ class VOCBENCH(Source):
                 # )
                 # try:
                 #     creators = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings']
-                #     config.VOCABS[k]['creators'] = list(set([creator['o']['value'] for creator in creators]))
+                #     g.VOCABS[k]['creators'] = list(set([creator['o']['value'] for creator in creators]))
                 # except:
-                #     config.VOCABS[k]['creators'] = None
+                #     g.VOCABS[k]['creators'] = None
                 #
                 # # Date Created
                 # r = s.post(
@@ -79,9 +74,9 @@ class VOCBENCH(Source):
                 # # Get the date in the format like '2019-01-01'.
                 # try:
                 #     date_created = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                #     config.VOCABS[k]['date_created'] = date_created
+                #     g.VOCABS[k]['date_created'] = date_created
                 # except:
-                #     config.VOCABS[k]['date_created'] = None
+                #     g.VOCABS[k]['date_created'] = None
                 #
                 # # Date Modified
                 # r = s.post(
@@ -100,9 +95,9 @@ class VOCBENCH(Source):
                 # )
                 # try:
                 #     date_modified = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                #     config.VOCABS[k]['date_modified'] = date_modified
+                #     g.VOCABS[k]['date_modified'] = date_modified
                 # except:
-                #     config.VOCABS[k]['date_modified'] = None
+                #     g.VOCABS[k]['date_modified'] = None
                 #
                 # # Version
                 # r = s.post(
@@ -121,9 +116,9 @@ class VOCBENCH(Source):
                 # )
                 # try:
                 #     version = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                #     config.VOCABS[k]['version'] = version
+                #     g.VOCABS[k]['version'] = version
                 # except:
-                #     config.VOCABS[k]['version'] = None
+                #     g.VOCABS[k]['version'] = None
 
     @staticmethod
     def _authed_request_object():

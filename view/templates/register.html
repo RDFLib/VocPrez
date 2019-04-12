@@ -10,7 +10,6 @@
                 {% else %}
                 <em>{{ register_item_type_string }}</em>
                 {% endif %}
-
             </h2>
             <p></p>
             {% if search_enabled %}
@@ -30,9 +29,7 @@
             <br>
             {% endif %}
         </div>
-
-
-        <div class="col-lg-8">
+        <div class="col-md-8">
             {%- for item in register_items -%}
 
                 <div class="card">
@@ -54,14 +51,21 @@
                         {% if item['date_created'] %}
                             <tr>
                                 <th>Date created:</th>
-                                <td>{{ item['date_created'] }}</td>
+                                <td>{{ item['date_created'].strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if item['date_issued'] %}
+                            <tr>
+                                <th>Date issued:</th>
+                                <td>{{ item['date_issued'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 
                         {% if item['date_modified'] %}
                             <tr>
                                 <th>Date modified:</th>
-                                <td>{{ item['date_modified'] }}</td>
+                                <td>{{ item['date_modified'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 
@@ -87,9 +91,7 @@
 
             {%- endfor -%}
         </div>
-
-
-        <div class="col-lg-4">
+        <div class="col-md-4">
             <div class="altview">
                 <h4>Alternates View</h4>
                 <p>Different views of this register are at its <a href="{{ request.base_url }}?_view=alternates">Alternate views</a>.</p>
@@ -113,34 +115,25 @@
             </div>
         </div>
     </div>
-
-
-
-
     <!-- pagination links as per MediaTypes -->
     {%  if pagination.links %}
         <h5>Paging</h5>
     {%  endif %}
     {{ pagination.links }}
-
-
-
     <script>
         var coll = document.getElementById("collapsible-toggle");
 
         coll.addEventListener("click", function() {
-        var content = document.getElementById("content-pagination");
-        if (content.style.display === "inline") {
-          content.style.display = "none";
-          document.getElementsByClassName("collapsible")[0].innerHTML = "(more)";
-        } else {
-          content.style.display = "inline";
-          document.getElementsByClassName("collapsible")[0].innerHTML = "(less)";
-        }
-          });
-
+            var content = document.getElementById("content-pagination");
+            if (content.style.display === "inline") {
+              content.style.display = "none";
+              document.getElementsByClassName("collapsible")[0].innerHTML = "(more)";
+            } else {
+              content.style.display = "inline";
+              document.getElementsByClassName("collapsible")[0].innerHTML = "(less)";
+            }
+        });
     </script>
-
     <script>
         let cards = document.getElementsByClassName("card")
         let i;

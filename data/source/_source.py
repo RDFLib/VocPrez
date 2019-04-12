@@ -5,6 +5,8 @@ from rdflib.namespace import SKOS
 import markdown
 import pickle
 import os
+from flask import g
+import logging
 
 
 class Source:
@@ -16,25 +18,8 @@ class Source:
     ]
 
     @staticmethod
-    def load_pickle_graph(vocab_id):
-        try:
-            with open(os.path.join(config.APP_DIR, 'vocab_files', vocab_id + '.p'), 'rb') as f:
-                g = pickle.load(f)
-                f.close()
-                return g
-        except Exception as e:
-            raise Exception(e)
-
-    @staticmethod
-    def pickle_to_file(vocab_id, g):
-        print('Pickling file: {}'.format(vocab_id))
-        path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
-        # TODO: Check if file_name already has extension
-        with open(path + '.p', 'wb') as f:
-            pickle.dump(g, f)
-            f.close()
-
-        g.serialize(path + '.ttl', format='turtle')
+    def collect(details):
+        pass
 
     def _delegator(self, function_name):
         """
@@ -43,28 +28,24 @@ class Source:
         :return: a call to a specialised method of a class inheriting from this class
         """
         # specialised sources that this instance knows about
-        from data.source_RVA import RVA
-        from data.source_FILE import FILE
-        from data.source_VOCBENCH import VOCBENCH
+        from data.source.RVA import RVA
+        from data.source.FILE import FILE
+        from data.source.SPARQL import SPARQL
 
         # for this vocab, identified by vocab_id, find its source type
-        source_type = config.VOCABS[self.vocab_id].get('source')
+        source_type = g.VOCABS[self.vocab_id].get('source')
 
         # delegate the constructor of this vocab's source the the specialised source, based on source_type
         if source_type == config.VocabSource.FILE:
             return getattr(FILE(self.vocab_id, self.request), function_name)
         elif source_type == config.VocabSource.RVA:
             return getattr(RVA(self.vocab_id, self.request), function_name)
-        elif source_type == config.VocabSource.VOCBENCH:
-            return getattr(VOCBENCH(self.vocab_id, self.request), function_name)
+        elif source_type == config.VocabSource.SPARQL:
+            return getattr(SPARQL(self.vocab_id, self.request), function_name)
 
     def __init__(self, vocab_id, request):
         self.vocab_id = vocab_id
         self.request = request
-
-    @classmethod
-    def list_vocabularies(self):
-        pass
 
     def list_collections(self):
         return self._delegator(sys._getframe().f_code.co_name)()
@@ -173,3 +154,41 @@ class Source:
             tracked_items.append({'name': item[1], 'indent': mult})
 
         return markdown.markdown(text)
+
+    @staticmethod
+    def load_pickle_graph(vocab_id):
+        pickled_file_path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id + '.p')
+
+        try:
+            with open(pickled_file_path, 'rb') as f:
+                g = pickle.load(f)
+                f.close()
+                return g
+        except Exception:
+            return None
+
+    @staticmethod
+    def pickle_to_file(vocab_id, g):
+        logging.debug('Pickling file: {}'.format(vocab_id))
+        path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
+        # TODO: Check if file_name already has extension
+        with open(path + '.p', 'wb') as f:
+            pickle.dump(g, f)
+            f.close()
+
+        g.serialize(path + '.ttl', format='turtle')
+
+    # @staticmethod
+    # def sparql_query_in_memory_graph(vocab_id, q):
+    #     # get the graph from the pickled file
+    #     g = Graph()
+    #     g = Source.load_pickle_graph(vocab_id)
+    #
+    #     # put the query to the graph
+    #     for r in g.query(q):
+    #
+    #
+    #
+    # @staticmethod
+    # def sparql_query_sparql_endpoint(vocab_id, q):
+    #     pass

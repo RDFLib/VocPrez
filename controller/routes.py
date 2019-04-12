@@ -1,25 +1,24 @@
-from flask import Blueprint, Response, request, render_template
+from flask import Blueprint, Response, request, render_template, Markup, g
 from model.vocabulary import VocabularyRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
 from model.skos_register import SkosRegisterRenderer
 import _config as config
 import markdown
-from flask import Markup
-from data.source import Source
-from data.source_VOCBENCH import VbException
+from data.source._source import Source
+from data.source.VOCBENCH import VbException
 import json
 
 routes = Blueprint('routes', __name__)
 
 
 def render_invalid_vocab_id_response():
-    msg = """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """ + '\n* '.join(config.VOCABS.keys())
+    msg = """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """ + '\n* '.join(g.VOCABS.keys())
     msg = Markup(markdown.markdown(msg))
     return render_template('error.html', title='Error - invalid vocab id', heading='Invalid Vocab ID', msg=msg)
     # return Response(
     #     'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-    #     '\n'.join(config.VOCABS.keys()),
+    #     '\n'.join(g.VOCABS.keys()),
     #     status=400,
     #     mimetype='text/plain'
     # )
@@ -43,14 +42,14 @@ Instead, found **{}**.""".format(vocab_id, uri, c_type)
     return render_template('error.html', title='Error - Object Class URI', heading='Concept Class Type Error', msg=msg)
 
 
-def get_a_vocab_source_key():
+def get_a_vocab_key():
     """
-    Get the first key from the config.VOCABS dictionary.
+    Get the first key from the g.VOCABS dictionary.
 
     :return: Key name
     :rtype: str
     """
-    return next(iter(config.VOCABS))
+    return next(iter(g.VOCABS))
 
 
 @routes.route('/')
@@ -62,6 +61,16 @@ def index():
         config=config,
         voc_key=get_a_vocab_source_key()
     )
+
+
+def get_a_vocab_source_key():
+    """
+    Get the first key from the config.VOCABS dictionary.
+
+    :return: Key name
+    :rtype: str
+    """
+    return next(iter(g.VOCABS))
 
 
 def match(vocabs, query):
@@ -84,15 +93,15 @@ def vocabularies():
     per_page = int(request.values.get('per_page')) if request.values.get('per_page') is not None else 20
 
     # TODO: replace this logic with the following
-    #   1. read all static vocabs from config.VOCABS
+    #   1. read all static vocabs from g.VOCABS
     # get this instance's list of vocabs
-    vocabs = []
-    for k, v in config.VOCABS.items():
+    vocabs = []  # local copy (to this request) for sorting
+    for k, v in g.VOCABS.items():
         v['vocab_id'] = k
         v['uri'] = request.base_url + k
         vocabs.append(v)
     vocabs.sort(key=lambda item: item['title'])
-    total = len(config.VOCABS.items())
+    total = len(g.VOCABS.items())
 
     # Search
     query = request.values.get('search')
@@ -124,7 +133,7 @@ def vocabularies():
 
 @routes.route('/vocabulary/<vocab_id>')
 def vocabulary(vocab_id):
-    if vocab_id not in config.VOCABS.keys():
+    if vocab_id not in g.VOCABS.keys():
         return render_invalid_vocab_id_response()
 
     # get vocab details using appropriate source handler
@@ -141,7 +150,7 @@ def vocabulary(vocab_id):
 
 @routes.route('/vocabulary/<vocab_id>/concept/')
 def vocabulary_list(vocab_id):
-    if vocab_id not in config.VOCABS.keys():
+    if vocab_id not in g.VOCABS.keys():
         return render_invalid_vocab_id_response()
 
     v = Source(vocab_id, request)
@@ -169,7 +178,7 @@ def vocabulary_list(vocab_id):
         request,
         [],
         concepts,
-        config.VOCABS[vocab_id]['title'] + ' concepts',
+        g.VOCABS[vocab_id]['title'] + ' concepts',
         total,
         search_query=query,
         search_enabled=True,
@@ -206,10 +215,10 @@ def object():
     uri = request.values.get('uri')
 
     # check this vocab ID is known
-    if vocab_id not in config.VOCABS.keys():
+    if vocab_id not in g.VOCABS.keys():
         return Response(
             'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-            '\n'.join(config.VOCABS.keys()),
+            '\n'.join(g.VOCABS.keys()),
             status=400,
             mimetype='text/plain'
         )
@@ -264,3 +273,21 @@ def about():
         navs={},
         content=content
     )
+
+
+@routes.route('/test')
+def test():
+    txt = ''
+    # for vocab_id, details in g.VOCABS.items():
+    #     txt = txt + '{}: {}\n'.format(vocab_id, details['title'])
+
+    import os
+    import pickle
+    import pprint
+    vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
+    if os.path.isfile(vocabs_file_path):
+        with open(vocabs_file_path, 'rb') as f:
+            txt = str(pickle.load(f))
+            f.close()
+
+    return Response(txt, mimetype='text/plain')
