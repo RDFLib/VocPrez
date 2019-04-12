@@ -139,10 +139,10 @@ class SPARQL(Source):
         sparql.setQuery('''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
-            WHERE {
-              ?s skos:hasTopConcept ?tc .
+            WHERE {{
+              <{}> skos:hasTopConcept ?tc .
               ?tc skos:prefLabel ?pl .
-            }''')
+            }}'''.format(g.VOCABS.get(self.vocab_id).get('uri')))
         sparql.setReturnFormat(JSON)
         top_concepts = sparql.query().convert()['results']['bindings']
 
@@ -151,7 +151,7 @@ class SPARQL(Source):
             g.VOCABS[self.vocab_id]['uri'],
             g.VOCABS[self.vocab_id]['title'],
             g.VOCABS[self.vocab_id].get('description'),
-            '',
+            None,  # we don't yet have creator info stored for GSQ vocabs
             g.VOCABS[self.vocab_id].get('date_created'),
             g.VOCABS[self.vocab_id].get('date_modified'),
             g.VOCABS[self.vocab_id].get('version'),
@@ -360,7 +360,6 @@ class SPARQL(Source):
         broadMatches.sort()
         narrowMatches.sort()
         relatedMatches.sort()
-
 
         from model.concept import Concept
         return Concept(
