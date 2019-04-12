@@ -155,7 +155,7 @@ def vocabulary_list(vocab_id):
 
     v = Source(vocab_id, request)
     concepts = v.list_concepts()
-    concepts.sort(key= lambda x: x['title'])
+    concepts.sort(key=lambda x: x['title'])
     total = len(concepts)
 
     # Search
@@ -236,7 +236,7 @@ def object():
         c = Source(vocab_id, request).get_object_class(uri)
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
-            concept = Source(vocab_id, request).get_concept(uri)
+            concept = Source(vocab_id, request).get_concept()
             return ConceptRenderer(
                 request,
                 concept

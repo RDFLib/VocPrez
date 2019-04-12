@@ -33,7 +33,6 @@
             {%- for item in register_items -%}
 
                 <div class="card">
-
                     {# This is the concept register. #}
                     {% if vocab_id %}
                         <h4><a href="{{ request.url_root }}object?vocab_id={{ vocab_id }}&uri={{ h.url_encode(item['uri']) }}">{{ item['title'] }}</a></h4>
@@ -45,8 +44,13 @@
                         <h4><a href="{{ h.url_encode(item) }}">{{ item.split('#')[-1].split('/')[-1] }}</a></h4>
                     {%- endif %}
 
-
                     <table>
+                        {% if item['definition'] %}
+                            <tr>
+                                <th>Defintion:</th>
+                                <td>{{ item['definition'] }}</td>
+                            </tr>
+                        {% endif %}
 
                         {% if item['date_created'] %}
                             <tr>
@@ -84,10 +88,8 @@
                                 <td>{{ item['version'] }}</td>
                             </tr>
                         {% endif %}
-
                     </table>
                 </div>
-
 
             {%- endfor -%}
         </div>

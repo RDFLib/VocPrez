@@ -30,25 +30,25 @@
     {% endif %}
 
     <!-- don't display hiddenLabels, duh! -->
+
     {%  if concept.definition is not none  %}
     <tr>
-        <th>Definition: </th><td>{{ concept.definition }}</td>
-    </tr>
-    {% endif %}
-
-    {%  if concept.source is not none  %}
-    <tr>
-        <th>Source</th><td>{{ format(concept.source) }}</td>
+        <th>Definition: </th><td>{{ format(concept.definition) }}</td>
     </tr>
     {% endif %}
 
     {%  if concept.contributor  %}
         {% for cont in concept.contributor %}
             <tr>
-                <th>Contributor</th><td>{{ format(cont) }}</td>
+                <th>Contributor</th><td>{{ format(concept.contributor) }}</td>
             </tr>
         {% endfor %}
+    {% endif %}
 
+    {%  if concept.source is not none  %}
+    <tr>
+        <th>Source</th><td>{{ format(concept.source) }}</td>
+    </tr>
     {% endif %}
 
     {% if concept.exactMatches %}

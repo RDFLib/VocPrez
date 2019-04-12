@@ -18,12 +18,12 @@
         {% endif %}
         {%  if vocab.created is not none  %}
         <tr>
-            <th>Created:</th><td>{{ vocab.created }}</td>
+            <th>Created:</th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
         </tr>
         {% endif %}
         {%  if vocab.modified is not none  %}
         <tr>
-            <th>Modified:</th><td>{{ vocab.modified }}</td>
+            <th>Modified:</th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
         </tr>
         {% endif %}
         {%  if vocab.versionInfo is not none  %}

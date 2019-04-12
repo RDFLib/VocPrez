@@ -90,9 +90,11 @@ class SkosRegisterRenderer(RegisterRenderer):
         return response
 
     def _render_reg_view_html(self, template_context=None):
-        pagination = Pagination(page=self.page, per_page=self.per_page,
+        pagination = Pagination(page=self.page,
+                                per_page=self.per_page,
                                 total=self.register_total_count,
-                                page_parameter='page', per_page_parameter='per_page')
+                                page_parameter='page',
+                                per_page_parameter='per_page')
         _template_context = {
             'label': self.label,
             'comment': self.comment,

@@ -1,5 +1,5 @@
 from pyldapi import Renderer, View
-from flask import Response, render_template, url_for
+from flask import Response, render_template, g
 import _config as config
 import data.source._source as source
 from rdflib import Graph, RDF, Literal, URIRef, XSD
