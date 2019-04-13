@@ -397,7 +397,6 @@ class Source:
               ?tc skos:prefLabel ?pl .
             }}'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
         top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
-        print([(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts])
 
         return [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts]
 

@@ -21,7 +21,6 @@ class VOCBENCH(Source):
 
     @staticmethod
     def init():
-        print('VocBench init ...')
         VOCBENCH.voc = Vocbench(config.VB_USER, config.VB_PASSWORD, config.VB_ENDPOINT)
 
         # Get register item metadata
