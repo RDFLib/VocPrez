@@ -5,17 +5,17 @@
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata concept">
-    {% if concept.date_created %}
+    {% if concept.created %}
     <tr>
         <th>Date created:</th>
-        <td>{{ concept.date_created }}</td>
+        <td>{{ concept.created }}</td>
     </tr>
     {% endif %}
 
-    {% if concept.date_modified %}
+    {% if concept.modified %}
     <tr>
         <th>Date modified:</th>
-        <td>{{ concept.date_modified }}</td>
+        <td>{{ concept.modified }}</td>
     </tr>
     {% endif %}
     {% if concept.altLabels|length > 0 %}

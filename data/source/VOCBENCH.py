@@ -73,10 +73,10 @@ class VOCBENCH(Source):
                 # )
                 # # Get the date in the format like '2019-01-01'.
                 # try:
-                #     date_created = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                #     g.VOCABS[k]['date_created'] = date_created
+                #     created = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
+                #     g.VOCABS[k]['created'] = created
                 # except:
-                #     g.VOCABS[k]['date_created'] = None
+                #     g.VOCABS[k]['created'] = None
                 #
                 # # Date Modified
                 # r = s.post(
@@ -94,10 +94,10 @@ class VOCBENCH(Source):
                 #     }
                 # )
                 # try:
-                #     date_modified = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
-                #     g.VOCABS[k]['date_modified'] = date_modified
+                #     modified = json.loads(r.content.decode('utf-8'))['result']['sparql']['results']['bindings'][0]['o']['value'][:10]
+                #     g.VOCABS[k]['modified'] = modified
                 # except:
-                #     g.VOCABS[k]['date_modified'] = None
+                #     g.VOCABS[k]['modified'] = None
                 #
                 # # Version
                 # r = s.post(
@@ -186,9 +186,9 @@ class VOCBENCH(Source):
                     WHERE {
                         ?c  a skos:Concept ;
                             skos:prefLabel ?pl .
-                            ?c dct:created ?date_created .
+                            ?c dct:created ?created .
                         OPTIONAL {{
-                            ?c dct:modified ?date_modified .
+                            ?c dct:modified ?modified .
                         }}
                     }''',
                 'ctx_project': self.vocab_id
@@ -203,11 +203,11 @@ class VOCBENCH(Source):
                 metadata.update({'key': self.vocab_id})
                 metadata.update({'uri': concept.get('c').get('value')})
                 metadata.update({'title': concept.get('pl').get('value')})
-                metadata.update({'date_created': concept.get('date_created').get('value')[:10]})
+                metadata.update({'created': concept.get('created').get('value')[:10]})
                 try:
-                    metadata.update({'date_modified': concept.get('date_modified').get('value')[:10]})
+                    metadata.update({'modified': concept.get('modified').get('value')[:10]})
                 except:
-                    metadata.update({'date_modified': None})
+                    metadata.update({'modified': None})
 
                 concept_items.append(metadata)
 
@@ -261,7 +261,7 @@ class VOCBENCH(Source):
                 metadata[0].get('m').get('value') if metadata[0].get('m') is not None else None,
                 metadata[0].get('v').get('value') if metadata[0].get('v') is not None else None,
                 [(x.get('tc').get('value'), x.get('tcpl').get('value')) for x in metadata],
-                conceptHierarchy=concept_hierarchy
+                concept_hierarchy=concept_hierarchy
             )
         else:
             raise VbException('There was an error: ' + r.content.decode('utf-8'))
@@ -276,8 +276,8 @@ class VOCBENCH(Source):
             WHERE {{
               <{0}> skos:prefLabel ?pl .
               OPTIONAL {{ <{0}> skos:definition ?d }}
-              OPTIONAL {{ <{0}> dct:created ?date_created }}
-              OPTIONAL {{ <{0}> dct:modified ?date_modified }}
+              OPTIONAL {{ <{0}> dct:created ?created }}
+              OPTIONAL {{ <{0}> dct:modified ?modified }}
             }}'''.format(uri)
         self.s = VOCBENCH('x', self.request)._authed_request_object()
         r = self.s.post(
@@ -444,8 +444,8 @@ class VOCBENCH(Source):
             [x['s']['value'] for x in narrowMatches],
             [x['s']['value'] for x in relatedMatches],
             None, # TODO: replace Sem Properties sub,
-            metadata.get('date_created').get('value')[:10] if metadata.get('date_created') else None,
-            metadata.get('date_modified').get('value')[:10] if metadata.get('date_modified') else None,
+            metadata.get('created').get('value')[:10] if metadata.get('created') else None,
+            metadata.get('modified').get('value')[:10] if metadata.get('modified') else None,
         )
 
     def get_concept_hierarchy(self, concept_scheme_uri):

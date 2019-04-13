@@ -96,11 +96,9 @@ def vocabularies():
     #   1. read all static vocabs from g.VOCABS
     # get this instance's list of vocabs
     vocabs = []  # local copy (to this request) for sorting
-    for k, v in g.VOCABS.items():
-        v['vocab_id'] = k
-        v['uri'] = request.base_url + k
-        vocabs.append(v)
-    vocabs.sort(key=lambda item: item['title'])
+    for k, voc in g.VOCABS.items():
+        vocabs.append(voc)
+    vocabs.sort(key=lambda v: v.title)
     total = len(g.VOCABS.items())
 
     # Search

@@ -62,24 +62,24 @@ class FILE(Source):
                 g.VOCABS[vocab_id]['creators'] = creators
 
                 # Date Created
-                date_created = None
+                created = None
                 # dct:created
                 for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                     for date in g.objects(uri, DCTERMS.created):
-                        date_created = str(date)[:10]
-                if not date_created:
+                        created = str(date)[:10]
+                if not created:
                     # dct:date
                     for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                         for date in g.objects(uri, DCTERMS.date):
-                            date_created = str(date)[:10]
-                g.VOCABS[vocab_id]['date_created'] = date_created
+                            created = str(date)[:10]
+                g.VOCABS[vocab_id]['created'] = created
 
                 # Date Modified
-                date_modified = None
+                modified = None
                 for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                     for date in g.objects(uri, DCTERMS.modified):
-                        date_modified = str(date)[:10]
-                g.VOCABS[vocab_id]['date_modified'] = date_modified
+                        modified = str(date)[:10]
+                g.VOCABS[vocab_id]['modified'] = modified
 
                 # Version
                 version = None
@@ -158,10 +158,10 @@ class FILE(Source):
                     MINUS { ?s dct:title ?prefLabel }
                 }}
                 OPTIONAL {{
-                    ?s dct:created ?date_created .
+                    ?s dct:created ?created .
                 }}
                 OPTIONAL {{
-                    ?s dct:modified ?date_modified .
+                    ?s dct:modified ?modified .
                 }}
             }}
             """)
@@ -171,8 +171,8 @@ class FILE(Source):
                 'vocab_id': self.vocab_id,
                 'uri': str(row['s']),
                 'title': row['title'] if row['title'] is not None else ' '.join(str(row['s']).split('#')[-1].split('/')[-1].split('_')),
-                'date_created': row['date_created'][:10] if row['date_created'] is not None else None,
-                'date_modified': row['date_modified'][:10] if row['date_modified'] is not None else None,
+                'created': row['created'][:10] if row['created'] is not None else None,
+                'modified': row['modified'][:10] if row['modified'] is not None else None,
             })
 
         return vocabs

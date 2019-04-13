@@ -39,7 +39,7 @@
 
                     {# This is the vocabulary register. #}
                     {%- elif item is not string %}
-                        <h4><a href="{{ h.url_encode(item['vocab_id']) }}">{{ item['title'] }}</a></h4>
+                        <h4><a href="{{ h.url_encode(item['id']) }}">{{ item['title'] }}</a></h4>
                     {%- else %}
                         <h4><a href="{{ h.url_encode(item) }}">{{ item.split('#')[-1].split('/')[-1] }}</a></h4>
                     {%- endif %}
@@ -52,24 +52,24 @@
                             </tr>
                         {% endif %}
 
-                        {% if item['date_created'] %}
+                        {% if item['created'] %}
                             <tr>
                                 <th>Date created:</th>
-                                <td>{{ item['date_created'].strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item['created'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 
-                        {% if item['date_issued'] %}
+                        {% if item['issued'] %}
                             <tr>
                                 <th>Date issued:</th>
-                                <td>{{ item['date_issued'].strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item['issued'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 
-                        {% if item['date_modified'] %}
+                        {% if item['modified'] %}
                             <tr>
                                 <th>Date modified:</th>
-                                <td>{{ item['date_modified'].strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item['modified'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 

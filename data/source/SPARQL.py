@@ -2,6 +2,7 @@ import logging
 import dateutil.parser
 from flask import g
 from data.source._source import Source
+from model.vocabulary import Vocabulary
 import _config as config
 
 
@@ -14,11 +15,18 @@ class SPARQL(Source):
 
     @staticmethod
     def collect(details):
+        """
+        For this source, one SPARQL endpoint is given for a series of vocabs which are all separate ConceptSchemes
+
+        'gsq-graphdb': {
+            'source': VocabSource.SPARQL,
+            'sparql_endpoint': 'http://graphdb.gsq.digital:7200/repositories/GSQ_Vocabularies_core'
+        },
+        """
         logging.debug('SPARQL collect()...')
-        # Treat each skos:ConceptScheme discoverable at this endpoint as a vocab
-        #
-        # get all the ConceptSchemes from the SPARQL endpoint
-        # interpret a CS as a Vocab
+
+        # Get all the ConceptSchemes from the SPARQL endpoint
+        # Interpret each CS as a Vocab
         q = '''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -44,35 +52,20 @@ class SPARQL(Source):
             if len(vocab_id) < 2:
                 vocab_id = cs['cs']['value'].split('/')[-2]
 
-            sparql_vocabs[vocab_id] = {
-                'uri': cs['cs']['value'].replace('/conceptScheme', ''),
-                'concept_scheme': cs['cs']['value'],
-                'source': config.VocabSource.SPARQL,
-                'title': cs.get('title').get('value') if cs.get('title') is not None else None,
-                'description': cs.get('description').get('value') if cs.get('description') is not None else None,
-                # owner
-                'date_created': dateutil.parser.parse(cs.get('created').get('value')) if cs.get('created') is not None else None,
-                'date_issued': dateutil.parser.parse(cs.get('issued').get('value')) if cs.get('issued') is not None else None,
-                'date_modified': dateutil.parser.parse(cs.get('modified').get('value')) if cs.get('modified') is not None else None,
-                # version
-                # creators
-                'sparql_endpoint': details['sparql_endpoint']
-            }
+            sparql_vocabs[vocab_id] = Vocabulary(
+                vocab_id,
+                cs['cs']['value'].replace('/conceptScheme', ''),
+                cs.get('title').get('value'),
+                cs.get('description').get('value') if cs.get('description') is not None else None,
+                None,  # none of these SPARQL vocabs have creator info yet # TODO: add creator info to GSQ vocabs
+                dateutil.parser.parse(cs.get('created').get('value')) if cs.get('created') is not None else None,
+                # dct:issued not in Vocabulary
+                # dateutil.parser.parse(cs.get('issued').get('value')) if cs.get('issued') is not None else None,
+                dateutil.parser.parse(cs.get('modified').get('value')) if cs.get('modified') is not None else None,
+                None,  # versionInfo
+                config.VocabSource.SPARQL,
+                cs['cs']['value'],
+                sparql_endpoint=details['sparql_endpoint']
+            )
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
         logging.debug('SPARQL collect() complete.')
-
-    def get_vocabulary(self):
-        from model.vocabulary import Vocabulary
-
-        return Vocabulary(
-            self.vocab_id,
-            g.VOCABS[self.vocab_id]['uri'],
-            g.VOCABS[self.vocab_id]['title'],
-            g.VOCABS[self.vocab_id].get('description'),
-            None,  # we don't yet have creator info stored for GSQ vocabs
-            g.VOCABS[self.vocab_id].get('date_created'),
-            g.VOCABS[self.vocab_id].get('date_modified'),
-            g.VOCABS[self.vocab_id].get('version'),
-            hasTopConcepts=self.get_top_concepts(),
-            conceptHierarchy=self.get_concept_hierarchy()
-        )

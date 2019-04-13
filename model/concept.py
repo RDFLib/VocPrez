@@ -25,8 +25,8 @@ class Concept:
             narrowMatches,
             relatedMatches,
             semantic_properties,
-            date_created,
-            date_modified
+            created,
+            modified
     ):
         self.vocab_id = vocab_id
         self.uri = uri
@@ -44,8 +44,8 @@ class Concept:
         self.narrowMatches = narrowMatches
         self.relatedMatches = relatedMatches
         self.semantic_properties = semantic_properties
-        self.date_created = date_created
-        self.date_modified = date_modified
+        self.created = created
+        self.modified = modified
 
 
 class ConceptRenderer(Renderer):

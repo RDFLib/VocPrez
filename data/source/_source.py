@@ -16,35 +16,17 @@ class Source:
         'http://www.w3.org/2004/02/skos/core#Concept',
     ]
 
-    @staticmethod
-    def collect(details):
-        pass
-
-    def _delegator(self, function_name):
-        """
-        Delegates a call to this upper class to one of its specialised child classes
-
-        :return: a call to a specialised method of a class inheriting from this class
-        """
-        # specialised sources that this instance knows about
-        from data.source.RVA import RVA
-        from data.source.FILE import FILE
-        from data.source.SPARQL import SPARQL
-
-        # for this vocab, identified by vocab_id, find its source type
-        source_type = g.VOCABS[self.vocab_id].get('source')
-
-        # delegate the constructor of this vocab's source the the specialised source, based on source_type
-        if source_type == config.VocabSource.FILE:
-            return getattr(FILE(self.vocab_id, self.request), function_name)
-        elif source_type == config.VocabSource.RVA:
-            return getattr(RVA(self.vocab_id, self.request), function_name)
-        elif source_type == config.VocabSource.SPARQL:
-            return getattr(SPARQL(self.vocab_id, self.request), function_name)
-
     def __init__(self, vocab_id, request):
         self.vocab_id = vocab_id
         self.request = request
+
+    @staticmethod
+    def collect(details):
+        """
+        Specialised Sources must implement a collect method to get all the vocabs of their sort, listed in
+        _config/__init__.py, at startup
+        """
+        pass
 
     def list_collections(self):
         q = '''
@@ -67,8 +49,8 @@ class Source:
              WHERE {
                  ?c skos:prefLabel ?pl .
                  OPTIONAL { ?c skos:definition ?d . }
-                 OPTIONAL { ?c dct:created ?date_created . }
-                 OPTIONAL { ?c dct:modified ?date_modified . }
+                 OPTIONAL { ?c dct:created ?created . }
+                 OPTIONAL { ?c dct:modified ?modified . }
              }'''
         concepts = Source.sparql_query(g.VOCABS[self.vocab_id]['sparql_endpoint'], q)
 
@@ -79,8 +61,8 @@ class Source:
                 'uri': concept['c']['value'],
                 'title': concept['pl']['value'],
                 'definition': concept.get('d')['value'] if concept.get('d') else None,
-                'date_created': dateutil.parser.parse(concept['date_created']['value']) if concept.get('date_created') else None,
-                'date_modified': dateutil.parser.parse(concept['date_modified']['value']) if concept.get('date_modified') else None
+                'created': dateutil.parser.parse(concept['created']['value']) if concept.get('created') else None,
+                'modified': dateutil.parser.parse(concept['modified']['value']) if concept.get('modified') else None
             }
 
             concept_items.append(metadata)
@@ -88,7 +70,16 @@ class Source:
         return concept_items
 
     def get_vocabulary(self):
-        return self._delegator(sys._getframe().f_code.co_name)()
+        """
+        Get a vocab from the cache
+        :return:
+        :rtype:
+        """
+        v = g.VOCABS[self.vocab_id]
+
+        v.hasTopConcept = self.get_top_concepts()
+        v.concept_hierarchy = self.get_concept_hierarchy()
+        return g.VOCABS[self.vocab_id]
 
     def get_collection(self, uri):
         sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
@@ -255,8 +246,8 @@ class Source:
             }}
             GROUP BY ?c ?pl ?parent
             ORDER BY ?length ?parent ?pl
-            """.format(g.VOCABS.get(self.vocab_id).get('concept_scheme'))
-        cs = Source.sparql_query(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'), q)
+            """.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
+        cs = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
 
         hierarchy = []
         previous_parent_uri = None
@@ -264,7 +255,7 @@ class Source:
 
         for c in cs:
             # insert all topConceptOf directly
-            if str(c['parent']['value']) == g.VOCABS.get(self.vocab_id).get('uri'):
+            if str(c['parent']['value']) == g.VOCABS.get(self.vocab_id).uri:
                 hierarchy.append((
                     int(c['length']['value']),
                     c['c']['value'],
@@ -389,10 +380,8 @@ class Source:
             if mult is None: # else: # everything is normal
                 mult = item[0] - 1
 
-            tag = str(mult+1)  # indent info to be displayed
-
             import helper as h
-            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + h.url_encode(item[1]) + ') (' + tag + ')\n'
+            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + h.url_encode(item[1]) + ')\n'
             text += t
             previous_length = mult
             tracked_items.append({'name': item[1], 'indent': mult})
@@ -406,8 +395,9 @@ class Source:
             WHERE {{
               <{}> skos:hasTopConcept ?tc .
               ?tc skos:prefLabel ?pl .
-            }}'''.format(g.VOCABS.get(self.vocab_id).get('concept_scheme'))
-        top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'), q)
+            }}'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
+        top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+        print([(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts])
 
         return [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts]
 

@@ -39,21 +39,29 @@
             </td>
         </tr>
         {% endif %}
-        {%  if vocab.hasTopConcepts is not none  %}
+        {% if vocab.sparql_endpoint %}
+        <tr>
+            <th>SPARQL Endpoint:</th>
+            <td>
+                    <a href="{{ vocab.sparql_endpoint }}">{{ vocab.sparql_endpoint }}</a>
+            </td>
+        </tr>
+        {% endif %}
+        {%  if vocab.hasTopConcept is not none  %}
         <tr>
             <th>Top Concepts:</th>
             <td>
-                {% for tc in vocab.hasTopConcepts %}
+                {% for tc in vocab.hasTopConcept %}
                     <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab.id }}&uri={{ h.url_encode(tc[0]) }}">{{ tc[1] }}</a><br />
                 {% endfor %}
             </td>
         </tr>
         {% endif %}
-        {%  if vocab.conceptHierarchy is not none and vocab.conceptHierarchy|length > 0  %}
+        {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  %}
         <tr>
             <th>Concept Hierarchy:</th>
             <td>
-                    {{ vocab.conceptHierarchy|safe }}
+                    {{ vocab.concept_hierarchy|safe }}
             </td>
         </tr>
         {% endif %}
