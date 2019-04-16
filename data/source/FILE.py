@@ -5,7 +5,8 @@ from rdflib import Graph, URIRef, RDF
 from rdflib.namespace import SKOS, DCTERMS, OWL
 import os
 import pickle
-from helper import APP_DIR, make_title
+import logging
+from helper import APP_DIR
 
 
 class PickleLoadException(Exception):
@@ -28,7 +29,6 @@ class FILE(Source):
 
     @staticmethod
     def init():
-        print('File init ...')
         # find all files in project_directory/vocab_files
         for path, subdirs, files in os.walk(join(config.APP_DIR, 'vocab_files')):
             for name in files:
@@ -40,7 +40,6 @@ class FILE(Source):
                     g = Graph().parse(file_path, format=file_format)
                     file_name = name.split('.')[0]
                     # pickle to directory/vocab_files/
-                    print('Pickling file: {}'.format(file_name))
                     with open(join(path, file_name + '.p'), 'wb') as f:
                         pickle.dump(g, f)
                         f.close()
@@ -61,24 +60,24 @@ class FILE(Source):
                 g.VOCABS[vocab_id]['creators'] = creators
 
                 # Date Created
-                date_created = None
+                created = None
                 # dct:created
                 for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                     for date in g.objects(uri, DCTERMS.created):
-                        date_created = str(date)[:10]
-                if not date_created:
+                        created = str(date)[:10]
+                if not created:
                     # dct:date
                     for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                         for date in g.objects(uri, DCTERMS.date):
-                            date_created = str(date)[:10]
-                g.VOCABS[vocab_id]['date_created'] = date_created
+                            created = str(date)[:10]
+                g.VOCABS[vocab_id]['created'] = created
 
                 # Date Modified
-                date_modified = None
+                modified = None
                 for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
                     for date in g.objects(uri, DCTERMS.modified):
-                        date_modified = str(date)[:10]
-                g.VOCABS[vocab_id]['date_modified'] = date_modified
+                        modified = str(date)[:10]
+                g.VOCABS[vocab_id]['modified'] = modified
 
                 # Version
                 version = None
@@ -157,10 +156,10 @@ class FILE(Source):
                     MINUS { ?s dct:title ?prefLabel }
                 }}
                 OPTIONAL {{
-                    ?s dct:created ?date_created .
+                    ?s dct:created ?created .
                 }}
                 OPTIONAL {{
-                    ?s dct:modified ?date_modified .
+                    ?s dct:modified ?modified .
                 }}
             }}
             """)
@@ -170,8 +169,8 @@ class FILE(Source):
                 'vocab_id': self.vocab_id,
                 'uri': str(row['s']),
                 'title': row['title'] if row['title'] is not None else ' '.join(str(row['s']).split('#')[-1].split('/')[-1].split('_')),
-                'date_created': row['date_created'][:10] if row['date_created'] is not None else None,
-                'date_modified': row['date_modified'][:10] if row['date_modified'] is not None else None,
+                'created': row['created'][:10] if row['created'] is not None else None,
+                'modified': row['modified'][:10] if row['modified'] is not None else None,
             })
 
         return vocabs
@@ -212,10 +211,6 @@ class FILE(Source):
                     ?hasTopConcept skos:prefLabel ?topConceptLabel .
               }}
             }}''')
-
-        # from helper import APP_DIR
-        # print('writing to disk ' + self.vocab_id)
-        # self.g.serialize(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
 
         title = None
         description = None
@@ -264,160 +259,6 @@ class FILE(Source):
 
     def get_collection(self, uri):
         pass
-
-    def get_concept(self, uri):
-        if g.VOCABS[self.vocab_id].get('turtle'):
-            g = Graph().parse(g.VOCABS[self.vocab_id]['turtle'])
-        else:
-            g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
-
-        query = """
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX dct: <http://purl.org/dc/terms/>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-            SELECT DISTINCT ?s ?prefLabel ?definition ?altLabel ?hiddenLabel ?source ?contributor ?broader ?narrower ?exactMatch ?closeMatch ?broadMatch ?narrowMatch ?relatedMatch ?created ?modified
-            WHERE 
-            {{
-                {{
-                    <{0}> a skos:Concept .
-                    <{0}> skos:prefLabel ?prefLabel .
-                }} UNION {{
-                    <{0}> a skos:Concept .
-                    <{0}> dct:title ?prefLabel .
-                    MINUS {{ <{0}> skos:prefLabel ?pl }}
-                }} UNION {{
-                    <{0}> a skos:Concept .
-                    <{0}> rdfs:label ?prefLabel .
-                    MINUS {{ <{0}> skos:prefLabel ?pl }}
-                    MINUS {{ <{0}> dct:title ?pl }}
-                }}
-                
-            }} LIMIT 1
-            """.format(uri)
-        result = g.query(query)
-
-        prefLabel = None
-        for row in result:
-            prefLabel = row['prefLabel']
-        if prefLabel is None:
-            prefLabel = make_title(uri)
-        print('prefLabel: {}'.format(prefLabel))
-
-        # TODO: Get the prefLabels of the concept's narrowers, broaders, etc. Currently we are just making the
-        #       label from the URI in the jinja template.
-        query = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX dct: <http://purl.org/dc/terms/>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-            SELECT DISTINCT ?s ?prefLabel ?definition ?altLabel ?hiddenLabel ?source ?contributor ?broader ?narrower ?exactMatch ?closeMatch ?broadMatch ?narrowMatch ?relatedMatch ?created ?modified
-            WHERE  {{
-                    
-                    <{0}> a skos:Concept .
-                    OPTIONAL {{ <{0}> skos:definition ?definition }}
-                    OPTIONAL {{ <{0}> skos:altLabel ?altLabel }}
-                    OPTIONAL {{ <{0}> skos:hiddenLabel ?hiddenLabel }}
-                    OPTIONAL {{ <{0}> dct:source ?source }}
-                    OPTIONAL {{ <{0}> dct:contributor ?contributor }}
-                    OPTIONAL {{ <{0}> skos:broader ?broader }}
-                    OPTIONAL {{ <{0}> skos:narrower ?narrower }}
-                    OPTIONAL {{ <{0}> skos:exactMatch ?exactMatch }}
-                    OPTIONAL {{ <{0}> skos:closeMatch ?closeMatch }}
-                    OPTIONAL {{ <{0}> skos:broadMatch ?broadMatch }}
-                    OPTIONAL {{ <{0}> skos:narrowMatch ?narrowMatch }}
-                    OPTIONAL {{ <{0}> skos:relatedMatch ?relatedMatch }}
-                    OPTIONAL {{ <{0}> dct:created ?created }}
-                    OPTIONAL {{ <{0}> dct:modified ?modified }}
-            }}""".format(uri)
-        result = g.query(query)
-
-        definition = None
-        altLabels = []
-        hiddenLabels = []
-        source = None
-        contributors = []
-        broaders = []
-        narrowers = []
-        exactMatches = []
-        closeMatches = []
-        broadMatches = []
-        narrowMatches = []
-        relatedMatches = []
-        for row in result:
-            if prefLabel is None:
-                prefLabel = row['prefLabel']
-
-            if definition is None:
-                definition = row['definition']
-
-            if row['altLabel'] is not None and row['altLabel'] not in altLabels:
-                altLabels.append(row['altLabel'])
-
-            if row['hiddenLabel'] is not None and row['hiddenLabel'] not in hiddenLabels:
-                hiddenLabels.append(row['hiddenLabel'])
-
-            if source is None:
-                source = row['source']
-
-            if row['contributor'] is not None and row['contributor'] not in contributors:
-                contributors.append(row['contributor'])
-
-            if row['broader'] is not None and row['broader'] not in broaders:
-                broaders.append(row['broader'])
-
-            if row['narrower'] is not None and row['narrower'] not in narrowers:
-                narrowers.append(row['narrower'])
-
-            if row['exactMatch'] is not None and row['exactMatch'] not in exactMatches:
-                exactMatches.append(row['exactMatch'])
-
-            if row['closeMatch'] is not None and row['closeMatch'] not in closeMatches:
-                closeMatches.append(row['closeMatch'])
-
-            if row['broadMatch'] is not None and row['broadMatch'] not in broadMatches:
-                broadMatches.append(row['broadMatch'])
-
-            if row['narrowMatch'] is not None and row['narrowMatch'] not in narrowMatches:
-                narrowMatches.append(row['narrowMatch'])
-
-            if row['relatedMatch'] is not None and row['relatedMatch'] not in relatedMatches:
-                relatedMatches.append(row['relatedMatch'])
-
-        altLabels.sort()
-        hiddenLabels.sort()
-        contributors.sort()
-        broaders.sort()
-        narrowers.sort()
-        exactMatches.sort()
-        closeMatches.sort()
-        broadMatches.sort()
-        narrowMatches.sort()
-        relatedMatches.sort()
-
-
-        from model.concept import Concept
-        return Concept(
-            self.vocab_id,
-            uri,
-            prefLabel,
-            definition,
-            altLabels,
-            hiddenLabels,
-            source,
-            contributors,
-            broaders,
-            narrowers,
-            exactMatches,
-            closeMatches,
-            broadMatches,
-            narrowMatches,
-            relatedMatches,
-            None,
-            None,
-            None,
-        )
 
     def get_concept_hierarchy(self):
         # return FILE.hierarchy[self.vocab_id]
@@ -528,3 +369,26 @@ class FILE(Source):
             g = Graph().parse(os.path.join(APP_DIR, 'vocab_files', self.vocab_id + '.ttl'), format='turtle')
         for s, p, o in g.triples((URIRef(uri), RDF.type, SKOS.Concept)):
                 return str(o)
+
+    @staticmethod
+    def load_pickle_graph(vocab_id):
+        pickled_file_path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id + '.p')
+
+        try:
+            with open(pickled_file_path, 'rb') as f:
+                g = pickle.load(f)
+                f.close()
+                return g
+        except Exception:
+            return None
+
+    @staticmethod
+    def pickle_to_file(vocab_id, g):
+        logging.debug('Pickling file: {}'.format(vocab_id))
+        path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
+        # TODO: Check if file_name already has extension
+        with open(path + '.p', 'wb') as f:
+            pickle.dump(g, f)
+            f.close()
+
+        g.serialize(path + '.ttl', format='turtle')

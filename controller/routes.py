@@ -83,7 +83,7 @@ def match(vocabs, query):
     :rtype: generator
     """
     for word in vocabs:
-        if query.lower() in word['title'].lower():
+        if query.lower() in word.title.lower():
             yield word
 
 
@@ -96,11 +96,9 @@ def vocabularies():
     #   1. read all static vocabs from g.VOCABS
     # get this instance's list of vocabs
     vocabs = []  # local copy (to this request) for sorting
-    for k, v in g.VOCABS.items():
-        v['vocab_id'] = k
-        v['uri'] = request.base_url + k
-        vocabs.append(v)
-    vocabs.sort(key=lambda item: item['title'])
+    for k, voc in g.VOCABS.items():
+        vocabs.append(voc)
+    vocabs.sort(key=lambda v: v.title)
     total = len(g.VOCABS.items())
 
     # Search
@@ -110,7 +108,7 @@ def vocabularies():
         for m in match(vocabs, query):
             results.append(m)
         vocabs[:] = results
-        vocabs.sort(key=lambda item: item['title'])
+        vocabs.sort(key=lambda v: v.title)
         total = len(vocabs)
 
     # generate vocabs list for requested page and per_page
@@ -155,7 +153,7 @@ def vocabulary_list(vocab_id):
 
     v = Source(vocab_id, request)
     concepts = v.list_concepts()
-    concepts.sort(key= lambda x: x['title'])
+    concepts.sort(key=lambda x: x['title'])
     total = len(concepts)
 
     # Search
@@ -178,7 +176,7 @@ def vocabulary_list(vocab_id):
         request,
         [],
         concepts,
-        g.VOCABS[vocab_id]['title'] + ' concepts',
+        g.VOCABS[vocab_id].title + ' concepts',
         total,
         search_query=query,
         search_enabled=True,
@@ -233,10 +231,10 @@ def object():
 
     try:
         # TODO reuse object within if, rather than re-loading graph
-        c = Source(vocab_id, request).get_object_class(uri)
+        c = Source(vocab_id, request).get_object_class()
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
-            concept = Source(vocab_id, request).get_concept(uri)
+            concept = Source(vocab_id, request).get_concept()
             return ConceptRenderer(
                 request,
                 concept

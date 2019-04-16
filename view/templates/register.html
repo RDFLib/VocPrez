@@ -33,39 +33,43 @@
             {%- for item in register_items -%}
 
                 <div class="card">
-
                     {# This is the concept register. #}
                     {% if vocab_id %}
                         <h4><a href="{{ request.url_root }}object?vocab_id={{ vocab_id }}&uri={{ h.url_encode(item['uri']) }}">{{ item['title'] }}</a></h4>
 
                     {# This is the vocabulary register. #}
                     {%- elif item is not string %}
-                        <h4><a href="{{ h.url_encode(item['vocab_id']) }}">{{ item['title'] }}</a></h4>
+                        <h4><a href="{{ h.url_encode(item['id']) }}">{{ item['title'] }}</a></h4>
                     {%- else %}
                         <h4><a href="{{ h.url_encode(item) }}">{{ item.split('#')[-1].split('/')[-1] }}</a></h4>
                     {%- endif %}
 
-
                     <table>
+                        {% if item['definition'] %}
+                            <tr>
+                                <th>Defintion:</th>
+                                <td>{{ item['definition'] }}</td>
+                            </tr>
+                        {% endif %}
 
-                        {% if item['date_created'] %}
+                        {% if item['created'] %}
                             <tr>
                                 <th>Date created:</th>
-                                <td>{{ item['date_created'].strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item['created'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 
-                        {% if item['date_issued'] %}
+                        {% if item['issued'] %}
                             <tr>
                                 <th>Date issued:</th>
-                                <td>{{ item['date_issued'].strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item['issued'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 
-                        {% if item['date_modified'] %}
+                        {% if item['modified'] %}
                             <tr>
                                 <th>Date modified:</th>
-                                <td>{{ item['date_modified'].strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item['modified'].strftime('%Y-%m-%d') }}</td>
                             </tr>
                         {% endif %}
 
@@ -84,10 +88,8 @@
                                 <td>{{ item['version'] }}</td>
                             </tr>
                         {% endif %}
-
                     </table>
                 </div>
-
 
             {%- endfor -%}
         </div>
@@ -133,8 +135,7 @@
               document.getElementsByClassName("collapsible")[0].innerHTML = "(less)";
             }
         });
-    </script>
-    <script>
+
         let cards = document.getElementsByClassName("card")
         let i;
         for (i = 0; i < cards.length; i++) {

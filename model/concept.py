@@ -1,5 +1,5 @@
 from pyldapi import Renderer, View
-from flask import Response, render_template, url_for
+from flask import Response, render_template, g
 import _config as config
 import data.source._source as source
 from rdflib import Graph, RDF, Literal, URIRef, XSD
@@ -25,8 +25,8 @@ class Concept:
             narrowMatches,
             relatedMatches,
             semantic_properties,
-            date_created,
-            date_modified
+            created,
+            modified
     ):
         self.vocab_id = vocab_id
         self.uri = uri
@@ -44,8 +44,8 @@ class Concept:
         self.narrowMatches = narrowMatches
         self.relatedMatches = relatedMatches
         self.semantic_properties = semantic_properties
-        self.date_created = date_created
-        self.date_modified = date_modified
+        self.created = created
+        self.modified = modified
 
 
 class ConceptRenderer(Renderer):
@@ -146,7 +146,7 @@ class ConceptRenderer(Renderer):
     def _render_skos_html(self):
         _template_context = {
             'vocab_id': self.request.values.get('vocab_id'),
-            'vocab_title': g.VOCABS[self.request.values.get('vocab_id')].get('title'),
+            'vocab_title': g.VOCABS[self.request.values.get('vocab_id')].title,
             'uri': self.request.values.get('uri'),
             'concept': self.concept,
             'navs': self.navs,

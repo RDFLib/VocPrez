@@ -15,10 +15,14 @@ class Vocabulary:
             created,        # DCAT
             modified,       # DCAT
             versionInfo,
-            hasTopConcepts=None,
-            conceptHierarchy=None,
+            data_source,
+            concept_scheme_uri,
+            hasTopConcept=None,
+            concept_hierarchy=None,
             accessURL=None,
-            downloadURL=None
+            downloadURL=None,
+            sparql_endpoint=None,
+            collection_uris=None
     ):
         self.id = id
         self.uri = uri
@@ -26,20 +30,24 @@ class Vocabulary:
         self.description = description
         self.creator = creator
         try:
-            self.created = created[:10]
+            self.created = created
         except:
             self.created = created
         try:
-            self.modified = modified[:10]
+            self.modified = modified
         except:
             self.modified = modified
         self.versionInfo = versionInfo
-        if hasTopConcepts:
-            hasTopConcepts.sort()
-        self.hasTopConcepts = hasTopConcepts
-        self.conceptHierarchy = conceptHierarchy
+        self.data_source = data_source
+        self.concept_scheme_uri = concept_scheme_uri
+        if hasTopConcept:
+            hasTopConcept.sort()
+        self.hasTopConcepts = hasTopConcept
+        self.conceptHierarchy = concept_hierarchy
         self.accessURL = accessURL
         self.downloadURL = downloadURL
+        self.sparql_endpoint = sparql_endpoint
+        self.collection_uris = collection_uris
 
 
 class VocabularyRenderer(Renderer):
@@ -93,6 +101,8 @@ class VocabularyRenderer(Renderer):
         g.namespace_manager.bind('dct', DCTERMS)
         g.namespace_manager.bind('owl', OWL)
         g.namespace_manager.bind('skos', SKOS)
+        VOID = Namespace('http://rdfs.org/ns/void')
+        g.namespace_manager.bind('void', VOID)
         s = URIRef(self.vocab.uri)
 
         g.add((s, RDF.type, DCAT.Dataset))
@@ -103,7 +113,7 @@ class VocabularyRenderer(Renderer):
         if self.vocab.creator:
             if self.vocab.creator[:7] == 'http://' or self.vocab.creator[:7] == 'https://': # if url
                 g.add((s, DCTERMS.creator, URIRef(self.vocab.creator)))
-            else: # else literal
+            else:  # else literal
                 g.add((s, DCTERMS.creator, Literal(self.vocab.creator)))
         if self.vocab.created:
             g.add((s, DCTERMS.created, Literal(self.vocab.created, datatype=XSD.date)))
@@ -119,6 +129,8 @@ class VocabularyRenderer(Renderer):
             g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
         if self.vocab.downloadURL:
             g.add((s, DCAT.downloadURL, URIRef(self.vocab.downloadURL)))
+        if self.vocab.sparql_endpoint:
+            g.add((s, VOID.sparqlEndpoint, URIRef(self.vocab.sparql_endpoint)))
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:
