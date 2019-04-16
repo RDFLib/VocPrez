@@ -146,7 +146,7 @@ class ConceptRenderer(Renderer):
     def _render_skos_html(self):
         _template_context = {
             'vocab_id': self.request.values.get('vocab_id'),
-            'vocab_title': g.VOCABS[self.request.values.get('vocab_id')].get('title'),
+            'vocab_title': g.VOCABS[self.request.values.get('vocab_id')].title,
             'uri': self.request.values.get('uri'),
             'concept': self.concept,
             'navs': self.navs,

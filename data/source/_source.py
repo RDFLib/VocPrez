@@ -46,13 +46,15 @@ class Source:
              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
              PREFIX dct: <http://purl.org/dc/terms/>
              SELECT *
-             WHERE {
+             WHERE {{
+                 ?c skos:inScheme <{0}> . 
                  ?c skos:prefLabel ?pl .
-                 OPTIONAL { ?c skos:definition ?d . }
-                 OPTIONAL { ?c dct:created ?created . }
-                 OPTIONAL { ?c dct:modified ?modified . }
-             }'''
-        concepts = Source.sparql_query(g.VOCABS[self.vocab_id]['sparql_endpoint'], q)
+                 OPTIONAL {{ ?c skos:definition ?d . }}
+                 OPTIONAL {{ ?c dct:created ?created . }}
+                 OPTIONAL {{ ?c dct:modified ?modified . }}
+             }}
+             ORDER BY ?pl'''.format(g.VOCABS[self.vocab_id].concept_scheme_uri)
+        concepts = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
 
         concept_items = []
         for concept in concepts:
@@ -82,7 +84,7 @@ class Source:
         return g.VOCABS[self.vocab_id]
 
     def get_collection(self, uri):
-        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'))
+        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).sparql_endpoint)
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
             WHERE {{
@@ -138,7 +140,7 @@ class Source:
                 OPTIONAL {{ <{0}> dct:created ?created }}
                 OPTIONAL {{ <{0}> dct:modified ?modified }}
             }}""".format(self.request.values.get('uri'))
-        result = Source.sparql_query(g.VOCABS[self.vocab_id]['sparql_endpoint'], q)
+        result = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
 
         prefLabel = None
         definition = None
@@ -214,7 +216,7 @@ class Source:
         from model.concept import Concept
         return Concept(
             self.vocab_id,
-            g.VOCABS[self.vocab_id]['uri'],
+            g.VOCABS[self.vocab_id].uri,
             prefLabel,
             definition,
             altLabels,
@@ -253,48 +255,51 @@ class Source:
         previous_parent_uri = None
         last_index = 0
 
-        for c in cs:
-            # insert all topConceptOf directly
-            if str(c['parent']['value']) == g.VOCABS.get(self.vocab_id).uri:
-                hierarchy.append((
-                    int(c['length']['value']),
-                    c['c']['value'],
-                    c['pl']['value'],
-                    None
-                ))
-            else:
-                # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
-                # If so, use that Concept's index + 1
-                this_parent = c['parent']['value']
-                if this_parent == previous_parent_uri:
-                    # use last inserted index
-                    hierarchy.insert(last_index + 1, (
+        if cs[0].get('parent') is not None:
+            for c in cs:
+                # insert all topConceptOf directly
+                if str(c['parent']['value']) == g.VOCABS.get(self.vocab_id).uri:
+                    hierarchy.append((
                         int(c['length']['value']),
                         c['c']['value'],
                         c['pl']['value'],
-                        c['parent']['value']
+                        None
                     ))
-                    last_index += 1
-                # This is not a TopConcept and it has a differnt parent from the previous insert
-                # So insert it after it's parent
                 else:
-                    i = 0
-                    parent_index = 0
-                    for t in hierarchy:
-                        if this_parent in t[1]:
-                            parent_index = i
-                        i += 1
+                    # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
+                    # If so, use that Concept's index + 1
+                    this_parent = c['parent']['value']
+                    if this_parent == previous_parent_uri:
+                        # use last inserted index
+                        hierarchy.insert(last_index + 1, (
+                            int(c['length']['value']),
+                            c['c']['value'],
+                            c['pl']['value'],
+                            c['parent']['value']
+                        ))
+                        last_index += 1
+                    # This is not a TopConcept and it has a differnt parent from the previous insert
+                    # So insert it after it's parent
+                    else:
+                        i = 0
+                        parent_index = 0
+                        for t in hierarchy:
+                            if this_parent in t[1]:
+                                parent_index = i
+                            i += 1
 
-                    hierarchy.insert(parent_index + 1, (
-                        int(c['length']['value']),
-                        c['c']['value'],
-                        c['pl']['value'],
-                        c['parent']['value']
-                    ))
+                        hierarchy.insert(parent_index + 1, (
+                            int(c['length']['value']),
+                            c['c']['value'],
+                            c['pl']['value'],
+                            c['parent']['value']
+                        ))
 
-                    last_index = parent_index + 1
-                previous_parent_uri = this_parent
-        return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
+                        last_index = parent_index + 1
+                    previous_parent_uri = this_parent
+            return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
+        else:
+            return ''  # empty HTML
 
     def get_object_class(self):
         q = '''
@@ -303,7 +308,7 @@ class Source:
                 <{}> a ?c .
             }}
             '''.format(self.request.values.get('uri'))
-        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).get('sparql_endpoint'), q)
+        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
 
         # look for classes we understand (SKOS)
         for cls in clses:
@@ -393,12 +398,22 @@ class Source:
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
             WHERE {{
-              <{}> skos:hasTopConcept ?tc .
-              ?tc skos:prefLabel ?pl .
+              {{
+                <{0}> skos:hasTopConcept ?tc .
+                ?tc skos:prefLabel ?pl .
+              }}
+              UNION 
+              {{
+                ?tc skos:topConceptOf <{0}> .
+                ?tc skos:prefLabel ?pl .
+              }}
             }}'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
         top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
 
-        return [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts]
+        if top_concepts is not None:
+            return [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts]
+        else:
+            None
 
     @staticmethod
     def sparql_query(endpoint, q):

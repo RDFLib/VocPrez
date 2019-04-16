@@ -176,7 +176,7 @@ def vocabulary_list(vocab_id):
         request,
         [],
         concepts,
-        g.VOCABS[vocab_id]['title'] + ' concepts',
+        g.VOCABS[vocab_id].title + ' concepts',
         total,
         search_query=query,
         search_enabled=True,

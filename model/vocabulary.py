@@ -21,7 +21,8 @@ class Vocabulary:
             concept_hierarchy=None,
             accessURL=None,
             downloadURL=None,
-            sparql_endpoint=None
+            sparql_endpoint=None,
+            collection_uris=None
     ):
         self.id = id
         self.uri = uri
@@ -46,6 +47,7 @@ class Vocabulary:
         self.accessURL = accessURL
         self.downloadURL = downloadURL
         self.sparql_endpoint = sparql_endpoint
+        self.collection_uris = collection_uris
 
 
 class VocabularyRenderer(Renderer):

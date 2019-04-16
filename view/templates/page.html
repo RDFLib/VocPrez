@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-
 {% from "macros/format.html" import format with context %}
 
-<html>
-<head lang="en">
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{{url_for('static', filename='vanilla_theme.css')}}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='extra.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-grid.css') }}" />
 </head>
 <body class="container">
@@ -21,10 +19,9 @@
                 {% for nav in navs %}
                     {{ nav|safe }}
                 {% endfor %}
-                <a href="{{ url_for('routes.index') }}">System Home</a> |
+                <a href="{{ url_for('routes.index') }}">VocPrez Home</a> |
                 <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a> |
                 <a href="{{ url_for('routes.about') }}">About</a>
-
             </div>
             <div style="clear:both;"></div>
         </div>
@@ -32,9 +29,9 @@
         <div>
             {% block content %}{% endblock %}
         </div>
-        <div id="footer">
+        <footer>
 
-        </div>
+        </footer>
     </div>
 </body>
 </html>
