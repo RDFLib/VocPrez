@@ -1,0 +1,44 @@
+{% extends "page.html" %}
+
+{% block content %}
+    <h1>VocPrezz</h1>
+    <h2>SPARQL UI</h2>
+    <p>
+        This page allows you to lodge <a href="https://en.wikipedia.org/wiki/SPARQL">SPARQL</a> queries against the
+        <a href="https://en.wikipedia.org/wiki/Triplestore">triplestore</a> (graph database) that stores all of the
+        LongSpine content.
+    </p>
+    <h3>Endpoint</h3>
+    <p>
+        This web age forwards all SPARQL queries on to this VocPrez's SPARQL endpoint which is:
+    </p>
+    <ul>
+        <li><a href="{{ url_for('routes.endpoint') }}">{{ url_for('routes.endpoint') }}</a></li>
+    </ul>
+    <p>
+        If you would like to odge SPARQL queries at this system's SPARQL endpoint directly, please use that.
+    </p>
+    <h3>Test Query</h3>
+    <p>
+        Here is an example query you can copy 'n paste into the text area below to test with. It counts the number of
+        vocabulary <em>Concepts</em> in the AGIFT vocabulary and should return '583':
+    </p>
+    <pre><code>
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+SELECT (COUNT(?c) AS ?count)
+FROM &lt;http://test.linked.data.gov.au/def/agift&gt;
+WHERE {
+  ?c a skos:Concept .
+}</code></pre>
+    <h4>Enter your SPARQL query in the text box below:</h4>
+    <div id="yasgui" style="margin-bottom: 25px;"></div>
+
+    <link href='//cdn.jsdelivr.net/npm/yasgui@2.7.29/dist/yasgui.min.css' rel='stylesheet' type='text/css'/>
+    <script src='//cdn.jsdelivr.net/npm/yasgui@2.7.29/dist/yasgui.min.js'></script>
+
+    <script type="text/javascript">
+        var yasgui = YASGUI(document.getElementById("yasgui"), {
+            yasqe:{sparql:{endpoint:'{{ url_for('routes.endpoint') }}'}} // default endpoint
+          });
+    </script>
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request, render_template, Markup, g
+from flask import Blueprint, Response, request, render_template, Markup, g, redirect, url_for
 from model.vocabulary import VocabularyRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
@@ -8,6 +8,8 @@ import markdown
 from data.source._source import Source
 from data.source.VOCBENCH import VbException
 import json
+from pyldapi import Renderer
+import controller.sparql_endpoint_functions
 
 routes = Blueprint('routes', __name__)
 
@@ -273,19 +275,170 @@ def about():
     )
 
 
-@routes.route('/test')
-def test():
-    txt = ''
-    # for vocab_id, details in g.VOCABS.items():
-    #     txt = txt + '{}: {}\n'.format(vocab_id, details['title'])
+# the SPARQL UI
+@routes.route('/sparql', methods=['GET', 'POST'])
+def sparql():
+    return render_template('sparql.html')
 
-    import os
-    import pickle
-    import pprint
-    vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
-    if os.path.isfile(vocabs_file_path):
-        with open(vocabs_file_path, 'rb') as f:
-            txt = str(pickle.load(f))
-            f.close()
 
-    return Response(txt, mimetype='text/plain')
+# the SPARQL endpoint under-the-hood
+@routes.route('/endpoint', methods=['GET', 'POST'])
+def endpoint():
+    '''
+    TESTS
+
+    Form POST:
+    curl -X POST -d query="PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0ASELECT%20*%20WHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%20.%7D" http://localhost:5000/endpoint
+
+    Raw POST:
+    curl -X POST -H 'Content-Type: application/sparql-query' --data-binary @query.sparql http://localhost:5000/endpoint
+    using query.sparql:
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        SELECT * WHERE {?s a skos:ConceptScheme .}
+
+    GET:
+    curl http://localhost:5000/endpoint?query=PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0ASELECT%20*%20WHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%20.%7D
+
+    GET CONSTRUCT:
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        CONSTRUCT {?s a rdf:Resource}
+        WHERE {?s a skos:ConceptScheme}
+    curl -H 'Accept: application/ld+json' http://localhost:5000/endpoint?query=PREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fco23%3E%0ACONSTRUCT%20%7B%3Fs%20a%20rdf%3AResource%7D%0AWHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%7D
+
+    '''
+    # Query submitted
+    if request.method == 'POST':
+        '''Pass on the SPARQL query to the underlying endpoint defined in config
+        '''
+        if 'application/x-www-form-urlencoded' in request.content_type:
+            '''
+            https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-via-post-urlencoded
+
+            2.1.2 query via POST with URL-encoded parameters
+
+            Protocol clients may send protocol requests via the HTTP POST method by URL encoding the parameters. When
+            using this method, clients must URL percent encode all parameters and include them as parameters within the
+            request body via the application/x-www-form-urlencoded media type with the name given above. Parameters must
+            be separated with the ampersand (&) character. Clients may include the parameters in any order. The content
+            type header of the HTTP request must be set to application/x-www-form-urlencoded.
+            '''
+            if request.values.get('query') is None or len(request.values.get('query')) < 5:
+                return Response(
+                    'Your POST request to the SPARQL endpoint must contain a \'query\' parameter if form posting '
+                    'is used.',
+                    status=400,
+                    mimetype='text/plain'
+                )
+            else:
+                query = request.values.get('query')
+        elif 'application/sparql-query' in request.content_type:
+            '''
+            https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-via-post-direct
+
+            2.1.3 query via POST directly
+
+            Protocol clients may send protocol requests via the HTTP POST method by including the query directly and
+            unencoded as the HTTP request message body. When using this approach, clients must include the SPARQL query
+            string, unencoded, and nothing else as the message body of the request. Clients must set the content type
+            header of the HTTP request to application/sparql-query. Clients may include the optional default-graph-uri
+            and named-graph-uri parameters as HTTP query string parameters in the request URI. Note that UTF-8 is the
+            only valid charset here.
+            '''
+            query = request.data.decode('utf-8')  # get the raw request
+            if query is None:
+                return Response(
+                    'Your POST request to this SPARQL endpoint must contain the query in plain text in the '
+                    'POST body if the Content-Type \'application/sparql-query\' is used.',
+                    status=400
+                )
+        else:
+            return Response(
+                'Your POST request to this SPARQL endpoint must either the \'application/x-www-form-urlencoded\' or'
+                '\'application/sparql-query\' ContentType.',
+                status=400
+            )
+
+        try:
+            if 'CONSTRUCT' in query:
+                format_mimetype = 'text/turtle'
+                return Response(
+                    controller.sparql_endpoint_functions.sparql_query(query, format_mimetype=format_mimetype),
+                    status=200,
+                    mimetype=format_mimetype
+                )
+            else:
+                return Response(
+                    controller.sparql_endpoint_functions.sparql_query(query),
+                    status=200
+                )
+        except ValueError as e:
+            return Response(
+                'Input error for query {}.\n\nError message: {}'.format(query, str(e)),
+                status=400,
+                mimetype='text/plain'
+            )
+        except ConnectionError as e:
+            return Response(str(e), status=500)
+    else:  # GET
+        if request.args.get('query') is not None:
+            # SPARQL GET request
+            '''
+            https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-via-get
+
+            2.1.1 query via GET
+
+            Protocol clients may send protocol requests via the HTTP GET method. When using the GET method, clients must
+            URL percent encode all parameters and include them as query parameter strings with the names given above.
+
+            HTTP query string parameters must be separated with the ampersand (&) character. Clients may include the
+            query string parameters in any order.
+
+            The HTTP request MUST NOT include a message body.
+            '''
+            query = request.args.get('query')
+            if 'CONSTRUCT' in query:
+                acceptable_mimes = [x for x in Renderer.RDF_MIMETYPES] + ['text/html']
+                best = request.accept_mimetypes.best_match(acceptable_mimes)
+
+                query_result = controller.sparql_endpoint_functions.sparql_query(query, format_mimetype=best)
+                return Response(query_result, status=200, mimetype=best)
+            else:
+                query_result = controller.sparql_endpoint_functions.sparql_query(query)
+                return Response(query_result, status=200, mimetype='application/sparql-results+json')
+        else:
+            # SPARQL Service Description
+            '''
+            https://www.w3.org/TR/sparql11-service-description/#accessing
+
+            SPARQL services made available via the SPARQL Protocol should return a service description document at the
+            service endpoint when dereferenced using the HTTP GET operation without any query parameter strings
+            provided. This service description must be made available in an RDF serialization, may be embedded in
+            (X)HTML by way of RDFa, and should use content negotiation if available in other RDF representations.
+            '''
+
+            acceptable_mimes = [x for x in Renderer.RDF_MIMETYPES] + ['text/html']
+            best = request.accept_mimetypes.best_match(acceptable_mimes)
+            if best == 'text/html':
+                # show the SPARQL query form
+                return redirect(url_for('routes.sparql'))
+            elif best is not None:
+                for item in Renderer.RDF_MIMETYPES:
+                    if item == best:
+                        rdf_format = best
+                        return Response(
+                            controller.sparql_endpoint_functions.get_sparql_service_description(
+                                rdf_format=rdf_format
+                            ),
+                            status=200,
+                            mimetype=best)
+
+                return Response(
+                    'Accept header must be one of ' + ', '.join(acceptable_mimes) + '.',
+                    status=400
+                )
+            else:
+                return Response(
+                    'Accept header must be one of ' + ', '.join(acceptable_mimes) + '.',
+                    status=400
+                )
