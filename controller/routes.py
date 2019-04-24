@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request, render_template, Markup, g, redirect, url_for
+from flask import Blueprint, Response, request, render_template, Markup, g, redirect, url_for, send_file
 from model.vocabulary import VocabularyRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
@@ -398,11 +398,24 @@ def endpoint():
             '''
             query = request.args.get('query')
             if 'CONSTRUCT' in query:
-                acceptable_mimes = [x for x in Renderer.RDF_MIMETYPES] + ['text/html']
+                acceptable_mimes = [x for x in Renderer.RDF_MIMETYPES]
                 best = request.accept_mimetypes.best_match(acceptable_mimes)
-
                 query_result = controller.sparql_endpoint_functions.sparql_query(query, format_mimetype=best)
-                return Response(query_result, status=200, mimetype=best)
+                file_ext = {
+                    'text/turtle': 'ttl',
+                    'application/rdf+xml': 'rdf',
+                    'application/ld+json': 'json',
+                    'text/n3': 'n3',
+                    'application/n-triples': 'nt'
+                }
+                return Response(
+                    query_result,
+                    status=200,
+                    mimetype=best,
+                    headers={
+                        'Content-Disposition': 'attachment; filename=query_result.{}'.format(file_ext[best])
+                    }
+                )
             else:
                 query_result = controller.sparql_endpoint_functions.sparql_query(query)
                 return Response(query_result, status=200, mimetype='application/sparql-results+json')
