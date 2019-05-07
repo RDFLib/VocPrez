@@ -28,24 +28,24 @@ VOCAB_SOURCES = {
     # an example of a SPARQL endpoint - here supplied by an instance of GrpahDB
     'gsq-graphdb': {
         'source': VocabSource.SPARQL,
-        'sparql_endpoint': 'http://graphdb.gsq.digital:7200/repositories/GSQ_Vocabularies_core'
+        'sparql_endpoint': ''
     },
     # an example of querying the ARDC RVA vocab system (https://vocabs.ands.org.au)
     'rva': {
         'source': VocabSource.RVA,
-        'api_endpoint': 'https://vocabs.ands.org.au/registry/api/resource/vocabularies/{}?includeAccessPoints=true',
+        'api_endpoint': '',
         'vocabs': [
             {
-                'ardc_id': 50,
-                'uri': 'http://resource.geosciml.org/classifierscheme/cgi/2016.01/geologicunittype',
+                'ardc_id': -99,
+                'uri': '',
             },
             {
-                'ardc_id': 52,
-                'uri': 'http://resource.geosciml.org/classifierscheme/cgi/2016.01/contacttype',
+                'ardc_id': -99,
+                'uri': '',
             },
             {
-                'ardc_id': 57,
-                'uri': 'http://resource.geosciml.org/classifierscheme/cgi/2016.01/stratigraphicrank',
+                'ardc_id': -99,
+                'uri': '',
             }
         ]
     }
