@@ -4,7 +4,7 @@ from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS
 import markdown
 from flask import g
-from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 
 
@@ -157,7 +157,11 @@ class Source:
         relatedMatches = []
         for row in result:
             prefLabel = row['prefLabel']['value']
-            definition = row['definition']['value']
+
+            if hasattr(row, 'definition'):
+                definition = row['definition']['value']
+            else:
+                definition = None
 
             if hasattr(row, 'altLabel'):
                 if row['altLabel']['value'] is not None and row['altLabel']['value'] not in altLabels:
@@ -420,6 +424,9 @@ class Source:
         sparql = SPARQLWrapper(endpoint)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
+        sparql.setHTTPAuth(BASIC)
+        sparql.setCredentials(config.SPARQL_USR, config.SPARQL_PWD)
+
         try:
             metadata = sparql.query().convert()['results']['bindings']
         except:
