@@ -44,7 +44,6 @@ def get_sparql_service_description(rdf_format='turtle'):
 def sparql_query(sparql_query, format_mimetype='application/sparql-results+json'):
     """ Make a SPARQL query"""
     auth = (config.SPARQL_USR, config.SPARQL_PWD)
-    auth = None  # TODO: revert to auth'd query
     data = {'query': sparql_query}
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
