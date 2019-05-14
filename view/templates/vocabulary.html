@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Vocabulary: {{ vocab.title }}</h1>
 <p>View this vocabulary's register of <a href="{{ url_for('routes.vocabulary', vocab_id=vocab.id) }}/concept/">concepts</a>.</p>
-<h3>URI: <div class="overflow"><a href="{{ uri }}">{{ uri }}</a></div></h3>
+<h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <div class="overflow">
     <table class="metadata concept_scheme">
         {%  if vocab.description is not none  %}
@@ -36,14 +36,6 @@
             <th>Download:</th>
             <td>
                     <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
-            </td>
-        </tr>
-        {% endif %}
-        {% if vocab.sparql_endpoint %}
-        <tr>
-            <th>SPARQL Endpoint:</th>
-            <td>
-                    <a href="{{ vocab.sparql_endpoint }}">{{ vocab.sparql_endpoint }}</a>
             </td>
         </tr>
         {% endif %}
