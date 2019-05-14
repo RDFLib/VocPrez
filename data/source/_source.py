@@ -396,7 +396,7 @@ class Source:
     def get_top_concepts(self):
         q = '''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT *
+            SELECT DISTINCT *
             WHERE {{
               {{
                 <{0}> skos:hasTopConcept ?tc .
@@ -407,13 +407,14 @@ class Source:
                 ?tc skos:topConceptOf <{0}> .
                 ?tc skos:prefLabel ?pl .
               }}
-            }}'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
+            }}
+            ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
         top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
 
         if top_concepts is not None:
             return [(x.get('tc').get('value'), x.get('pl').get('value')) for x in top_concepts]
         else:
-            None
+            return None
 
     @staticmethod
     def sparql_query(endpoint, q):
