@@ -157,7 +157,8 @@ class Source:
         relatedMatches = []
         for row in result:
             prefLabel = row['prefLabel']['value']
-            definition = row['definition']['value']
+            if hasattr(row, 'definition'):
+                definition = row['definition']['value']
 
             if hasattr(row, 'altLabel'):
                 if row['altLabel']['value'] is not None and row['altLabel']['value'] not in altLabels:
