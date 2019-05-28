@@ -424,6 +424,22 @@ class Source:
                 if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache
                     tcs.append((tc.get('tc').get('value'), tc.get('pl').get('value')))
                     pl_cache.append(tc.get('pl').get('value'))
+
+            if len(tcs) == 0:
+                q = '''
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    SELECT DISTINCT *
+                    WHERE {{
+                      ?tc skos:inScheme <{0}> .
+                      ?tc skos:prefLabel ?pl .
+                    }}
+                    ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
+                top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+                for tc in top_concepts:
+                    if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache
+                        tcs.append((tc.get('tc').get('value'), tc.get('pl').get('value')))
+                        pl_cache.append(tc.get('pl').get('value'))
+
             return tcs
         else:
             return None
