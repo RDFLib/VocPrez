@@ -12,7 +12,7 @@ class Source:
     VOC_TYPES = [
         'http://purl.org/vocommons/voaf#Vocabulary',
         'http://www.w3.org/2004/02/skos/core#ConceptScheme',
-        'http://www.w3.org/2004/02/skos/core#ConceptCollection',
+        'http://www.w3.org/2004/02/skos/core#Collection',
         'http://www.w3.org/2004/02/skos/core#Concept',
     ]
 
@@ -158,51 +158,51 @@ class Source:
         for row in result:
             prefLabel = row['prefLabel']['value']
 
-            if hasattr(row, 'definition'):
+            if row.get('definition'):
                 definition = row['definition']['value']
             else:
                 definition = None
 
-            if hasattr(row, 'altLabel'):
+            if row.get('altLabel'):
                 if row['altLabel']['value'] is not None and row['altLabel']['value'] not in altLabels:
                     altLabels.append(row['altLabel']['value'])
 
-            if hasattr(row, 'hiddenLabel'):
+            if row.get('hiddenLabel'):
                 if row['hiddenLabel']['value'] is not None and row['hiddenLabel']['value'] not in hiddenLabels:
                     hiddenLabels.append(row['hiddenLabel']['value'])
 
-            if hasattr(row, 'source'):
+            if row.get('source'):
                 source = row['source']['value']
 
-            if hasattr(row, 'contributor'):
+            if row.get('contributor'):
                 if row['contributor']['value'] is not None and row['contributor']['value'] not in contributors:
                     contributors.append(row['contributor']['value'])
 
-            if hasattr(row, 'broader'):
+            if row.get('broader'):
                 if row['broader']['value'] is not None and row['broader']['value'] not in broaders:
                     broaders.append(row['broader']['value'])
 
-            if hasattr(row, 'narrower'):
+            if row.get('narrower'):
                 if row['narrower']['value'] is not None and row['narrower']['value'] not in narrowers:
                     narrowers.append(row['narrower']['value'])
 
-            if hasattr(row, 'exactMatch'):
+            if row.get('exactMatch'):
                 if row['exactMatch']['value'] is not None and row['exactMatch']['value'] not in exactMatches:
                     exactMatches.append(row['exactMatch']['value'])
 
-            if hasattr(row, 'closeMatch'):
+            if row.get('closeMatch'):
                 if row['closeMatch']['value'] is not None and row['closeMatch']['value'] not in closeMatches:
                     closeMatches.append(row['closeMatch']['value'])
 
-            if hasattr(row, 'broadMatch'):
+            if row.get('broadMatch'):
                 if row['broadMatch']['value'] is not None and row['broadMatch']['value'] not in broadMatches:
                     broadMatches.append(row['broadMatch']['value'])
 
-            if hasattr(row, 'narrowMatch'):
+            if row.get('narrowMatch'):
                 if row['narrowMatch']['value'] is not None and row['narrowMatch']['value'] not in narrowMatches:
                     narrowMatches.append(row['narrowMatch']['value'])
 
-            if hasattr(row, 'relatedMatch'):
+            if row.get('relatedMatch'):
                 if row['relatedMatch']['value'] is not None and row['relatedMatch']['value'] not in relatedMatches:
                     relatedMatches.append(row['relatedMatch']['value'])
 
