@@ -51,7 +51,10 @@ def get_a_vocab_key():
     :return: Key name
     :rtype: str
     """
-    return next(iter(g.VOCABS))
+    try:
+        return next(iter(g.VOCABS))
+    except:
+        return None
 
 
 @routes.route('/')
@@ -72,7 +75,10 @@ def get_a_vocab_source_key():
     :return: Key name
     :rtype: str
     """
-    return next(iter(g.VOCABS))
+    try:
+        return next(iter(g.VOCABS))
+    except:
+        return None
 
 
 def match(vocabs, query):
