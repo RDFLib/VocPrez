@@ -57,6 +57,11 @@ def get_a_vocab_key():
         return None
 
 
+@routes.context_processor
+def inject_date():
+    return {'date': datetime.date.today()}
+
+
 @routes.route('/')
 def index():
     return render_template(
