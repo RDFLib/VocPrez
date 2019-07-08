@@ -39,7 +39,7 @@ def before_request():
     # load all the vocabs from it into this session's (g) VOCABS variable
     g.VOCABS = {}
     for name, details in config.VOCAB_SOURCES.items():
-        getattr(source, details['source']).collect(source, details)
+        getattr(source, details['source']).collect(details)
 
     # also load all vocabs into VOCABS.p on disk for future use
     if g.VOCABS: # Don't write empty file
