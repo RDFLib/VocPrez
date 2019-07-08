@@ -5,17 +5,17 @@
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata concept">
-    {% if concept.created %}
+    {% if concept.date_created %}
     <tr>
         <th>Date created:</th>
-        <td>{{ concept.created }}</td>
+        <td>{{ concept.date_created }}</td>
     </tr>
     {% endif %}
 
-    {% if concept.modified %}
+    {% if concept.date_modified %}
     <tr>
         <th>Date modified:</th>
-        <td>{{ concept.modified }}</td>
+        <td>{{ concept.date_modified }}</td>
     </tr>
     {% endif %}
     {% if concept.altLabels|length > 0 %}
@@ -30,25 +30,25 @@
     {% endif %}
 
     <!-- don't display hiddenLabels, duh! -->
-
     {%  if concept.definition is not none  %}
     <tr>
-        <th>Definition: </th><td>{{ format(concept.definition) }}</td>
+        <th>Definition: </th><td>{{ concept.definition }}</td>
+    </tr>
+    {% endif %}
+
+    {%  if concept.source is not none  %}
+    <tr>
+        <th>Source</th><td>{{ concept.source }}</td>
     </tr>
     {% endif %}
 
     {%  if concept.contributor  %}
         {% for cont in concept.contributor %}
             <tr>
-                <th>Contributor</th><td>{{ format(concept.contributor) }}</td>
+                <th>Contributor</th><td>{{ format(cont) }}</td>
             </tr>
         {% endfor %}
-    {% endif %}
 
-    {%  if concept.source is not none  %}
-    <tr>
-        <th>Source</th><td>{{ format(concept.source) }}</td>
-    </tr>
     {% endif %}
 
     {% if concept.exactMatches %}
@@ -102,7 +102,7 @@
         <th>Broader</th>
         <td class="list">
             {% for broader in concept.broaders -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(broader) }}">{{ h.make_title(broader) }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(broader['uri']) }}">{{ h.make_title(broader['uri']) }}</a><br />
             {% endfor %}
         </td>
         {% endif %}
@@ -110,10 +110,10 @@
     {% endif %}
     {% if concept.narrowers %}
     <tr>
-        <th>Narrower: </th>
+        <th style="padding-right: 10px;">Narrower: </th>
         <td class="list">
             {% for narrower in concept.narrowers -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(narrower) }}">{{ h.make_title(narrower) }}</a><br />
+            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(narrower['uri']) }}">{{ h.make_title(narrower['uri']) }}</a><br />
             {% endfor %}
         </td>
     </tr>

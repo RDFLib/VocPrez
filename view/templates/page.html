@@ -1,38 +1,76 @@
+<!-- following https://www.dnrme.qld.gov.au/mining-resources/initiatives/qld-mine-safety-framework -->
 <!DOCTYPE html>
-{% from "macros/format.html" import format with context %}
-
-<html lang="en">
-<head>
+<html>
+<head lang="en">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='vanilla_theme.css')}}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-grid.css') }}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='master.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='extra.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='ga_theme.css')}}" />
+    <link href="https://fonts.googleapis.com/css?family=Heebo:300,700" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="https://static.qgov.net.au/assets/v2/images/skin/favicon.ico">
 </head>
-<body class="container">
-    <div>
+<body>
+    <header>
         <div id="header">
-            <div style="float:left;">
-                <em>Logo Placeholder</em>
-            </div>
-            <div style="float:right;">
-                {% for nav in navs %}
-                    {{ nav|safe }}
-                {% endfor %}
-                <a href="{{ url_for('routes.index') }}">VocPrez Home</a> |
-                <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a> |
-                <a href="{{ url_for('routes.sparql') }}">SPARQL</a> |
-                <a href="{{ url_for('routes.about') }}">About</a>
-            </div>
-            <div style="clear:both;"></div>
+          <table>
+            <tr>
+              <td>
+                <img id="ga-logo" src="{{ url_for('static', filename = 'ga-logo.jpg') }}" />
+              </td>
+              <td>
+                <table>
+                  <tr>
+                    <td id="quote">
+                      <span id="quote">Applying geoscience to Australia's most important challenges</span>
+                    </td>
+                  </tr>
+                   </table>
+              </td>
+            </tr>
+          </table>
+          <div id="ga-colour-strip-container">
+            <img id="ga-colour-strip" src="{{ url_for('static', filename = 'lo.jpg') }}" />
+          </div>
         </div>
+    </header>
 
-        <div>
+    <div class="breadcrumbs" style="height:75px; padding-top:30px; text-align:center;">
+        <div id="inner flex" style="margin: 0 auto; width:1245px; text-align:left;">
+            {% for nav in navs %}
+                {{ nav|safe }}
+            {% endfor %}
+            <a href="{{ url_for('routes.index') }}">System Home</a> /
+            <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a> /
+            <a href="{{ url_for('routes.about') }}">About</a>
+        </div>
+    </div>
+
+    <div id="container-content" style="text-align:center;">
+        <div style="margin: 0 auto; width:1245px; text-align:left;" class="content">
             {% block content %}{% endblock %}
         </div>
-        <footer>
-
-        </footer>
     </div>
+
+
+
+    <div id="footer-container">
+	<div id="footer-links">
+        <p style="text-align:left;">
+            <a href="http://creativecommons.org/licenses/by/4.0/legalcode"><img src="{{ url_for('static', filename = 'by.png') }}" style="width:88px;" /></a>
+        </p>
+        <a href="http://www.gov.au">&copy; Commonwealth of Australia</a>
+		<a href="http://www.ga.gov.au/copyright">Copyright</a>
+		<a href="http://www.ga.gov.au/privacy">Privacy</a>
+		<a href="http://www.ga.gov.au/accessibility">Accessibility</a>
+		<a href="http://www.ga.gov.au/sitemap">Sitemap</a>
+		<a href="http://www.ga.gov.au/ips">Information Publication Scheme</a>
+		<a href="http://www.ga.gov.au/ips/foi">Freedom of Information</a>
+        <a id="contact-us" href="http://www.ga.gov.au/contact-us">Contact us&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+	</div>
+    <p id="footer-text">Geoscience Australia acknowledges the traditional owners of the country throughout Australia and their continuing connection to land, sea and community. We pay our respect to them and their cultures and to the elders past and present.</p>
+</div>
+
+
 </body>
 </html>
