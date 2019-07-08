@@ -21,7 +21,7 @@ class Source:
         self.request = request
 
     @staticmethod
-    def collect(details):
+    def collect(self, details):
         """
         Specialised Sources must implement a collect method to get all the vocabs of their sort, listed in
         _config/__init__.py, at startup
@@ -37,7 +37,7 @@ class Source:
                 ?c a skos:Collection .
                 ?c (rdfs:label | skos:prefLabel) ?l .
             }'''
-        collections = Source.sparql_query(g.VOCABS[self.vocab_id]['details']['sparql_endpoint'], q)
+        collections = Source.sparql_query(g.VOCABS[self.vocab_id]['details']['sparql_endpoint'], q, g.VOCABS.get(self.vocab_id).sparql_username, g.VOCABS.get(self.vocab_id).sparql_password)
 
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in collections]
 
@@ -54,7 +54,7 @@ class Source:
                  OPTIONAL {{ ?c dct:modified ?modified . }}
              }}
              ORDER BY ?pl'''.format(g.VOCABS[self.vocab_id].concept_scheme_uri)
-        concepts = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
+        concepts = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q, g.VOCABS.get(self.vocab_id).sparql_username, g.VOCABS.get(self.vocab_id).sparql_password)
 
         concept_items = []
         for concept in concepts:
@@ -140,7 +140,7 @@ class Source:
                 OPTIONAL {{ <{0}> dct:created ?created }}
                 OPTIONAL {{ <{0}> dct:modified ?modified }}
             }}""".format(self.request.values.get('uri'))
-        result = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
+        result = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q, g.VOCABS.get(self.vocab_id).sparql_username, g.VOCABS.get(self.vocab_id).sparql_password)
 
         prefLabel = None
         definition = None
@@ -240,16 +240,16 @@ class Source:
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
             SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
-            WHERE {{   
+            WHERE {{GRAPH ?g {{   
                 <{}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
                 ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
                 ?c      skos:prefLabel                          ?pl .
                 ?c		(skos:topConceptOf | skos:broader)		?parent .
-            }}
+            }} }}
             GROUP BY ?c ?pl ?parent
             ORDER BY ?length ?parent ?pl
             """.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-        cs = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+        cs = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q, g.VOCABS.get(self.vocab_id).sparql_username, g.VOCABS.get(self.vocab_id).sparql_password)
 
         hierarchy = []
         previous_parent_uri = None
@@ -314,7 +314,7 @@ class Source:
                 <{}> a ?c .
             }}
             '''.format(self.request.values.get('uri'))
-        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q, g.VOCABS.get(self.vocab_id).sparql_username, g.VOCABS.get(self.vocab_id).sparql_password)
 
         # look for classes we understand (SKOS)
         for cls in clses:
@@ -414,7 +414,7 @@ class Source:
               ?tc skos:prefLabel ?pl .
             }}
             ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-        top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+        top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q, g.VOCABS.get(self.vocab_id).sparql_username, g.VOCABS.get(self.vocab_id).sparql_password)
 
         if top_concepts is not None:
             # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice
@@ -434,7 +434,7 @@ class Source:
                       ?tc skos:prefLabel ?pl .
                     }}
                     ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-                top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+                top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q, g.VOCABS.get(self.vocab_id).sparql_username, g.VOCABS.get(self.vocab_id).sparql_password)
                 for tc in top_concepts:
                     if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache
                         tcs.append((tc.get('tc').get('value'), tc.get('pl').get('value')))
@@ -445,15 +445,19 @@ class Source:
             return None
 
     @staticmethod
-    def sparql_query(endpoint, q):
+    def sparql_query(endpoint, q, sparql_username=None, sparql_password=None):
         sparql = SPARQLWrapper(endpoint)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        try:
+        
+        if sparql_username and sparql_password:            
+            sparql.setCredentials(sparql_username, sparql_password)
+            
+        if True:#try:
             metadata = sparql.query().convert()['results']['bindings']
-        except:
+        else:#except:
             return None
-
+        
         return metadata
 
     # @staticmethod

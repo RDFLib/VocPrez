@@ -29,7 +29,8 @@ def before_request():
         with open(vocabs_file_path, 'rb') as f:
             g.VOCABS = pickle.load(f)
             f.close()
-        return
+        if g.VOCABS: # Ignore empty file
+            return
 
     # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
 
@@ -38,12 +39,13 @@ def before_request():
     # load all the vocabs from it into this session's (g) VOCABS variable
     g.VOCABS = {}
     for name, details in config.VOCAB_SOURCES.items():
-        getattr(source, details['source']).collect(details)
+        getattr(source, details['source']).collect(source, details)
 
     # also load all vocabs into VOCABS.p on disk for future use
-    with open(vocabs_file_path, 'wb') as f:
-        pickle.dump(g.VOCABS, f)
-        f.close()
+    if g.VOCABS: # Don't write empty file
+        with open(vocabs_file_path, 'wb') as f:
+            pickle.dump(g.VOCABS, f)
+            f.close()
 
 
 @app.context_processor
