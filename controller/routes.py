@@ -11,7 +11,6 @@ import json
 from pyldapi import Renderer
 import controller.sparql_endpoint_functions
 import datetime
-import pytz
 
 routes = Blueprint('routes', __name__)
 
