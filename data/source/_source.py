@@ -4,7 +4,7 @@ from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS
 import markdown
 from flask import g
-from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 from model.concept import Concept
 
@@ -453,6 +453,7 @@ class Source:
         sparql.setReturnFormat(JSON)
         
         if sparql_username and sparql_password:            
+            sparql.setHTTPAuth(BASIC)
             sparql.setCredentials(sparql_username, sparql_password)
             
         try:
