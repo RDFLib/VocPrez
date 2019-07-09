@@ -35,8 +35,10 @@ def before_request():
         # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
         vocab_file_creation_time = os.stat(vocabs_file_path).st_mtime
         if vocab_file_creation_time < time.time() - cache_seconds:
-            os.remove(vocabs_file_path)
-            
+            try:
+                os.remove(vocabs_file_path)
+            except:
+                pass
         # the file is less than VOCAB_CACHE_DAYS days old so use it
         else:
             with open(vocabs_file_path, 'rb') as f:
