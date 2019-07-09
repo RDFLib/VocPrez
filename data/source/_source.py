@@ -22,7 +22,7 @@ class Source:
         self.request = request
 
     @staticmethod
-    def collect(self, details):
+    def collect(details):
         """
         Specialised Sources must implement a collect method to get all the vocabs of their sort, listed in
         _config/__init__.py, at startup
