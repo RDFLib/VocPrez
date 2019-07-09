@@ -138,7 +138,8 @@ class Source:
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             SELECT DISTINCT *
             WHERE  {{ GRAPH ?g {{
-                <{concept_uri}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
+                {{ <{concept_uri}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
+                    FILTER(lang(?prefLabel) = "{language}" || lang(?prefLabel) = "") }}
                 OPTIONAL {{ <{concept_uri}> skos:definition ?definition .
                     FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
                 OPTIONAL {{ <{concept_uri}> skos:altLabel ?altLabel .
