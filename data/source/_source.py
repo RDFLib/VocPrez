@@ -455,9 +455,9 @@ class Source:
         if sparql_username and sparql_password:            
             sparql.setCredentials(sparql_username, sparql_password)
             
-        if True:#try:
+        try:
             metadata = sparql.query().convert()['results']['bindings']
-        else:#except:
+        except:
             return None
         
         return metadata
