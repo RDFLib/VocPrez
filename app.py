@@ -23,15 +23,23 @@ def before_request():
     # check to see if g.VOCABS exists, if so, do nothing
     if hasattr(g, 'VOCABS'):
         return
+    
+    if hasattr(config, 'VOCAB_CACHE_DAYS'):
+        cache_seconds = config.VOCAB_CACHE_DAYS * 86400
+    else:
+        cache_seconds = 0
 
-    # we have no g.VOCABS so try and load it from a pickled VOCABS.pickle file
+    # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
     vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
     if os.path.isfile(vocabs_file_path):
-        # if the VOCABS.pickle file is more than one day old, delete it and run collect()
+        # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
         vocab_file_creation_time = os.stat(vocabs_file_path).st_mtime
-        if vocab_file_creation_time < time.time() - 86400:  # now less 1 day (in seconds)
-            os.remove(vocabs_file_path)
-        # the file is less than a day old so use it
+        if vocab_file_creation_time < time.time() - cache_seconds:
+            try:
+                os.remove(vocabs_file_path)
+            except:
+                pass
+        # the file is less than VOCAB_CACHE_DAYS days old so use it
         else:
             with open(vocabs_file_path, 'rb') as f:
                 g.VOCABS = pickle.load(f)
@@ -39,7 +47,7 @@ def before_request():
             if g.VOCABS: # Ignore empty file
                 return
 
-    # we haven't been able to load from VOCABS.pickle so run collect() on each vocab source to recreate it
+    # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
 
     # check each vocab source and,
     # using the appropriate class (from details['source']),
@@ -53,7 +61,6 @@ def before_request():
         with open(vocabs_file_path, 'wb') as f:
             pickle.dump(g.VOCABS, f)
             f.close()
-
 
 @app.context_processor
 def context_processor():
