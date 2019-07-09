@@ -6,13 +6,14 @@ import markdown
 from flask import g
 from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
+from model.concept import Concept
 
 
 class Source:
     VOC_TYPES = [
         'http://purl.org/vocommons/voaf#Vocabulary',
         'http://www.w3.org/2004/02/skos/core#ConceptScheme',
-        'http://www.w3.org/2004/02/skos/core#Collection',
+        'http://www.w3.org/2004/02/skos/core#ConceptCollection',
         'http://www.w3.org/2004/02/skos/core#Concept',
     ]
 
@@ -29,32 +30,34 @@ class Source:
         pass
 
     def list_collections(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
-            WHERE {
+            WHERE {GRAPH ?g {
                 ?c a skos:Collection .
                 ?c (rdfs:label | skos:prefLabel) ?l .
-            }'''
-        collections = Source.sparql_query(g.VOCABS[self.vocab_id]['details']['sparql_endpoint'], q)
+            } }'''
+        collections = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in collections]
 
     def list_concepts(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
              PREFIX dct: <http://purl.org/dc/terms/>
              SELECT *
-             WHERE {{
+             WHERE {{GRAPH ?g {{
                  ?c skos:inScheme <{0}> . 
                  ?c skos:prefLabel ?pl .
                  OPTIONAL {{ ?c skos:definition ?d . }}
                  OPTIONAL {{ ?c dct:created ?created . }}
                  OPTIONAL {{ ?c dct:modified ?modified . }}
-             }}
-             ORDER BY ?pl'''.format(g.VOCABS[self.vocab_id].concept_scheme_uri)
-        concepts = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
+             }} }}
+             ORDER BY ?pl'''.format(vocab.concept_scheme_uri)
+        concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         concept_items = []
         for concept in concepts:
@@ -77,34 +80,30 @@ class Source:
         :return:
         :rtype:
         """
-        v = g.VOCABS[self.vocab_id]
+        vocab = g.VOCABS[self.vocab_id]
 
-        v.hasTopConcept = self.get_top_concepts()
-        v.concept_hierarchy = self.get_concept_hierarchy()
-        return g.VOCABS[self.vocab_id]
+        vocab.hasTopConcept = self.get_top_concepts()
+        vocab.concept_hierarchy = self.get_concept_hierarchy()
+        return vocab
 
     def get_collection(self, uri):
-        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).sparql_endpoint)
+        vocab = g.VOCABS[self.vocab_id]
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
-            WHERE {{
+            WHERE {{ GRAPH ?g {{
               <{}> rdfs:label ?l .
               OPTIONAL {{?s rdfs:comment ?c }}
-            }}'''.format(uri)
-        sparql.setQuery(q)
-        sparql.setReturnFormat(JSON)
-        metadata = sparql.query().convert()['results']['bindings']
+            }} }}'''.format(uri)
+        metadata = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # get the collection's members
         q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
-            WHERE {{
+            WHERE {{ GRAPH ?g {{
               <{}> skos:member ?m .
               ?n skos:prefLabel ?pl .
-            }}'''.format(uri)
-        sparql.setQuery(q)
-        sparql.setReturnFormat(JSON)
-        members = sparql.query().convert()['results']['bindings']
+            }} }}'''.format(uri)
+        members = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         from model.collection import Collection
         return Collection(
@@ -116,6 +115,7 @@ class Source:
         )
 
     def get_concept(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
@@ -123,7 +123,7 @@ class Source:
             PREFIX dc: <http://purl.org/dc/elements/1.1/>
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             SELECT DISTINCT *
-            WHERE  {{
+            WHERE  {{ GRAPH ?g {{
                 <{0}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
                 OPTIONAL {{ <{0}> skos:definition ?definition }}
                 OPTIONAL {{ <{0}> skos:altLabel ?altLabel }}
@@ -139,8 +139,8 @@ class Source:
                 OPTIONAL {{ <{0}> skos:relatedMatch ?relatedMatch }}
                 OPTIONAL {{ <{0}> dct:created ?created }}
                 OPTIONAL {{ <{0}> dct:modified ?modified }}
-            }}""".format(self.request.values.get('uri'))
-        result = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
+            }} }}""".format(self.request.values.get('uri'))
+        result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         prefLabel = None
         definition = None
@@ -217,10 +217,9 @@ class Source:
         narrowMatches.sort()
         relatedMatches.sort()
 
-        from model.concept import Concept
         return Concept(
             self.vocab_id,
-            g.VOCABS[self.vocab_id].uri,
+            vocab.uri,
             prefLabel,
             definition,
             altLabels,
@@ -240,20 +239,21 @@ class Source:
         )
 
     def get_concept_hierarchy(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
             SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
-            WHERE {{   
+            WHERE {{GRAPH ?g {{   
                 <{}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
                 ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
                 ?c      skos:prefLabel                          ?pl .
                 ?c		(skos:topConceptOf | skos:broader)		?parent .
-            }}
+            }} }}
             GROUP BY ?c ?pl ?parent
             ORDER BY ?length ?parent ?pl
-            """.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-        cs = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+            """.format(vocab.concept_scheme_uri)
+        cs = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         hierarchy = []
         previous_parent_uri = None
@@ -264,7 +264,7 @@ class Source:
         if cs[0].get('parent') is not None:
             for c in cs:
                 # insert all topConceptOf directly
-                if str(c['parent']['value']) == g.VOCABS.get(self.vocab_id).uri:
+                if str(c['parent']['value']) == vocab.uri:
                     if c['pl']['value'] not in pl_cache:  # only add if not already in cache
                         hierarchy.append((
                             int(c['length']['value']),
@@ -312,13 +312,14 @@ class Source:
             return ''  # empty HTML
 
     def get_object_class(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
             SELECT * 
-            WHERE {{
+            WHERE {{ GRAPH ?g {{
                 <{}> a ?c .
-            }}
+            }} }}
             '''.format(self.request.values.get('uri'))
-        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+        clses = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # look for classes we understand (SKOS)
         for cls in clses:
@@ -404,10 +405,11 @@ class Source:
         return markdown.markdown(text)
 
     def get_top_concepts(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT DISTINCT *
-            WHERE {{
+            WHERE {{ GRAPH ?g {{
               {{
                 <{0}> skos:hasTopConcept ?tc .                
               }}
@@ -416,9 +418,9 @@ class Source:
                 ?tc skos:topConceptOf <{0}> .
               }}
               ?tc skos:prefLabel ?pl .
-            }}
-            ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-        top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+            }} }}
+            ORDER BY ?pl'''.format(vocab.concept_scheme_uri)
+        top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         if top_concepts is not None:
             # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice
@@ -433,12 +435,12 @@ class Source:
                 q = '''
                     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                     SELECT DISTINCT *
-                    WHERE {{
+                    WHERE {{ GRAPH ?g {{
                       ?tc skos:inScheme <{0}> .
                       ?tc skos:prefLabel ?pl .
-                    }}
-                    ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-                top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+                    }} }}
+                    ORDER BY ?pl'''.format(vocab.concept_scheme_uri)
+                top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
                 for tc in top_concepts:
                     if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache
                         tcs.append((tc.get('tc').get('value'), tc.get('pl').get('value')))
@@ -449,18 +451,21 @@ class Source:
             return None
 
     @staticmethod
-    def sparql_query(endpoint, q):
+    def sparql_query(endpoint, q, sparql_username=None, sparql_password=None):
         sparql = SPARQLWrapper(endpoint)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
-        sparql.setHTTPAuth(BASIC)
-        sparql.setCredentials(config.SPARQL_USR, config.SPARQL_PWD)
 
+        
+        if sparql_username and sparql_password:            
+            sparql.setHTTPAuth(BASIC)
+            sparql.setCredentials(sparql_username, sparql_password)
+            
         try:
             metadata = sparql.query().convert()['results']['bindings']
         except:
             return None
-
+        
         return metadata
 
     # @staticmethod

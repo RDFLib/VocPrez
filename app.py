@@ -17,7 +17,7 @@ app.register_blueprint(routes.routes)
 @app.before_request
 def before_request():
     """
-    Runs before every request and populates vocab index either from disk (VOCABS.pickle) or from a complete reload by
+    Runs before every request and populates vocab index either from disk (VOCABS.p) or from a complete reload by
     calling collect() for each of the vocab sources defined in config/__init__.py -> VOCAB_SOURCES
     :return: nothing
     """
@@ -26,7 +26,7 @@ def before_request():
         return
 
     # we have no g.VOCABS so try and load it from a pickled VOCABS.pickle file
-    vocabs_file_path = os.path.join(config.APP_DIR, 'cache', 'VOCABS.pickle')
+    vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
     if os.path.isfile(vocabs_file_path):
         # if the VOCABS.pickle file is more than one day old, delete it and run collect()
         vocab_file_creation_time = os.stat(vocabs_file_path).st_mtime
@@ -37,7 +37,8 @@ def before_request():
             with open(vocabs_file_path, 'rb') as f:
                 g.VOCABS = pickle.load(f)
                 f.close()
-            return
+            if g.VOCABS: # Ignore empty file
+                return
 
     # we haven't been able to load from VOCABS.pickle so run collect() on each vocab source to recreate it
 
@@ -48,10 +49,11 @@ def before_request():
     for name, details in config.VOCAB_SOURCES.items():
         getattr(source, details['source']).collect(details)
 
-    # also load all vocabs into VOCABS.pickle on disk for future use
-    with open(vocabs_file_path, 'wb') as f:
-        pickle.dump(g.VOCABS, f)
-        f.close()
+    # also load all vocabs into VOCABS.p on disk for future use
+    if g.VOCABS: # Don't write empty file
+        with open(vocabs_file_path, 'wb') as f:
+            pickle.dump(g.VOCABS, f)
+            f.close()
 
 
 @app.context_processor

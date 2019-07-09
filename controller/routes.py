@@ -10,6 +10,7 @@ from data.source.VOCBENCH import VbException
 import json
 from pyldapi import Renderer
 import controller.sparql_endpoint_functions
+import datetime
 
 routes = Blueprint('routes', __name__)
 
@@ -51,7 +52,15 @@ def get_a_vocab_key():
     :return: Key name
     :rtype: str
     """
-    return next(iter(g.VOCABS))
+    try:
+        return next(iter(g.VOCABS))
+    except:
+        return None
+
+
+@routes.context_processor
+def inject_date():
+    return {'date': datetime.date.today()}
 
 
 @routes.route('/')
@@ -72,7 +81,10 @@ def get_a_vocab_source_key():
     :return: Key name
     :rtype: str
     """
-    return next(iter(g.VOCABS))
+    try:
+        return next(iter(g.VOCABS))
+    except:
+        return None
 
 
 def match(vocabs, query):
