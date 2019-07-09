@@ -4,6 +4,7 @@ from flask import g
 from data.source._source import Source
 from model.vocabulary import Vocabulary
 import _config as config
+import re
 
 from pprint import pprint
 
@@ -52,6 +53,12 @@ class SPARQL(Source):
         for cs in concept_schemes:
             # handling CS URIs that end with '/'
             vocab_id = cs['cs']['value'].replace('/conceptScheme', '').split('/')[-1]
+            
+            #print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
+            if details.get('uri_filter_regex') and not re.search(details['uri_filter_regex'], cs['cs']['value']):
+                logging.debug('Skipping vocabulary {}'.format(vocab_id))
+                continue
+            
             if len(vocab_id) < 2:
                 vocab_id = cs['cs']['value'].split('/')[-2]
                 

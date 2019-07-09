@@ -5,7 +5,6 @@ from controller import routes
 import helper
 import data.source as source
 import os
-import os.path
 import pickle
 import time
 
