@@ -8,6 +8,11 @@ from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 from model.concept import Concept
 
+if hasattr(config, 'DEFAULT_LANGUAGE:'):
+    DEFAULT_LANGUAGE = config.DEFAULT_LANGUAGE
+else:
+    DEFAULT_LANGUAGE = 'en'
+
 
 class Source:
     VOC_TYPES = [
@@ -35,10 +40,11 @@ class Source:
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
-            WHERE {GRAPH ?g {
+            WHERE {{GRAPH ?g {{
                 ?c a skos:Collection .
-                ?c (rdfs:label | skos:prefLabel) ?l .
-            } }'''
+                {{?c (rdfs:label | skos:prefLabel) ?l .
+                    FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
+            }} }}'''.format(language=DEFAULT_LANGUAGE)
         collections = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in collections]
@@ -50,13 +56,16 @@ class Source:
              PREFIX dct: <http://purl.org/dc/terms/>
              SELECT *
              WHERE {{GRAPH ?g {{
-                 ?c skos:inScheme <{0}> . 
-                 ?c skos:prefLabel ?pl .
-                 OPTIONAL {{ ?c skos:definition ?d . }}
+                 ?c skos:inScheme <{concept_scheme_uri}> . 
+                 {{?c skos:prefLabel ?pl .
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+                 OPTIONAL {{ ?c skos:definition ?d .
+                    FILTER(lang(?d) = "{language}" || lang(?d) = "") }}
                  OPTIONAL {{ ?c dct:created ?created . }}
                  OPTIONAL {{ ?c dct:modified ?modified . }}
              }} }}
-             ORDER BY ?pl'''.format(vocab.concept_scheme_uri)
+             ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri, 
+                                    language=DEFAULT_LANGUAGE)
         concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         concept_items = []
@@ -91,18 +100,23 @@ class Source:
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
             WHERE {{ GRAPH ?g {{
-              <{}> rdfs:label ?l .
-              OPTIONAL {{?s rdfs:comment ?c }}
-            }} }}'''.format(uri)
+              {{ <{collection_uri}> (rdfs:label | skos:prefLabel) ?l .
+                  FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
+              OPTIONAL {{?s rdfs:comment ?c .
+                  FILTER(lang(?c) = "{language}" || lang(?c) = "") }}
+            }} }}'''.format(collection_uri=uri, 
+                            language=DEFAULT_LANGUAGE)
         metadata = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # get the collection's members
-        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
             WHERE {{ GRAPH ?g {{
               <{}> skos:member ?m .
-              ?n skos:prefLabel ?pl .
-            }} }}'''.format(uri)
+              {{ ?n skos:prefLabel ?pl .
+                  FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+            }} }}'''.format(collection_uri=uri, 
+                            language=DEFAULT_LANGUAGE)
         members = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         from model.collection import Collection
@@ -124,22 +138,28 @@ class Source:
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             SELECT DISTINCT *
             WHERE  {{ GRAPH ?g {{
-                <{0}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
-                OPTIONAL {{ <{0}> skos:definition ?definition }}
-                OPTIONAL {{ <{0}> skos:altLabel ?altLabel }}
-                OPTIONAL {{ <{0}> skos:hiddenLabel ?hiddenLabel }}
-                OPTIONAL {{ <{0}> dct:source ?source }}
-                OPTIONAL {{ <{0}> dct:contributor ?contributor }}
-                OPTIONAL {{ <{0}> skos:broader ?broader }}
-                OPTIONAL {{ <{0}> skos:narrower ?narrower }}
-                OPTIONAL {{ <{0}> skos:exactMatch ?exactMatch }}
-                OPTIONAL {{ <{0}> skos:closeMatch ?closeMatch }}
-                OPTIONAL {{ <{0}> skos:broadMatch ?broadMatch }}
-                OPTIONAL {{ <{0}> skos:narrowMatch ?narrowMatch }}
-                OPTIONAL {{ <{0}> skos:relatedMatch ?relatedMatch }}
-                OPTIONAL {{ <{0}> dct:created ?created }}
-                OPTIONAL {{ <{0}> dct:modified ?modified }}
-            }} }}""".format(self.request.values.get('uri'))
+                <{concept_uri}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
+                OPTIONAL {{ <{concept_uri}> skos:definition ?definition .
+                    FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
+                OPTIONAL {{ <{concept_uri}> skos:altLabel ?altLabel .
+                    FILTER(lang(?altLabel) = "{language}" || lang(?altLabel) = "") }}
+                OPTIONAL {{ <{concept_uri}> skos:hiddenLabel ?hiddenLabel .
+                    FILTER(lang(?hiddenLabel) = "{language}" || lang(?hiddenLabel) = "") }}
+                OPTIONAL {{ <{concept_uri}> dct:source ?source }}
+                    FILTER(lang(?source) = "{language}" || lang(?source) = "") }}
+                OPTIONAL {{ <{concept_uri}> dct:contributor ?contributor }}
+                    FILTER(lang(?contributor) = "{language}" || lang(?contributor) = "") }}
+                OPTIONAL {{ <{concept_uri}> skos:broader ?broader }}
+                OPTIONAL {{ <{concept_uri}> skos:narrower ?narrower }}
+                OPTIONAL {{ <{concept_uri}> skos:exactMatch ?exactMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:closeMatch ?closeMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:broadMatch ?broadMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:narrowMatch ?narrowMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:relatedMatch ?relatedMatch }}
+                OPTIONAL {{ <{concept_uri}> dct:created ?created }}
+                OPTIONAL {{ <{concept_uri}> dct:modified ?modified }}
+            }} }}""".format(concept_uri=self.request.values.get('uri'), 
+                            language=DEFAULT_LANGUAGE)
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         prefLabel = None
@@ -245,14 +265,16 @@ class Source:
 
             SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
             WHERE {{GRAPH ?g {{   
-                <{}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
+                <{concept_scheme_uri}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
                 ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
-                ?c      skos:prefLabel                          ?pl .
+                {{ ?c      skos:prefLabel                          ?pl .
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
                 ?c		(skos:topConceptOf | skos:broader)		?parent .
             }} }}
             GROUP BY ?c ?pl ?parent
             ORDER BY ?length ?parent ?pl
-            """.format(vocab.concept_scheme_uri)
+            """.format(concept_scheme_uri=vocab.concept_scheme_uri, 
+                       language=DEFAULT_LANGUAGE)
         cs = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         hierarchy = []
@@ -316,9 +338,9 @@ class Source:
         q = '''
             SELECT * 
             WHERE {{ GRAPH ?g {{
-                <{}> a ?c .
+                <{uri}> a ?c .
             }} }}
-            '''.format(self.request.values.get('uri'))
+            '''.format(uri=self.request.values.get('uri'))
         clses = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # look for classes we understand (SKOS)
@@ -411,15 +433,17 @@ class Source:
             SELECT DISTINCT *
             WHERE {{ GRAPH ?g {{
               {{
-                <{0}> skos:hasTopConcept ?tc .                
+                <{concept_scheme_uri}> skos:hasTopConcept ?tc .                
               }}
               UNION 
               {{
-                ?tc skos:topConceptOf <{0}> .
+                ?tc skos:topConceptOf <{concept_scheme_uri}> .
               }}
-              ?tc skos:prefLabel ?pl .
+              {{ ?tc skos:prefLabel ?pl .
+                  FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
             }} }}
-            ORDER BY ?pl'''.format(vocab.concept_scheme_uri)
+            ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri,
+                                   language=DEFAULT_LANGUAGE)
         top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         if top_concepts is not None:
@@ -436,10 +460,12 @@ class Source:
                     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                     SELECT DISTINCT *
                     WHERE {{ GRAPH ?g {{
-                      ?tc skos:inScheme <{0}> .
-                      ?tc skos:prefLabel ?pl .
+                      ?tc skos:inScheme <{concept_scheme_uri}> .
+                      {{ ?tc skos:prefLabel ?pl .
+                          FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
                     }} }}
-                    ORDER BY ?pl'''.format(vocab.concept_scheme_uri)
+                    ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri,
+                                           language=DEFAULT_LANGUAGE)
                 top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
                 for tc in top_concepts:
                     if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache

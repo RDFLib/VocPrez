@@ -6,6 +6,11 @@ from model.vocabulary import Vocabulary
 import _config as config
 import re
 
+if hasattr(config, 'DEFAULT_LANGUAGE:'):
+    DEFAULT_LANGUAGE = config.DEFAULT_LANGUAGE
+else:
+    DEFAULT_LANGUAGE = 'en'
+
 from pprint import pprint
 
 class SPARQL(Source):
@@ -33,18 +38,20 @@ class SPARQL(Source):
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX dcterms: <http://purl.org/dc/terms/>
-            SELECT * WHERE {
-                GRAPH ?g {
+            SELECT * WHERE {{
+                GRAPH ?g {{
                     ?cs a skos:ConceptScheme .
-                    OPTIONAL { ?cs skos:prefLabel ?title }
-                    OPTIONAL { ?cs dcterms:created ?created }
-                    OPTIONAL { ?cs dcterms:issued ?issued }
-                    OPTIONAL { ?cs dcterms:modified ?modified }
-                    OPTIONAL { ?cs skos:definition ?description }
-                }
-            } 
+                    OPTIONAL {{ ?cs skos:prefLabel ?title .
+                        FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
+                    OPTIONAL {{ ?cs dcterms:created ?created }}
+                    OPTIONAL {{ ?cs dcterms:issued ?issued }}
+                    OPTIONAL {{ ?cs dcterms:modified ?modified }}
+                    OPTIONAL {{ ?cs skos:definition ?description .
+                        FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
+                }}
+            }} 
             ORDER BY ?l
-        '''
+        '''.format(language=DEFAULT_LANGUAGE)
         # record just the IDs & title for the VocPrez in-memory vocabs list
         concept_schemes = Source.sparql_query(details['sparql_endpoint'], q, 
                                               sparql_username=details.get('sparql_username'), sparql_password=details.get('sparql_password')
