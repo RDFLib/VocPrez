@@ -22,9 +22,7 @@ class Vocabulary:
             accessURL=None,
             downloadURL=None,
             sparql_endpoint=None,
-            collection_uris=None,
-            sparql_username=None,
-            sparql_password=None
+            collection_uris=None
     ):
         self.id = id
         self.uri = uri
@@ -50,8 +48,6 @@ class Vocabulary:
         self.downloadURL = downloadURL
         self.sparql_endpoint = sparql_endpoint
         self.collection_uris = collection_uris
-        self.sparql_username = sparql_username
-        self.sparql_password = sparql_password
 
 
 class VocabularyRenderer(Renderer):

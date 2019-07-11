@@ -10,7 +10,6 @@ from data.source.VOCBENCH import VbException
 import json
 from pyldapi import Renderer
 import controller.sparql_endpoint_functions
-import datetime
 
 routes = Blueprint('routes', __name__)
 
@@ -52,15 +51,7 @@ def get_a_vocab_key():
     :return: Key name
     :rtype: str
     """
-    try:
-        return next(iter(g.VOCABS))
-    except:
-        return None
-
-
-@routes.context_processor
-def inject_date():
-    return {'date': datetime.date.today()}
+    return next(iter(g.VOCABS))
 
 
 @routes.route('/')
@@ -81,10 +72,7 @@ def get_a_vocab_source_key():
     :return: Key name
     :rtype: str
     """
-    try:
-        return next(iter(g.VOCABS))
-    except:
-        return None
+    return next(iter(g.VOCABS))
 
 
 def match(vocabs, query):
@@ -264,14 +252,6 @@ def object():
             return render_invalid_object_class_response(vocab_id, uri, c)
     except VbException as e:
         return render_vb_exception_response(e)
-
-
-
-@routes.route('/geosciml')
-def geosciml():
-    return render_template(
-        'geosciml_home.html'
-    )
 
 
 @routes.route('/about')
