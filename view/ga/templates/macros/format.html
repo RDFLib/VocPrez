@@ -1,0 +1,27 @@
+{# -- Serialize data to the correct HTML format depending if it's an rdflib.Literal or rdflib.URIRef ---------------- #}
+{#
+Input:
+    s - the string to be formatted
+    markdown - should the string be considered as markdown and transformed into HTML? (default is false)
+    safe - should the string be displayed without escaping characters (default is false)
+Output:
+    A snippet of HTML serialised as the correct format for emails, urls, etc.
+#}
+
+{% macro format(s, markdown=false, safe=false) %}
+    {% if h.is_email(s) %}
+        {% if h.contains_mailto(s) %}
+            <a href="{{ s }}">{{ h.strip_mailto(s) }}</a>
+        {% else %}
+            <a href="mailto:{{ s }}">{{ s }}</a>
+        {% endif %}
+    {% elif h.is_url(s) %}
+        <a href="{{ s }}">{{ s }}</a>
+    {% elif markdown %}
+        {{ h.parse_markdown(s)|safe }}
+    {% elif safe %}
+        {{ s|safe }}
+    {% else %}
+        {{ s }}
+    {% endif %}
+{% endmacro %}

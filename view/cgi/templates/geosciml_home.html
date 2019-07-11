@@ -1,0 +1,93 @@
+{% extends "page.html" %}
+<!DOCTYPE html>
+{% block content %}
+    <div id="container-content">
+        <!--?php include $PROJECT_HOME_DIR . 'theme/right_menu.inc'; ?-->
+
+        <h1>GeoSciML</h1>
+<p>GeoSciML is a data model and data transfer standard  for geological data  - from basic  map data to complex relational geological databases.</p>
+<h3><img src="http://www.geosciml.org/theme/img/new.gif" alt="new" /> <a href="http://www.geosciml.org/doc/geosciml/4.1/documentation/ogc_spec_translations/16-008_OGC_Geoscience_Markup_Language_GSML4.1-CN2018.08.18.docx">Chinese translation of the GeoSciML v4.1 OGC documentation</a></h3>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Many thanks to the China Geological Survey for their great work.</p>
+<ul>
+<li><strong><a href="http://www.geosciml.org/news_archive.php">GeoSciML News Archive</a></strong></li>
+</ul>
+<hr />
+<h3>GeoSciML - current version 4.1</h3>
+<ul>
+<li>
+<p><strong>Data Model Documentation</strong></p>
+<ul>
+<li>OGC Implementation Specification Document <a href="http://docs.opengeospatial.org/is/16-008/16-008.html">(html)</a> </li>
+<li>UML model <a href="http://www.geosciml.org/doc/geosciml/4.1/documentation/html/">(html)</a></li>
+<li>Enterprise Architect UML file <a href="http://www.geosciml.org/doc/geosciml/4.1/documentation/uml">(eap)</a></li>
+<li>UML summary wall poster <a href="https://portal.opengeospatial.org/files/?artifact_id=72895">(pdf)</a></li>
+</ul>
+</li>
+<li>
+<p><strong>XML schemas and encoding examples</strong> <a href="http://schemas.opengis.net/gsml/4.1/">(xsd, xml)</a></p>
+</li>
+<li>
+<p><strong>Guides for building GeoSciML web feature services</strong></p>
+<ul>
+<li>How To Serve a GeoSciML Web Feature Service (WFS) Using GeoServer  <a href="http://www.onegeology.org/docs/technical/OneGeologyWFSCookbook_v1.2.pdf">(pdf)</a></li>
+<li>GeoSciML Encoding Cookbook for OneGeology and INSPIRE <a href="http://www.onegeology.org/docs/technical/GeoSciML_Cookbook_1.2.1.pdf">(pdf)</a></li>
+</ul>
+</li>
+<li>
+<p><strong>Change log - version 4.0 to version 4.1</strong></p>
+<ul>
+<li>GeoSciML v4.1 differs from GeoSciML v4.0 in two respects:
+<ul>
+<li>XSD schemas are now located at the <a href="http://schemas.opengis.net/gsml">OGC schema repository</a></li>
+<li>&quot;GeoSciML-Portrayal&quot;, the package for simple WFS and WMS services, is now called &quot;GeoSciML-Lite&quot;.</li>
+</ul></li>
+<li>All other aspects of the v4.1 model and schemas are the same as v4.0.<br />
+&nbsp;   
+<hr /></li>
+</ul>
+</li>
+</ul>
+<h3>Previous versions of  GeoSciML and GeoSciML-Portrayal</h3>
+<ol>
+<li>
+<p>GeoSciML</p>
+<ul>
+<li><a href="http://geosciml.org/doc/geosciml/4.0/documentation/">version 4.0</a> (2015)</li>
+<li><a href="http://geosciml.org/doc/geosciml/3.2/documentation/">version 3.2</a> (2013)</li>
+<li><a href="http://geosciml.org/doc/geosciml/3.1/documentation/">version 3.1</a></li>
+<li><a href="http://geosciml.org/doc/geosciml/3.0/documentation/">version 3.0</a> (2012)
+<ul>
+<li>an example database for mapping geological data to GeoSciML v3 web services <a href="../reference_database/reference_database_2013-11-07.zip">(zipfile)</a></li>
+</ul></li>
+<li><a href="http://geosciml.org/doc/geosciml/2.1/">version 2.1</a></li>
+<li><a href="http://geosciml.org/doc/geosciml/2.0/">version 2.0</a> (2009)</li>
+<li><a href="http://geosciml.org/doc/geosciml/1.1.1/">version 1.1.1</a></li>
+<li><a href="http://geosciml.org/doc/geosciml/1.1.0/">version 1.1.0</a></li>
+<li><a href="http://geosciml.org/doc/geosciml/1.0.0/">version 1.0.0</a> (2005)</li>
+<li><a href="http://geosciml.org/doc/geosciml/0.9.0/">version 0.9.0</a></li>
+</ul>
+</li>
+<li>
+<p>GeoSciML-Portrayal (this is now the GeoSciML-Lite package of GeoSciML v4)</p>
+<ul>
+<li><a href="http://geosciml.org/doc/geosciml-portrayal/2.0.1/">version 2.0</a> (2013)</li>
+<li><a href="http://geosciml.org/doc/geosciml-portrayal/1.0/">version 1.0</a> (2011)
+<ul>
+<li>a guide for building GeoSciML-Portrayal (version 1) web services <a href="http://repository.usgin.org/sites/default/files/dlio/files/2012/u11/geosciml-portrayalcookbook0.7.pdf">(pdf)</a> - &copy; <a href="http://usgin.org/USGIN">USGIN</a></li>
+</ul></li>
+</ul>
+</li>
+<li>
+<p>Geologic Time</p>
+<ul>
+<li><a href="http://schemas.geosciml.org/geotime/2.0/">version 2.0</a> (2009)</li>
+</ul>
+</li>
+<li>Utilities
+<ul>
+<li><a href="http://schemas.geosciml.org/cgiutilities/3.0/">version 1.0</a></li>
+<li><a href="http://schemas.geosciml.org/cgiutilities/1.0/">version 1.0</a> (2008)</li>
+</ul></li>
+</ol>
+    </div><!-- #content-container -->
+{% endblock %}

@@ -41,17 +41,19 @@ def get_sparql_service_description(rdf_format='turtle'):
         raise ValueError('Input parameter rdf_format must be one of: ' + ', '.join(rdf_formats))
 
 
-def sparql_query(sparql_query, format_mimetype='application/sparql-results+json'):
+def sparql_query(sparql_query, format_mimetype='application/sparql-results+json', sparql_username=None, sparql_password=None):
     """ Make a SPARQL query"""
-    auth = (config.SPARQL_USR, config.SPARQL_PWD)
-    auth = None  # TODO: revert to auth'd query
+    if sparql_username and sparql_password:
+        auth = (sparql_username, sparql_password)
+    else:
+        auth = None  # TODO: revert to auth'd query
     data = {'query': sparql_query}
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': format_mimetype
     }
     try:
-        r = requests.post(config.SPARQL_ENDOINT, auth=auth, data=data, headers=headers, timeout=1)
+        r = requests.post(config.SPARQL_ENDPOINT, auth=auth, data=data, headers=headers, timeout=1)
         return r.content.decode('utf-8')
     except Exception as e:
         raise e
@@ -62,4 +64,3 @@ if __name__ == '__main__':
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
         SELECT * WHERE {?s a skos:ConceptScheme .}
         '''
-    print(sparql_query(q))

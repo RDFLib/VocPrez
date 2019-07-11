@@ -4,8 +4,14 @@ from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS
 import markdown
 from flask import g
-from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
+from model.concept import Concept
+
+if hasattr(config, 'DEFAULT_LANGUAGE:'):
+    DEFAULT_LANGUAGE = config.DEFAULT_LANGUAGE
+else:
+    DEFAULT_LANGUAGE = 'en'
 
 
 class Source:
@@ -29,32 +35,38 @@ class Source:
         pass
 
     def list_collections(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
-            WHERE {
+            WHERE {{GRAPH ?g {{
                 ?c a skos:Collection .
-                ?c (rdfs:label | skos:prefLabel) ?l .
-            }'''
-        collections = Source.sparql_query(g.VOCABS[self.vocab_id]['details']['sparql_endpoint'], q)
+                {{?c (rdfs:label | skos:prefLabel) ?l .
+                    FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
+            }} }}'''.format(language=DEFAULT_LANGUAGE)
+        collections = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in collections]
 
     def list_concepts(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
              PREFIX dct: <http://purl.org/dc/terms/>
              SELECT *
-             WHERE {{
-                 ?c skos:inScheme <{0}> . 
-                 ?c skos:prefLabel ?pl .
-                 OPTIONAL {{ ?c skos:definition ?d . }}
+             WHERE {{GRAPH ?g {{
+                 ?c skos:inScheme <{concept_scheme_uri}> . 
+                 {{?c skos:prefLabel ?pl .
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+                 OPTIONAL {{ ?c skos:definition ?d .
+                    FILTER(lang(?d) = "{language}" || lang(?d) = "") }}
                  OPTIONAL {{ ?c dct:created ?created . }}
                  OPTIONAL {{ ?c dct:modified ?modified . }}
-             }}
-             ORDER BY ?pl'''.format(g.VOCABS[self.vocab_id].concept_scheme_uri)
-        concepts = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
+             }} }}
+             ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri, 
+                                    language=DEFAULT_LANGUAGE)
+        concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         concept_items = []
         for concept in concepts:
@@ -77,34 +89,35 @@ class Source:
         :return:
         :rtype:
         """
-        v = g.VOCABS[self.vocab_id]
+        vocab = g.VOCABS[self.vocab_id]
 
-        v.hasTopConcept = self.get_top_concepts()
-        v.concept_hierarchy = self.get_concept_hierarchy()
-        return g.VOCABS[self.vocab_id]
+        vocab.hasTopConcept = self.get_top_concepts()
+        vocab.concept_hierarchy = self.get_concept_hierarchy()
+        return vocab
 
     def get_collection(self, uri):
-        sparql = SPARQLWrapper(g.VOCABS.get(self.vocab_id).sparql_endpoint)
+        vocab = g.VOCABS[self.vocab_id]
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
-            WHERE {{
-              <{}> rdfs:label ?l .
-              OPTIONAL {{?s rdfs:comment ?c }}
-            }}'''.format(uri)
-        sparql.setQuery(q)
-        sparql.setReturnFormat(JSON)
-        metadata = sparql.query().convert()['results']['bindings']
+            WHERE {{ GRAPH ?g {{
+              {{ <{collection_uri}> (rdfs:label | skos:prefLabel) ?l .
+                  FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
+              OPTIONAL {{?s rdfs:comment ?c .
+                  FILTER(lang(?c) = "{language}" || lang(?c) = "") }}
+            }} }}'''.format(collection_uri=uri, 
+                            language=DEFAULT_LANGUAGE)
+        metadata = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # get the collection's members
-        q = ''' PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT *
-            WHERE {{
+            WHERE {{ GRAPH ?g {{
               <{}> skos:member ?m .
-              ?n skos:prefLabel ?pl .
-            }}'''.format(uri)
-        sparql.setQuery(q)
-        sparql.setReturnFormat(JSON)
-        members = sparql.query().convert()['results']['bindings']
+              {{ ?n skos:prefLabel ?pl .
+                  FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+            }} }}'''.format(collection_uri=uri, 
+                            language=DEFAULT_LANGUAGE)
+        members = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         from model.collection import Collection
         return Collection(
@@ -116,6 +129,7 @@ class Source:
         )
 
     def get_concept(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
@@ -123,24 +137,31 @@ class Source:
             PREFIX dc: <http://purl.org/dc/elements/1.1/>
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             SELECT DISTINCT *
-            WHERE  {{
-                <{0}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
-                OPTIONAL {{ <{0}> skos:definition ?definition }}
-                OPTIONAL {{ <{0}> skos:altLabel ?altLabel }}
-                OPTIONAL {{ <{0}> skos:hiddenLabel ?hiddenLabel }}
-                OPTIONAL {{ <{0}> dct:source ?source }}
-                OPTIONAL {{ <{0}> dct:contributor ?contributor }}
-                OPTIONAL {{ <{0}> skos:broader ?broader }}
-                OPTIONAL {{ <{0}> skos:narrower ?narrower }}
-                OPTIONAL {{ <{0}> skos:exactMatch ?exactMatch }}
-                OPTIONAL {{ <{0}> skos:closeMatch ?closeMatch }}
-                OPTIONAL {{ <{0}> skos:broadMatch ?broadMatch }}
-                OPTIONAL {{ <{0}> skos:narrowMatch ?narrowMatch }}
-                OPTIONAL {{ <{0}> skos:relatedMatch ?relatedMatch }}
-                OPTIONAL {{ <{0}> dct:created ?created }}
-                OPTIONAL {{ <{0}> dct:modified ?modified }}
-            }}""".format(self.request.values.get('uri'))
-        result = Source.sparql_query(g.VOCABS[self.vocab_id].sparql_endpoint, q)
+            WHERE  {{ GRAPH ?g {{
+                {{ <{concept_uri}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
+                    FILTER(lang(?prefLabel) = "{language}" || lang(?prefLabel) = "") }}
+                OPTIONAL {{ <{concept_uri}> skos:definition ?definition .
+                    FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
+                OPTIONAL {{ <{concept_uri}> skos:altLabel ?altLabel .
+                    FILTER(lang(?altLabel) = "{language}" || lang(?altLabel) = "") }}
+                OPTIONAL {{ <{concept_uri}> skos:hiddenLabel ?hiddenLabel .
+                    FILTER(lang(?hiddenLabel) = "{language}" || lang(?hiddenLabel) = "") }}
+                OPTIONAL {{ <{concept_uri}> dct:source ?source }}
+                    FILTER(lang(?source) = "{language}" || lang(?source) = "") }}
+                OPTIONAL {{ <{concept_uri}> dct:contributor ?contributor }}
+                    FILTER(lang(?contributor) = "{language}" || lang(?contributor) = "") }}
+                OPTIONAL {{ <{concept_uri}> skos:broader ?broader }}
+                OPTIONAL {{ <{concept_uri}> skos:narrower ?narrower }}
+                OPTIONAL {{ <{concept_uri}> skos:exactMatch ?exactMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:closeMatch ?closeMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:broadMatch ?broadMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:narrowMatch ?narrowMatch }}
+                OPTIONAL {{ <{concept_uri}> skos:relatedMatch ?relatedMatch }}
+                OPTIONAL {{ <{concept_uri}> dct:created ?created }}
+                OPTIONAL {{ <{concept_uri}> dct:modified ?modified }}
+            }} }}""".format(concept_uri=self.request.values.get('uri'), 
+                            language=DEFAULT_LANGUAGE)
+        result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         prefLabel = None
         definition = None
@@ -157,48 +178,52 @@ class Source:
         relatedMatches = []
         for row in result:
             prefLabel = row['prefLabel']['value']
-            definition = row['definition']['value']
 
-            if hasattr(row, 'altLabel'):
+            if row.get('definition'):
+                definition = row['definition']['value']
+            else:
+                definition = None
+
+            if row.get('altLabel'):
                 if row['altLabel']['value'] is not None and row['altLabel']['value'] not in altLabels:
                     altLabels.append(row['altLabel']['value'])
 
-            if hasattr(row, 'hiddenLabel'):
+            if row.get('hiddenLabel'):
                 if row['hiddenLabel']['value'] is not None and row['hiddenLabel']['value'] not in hiddenLabels:
                     hiddenLabels.append(row['hiddenLabel']['value'])
 
-            if hasattr(row, 'source'):
+            if row.get('source'):
                 source = row['source']['value']
 
-            if hasattr(row, 'contributor'):
+            if row.get('contributor'):
                 if row['contributor']['value'] is not None and row['contributor']['value'] not in contributors:
                     contributors.append(row['contributor']['value'])
 
-            if hasattr(row, 'broader'):
+            if row.get('broader'):
                 if row['broader']['value'] is not None and row['broader']['value'] not in broaders:
                     broaders.append(row['broader']['value'])
 
-            if hasattr(row, 'narrower'):
+            if row.get('narrower'):
                 if row['narrower']['value'] is not None and row['narrower']['value'] not in narrowers:
                     narrowers.append(row['narrower']['value'])
 
-            if hasattr(row, 'exactMatch'):
+            if row.get('exactMatch'):
                 if row['exactMatch']['value'] is not None and row['exactMatch']['value'] not in exactMatches:
                     exactMatches.append(row['exactMatch']['value'])
 
-            if hasattr(row, 'closeMatch'):
+            if row.get('closeMatch'):
                 if row['closeMatch']['value'] is not None and row['closeMatch']['value'] not in closeMatches:
                     closeMatches.append(row['closeMatch']['value'])
 
-            if hasattr(row, 'broadMatch'):
+            if row.get('broadMatch'):
                 if row['broadMatch']['value'] is not None and row['broadMatch']['value'] not in broadMatches:
                     broadMatches.append(row['broadMatch']['value'])
 
-            if hasattr(row, 'narrowMatch'):
+            if row.get('narrowMatch'):
                 if row['narrowMatch']['value'] is not None and row['narrowMatch']['value'] not in narrowMatches:
                     narrowMatches.append(row['narrowMatch']['value'])
 
-            if hasattr(row, 'relatedMatch'):
+            if row.get('relatedMatch'):
                 if row['relatedMatch']['value'] is not None and row['relatedMatch']['value'] not in relatedMatches:
                     relatedMatches.append(row['relatedMatch']['value'])
 
@@ -213,10 +238,9 @@ class Source:
         narrowMatches.sort()
         relatedMatches.sort()
 
-        from model.concept import Concept
         return Concept(
             self.vocab_id,
-            g.VOCABS[self.vocab_id].uri,
+            vocab.uri,
             prefLabel,
             definition,
             altLabels,
@@ -236,20 +260,23 @@ class Source:
         )
 
     def get_concept_hierarchy(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
             SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
-            WHERE {{   
-                <{}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
+            WHERE {{GRAPH ?g {{   
+                <{concept_scheme_uri}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
                 ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
-                ?c      skos:prefLabel                          ?pl .
+                {{ ?c      skos:prefLabel                          ?pl .
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
                 ?c		(skos:topConceptOf | skos:broader)		?parent .
-            }}
+            }} }}
             GROUP BY ?c ?pl ?parent
             ORDER BY ?length ?parent ?pl
-            """.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-        cs = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+            """.format(concept_scheme_uri=vocab.concept_scheme_uri, 
+                       language=DEFAULT_LANGUAGE)
+        cs = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         hierarchy = []
         previous_parent_uri = None
@@ -260,7 +287,7 @@ class Source:
         if cs[0].get('parent') is not None:
             for c in cs:
                 # insert all topConceptOf directly
-                if str(c['parent']['value']) == g.VOCABS.get(self.vocab_id).uri:
+                if str(c['parent']['value']) == vocab.uri:
                     if c['pl']['value'] not in pl_cache:  # only add if not already in cache
                         hierarchy.append((
                             int(c['length']['value']),
@@ -308,13 +335,14 @@ class Source:
             return ''  # empty HTML
 
     def get_object_class(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
             SELECT * 
-            WHERE {{
-                <{}> a ?c .
-            }}
-            '''.format(self.request.values.get('uri'))
-        clses = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+            WHERE {{ GRAPH ?g {{
+                <{uri}> a ?c .
+            }} }}
+            '''.format(uri=self.request.values.get('uri'))
+        clses = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # look for classes we understand (SKOS)
         for cls in clses:
@@ -400,21 +428,24 @@ class Source:
         return markdown.markdown(text)
 
     def get_top_concepts(self):
+        vocab = g.VOCABS[self.vocab_id]
         q = '''
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT DISTINCT *
-            WHERE {{
+            WHERE {{ GRAPH ?g {{
               {{
-                <{0}> skos:hasTopConcept ?tc .                
+                <{concept_scheme_uri}> skos:hasTopConcept ?tc .                
               }}
               UNION 
               {{
-                ?tc skos:topConceptOf <{0}> .
+                ?tc skos:topConceptOf <{concept_scheme_uri}> .
               }}
-              ?tc skos:prefLabel ?pl .
-            }}
-            ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-        top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+              {{ ?tc skos:prefLabel ?pl .
+                  FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+            }} }}
+            ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri,
+                                   language=DEFAULT_LANGUAGE)
+        top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         if top_concepts is not None:
             # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice
@@ -429,12 +460,14 @@ class Source:
                 q = '''
                     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                     SELECT DISTINCT *
-                    WHERE {{
-                      ?tc skos:inScheme <{0}> .
-                      ?tc skos:prefLabel ?pl .
-                    }}
-                    ORDER BY ?pl'''.format(g.VOCABS.get(self.vocab_id).concept_scheme_uri)
-                top_concepts = Source.sparql_query(g.VOCABS.get(self.vocab_id).sparql_endpoint, q)
+                    WHERE {{ GRAPH ?g {{
+                      ?tc skos:inScheme <{concept_scheme_uri}> .
+                      {{ ?tc skos:prefLabel ?pl .
+                          FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+                    }} }}
+                    ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri,
+                                           language=DEFAULT_LANGUAGE)
+                top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
                 for tc in top_concepts:
                     if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache
                         tcs.append((tc.get('tc').get('value'), tc.get('pl').get('value')))
@@ -445,15 +478,21 @@ class Source:
             return None
 
     @staticmethod
-    def sparql_query(endpoint, q):
+    def sparql_query(endpoint, q, sparql_username=None, sparql_password=None):
         sparql = SPARQLWrapper(endpoint)
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
+
+        
+        if sparql_username and sparql_password:            
+            sparql.setHTTPAuth(BASIC)
+            sparql.setCredentials(sparql_username, sparql_password)
+            
         try:
             metadata = sparql.query().convert()['results']['bindings']
         except:
             return None
-
+        
         return metadata
 
     # @staticmethod
