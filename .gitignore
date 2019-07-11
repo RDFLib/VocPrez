@@ -124,3 +124,6 @@ _config/__init__.py
 *.p
 
 _config/server__init__.py
+
+# implementation-specific launch file
+app.wsgi
