@@ -266,6 +266,14 @@ def object():
         return render_vb_exception_response(e)
 
 
+
+@routes.route('/geosciml')
+def geosciml():
+    return render_template(
+        'geosciml_home.html'
+    )
+
+
 @routes.route('/about')
 def about():
     import os
