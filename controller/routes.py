@@ -331,7 +331,7 @@ def endpoint():
     logging.debug('request: {}'.format(request.__dict__))
     
     #TODO: Find a slightly less hacky way of getting the format_mimetime value
-    format_mimetype = request.__dict__.get('HTTP_ACCEPT')
+    format_mimetype = request.__dict__['environ']['HTTP_ACCEPT']
     
     # Query submitted
     if request.method == 'POST':
