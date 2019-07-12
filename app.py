@@ -12,7 +12,19 @@ app = Flask(__name__, template_folder=config.TEMPLATES_DIR, static_folder=config
 
 app.register_blueprint(routes.routes)
 
+if hasattr(config, 'VOCAB_CACHE_DAYS'):
+    cache_seconds = config.VOCAB_CACHE_DAYS * 86400
+else:
+    cache_seconds = 0
 
+vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
+if os.path.isfile(vocabs_file_path):
+    # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
+    vocab_file_creation_time = os.stat(vocabs_file_path).st_mtime
+    # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
+    if vocab_file_creation_time < time.time() - cache_seconds:
+        os.remove(vocabs_file_path)
+    
 @app.before_request
 def before_request():
     """
@@ -24,27 +36,17 @@ def before_request():
     if hasattr(g, 'VOCABS'):
         return
     
-    if hasattr(config, 'VOCAB_CACHE_DAYS'):
-        cache_seconds = config.VOCAB_CACHE_DAYS * 86400
-    else:
-        cache_seconds = 0
 
     # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
-    vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
     if os.path.isfile(vocabs_file_path):
-        # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
-        vocab_file_creation_time = os.stat(vocabs_file_path).st_mtime
         try:
-            if vocab_file_creation_time < time.time() - cache_seconds:
-                os.remove(vocabs_file_path)
-            # the file is less than VOCAB_CACHE_DAYS days old so use it
-            else:
-                with open(vocabs_file_path, 'rb') as f:
-                    g.VOCABS = pickle.load(f)
-                    f.close()
-                if g.VOCABS: # Ignore empty file
-                    return
-        except:
+            with open(vocabs_file_path, 'rb') as f:
+                g.VOCABS = pickle.load(f)
+                f.close()
+            if g.VOCABS: # Ignore empty file
+                return
+        except Exception as e:
+            logging.debug('Unable to read vocab index file {}: {}'.format(vocabs_file_path, e))
             pass
 
     # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
@@ -53,7 +55,7 @@ def before_request():
     # using the appropriate class (from details['source']),
     # load all the vocabs from it into this session's (g) VOCABS variable
     g.VOCABS = {}
-    for name, details in config.VOCAB_SOURCES.items():
+    for _name, details in config.VOCAB_SOURCES.items():
         getattr(source, details['source']).collect(details)
 
     # also load all vocabs into VOCABS.p on disk for future use
