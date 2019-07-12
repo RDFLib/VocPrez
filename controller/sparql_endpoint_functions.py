@@ -50,7 +50,6 @@ def sparql_query(query, format_mimetype='application/json'):
         'Content-Type': 'application/sparql-query',
         'Accept': format_mimetype,
         'Accept-Encoding': 'UTF-8',
-        'HTTP_ACCEPT_ENCODING': 'gzip, deflate'
     }
     if hasattr(config, 'SPARQL_USERNAME') and hasattr(config, 'SPARQL_PASSWORD'):
         auth = (config.SPARQL_USERNAME, config.SPARQL_PASSWORD)
