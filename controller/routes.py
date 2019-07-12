@@ -11,6 +11,7 @@ import json
 from pyldapi import Renderer
 import controller.sparql_endpoint_functions
 import datetime
+import logging
 
 routes = Blueprint('routes', __name__)
 
@@ -327,6 +328,11 @@ def endpoint():
     curl -H 'Accept: application/ld+json' http://localhost:5000/endpoint?query=PREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fco23%3E%0ACONSTRUCT%20%7B%3Fs%20a%20rdf%3AResource%7D%0AWHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%7D
 
     '''
+    logging.debug('request: {}'.format(request.__dict__))
+    
+    #TODO: Find a slightly less hacky way of getting the format_mimetime value
+    format_mimetype = request.__dict__.get('HTTP_ACCEPT')
+    
     # Query submitted
     if request.method == 'POST':
         '''Pass on the SPARQL query to the underlying endpoint defined in config
@@ -389,7 +395,7 @@ def endpoint():
                 )
             else:
                 return Response(
-                    controller.sparql_endpoint_functions.sparql_query(query),
+                    controller.sparql_endpoint_functions.sparql_query(query, format_mimetype),
                     status=200
                 )
         except ValueError as e:
