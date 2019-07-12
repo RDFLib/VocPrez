@@ -146,9 +146,9 @@ class Source:
                     FILTER(lang(?altLabel) = "{language}" || lang(?altLabel) = "") }}
                 OPTIONAL {{ <{concept_uri}> skos:hiddenLabel ?hiddenLabel .
                     FILTER(lang(?hiddenLabel) = "{language}" || lang(?hiddenLabel) = "") }}
-                OPTIONAL {{ <{concept_uri}> dct:source ?source }}
+                OPTIONAL {{ <{concept_uri}> dct:source ?source .
                     FILTER(lang(?source) = "{language}" || lang(?source) = "") }}
-                OPTIONAL {{ <{concept_uri}> dct:contributor ?contributor }}
+                OPTIONAL {{ <{concept_uri}> dct:contributor ?contributor .
                     FILTER(lang(?contributor) = "{language}" || lang(?contributor) = "") }}
                 OPTIONAL {{ <{concept_uri}> skos:broader ?broader }}
                 OPTIONAL {{ <{concept_uri}> skos:narrower ?narrower }}
