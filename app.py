@@ -6,6 +6,7 @@ import helper
 import data.source as source
 import os
 import pickle
+import time
 
 app = Flask(__name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR)
 
@@ -22,14 +23,29 @@ def before_request():
     # check to see if g.VOCABS exists, if so, do nothing
     if hasattr(g, 'VOCABS'):
         return
+    
+    if hasattr(config, 'VOCAB_CACHE_DAYS'):
+        cache_seconds = config.VOCAB_CACHE_DAYS * 86400
+    else:
+        cache_seconds = 0
 
     # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
     vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
     if os.path.isfile(vocabs_file_path):
-        with open(vocabs_file_path, 'rb') as f:
-            g.VOCABS = pickle.load(f)
-            f.close()
-        return
+        # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
+        vocab_file_creation_time = os.stat(vocabs_file_path).st_mtime
+        try:
+            if vocab_file_creation_time < time.time() - cache_seconds:
+                os.remove(vocabs_file_path)
+            # the file is less than VOCAB_CACHE_DAYS days old so use it
+            else:
+                with open(vocabs_file_path, 'rb') as f:
+                    g.VOCABS = pickle.load(f)
+                    f.close()
+                if g.VOCABS: # Ignore empty file
+                    return
+        except:
+            pass
 
     # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
 
@@ -41,10 +57,10 @@ def before_request():
         getattr(source, details['source']).collect(details)
 
     # also load all vocabs into VOCABS.p on disk for future use
-    with open(vocabs_file_path, 'wb') as f:
-        pickle.dump(g.VOCABS, f)
-        f.close()
-
+    if g.VOCABS: # Don't write empty file
+        with open(vocabs_file_path, 'wb') as f:
+            pickle.dump(g.VOCABS, f)
+            f.close()
 
 @app.context_processor
 def context_processor():

@@ -1,0 +1,32 @@
+{% extends "page.html" %}
+
+{% block content %}
+    <h1>System Home</h1>
+
+    {% set title = title %}
+
+<p>
+    Welcome to
+
+    {% if title != 'VocPrez' %}
+        {{ title }},
+    {% endif %}
+
+    an instance of <a href="https://github.com/CSIRO-enviro-informatics/skos-styler">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+</p>
+
+<p>VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbench.uniroma2.it/">VocBench</a>. </p>
+
+<p>See the <a href="about">About page</a> for more information.</p>
+
+<h2>Vocabularies</h2>
+<p>See the <a href="vocabulary">Vocabularies Register</a> for a list of vocabularies.</p>
+
+<h2>Concepts</h2>
+<p>SKOS concepts will be listed within a vocabulary's landing page. When within a vocabulary, a Concepts Register will be accessible in the navigation bar. </p>
+<p>Example <a href="vocabulary/{{ voc_key }}/concept/">Concepts Register</a> for {{ voc_key }}.</p>
+
+<h2>Collections</h2>
+<p><i>Coming soon.</i></p>
+
+{% endblock %}

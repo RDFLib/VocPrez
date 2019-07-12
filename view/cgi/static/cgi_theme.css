@@ -1,0 +1,233 @@
+/* version 2 */
+
+body {
+	margin: 0 auto;
+	text-align: center;
+	background-color: white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-weight:normal;
+}
+
+#container-content {
+	margin: 0 auto;
+	text-align:left;
+	width:1245px;
+	background-color:white;
+	padding: 20px 0 20px 0;
+}
+
+#container-content-2 {
+
+}
+
+
+
+h1 {
+	padding:0em 0px 0px 0px;
+	margin:0px 0px 0.2em 0px;
+	color:#2f2f2f;
+	font-family:sans-serif;
+	font-size:3em;
+	font-weight:normal;
+	line-height:1.1;
+}
+
+h2, h3 {
+	font-family:sans-serif;
+	font-weight:normal;
+}
+
+
+
+a {
+	color: #006983;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.figure {
+	text-align: center;
+}
+.caption {
+	font-size: small;
+}
+
+.definition {
+	font-style: italic;
+	text-decoration: none;
+	border-bottom: 1px dashed;
+}
+
+/*
+*	Header
+*/
+#header {
+	text-align:center;
+	align:center;
+}
+#header > table {
+	margin:0 auto;
+	text-align:center;
+
+}
+
+.header td
+{
+padding:10px;
+vertical-align:middle;
+}
+
+img#cgi-logo {
+	height:100px;
+}
+td#quote {
+	font-size:1.5em;
+	font-family:sans-serif;
+}
+#cgi-colour-strip-container {
+	width:130%;
+}
+#cgi-colour-strip {
+	height:10px;
+	width:130%;
+}
+
+/*
+*	Footer
+*/
+
+#footer-container {
+    font-size: 0.8em;
+    color: white;
+	text-align: center;
+	background-color: #97771A;
+	padding:5px;
+}
+#footer-links {
+    text-align: left;
+	margin:0 auto;
+	width:1245px;
+}
+#footer p{
+color: white;
+    font-size: 1em;
+}
+
+#footer-links a {
+    color: blue;
+	text-decoration:none;
+}
+
+.footer td
+{
+padding:15px;
+align:center;
+vertical-align:middle;
+}
+
+
+#footer-text {
+    color: white;
+    margin:0 auto;
+    margin-top: 10px;
+    text-align: left;
+    width: 1245px;
+}
+
+/*
+*	Nav
+*/
+nav {
+	font-size: 1em;
+	font-family:sans-serif;
+	text-align:right;
+	margin:20px 0 0 0;
+	color: #2f2f2f;
+}
+
+.breadcrumbs {
+  background: #ffffff;
+
+}
+  .breadcrumbs a:link,
+  .breadcrumbs a:active,
+  .breadcrumbs a:visited {
+    color: #2f2f2f;
+     }
+
+
+nav a {
+	margin: 0 10px 0 10px;
+	text-decoration:none;
+	color: #2f2f2f;
+}
+
+nav a:hover {
+	text-decoration:underline;
+}
+
+table.lined {
+    border-collapse: collapse;
+    border: solid 2px black;
+}
+
+table.lined th,
+table.lined td {
+    border: solid 1px black;
+    padding: 15px;
+}
+
+table.pretty {
+    border-collapse: collapse;
+    /*border: solid 2px black;*/
+	width: 568px;
+    font-size: 0.8em;
+}
+
+table.pretty tr:nth-child(even) {
+    background: #efefef;
+    border-top: 1px solid #D8D8D8;
+}
+table.pretty tr:nth-child(odd) {
+    background: #ffffff;
+    border-top: 1px solid #D8D8D8;
+}
+
+table.pretty th,
+table.pretty td {
+    /*border: solid 1px black;*/
+    padding: 15px;
+}
+
+table.pretty th {
+    color: white;
+    font-weight: bold;
+    background-color: #006983;
+}
+
+/* Pagination */
+.pagination {
+    margin: 10px 0;
+    margin-top: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.pagination > ul li {
+    display: inline;
+    list-style-type: none;
+    padding-right: 10px;
+    float: left;
+}
+
+.pagination > ul li.active {
+    font-weight: bold;
+}
+
+.no-line-height {
+    line-height: 0px;
+}
+

@@ -1,7 +1,6 @@
 from pyldapi import Renderer, View
 from flask import Response, render_template, g
 import _config as config
-import data.source._source as source
 from rdflib import Graph, RDF, Literal, URIRef, XSD
 from rdflib.namespace import SKOS, DCTERMS, NamespaceManager
 
@@ -88,8 +87,6 @@ class ConceptRenderer(Renderer):
                 return self._render_skos_html()
 
     def _render_skos_rdf(self):
-        g = source.Source.load_pickle_graph(self.concept.vocab_id)
-
         namespace_manager = NamespaceManager(Graph())
         namespace_manager.bind('dct', DCTERMS)
         namespace_manager.bind('skos', SKOS)

@@ -1,0 +1,140 @@
+.content {
+    margin-bottom: 40px;
+    padding: 40px;
+    box-shadow: 0 0 10px rgba(53, 52, 53, 0.1);
+    border: 1px solid rgba(53, 52, 53, 0.1);
+    border-radius: 2px;
+    background: white;
+}
+
+h1 {
+    margin-bottom: 26px;
+    padding-bottom: 5px;
+    font-size: 40px;
+    line-height: 42px;
+    font-weight: 700;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+h2 {
+    margin: 25px 0 10px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 45px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+h4 {
+    margin: 20px 0 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+p, ul, td, th {
+    font-family: "Heebo", sans-serif;
+}
+
+th {
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+a {
+    color: #4294B0;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    list-style-position: inside;
+    list-style-type: disc;
+}
+ul > li {
+    margin-left: 25px;
+}
+
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
+    transition: 0.3s;
+    /*background-color: #93c3d4;*/
+    background-color: white;
+    padding: 1px 1em 0.2em 1em;
+    margin-bottom: 20px;
+    min-height: 110px;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    /*background-color: #a5d1e0;*/
+}
+
+.card > table {
+    border: none;
+}
+
+.card > h4 > a {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.card > table > tbody > tr > th {
+    font-weight: bold;
+}
+
+.card > table > tbody > tr > th, .card > table > tbody > tr > td {
+    border: none;
+    font-size: 15px;
+    padding-right: 10px;
+    text-align: left;
+}
+
+.card > table > tbody> tr > th {
+    vertical-align: baseline;
+}
+
+.card > h4 {
+    margin-bottom: 6px;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+hr {
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.collapsible {
+    font-weight: normal;
+    color: #4294B0;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.collapsible-content {
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+.overflow {
+    overflow: auto;
+    min-height: 28px;
+}
+
+body {
+    text-align: left;
+}
+
+.content-footer {
+    margin-top: 40px;
+    border-top: 2px solid #f0f0f0;
+}
