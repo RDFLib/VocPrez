@@ -18,6 +18,18 @@
         <td>{{ concept.modified }}</td>
     </tr>
     {% endif %}
+
+    {% if concept.lang_prefLabels|length > 0 %}
+    <tr>
+        <th>Other Language Labels</th>
+        <td class="list">
+            {% for lang, prefLabel in concept.lang_prefLabels.items() -%}
+                {{ prefLabel }} ({{ lang }})
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+
     {% if concept.altLabels|length > 0 %}
     <tr>
         <th>Alternative Labels</th>
@@ -28,7 +40,6 @@
         </td>
     </tr>
     {% endif %}
-
     <!-- don't display hiddenLabels, duh! -->
 
     {%  if concept.definition is not none  %}
