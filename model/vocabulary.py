@@ -55,7 +55,7 @@ class Vocabulary:
 
 
 class VocabularyRenderer(Renderer):
-    def __init__(self, request, vocab):
+    def __init__(self, request, vocab, language='en'):
         self.views = self._add_dcat_view()
         self.navs = [
             # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
@@ -63,6 +63,7 @@ class VocabularyRenderer(Renderer):
         ]
 
         self.vocab = vocab
+        self.language = language
 
         super().__init__(
             request,

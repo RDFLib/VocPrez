@@ -7,7 +7,9 @@ from flask import g
 from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 from model.concept import Concept
+from collections import OrderedDict
 
+# Default to English if no DEFAULT_LANGUAGE in config
 if hasattr(config, 'DEFAULT_LANGUAGE:'):
     DEFAULT_LANGUAGE = config.DEFAULT_LANGUAGE
 else:
@@ -22,9 +24,10 @@ class Source:
         'http://www.w3.org/2004/02/skos/core#Concept',
     ]
 
-    def __init__(self, vocab_id, request):
+    def __init__(self, vocab_id, request, language=None):
         self.vocab_id = vocab_id
         self.request = request
+        self.language = language or DEFAULT_LANGUAGE
 
     @staticmethod
     def collect(details):
@@ -44,7 +47,7 @@ class Source:
                 ?c a skos:Collection .
                 {{?c (rdfs:label | skos:prefLabel) ?l .
                     FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
-            }} }}'''.format(language=DEFAULT_LANGUAGE)
+            }} }}'''.format(language=self.language)
         collections = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in collections]
@@ -65,7 +68,7 @@ class Source:
                  OPTIONAL {{ ?c dct:modified ?modified . }}
              }} }}
              ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri, 
-                                    language=DEFAULT_LANGUAGE)
+                                    language=self.language)
         concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         concept_items = []
@@ -105,7 +108,7 @@ class Source:
               OPTIONAL {{?s rdfs:comment ?c .
                   FILTER(lang(?c) = "{language}" || lang(?c) = "") }}
             }} }}'''.format(collection_uri=uri, 
-                            language=DEFAULT_LANGUAGE)
+                            language=self.language)
         metadata = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # get the collection's members
@@ -116,7 +119,7 @@ class Source:
               {{ ?n skos:prefLabel ?pl .
                   FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
             }} }}'''.format(collection_uri=uri, 
-                            language=DEFAULT_LANGUAGE)
+                            language=self.language)
         members = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         from model.collection import Collection
@@ -139,7 +142,8 @@ class Source:
             SELECT DISTINCT *
             WHERE  {{ GRAPH ?g {{
                 {{ <{concept_uri}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
-                    FILTER(lang(?prefLabel) = "{language}" || lang(?prefLabel) = "") }}
+                    # FILTER(lang(?prefLabel) = "{language}" || lang(?prefLabel) = "") 
+                    }}
                 OPTIONAL {{ <{concept_uri}> skos:definition ?definition .
                     FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
                 OPTIONAL {{ <{concept_uri}> skos:altLabel ?altLabel .
@@ -160,11 +164,13 @@ class Source:
                 OPTIONAL {{ <{concept_uri}> dct:created ?created }}
                 OPTIONAL {{ <{concept_uri}> dct:modified ?modified }}
             }} }}""".format(concept_uri=self.request.values.get('uri'), 
-                            language=DEFAULT_LANGUAGE)
+                            language=self.language)
+        print(q)
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         prefLabel = None
         definition = None
+        lang_prefLabels = {}
         altLabels = []
         hiddenLabels = []
         source = None
@@ -177,7 +183,15 @@ class Source:
         narrowMatches = []
         relatedMatches = []
         for row in result:
-            prefLabel = row['prefLabel']['value']
+            preflabel_lang = row['prefLabel'].get('xml:lang') or ''
+            # Use default language or no language prefLabel as primary
+            if ((not prefLabel and preflabel_lang == '') or 
+                (preflabel_lang == self.language)
+                ):
+                prefLabel = row['prefLabel']['value']
+                
+            if preflabel_lang not in ['', self.language]:
+                lang_prefLabels[preflabel_lang] = row['prefLabel']['value']
 
             if row.get('definition'):
                 definition = row['definition']['value']
@@ -227,6 +241,8 @@ class Source:
                 if row['relatedMatch']['value'] is not None and row['relatedMatch']['value'] not in relatedMatches:
                     relatedMatches.append(row['relatedMatch']['value'])
 
+        lang_prefLabels = OrderedDict([(key, lang_prefLabels[key]) 
+                                       for key in sorted(lang_prefLabels.keys())])
         altLabels.sort()
         hiddenLabels.sort()
         contributors.sort()
@@ -257,6 +273,7 @@ class Source:
             None,
             None,
             None,
+            lang_prefLabels
         )
 
     def get_concept_hierarchy(self):
@@ -275,7 +292,7 @@ class Source:
             GROUP BY ?c ?pl ?parent
             ORDER BY ?length ?parent ?pl
             """.format(concept_scheme_uri=vocab.concept_scheme_uri, 
-                       language=DEFAULT_LANGUAGE)
+                       language=self.language)
         cs = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         hierarchy = []
@@ -444,7 +461,7 @@ class Source:
                   FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
             }} }}
             ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri,
-                                   language=DEFAULT_LANGUAGE)
+                                   language=self.language)
         top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         if top_concepts is not None:
@@ -466,7 +483,7 @@ class Source:
                           FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
                     }} }}
                     ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri,
-                                           language=DEFAULT_LANGUAGE)
+                                           language=self.language)
                 top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
                 for tc in top_concepts:
                     if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache

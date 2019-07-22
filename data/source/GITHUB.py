@@ -6,8 +6,8 @@ from rdflib import Graph
 
 # TODO: implement GITHUB source
 class GITHUB(Source):
-    def __init__(self, vocab_id):
-        super().__init__(vocab_id)
+    def __init__(self, vocab_id, request, language=None):
+        super().__init__(vocab_id, request, language)
 
     def _parse_vocab(self):
         self.g = Graph().parse(join(config.APP_DIR, 'data', self.vocab_id + '.ttl'), format='turtle')

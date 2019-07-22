@@ -25,7 +25,8 @@ class Concept:
             relatedMatches,
             semantic_properties,
             created,
-            modified
+            modified,
+            lang_prefLabels=None
     ):
         self.vocab_id = vocab_id
         self.uri = uri
@@ -45,6 +46,7 @@ class Concept:
         self.semantic_properties = semantic_properties
         self.created = created
         self.modified = modified
+        self.lang_prefLabels = lang_prefLabels
 
 
 class ConceptRenderer(Renderer):

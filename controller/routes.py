@@ -146,28 +146,32 @@ def vocabularies():
 
 @routes.route('/vocabulary/<vocab_id>')
 def vocabulary(vocab_id):
+    language = request.values.get('lang') or config.DEFAULT_LANGUAGE
+
     if vocab_id not in g.VOCABS.keys():
         return render_invalid_vocab_id_response()
 
     # get vocab details using appropriate source handler
     try:
-        v = Source(vocab_id, request).get_vocabulary()
+        vocab = Source(vocab_id, request, language).get_vocabulary()
     except VbException as e:
         return render_vb_exception_response(e)
 
     return VocabularyRenderer(
         request,
-        v
+        vocab
     ).render()
 
 
 @routes.route('/vocabulary/<vocab_id>/concept/')
 def vocabulary_list(vocab_id):
+    language = request.values.get('lang') or config.DEFAULT_LANGUAGE
+
     if vocab_id not in g.VOCABS.keys():
         return render_invalid_vocab_id_response()
-
-    v = Source(vocab_id, request)
-    concepts = v.list_concepts()
+    
+    vocab_source = Source(vocab_id, request, language)
+    concepts = vocab_source.list_concepts()
     concepts.sort(key=lambda x: x['title'])
     total = len(concepts)
 
@@ -224,6 +228,7 @@ def object():
     :return: A Flask Response object
     :rtype: :class:`flask.Response`
     """
+    language = request.values.get('lang') or config.DEFAULT_LANGUAGE
     vocab_id = request.values.get('vocab_id')
     uri = request.values.get('uri')
 
@@ -243,19 +248,21 @@ def object():
             status=400,
             mimetype='text/plain'
         )
+        
+    vocab_source = Source(vocab_id, request, language)
 
     try:
         # TODO reuse object within if, rather than re-loading graph
-        c = Source(vocab_id, request).get_object_class()
+        c = vocab_source.get_object_class()
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
-            concept = Source(vocab_id, request).get_concept()
+            concept = vocab_source.get_concept()
             return ConceptRenderer(
                 request,
                 concept
             ).render()
         elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
-            collection = Source(vocab_id, request).get_collection(uri)
+            collection = vocab_source.get_collection(uri)
 
             return CollectionRenderer(
                 request,

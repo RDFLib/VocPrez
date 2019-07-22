@@ -5,7 +5,9 @@ import _config as config
 from rdflib import Graph, Literal, URIRef
 import os
 from helper import APP_DIR
+from vocbench import Vocbench
 
+global g # Flask globals
 
 class VbAuthException(Exception):
     pass
@@ -16,8 +18,8 @@ class VbException(Exception):
 
 
 class VOCBENCH(Source):
-    def __init__(self, vocab_id, request):
-        super().__init__(vocab_id, request)
+    def __init__(self, vocab_id, request, language=None):
+        super().__init__(vocab_id, request, language)
 
     @staticmethod
     def init():
