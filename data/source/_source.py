@@ -394,7 +394,7 @@ class Source:
                 g = Graph().parse(uri + '.ttl', format='turtle')
                 break
             except:
-                logging.error('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i+1))
+                logging.warning('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i+1))
         if not g:
             raise Exception('Failed to load Graph from {}. Maximum attempts exceeded {}.'.format(uri, max_attempts))
 
