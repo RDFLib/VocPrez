@@ -8,6 +8,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 from model.concept import Concept
 from collections import OrderedDict
+import logging
 
 # Default to English if no DEFAULT_LANGUAGE in config
 if hasattr(config, 'DEFAULT_LANGUAGE:'):
@@ -165,7 +166,6 @@ class Source:
                 OPTIONAL {{ <{concept_uri}> dct:modified ?modified }}
             }} }}""".format(concept_uri=self.request.values.get('uri'), 
                             language=self.language)
-        print(q)
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         prefLabel = None
@@ -394,7 +394,7 @@ class Source:
                 g = Graph().parse(uri + '.ttl', format='turtle')
                 break
             except:
-                print('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i+1))
+                logging.error('Failed to load resource at URI {}. Attempt: {}.'.format(uri, i+1))
         if not g:
             raise Exception('Failed to load Graph from {}. Maximum attempts exceeded {}.'.format(uri, max_attempts))
 
