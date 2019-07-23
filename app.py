@@ -17,13 +17,12 @@ if hasattr(config, 'VOCAB_CACHE_DAYS'):
 else:
     cache_seconds = 0
 
-vocabs_file_path = os.path.join(config.APP_DIR, 'VOCABS.p')
-if os.path.isfile(vocabs_file_path):
+if os.path.isfile(config.VOCAB_CACHE_PATH):
     # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
-    vocab_file_creation_time = os.stat(vocabs_file_path).st_mtime
+    vocab_file_creation_time = os.stat(config.VOCAB_CACHE_PATH).st_mtime
     # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
     if vocab_file_creation_time < time.time() - cache_seconds:
-        os.remove(vocabs_file_path)
+        os.remove(config.VOCAB_CACHE_PATH)
     
 @app.before_request
 def before_request():
@@ -38,15 +37,15 @@ def before_request():
     
 
     # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
-    if os.path.isfile(vocabs_file_path):
+    if os.path.isfile(config.VOCAB_CACHE_PATH):
         try:
-            with open(vocabs_file_path, 'rb') as f:
+            with open(config.VOCAB_CACHE_PATH, 'rb') as f:
                 g.VOCABS = pickle.load(f)
                 f.close()
             if g.VOCABS: # Ignore empty file
                 return
         except Exception as e:
-            logging.debug('Unable to read vocab index file {}: {}'.format(vocabs_file_path, e))
+            logging.debug('Unable to read vocab index file {}: {}'.format(config.VOCAB_CACHE_PATH, e))
             pass
 
     # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
@@ -60,7 +59,7 @@ def before_request():
 
     # also load all vocabs into VOCABS.p on disk for future use
     if g.VOCABS: # Don't write empty file
-        with open(vocabs_file_path, 'wb') as f:
+        with open(config.VOCAB_CACHE_PATH, 'wb') as f:
             pickle.dump(g.VOCABS, f)
             f.close()
 
