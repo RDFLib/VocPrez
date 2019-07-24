@@ -24,7 +24,7 @@
         <th>Other Language Labels</th>
         <td class="list">
             {% for lang, prefLabel in concept.lang_prefLabels.items() -%}
-                {{ prefLabel }} ({{ lang }})<br />
+                {{ prefLabel }} ({{ lang }})<br>
             {% endfor %}
         </td>
     </tr>
@@ -72,15 +72,17 @@
         ('narrower', 'Narrower'),
         ] %}
 
-        {% if concept.concept_relationships[relationship] %}
+        {% if concept.concept_relationships[relationship] -%}
             <tr>
                 <th>{{relationship_label}}:</th>
-                {% for concept_uri, concept_label in concept.concept_relationships[relationship].items() %}
-                    <td><a href="{{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br /></td>
-                {% endfor %}
+                <td class="list">
+                    {% for concept_uri, concept_label in concept.concept_relationships[relationship].items() -%}
+                    <a href="{{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
+                    {% endfor -%}
+                </td>
             </tr>
-        {% endif %}
-    {% endfor %}
+        {% endif -%}
+    {% endfor -%}
 
 </table>
 <hr>
