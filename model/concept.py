@@ -11,30 +11,16 @@ class Concept:
             vocab_id,
             uri,
             prefLabel,
-            definition,
-            altLabels,
-            hiddenLabels,
-            source,
-            contributors,
-            concept_relationships,
-            semantic_properties,
-            created,
-            modified,
-            lang_prefLabels=None
+            lang_prefLabels,
+            related_objects,
+            semantic_properties
     ):
         self.vocab_id = vocab_id
         self.uri = uri
         self.prefLabel = prefLabel
-        self.definition = definition
-        self.altLabels = altLabels
-        self.hiddenLabels = hiddenLabels
-        self.source = source
-        self.contributors = contributors
-        self.concept_relationships = concept_relationships
-        self.semantic_properties = semantic_properties
-        self.created = created
-        self.modified = modified
         self.lang_prefLabels = lang_prefLabels
+        self.related_objects = related_objects
+        self.semantic_properties = semantic_properties
 
 
 class ConceptRenderer(Renderer):
