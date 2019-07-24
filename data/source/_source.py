@@ -8,6 +8,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 from model.concept import Concept
 from collections import OrderedDict
+from helper import make_title
 import logging
 
 # Default to English if no DEFAULT_LANGUAGE in config
@@ -134,39 +135,37 @@ class Source:
 
     def get_concept(self):
         vocab = g.VOCABS[self.vocab_id]
-        q = """
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX dct: <http://purl.org/dc/terms/>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            PREFIX dc: <http://purl.org/dc/elements/1.1/>
-            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-            SELECT DISTINCT *
-            WHERE  {{ GRAPH ?g {{
-                {{ <{concept_uri}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
-                    # FILTER(lang(?prefLabel) = "{language}" || lang(?prefLabel) = "") 
-                    }}
-                OPTIONAL {{ <{concept_uri}> skos:definition ?definition .
-                    FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
-                OPTIONAL {{ <{concept_uri}> skos:altLabel ?altLabel .
-                    FILTER(lang(?altLabel) = "{language}" || lang(?altLabel) = "") }}
-                OPTIONAL {{ <{concept_uri}> skos:hiddenLabel ?hiddenLabel .
-                    FILTER(lang(?hiddenLabel) = "{language}" || lang(?hiddenLabel) = "") }}
-                OPTIONAL {{ <{concept_uri}> dct:source ?source .
-                    FILTER(lang(?source) = "{language}" || lang(?source) = "") }}
-                OPTIONAL {{ <{concept_uri}> dct:contributor ?contributor .
-                    FILTER(lang(?contributor) = "{language}" || lang(?contributor) = "") }}
-                OPTIONAL {{ <{concept_uri}> skos:broader ?broader }}
-                OPTIONAL {{ <{concept_uri}> skos:narrower ?narrower }}
-                OPTIONAL {{ <{concept_uri}> skos:exactMatch ?exactMatch }}
-                OPTIONAL {{ <{concept_uri}> skos:closeMatch ?closeMatch }}
-                OPTIONAL {{ <{concept_uri}> skos:broadMatch ?broadMatch }}
-                OPTIONAL {{ <{concept_uri}> skos:narrowMatch ?narrowMatch }}
-                OPTIONAL {{ <{concept_uri}> skos:relatedMatch ?relatedMatch }}
-                OPTIONAL {{ <{concept_uri}> dct:created ?created }}
-                OPTIONAL {{ <{concept_uri}> dct:modified ?modified }}
-            }} }}""".format(concept_uri=self.request.values.get('uri'), 
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT DISTINCT *
+WHERE  {{ 
+    GRAPH ?g {{
+        {{ <{concept_uri}> skos:prefLabel ?prefLabel . # ?s skos:prefLabel|dct:title|rdfs:label ?prefLabel .
+            # FILTER(lang(?prefLabel) = "{language}" || lang(?prefLabel) = "") 
+            }}
+        OPTIONAL {{ <{concept_uri}> skos:definition ?definition .
+            FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
+        OPTIONAL {{ <{concept_uri}> skos:altLabel ?altLabel .
+            FILTER(lang(?altLabel) = "{language}" || lang(?altLabel) = "") }}
+        OPTIONAL {{ <{concept_uri}> skos:hiddenLabel ?hiddenLabel .
+            FILTER(lang(?hiddenLabel) = "{language}" || lang(?hiddenLabel) = "") }}
+        OPTIONAL {{ <{concept_uri}> dct:source ?source .
+            FILTER(lang(?source) = "{language}" || lang(?source) = "") }}
+        OPTIONAL {{ <{concept_uri}> dct:contributor ?contributor .
+            FILTER(lang(?contributor) = "{language}" || lang(?contributor) = "") }}
+        OPTIONAL {{ <{concept_uri}> dct:created ?created }}
+        OPTIONAL {{ <{concept_uri}> dct:modified ?modified }}
+    }}
+}}""".format(concept_uri=self.request.values.get('uri'), 
                             language=self.language)
+            
+        print(q)
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
+        
+        assert result, 'Unable to query concepts for {}'.format(self.request.values.get('uri'))
 
         prefLabel = None
         definition = None
@@ -175,13 +174,7 @@ class Source:
         hiddenLabels = []
         source = None
         contributors = []
-        broaders = []
-        narrowers = []
-        exactMatches = []
-        closeMatches = []
-        broadMatches = []
-        narrowMatches = []
-        relatedMatches = []
+        
         for row in result:
             preflabel_lang = row['prefLabel'].get('xml:lang') or ''
             # Use default language or no language prefLabel as primary
@@ -213,67 +206,70 @@ class Source:
                 if row['contributor']['value'] is not None and row['contributor']['value'] not in contributors:
                     contributors.append(row['contributor']['value'])
 
-            if row.get('broader'):
-                if row['broader']['value'] is not None and row['broader']['value'] not in broaders:
-                    broaders.append(row['broader']['value'])
+        concept_relationships = {        
+            'broader': {},
+            'narrower': {},
+            'exactMatch': {},
+            'closeMatch': {},
+            'broadMatch': {},
+            'narrowMatch': {},
+            'relatedMatch': {},
+            }
+        
+        for relationship, related_concepts in concept_relationships.items():
+            print(relationship)
+            q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT DISTINCT *
+WHERE  {{ 
+    GRAPH ?g {{
+        OPTIONAL {{ <{concept_uri}> skos:{relationship} ?{relationship} }}
+        OPTIONAL {{ ?{relationship} skos:prefLabel ?{relationship}Label .
+            FILTER(lang(?{relationship}Label) = "{language}" || lang(?{relationship}Label) = "") }}
+    }} 
+}}
+ORDER BY ?{relationship}""".format(concept_uri=self.request.values.get('uri'), 
+                                relationship=relationship,
+                                language=self.language)
+                
+            print(q)
+            result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
+            
+            assert result, 'Unable to query {} concepts for {}'.format(relationship, self.request.values.get('uri'))
 
-            if row.get('narrower'):
-                if row['narrower']['value'] is not None and row['narrower']['value'] not in narrowers:
-                    narrowers.append(row['narrower']['value'])
-
-            if row.get('exactMatch'):
-                if row['exactMatch']['value'] is not None and row['exactMatch']['value'] not in exactMatches:
-                    exactMatches.append(row['exactMatch']['value'])
-
-            if row.get('closeMatch'):
-                if row['closeMatch']['value'] is not None and row['closeMatch']['value'] not in closeMatches:
-                    closeMatches.append(row['closeMatch']['value'])
-
-            if row.get('broadMatch'):
-                if row['broadMatch']['value'] is not None and row['broadMatch']['value'] not in broadMatches:
-                    broadMatches.append(row['broadMatch']['value'])
-
-            if row.get('narrowMatch'):
-                if row['narrowMatch']['value'] is not None and row['narrowMatch']['value'] not in narrowMatches:
-                    narrowMatches.append(row['narrowMatch']['value'])
-
-            if row.get('relatedMatch'):
-                if row['relatedMatch']['value'] is not None and row['relatedMatch']['value'] not in relatedMatches:
-                    relatedMatches.append(row['relatedMatch']['value'])
+            for row in result:    
+                if row.get(relationship) and row[relationship].get('value'):
+                    relatedConceptLabel = (row[relationship+'Label']['value'] if row.get(relationship+'Label') and row[relationship+'Label'].get('value') 
+                                           else make_title(row[relationship]['value'])) # No prefLabel
+                    related_concepts[row[relationship]['value']] = relatedConceptLabel
 
         lang_prefLabels = OrderedDict([(key, lang_prefLabels[key]) 
                                        for key in sorted(lang_prefLabels.keys())])
         altLabels.sort()
         hiddenLabels.sort()
         contributors.sort()
-        broaders.sort()
-        narrowers.sort()
-        exactMatches.sort()
-        closeMatches.sort()
-        broadMatches.sort()
-        narrowMatches.sort()
-        relatedMatches.sort()
-
+        
+        for relationship, related_concepts in concept_relationships.items():
+            concept_relationships[relationship] = OrderedDict([(key, related_concepts[key]) 
+                                                          for key in sorted(related_concepts.keys())])
+            
         return Concept(
-            self.vocab_id,
-            vocab.uri,
-            prefLabel,
-            definition,
-            altLabels,
-            hiddenLabels,
-            source,
-            contributors,
-            broaders,
-            narrowers,
-            exactMatches,
-            closeMatches,
-            broadMatches,
-            narrowMatches,
-            relatedMatches,
-            None,
-            None,
-            None,
-            lang_prefLabels
+            vocab_id=self.vocab_id,
+            uri=vocab.uri,
+            prefLabel=prefLabel,
+            definition=definition,
+            altLabels=altLabels,
+            hiddenLabels=hiddenLabels,
+            source=source,
+            contributors=contributors,
+            concept_relationships=concept_relationships,
+            semantic_properties=None,
+            created=None,
+            modified=None,
+            lang_prefLabels=lang_prefLabels
         )
 
     def get_concept_hierarchy(self):
@@ -294,6 +290,8 @@ class Source:
             """.format(concept_scheme_uri=vocab.concept_scheme_uri, 
                        language=self.language)
         cs = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
+        
+        assert cs, 'Unable to query concept hierarchy for conceptScheme {}'.format(vocab.concept_scheme_uri)
 
         hierarchy = []
         previous_parent_uri = None
