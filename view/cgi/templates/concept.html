@@ -21,7 +21,7 @@
 
     {% if concept.lang_prefLabels|length > 0 %}
     <tr>
-        <th>Other Language Labels</th>
+        <th style="padding-right: 10px;">Other Language Labels</th>
         <td class="list">
             {% for lang, prefLabel in concept.lang_prefLabels.items() -%}
                 {{ prefLabel }} ({{ lang }})<br>
@@ -74,7 +74,7 @@
 
         {% if concept.concept_relationships[relationship] -%}
             <tr>
-                <th>{{relationship_label}}:</th>
+                <th style="padding-right: 10px;">{{relationship_label}}:</th>
                 <td class="list">
                     {% for concept_uri, concept_label in concept.concept_relationships[relationship].items() -%}
                     <a href="{{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
