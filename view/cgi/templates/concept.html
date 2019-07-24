@@ -1,7 +1,7 @@
 {% extends "page.html" %}
 
 {% block content %}
-<h1>Concept: {{ concept.prefLabel }}</h1>
+<h1>{{ concept.prefLabel }}</h1>
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata concept">
@@ -18,6 +18,18 @@
         <td>{{ concept.date_modified }}</td>
     </tr>
     {% endif %}
+
+    {% if concept.lang_prefLabels|length > 0 %}
+    <tr>
+        <th style="padding-right: 10px;">Other Language Labels</th>
+        <td class="list">
+            {% for lang, prefLabel in concept.lang_prefLabels.items() -%}
+                {{ prefLabel }} ({{ lang }})<br>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+
     {% if concept.altLabels|length > 0 %}
     <tr>
         <th>Alternative Labels</th>
@@ -51,73 +63,27 @@
 
     {% endif %}
 
-    {% if concept.exactMatches %}
-        <tr>
-            <th>has exact match:</th>
-            {% for match in concept.exactMatches %}
-                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-            {% endfor %}
-        </tr>
-    {% endif %}
+    {% for relationship, relationship_label in [
+        ('exactMatch', 'has exact match'),
+        ('closeMatch', 'has close match'),
+        ('broadMatch', 'has broad match'),
+        ('narrowMatch', 'has narrow match'),
+        ('broader', 'Broader'),
+        ('narrower', 'Narrower'),
+        ] %}
 
-    {% if concept.closeMatches %}
-        <tr>
-            <th>has close match:</th>
-            {% for match in concept.closeMatches %}
-                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-            {% endfor %}
-        </tr>
-    {% endif %}
+        {% if concept.concept_relationships[relationship] -%}
+            <tr>
+                <th style="padding-right: 10px;">{{relationship_label}}:</th>
+                <td class="list">
+                    {% for concept_uri, concept_label in concept.concept_relationships[relationship].items() -%}
+                    <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
+                    {% endfor -%}
+                </td>
+            </tr>
+        {% endif -%}
+    {% endfor -%}
 
-    {% if concept.broadMatches %}
-        <tr>
-            <th>has broad match:</th>
-            {% for match in concept.broadMatches %}
-                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-            {% endfor %}
-        </tr>
-    {% endif %}
-
-    {% if concept.narrowMatches %}
-        <tr>
-            <th>has narrow match:</th>
-            {% for match in concept.narrowMatches %}
-                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-            {% endfor %}
-        </tr>
-    {% endif %}
-
-    {% if concept.relatedMatches %}
-        <tr>
-            <th>has related match:</th>
-            {% for match in concept.relatedMatches %}
-                <td><a href="{{ match }}">{{ h.make_title(match) }}</a></td>
-            {% endfor %}
-        </tr>
-    {% endif %}
-
-    {% if concept.broaders|length > 0 %}
-    <tr>
-        {% if concept.broaders %}
-        <th>Broader</th>
-        <td class="list">
-            {% for broader in concept.broaders -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(broader) }}">{{ h.make_title(broader) }}</a><br />
-            {% endfor %}
-        </td>
-        {% endif %}
-    </tr>
-    {% endif %}
-    {% if concept.narrowers %}
-    <tr>
-        <th style="padding-right: 10px;">Narrower: </th>
-        <td class="list">
-            {% for narrower in concept.narrowers -%}
-            <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(narrower) }}">{{ h.make_title(narrower) }}</a><br />
-            {% endfor %}
-        </td>
-    </tr>
-    {% endif %}
 </table>
 <hr>
 <h3>Alternate views</h3>

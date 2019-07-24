@@ -9,6 +9,8 @@ import logging
 from helper import APP_DIR
 
 
+global g # Flask globals
+
 class PickleLoadException(Exception):
     pass
 
@@ -23,8 +25,8 @@ class FILE(Source):
         'rdf': 'xml'
     }
 
-    def __init__(self, vocab_id, request):
-        super().__init__(vocab_id, request)
+    def __init__(self, vocab_id, request, language=None):
+        super().__init__(vocab_id, request, language)
         self.g = FILE.load_pickle_graph(vocab_id)
 
     @staticmethod

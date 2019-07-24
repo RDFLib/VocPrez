@@ -16,16 +16,11 @@ class Concept:
             hiddenLabels,
             source,
             contributors,
-            broaders,
-            narrowers,
-            exactMatches,
-            closeMatches,
-            broadMatches,
-            narrowMatches,
-            relatedMatches,
+            concept_relationships,
             semantic_properties,
             created,
-            modified
+            modified,
+            lang_prefLabels=None
     ):
         self.vocab_id = vocab_id
         self.uri = uri
@@ -35,16 +30,11 @@ class Concept:
         self.hiddenLabels = hiddenLabels
         self.source = source
         self.contributors = contributors
-        self.broaders = broaders
-        self.narrowers = narrowers
-        self.exactMatches = exactMatches
-        self.closeMatches = closeMatches
-        self.broadMatches = broadMatches
-        self.narrowMatches = narrowMatches
-        self.relatedMatches = relatedMatches
+        self.concept_relationships = concept_relationships
         self.semantic_properties = semantic_properties
         self.created = created
         self.modified = modified
+        self.lang_prefLabels = lang_prefLabels
 
 
 class ConceptRenderer(Renderer):
