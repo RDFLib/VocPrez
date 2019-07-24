@@ -75,7 +75,7 @@
                 <th style="padding-right: 10px;">{{relationship_label}}:</th>
                 <td class="list">
                     {% for concept_uri, concept_label in concept.concept_relationships[relationship].items() -%}
-                    <a href="{{ concept_uri }}">{{ concept_label }}</a><br>
+                    <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}>{{ concept_label }}</a><br>
                     {% endfor -%}
                 </td>
             </tr>
