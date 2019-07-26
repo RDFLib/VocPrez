@@ -1,24 +1,28 @@
 {% extends "page.html" %}
 
+<!-- Set list of predicates for display -->
+{% set displayed_relationships = [
+    'http://purl.org/dc/terms/created',
+    'http://purl.org/dc/terms/modified',
+    'http://www.w3.org/2004/02/skos/core#prefLabel',
+    'http://www.w3.org/2004/02/skos/core#altLabel',
+    'http://www.w3.org/2004/02/skos/core#definition',
+    'http://purl.org/dc/terms/source',
+    'http://purl.org/dc/terms/contributor',
+    'http://www.w3.org/2004/02/skos/core#exactMatch',
+    'http://www.w3.org/2004/02/skos/core#closeMatch',
+    'http://www.w3.org/2004/02/skos/core#broadMatch',
+    'http://www.w3.org/2004/02/skos/core#narrowMatch',
+    'http://www.w3.org/2004/02/skos/core#broader',
+    'http://www.w3.org/2004/02/skos/core#narrower'
+    ]         
+%}
+
 {% block content %}
 <h1>{{ concept.prefLabel }}</h1>
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata concept">
-    {% if concept.date_created %}
-    <tr>
-        <th>Date created:</th>
-        <td>{{ concept.date_created }}</td>
-    </tr>
-    {% endif %}
-
-    {% if concept.date_modified %}
-    <tr>
-        <th>Date modified:</th>
-        <td>{{ concept.date_modified }}</td>
-    </tr>
-    {% endif %}
-
     {% if concept.lang_prefLabels|length > 0 %}
     <tr>
         <th style="padding-right: 10px;">Other Language Labels</th>
@@ -30,55 +34,37 @@
     </tr>
     {% endif %}
 
-    {% if concept.altLabels|length > 0 %}
-    <tr>
-        <th>Alternative Labels</th>
-        <td class="list">
-            {% for altLabel in concept.altLabels -%}
-                {{ altLabel }}
-            {% endfor %}
-        </td>
-    </tr>
-    {% endif %}
-
-    <!-- don't display hiddenLabels, duh! -->
-    {%  if concept.definition is not none  %}
-    <tr>
-        <th>Definition: </th><td>{{ concept.definition }}</td>
-    </tr>
-    {% endif %}
-
-    {%  if concept.source is not none  %}
-    <tr>
-        <th>Source</th><td>{{ concept.source }}</td>
-    </tr>
-    {% endif %}
-
-    {%  if concept.contributor  %}
-        {% for cont in concept.contributor %}
+    {% for relationship in displayed_relationships -%}
+        {% if concept.related_objects[relationship] and concept.related_objects[relationship]['objects'] -%}
             <tr>
-                <th>Contributor</th><td>{{ format(cont) }}</td>
-            </tr>
-        {% endfor %}
-
-    {% endif %}
-
-    {% for relationship, relationship_label in [
-        ('exactMatch', 'has exact match'),
-        ('closeMatch', 'has close match'),
-        ('broadMatch', 'has broad match'),
-        ('narrowMatch', 'has narrow match'),
-        ('broader', 'Broader'),
-        ('narrower', 'Narrower'),
-        ] %}
-
-        {% if concept.concept_relationships[relationship] -%}
-            <tr>
-                <th style="padding-right: 10px;">{{relationship_label}}:</th>
+                <th style="padding-right: 10px;">{{concept.related_objects[relationship]['label']}}:</th>
                 <td class="list">
-                    {% for concept_uri, concept_label in concept.concept_relationships[relationship].items() -%}
+                    {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
+                    {%  if concept_uri  -%}
                     <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
-                    {% endfor -%}
+                    {% else -%}
+                    {{ concept_label }}</a><br>
+                    {% endif -%}
+                    {% endfor -%}                    
+                </td>
+            </tr>
+        {% endif -%}
+    {% endfor -%}
+    
+
+    <!-- Display W3C time relationships for concept - required for CGI International Chronostratigraphic Chart -->
+    {% for relationship in concept.related_objects.keys() -%}
+        {% if relationship.startswith('http://www.w3.org/2006/time#') and concept.related_objects[relationship]['objects'] -%}
+            <tr>
+                <th style="padding-right: 10px;">{{concept.related_objects[relationship]['label']}}:</th>
+                <td class="list">
+                    {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
+                    {%  if concept_uri  -%}
+                    <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
+                    {% else -%}
+                    {{ concept_label }}</a><br>
+                    {% endif -%}
+                    {% endfor -%}                    
                 </td>
             </tr>
         {% endif -%}

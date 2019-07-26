@@ -198,7 +198,7 @@ select *
 
 WHERE {{
     GRAPH ?graph {{
-        <{concept_uri}> skos:prefLabel ?prefLabel .
+        <{concept_uri}> skos:prefLabel ?prefLabel . # Don't filter prefLabel language
         <{concept_uri}> ?predicate ?object .
         optional {{GRAPH ?predicateGraph {{?predicate rdfs:label ?predicateLabel .}} 
             FILTER(lang(?predicateLabel) = "{language}" || lang(?predicateLabel) = "")
@@ -210,10 +210,12 @@ WHERE {{
     FILTER(?predicate != skos:prefLabel) 
 }}""".format(concept_uri=self.request.values.get('uri'), 
              language=self.language)   
-        print(q)
+        #print(q)
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
         
         assert result, 'Unable to query concepts for {}'.format(self.request.values.get('uri'))
+        
+        #print(str(result).encode('utf-8'))
 
         prefLabel = None
         lang_prefLabels = {}
@@ -231,31 +233,39 @@ WHERE {{
             if preflabel_lang not in ['', self.language]:
                 lang_prefLabels[preflabel_lang] = row['prefLabel']['value']
 
-            predicate = row['predicate']['value']
+            predicateUri = row['predicate']['value']
             predicateLabel = (row['predicateLabel']['value'] if row.get('predicateLabel') and row['predicateLabel'].get('value') 
                               else make_title(row['predicate']['value']))
             
-            related_object = row['object']['value']
-            related_objectLabel = (row['objectLabel']['value'] if row.get('objectLabel') and row['objectLabel'].get('value') 
-                           else make_title(row['object']['value'])) 
+            if row['object']['type'] == 'literal':
+                related_objectUri = None
+                related_objectLabel = row['object']['value']
+            elif row['object']['type'] == 'uri':
+                related_objectUri = row['object']['value']
+                related_objectLabel = (row['objectLabel']['value'] if row.get('objectLabel') and row['objectLabel'].get('value') 
+                                       else make_title(row['object']['value'])) 
             
-            
-            relationship_dict = related_objects.get(predicate)
+            relationship_dict = related_objects.get(predicateUri)
             if relationship_dict is None:
                 relationship_dict = {'label': predicateLabel,
                                      'objects': {}}
-                related_objects[predicate] = relationship_dict
+                related_objects[predicateUri] = relationship_dict
                 
-            relationship_dict['objects'][related_object] = related_objectLabel
+            relationship_dict['objects'][related_objectUri] = related_objectLabel
             
 
         lang_prefLabels = OrderedDict([(key, lang_prefLabels[key]) 
                                        for key in sorted(lang_prefLabels.keys())])
-        for predicate in related_objects.keys():
-            related_objects = related_objects[predicate]['objects']
-            related_objects = OrderedDict([(key, related_objects[key]) 
-                                           for key in sorted(related_objects.keys())])
-            
+
+        related_objects = OrderedDict([(predicate, {'label': related_objects[predicate]['label'],
+                                                    'objects': OrderedDict([(key, related_objects[predicate]['objects'][key]) 
+                                                                            for key in sorted(related_objects[predicate]['objects'].keys())
+                                                                            ])
+                                                    }
+                                        )
+                                       for predicate in sorted(related_objects.keys())
+                                       ])
+        
         return Concept(
             vocab_id=self.vocab_id,
             uri=vocab.uri,
