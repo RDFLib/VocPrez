@@ -238,10 +238,10 @@ WHERE {{
                               else make_title(row['predicate']['value']))
             
             if row['object']['type'] == 'literal':
-                related_objectUri = None
-                related_objectLabel = row['object']['value']
+                related_object= row['object']['value']
+                related_objectLabel = None
             elif row['object']['type'] == 'uri':
-                related_objectUri = row['object']['value']
+                related_object = row['object']['value']
                 related_objectLabel = (row['objectLabel']['value'] if row.get('objectLabel') and row['objectLabel'].get('value') 
                                        else make_title(row['object']['value'])) 
             
@@ -251,7 +251,7 @@ WHERE {{
                                      'objects': {}}
                 related_objects[predicateUri] = relationship_dict
                 
-            relationship_dict['objects'][related_objectUri] = related_objectLabel
+            relationship_dict['objects'][related_object] = related_objectLabel
             
 
         lang_prefLabels = OrderedDict([(key, lang_prefLabels[key]) 
@@ -265,6 +265,8 @@ WHERE {{
                                         )
                                        for predicate in sorted(related_objects.keys())
                                        ])
+        
+        #print(repr(related_objects).encode('utf-8'))
         
         return Concept(
             vocab_id=self.vocab_id,

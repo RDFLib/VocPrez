@@ -7,6 +7,7 @@
     'http://www.w3.org/2004/02/skos/core#prefLabel',
     'http://www.w3.org/2004/02/skos/core#altLabel',
     'http://www.w3.org/2004/02/skos/core#definition',
+    'http://www.w3.org/2000/01/rdf-schema#comment',
     'http://purl.org/dc/terms/source',
     'http://purl.org/dc/terms/contributor',
     'http://www.w3.org/2004/02/skos/core#exactMatch',
@@ -42,10 +43,10 @@
                 <th style="padding-right: 10px;">{{concept.related_objects[relationship]['label']}}:</th>
                 <td class="list">
                     {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
-                    {%  if concept_uri  -%}
+                    {%  if concept_uri and concept_label -%}
                     <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
                     {% else -%}
-                    {{ concept_label }}</a><br>
+                    {{ concept_uri }}</a><br>
                     {% endif -%}
                     {% endfor -%}                    
                 </td>
@@ -61,10 +62,10 @@
                 <th style="padding-right: 10px;">{{concept.related_objects[relationship]['label']}}:</th>
                 <td class="list">
                     {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
-                    {%  if concept_uri  -%}
+                    {%  if concept_uri and concept_label -%}
                     <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
                     {% else -%}
-                    {{ concept_label }}</a><br>
+                    {{ concept_uri }}</a><br>
                     {% endif -%}
                     {% endfor -%}                    
                 </td>
