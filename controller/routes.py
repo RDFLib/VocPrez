@@ -228,9 +228,12 @@ def object():
     :return: A Flask Response object
     :rtype: :class:`flask.Response`
     """
+    print(request.values)
     language = request.values.get('lang') or config.DEFAULT_LANGUAGE
     vocab_id = request.values.get('vocab_id')
     uri = request.values.get('uri')
+    _view = request.values.get('_view')
+    _format = request.values.get('_format')
 
     # check this vocab ID is known
     if vocab_id not in g.VOCABS.keys():
@@ -254,6 +257,7 @@ def object():
     try:
         # TODO reuse object within if, rather than re-loading graph
         c = vocab_source.get_object_class()
+        print(c)
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
             concept = vocab_source.get_concept()
@@ -261,6 +265,23 @@ def object():
                 request,
                 concept
             ).render()
+            
+        elif c == 'http://www.w3.org/2004/02/skos/core#ConceptScheme':
+            vocabulary = vocab_source.get_vocabulary()
+            vocabulary.view = _view
+            vocabulary.format = _view
+
+            vocabulary_renderer = VocabularyRenderer(
+                request,
+                vocabulary
+            )
+            
+            #TODO: Check with NC whether this is correct
+            vocabulary_renderer.view = _view
+            vocabulary_renderer.format = _format
+        
+            return vocabulary_renderer.render()
+
         elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
             collection = vocab_source.get_collection(uri)
 

@@ -8,7 +8,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 from model.concept import Concept
 from collections import OrderedDict
-from helper import make_title
+from helper import make_title, url_decode
 import logging
 
 # Default to English if no DEFAULT_LANGUAGE in config
@@ -134,6 +134,7 @@ class Source:
         )
 
     def get_concept(self):
+        concept_uri=self.request.values.get('uri')
         vocab = g.VOCABS[self.vocab_id]
         #=======================================================================
         # q = """
@@ -206,7 +207,7 @@ WHERE {{
             FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "") # Don't filter prefLabel language
         }}
     }}
-}}""".format(concept_uri=self.request.values.get('uri'), 
+}}""".format(concept_uri=concept_uri, 
              language=self.language)   
         #print(q)
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
@@ -274,7 +275,7 @@ WHERE {{
         
         return Concept(
             vocab_id=self.vocab_id,
-            uri=vocab.uri,
+            uri=concept_uri,
             prefLabel=prefLabel,
             related_objects=related_objects,
             semantic_properties=None
@@ -356,15 +357,16 @@ WHERE {{
             return ''  # empty HTML
 
     def get_object_class(self):
+        print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
         vocab = g.VOCABS[self.vocab_id]
         q = '''
             SELECT * 
             WHERE {{ GRAPH ?g {{
                 <{uri}> a ?c .
             }} }}
-            '''.format(uri=self.request.values.get('uri'))
+            '''.format(uri=url_decode(self.request.values.get('uri')))
         clses = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
-
+        print(clses)
         # look for classes we understand (SKOS)
         for cls in clses:
             if cls['c']['value'] in Source.VOC_TYPES:

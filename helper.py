@@ -14,6 +14,13 @@ def url_encode(s):
         pass
 
 
+def url_decode(s):
+    try:
+        return urllib.parse.unquote(s)
+    except:
+        pass
+
+
 def make_title(s):
     # make title from URI
     title = ' '.join(s.split('#')[-1].split('/')[-1].split('_')).title()
