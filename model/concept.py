@@ -11,14 +11,12 @@ class Concept:
             vocab_id,
             uri,
             prefLabel,
-            lang_prefLabels,
             related_objects,
             semantic_properties
     ):
         self.vocab_id = vocab_id
         self.uri = uri
         self.prefLabel = prefLabel
-        self.lang_prefLabels = lang_prefLabels
         self.related_objects = related_objects
         self.semantic_properties = semantic_properties
 

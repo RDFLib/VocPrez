@@ -198,16 +198,14 @@ select *
 
 WHERE {{
     GRAPH ?graph {{
-        <{concept_uri}> skos:prefLabel ?prefLabel . # Don't filter prefLabel language
         <{concept_uri}> ?predicate ?object .
         optional {{GRAPH ?predicateGraph {{?predicate rdfs:label ?predicateLabel .}} 
             FILTER(lang(?predicateLabel) = "{language}" || lang(?predicateLabel) = "")
             }}
         optional {{?object skos:prefLabel | rdfs:label ?objectLabel .
-            FILTER(lang(?objectLabel) = "{language}" || lang(?objectLabel) = "")
+            FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "") # Don't filter prefLabel language
         }}
     }}
-    FILTER(?predicate != skos:prefLabel) 
 }}""".format(concept_uri=self.request.values.get('uri'), 
              language=self.language)   
         #print(q)
@@ -218,32 +216,41 @@ WHERE {{
         #print(str(result).encode('utf-8'))
 
         prefLabel = None
-        lang_prefLabels = {}
         
         related_objects = {}
         
         for row in result:
-            preflabel_lang = row['prefLabel'].get('xml:lang') or ''
-            # Use default language or no language prefLabel as primary
-            if ((not prefLabel and preflabel_lang == '') or 
-                (preflabel_lang == self.language)
-                ):
-                prefLabel = row['prefLabel']['value']
-                
-            if preflabel_lang not in ['', self.language]:
-                lang_prefLabels[preflabel_lang] = row['prefLabel']['value']
-
             predicateUri = row['predicate']['value']
-            predicateLabel = (row['predicateLabel']['value'] if row.get('predicateLabel') and row['predicateLabel'].get('value') 
-                              else make_title(row['predicate']['value']))
-            
-            if row['object']['type'] == 'literal':
-                related_object= row['object']['value']
+                
+            # Special case for prefLabels
+            if predicateUri == 'http://www.w3.org/2004/02/skos/core#prefLabel':
+                predicateLabel = 'Multilingual Labels'
+                preflabel_lang = row['object'].get('xml:lang')
+                
+                # Use default language or no language prefLabel as primary
+                if ((not prefLabel and not preflabel_lang) or 
+                    (preflabel_lang == self.language)
+                    ):
+                    prefLabel = row['object']['value'] # Set current language prefLabel
+                    
+                # Omit current language string from list (remove this if we want to show all)
+                if preflabel_lang in ['', self.language]:
+                    continue
+                    
+                # Apend language code to prefLabel literal
+                related_object = '{} ({})'.format(row['object']['value'], preflabel_lang)
                 related_objectLabel = None
-            elif row['object']['type'] == 'uri':
-                related_object = row['object']['value']
-                related_objectLabel = (row['objectLabel']['value'] if row.get('objectLabel') and row['objectLabel'].get('value') 
-                                       else make_title(row['object']['value'])) 
+            else:
+                predicateLabel = (row['predicateLabel']['value'] if row.get('predicateLabel') and row['predicateLabel'].get('value') 
+                                  else make_title(row['predicate']['value']))
+            
+                if row['object']['type'] == 'literal':
+                    related_object= row['object']['value']
+                    related_objectLabel = None
+                elif row['object']['type'] == 'uri':
+                    related_object = row['object']['value']
+                    related_objectLabel = (row['objectLabel']['value'] if row.get('objectLabel') and row['objectLabel'].get('value') 
+                                           else make_title(row['object']['value'])) 
             
             relationship_dict = related_objects.get(predicateUri)
             if relationship_dict is None:
@@ -253,9 +260,6 @@ WHERE {{
                 
             relationship_dict['objects'][related_object] = related_objectLabel
             
-
-        lang_prefLabels = OrderedDict([(key, lang_prefLabels[key]) 
-                                       for key in sorted(lang_prefLabels.keys())])
 
         related_objects = OrderedDict([(predicate, {'label': related_objects[predicate]['label'],
                                                     'objects': OrderedDict([(key, related_objects[predicate]['objects'][key]) 
@@ -273,7 +277,6 @@ WHERE {{
             uri=vocab.uri,
             prefLabel=prefLabel,
             related_objects=related_objects,
-            lang_prefLabels=lang_prefLabels,
             semantic_properties=None
         )
 
