@@ -134,6 +134,7 @@ class Source:
         )
 
     def get_concept(self):
+        concept_uri=self.request.values.get('uri')
         vocab = g.VOCABS[self.vocab_id]
         #=======================================================================
         # q = """
@@ -206,7 +207,7 @@ WHERE {{
             FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "") # Don't filter prefLabel language
         }}
     }}
-}}""".format(concept_uri=self.request.values.get('uri'), 
+}}""".format(concept_uri=concept_uri, 
              language=self.language)   
         #print(q)
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
@@ -274,7 +275,7 @@ WHERE {{
         
         return Concept(
             vocab_id=self.vocab_id,
-            uri=vocab.uri,
+            uri=concept_uri,
             prefLabel=prefLabel,
             related_objects=related_objects,
             semantic_properties=None
