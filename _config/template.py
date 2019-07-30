@@ -1,14 +1,31 @@
 from os import path
+import tempfile
 
 APP_DIR = path.dirname(path.dirname(path.realpath(__file__)))
-TEMPLATES_DIR = path.join(APP_DIR, 'view', 'templates')
-STATIC_DIR = path.join(APP_DIR, 'view', 'static')
+SKIN_DIR = path.join(APP_DIR, 'view', 'generic')
+TEMPLATES_DIR = path.join(SKIN_DIR, 'templates')
+STATIC_DIR = path.join(SKIN_DIR, 'static')
 LOGFILE = APP_DIR + '/flask.log'
 DEBUG = True
+VOCAB_CACHE_PATH = path.join(tempfile.gettempdir(), 'VOCABS.p')
+VOCAB_CACHE_DAYS = 0 # Number of days before cache is replaced (set to zero to always replace)
+DEFAULT_LANGUAGE = 'en'
+SPARQL_QUERY_LIMIT = 2000 # Maximum number of results to return per SPARQL query
+MAX_RETRIES = 2
+RETRY_SLEEP_SECONDS = 10
+SPARQL_TIMEOUT=60
 
+# Parameters for global SPARQL query endpoint
+SPARQL_ENDPOINT = 'http://sparql_endpoint.org'
+SPARQL_USERNAME = 'sparql_user'
+SPARQL_PASSWORD = 'sparql_password'
+
+# VocBench parameters
+VB_ENDPOINT = ''
+VB_USER = ''
+VB_PASSWORD = ''
 
 TITLE = 'VocPrez'
-
 
 #
 #   Vocabulary data sources
@@ -48,5 +65,17 @@ VOCAB_SOURCES = {
                 'uri': '',
             }
         ]
-    }
+    },
+    #===========================================================================
+    # 'ga-jena-fuseki': {
+    #     'source': VocabSource.SPARQL,
+    #     'sparql_endpoint': 'http://sparql_endpoint.org',
+    #     'sparql_username': 'sparql_user',
+    #     'sparql_password': 'sparql_password',
+    #     'uri_filter_regex': '.*', # Regular expression to filter vocabulary URIs - Everything
+    #     #'uri_filter_regex': '^http(s?)://pid.geoscience.gov.au/def/voc/ga/', # Regular expression to filter vocabulary URIs - GA
+    #     #'uri_filter_regex': '^https://gcmdservices.gsfc.nasa.gov', # Regular expression to filter vocabulary URIs - GCMD
+    #     #'uri_filter_regex': '^http(s?)://resource.geosciml.org/', # Regular expression to filter vocabulary URIs - CGI
+    # },  
+    #===========================================================================
 }
