@@ -11,8 +11,6 @@ if hasattr(config, 'DEFAULT_LANGUAGE:'):
 else:
     DEFAULT_LANGUAGE = 'en'
 
-from pprint import pprint
-
 class SPARQL(Source):
     """Source for a generic SPARQL endpoint
     """

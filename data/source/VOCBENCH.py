@@ -447,6 +447,7 @@ class VOCBENCH(Source):
             None, # TODO: replace Sem Properties sub,
             metadata.get('created').get('value')[:10] if metadata.get('created') else None,
             metadata.get('modified').get('value')[:10] if metadata.get('modified') else None,
+            source=self,
         )
 
     def get_concept_hierarchy(self, concept_scheme_uri):

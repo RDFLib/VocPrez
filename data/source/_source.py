@@ -10,6 +10,9 @@ from model.concept import Concept
 from collections import OrderedDict
 from helper import make_title, url_decode
 import logging
+import base64
+import requests
+from time import sleep
 
 # Default to English if no DEFAULT_LANGUAGE in config
 if hasattr(config, 'DEFAULT_LANGUAGE:'):
@@ -30,6 +33,8 @@ class Source:
         self.vocab_id = vocab_id
         self.request = request
         self.language = language or DEFAULT_LANGUAGE
+        
+        self._graph = None # Property for rdflib Graph object to be populated on demand
 
     @staticmethod
     def collect(details):
@@ -98,6 +103,7 @@ class Source:
 
         vocab.hasTopConcept = self.get_top_concepts()
         vocab.concept_hierarchy = self.get_concept_hierarchy()
+        vocab.source = self
         return vocab
 
     def get_collection(self, uri):
@@ -278,7 +284,8 @@ WHERE {{
             uri=concept_uri,
             prefLabel=prefLabel,
             related_objects=related_objects,
-            semantic_properties=None
+            semantic_properties=None,
+            source=self,
         )
 
     def get_concept_hierarchy(self):
@@ -357,7 +364,7 @@ WHERE {{
             return ''  # empty HTML
 
     def get_object_class(self):
-        print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
+        #print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
         vocab = g.VOCABS[self.vocab_id]
         q = '''
             SELECT * 
@@ -366,7 +373,7 @@ WHERE {{
             }} }}
             '''.format(uri=url_decode(self.request.values.get('uri')))
         clses = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
-        print(clses)
+        #print(clses)
         # look for classes we understand (SKOS)
         for cls in clses:
             if cls['c']['value'] in Source.VOC_TYPES:
@@ -517,6 +524,105 @@ WHERE {{
             return None
         
         return metadata
+    
+    @staticmethod
+    def submit_sparql_query(endpoint, q, sparql_username=None, sparql_password=None, accept_format='json'):
+        '''
+        Function to submit a sparql query and return the textual response
+        '''
+        #logging.debug('sparql_query = {}'.format(sparql_query))
+        accept_format = {'json': 'application/json',
+                         'xml': 'application/rdf+xml',
+                         'turtle': 'application/turtle'
+                         }.get(accept_format) or 'application/json'
+        headers = {'Accept': accept_format,
+                   'Content-Type': 'application/sparql-query',
+                   'Accept-Encoding': 'UTF-8'
+                   }
+        if (sparql_username and sparql_password):
+            #logging.debug('Authenticating with username {} and password {}'.format(sparql_username, sparql_password))
+            headers['Authorization'] = 'Basic ' + base64.encodebytes('{}:{}'.format(sparql_username, sparql_password).encode('utf-8')).strip().decode('utf-8')
+            
+        params = None
+        
+        retries = 0
+        while True:
+            try:
+                response = requests.post(endpoint, 
+                                       headers=headers, 
+                                       params=params, 
+                                       data=q, 
+                                       timeout=config.SPARQL_TIMEOUT)
+                #logging.debug('Response content: {}'.format(str(response.content)))
+                assert response.status_code == 200, 'Response status code {} != 200'.format(response.status_code)
+                return response.text
+            except Exception as e:
+                logging.warning('SPARQL query failed: {}'.format(e))
+                retries += 1
+                if retries <= config.MAX_RETRIES:
+                    sleep(config.RETRY_SLEEP_SECONDS)
+                    continue # Go around again
+                else:
+                    break
+                
+        raise(BaseException('SPARQL query failed'))
+
+    @staticmethod
+    def get_graph(endpoint, q, sparql_username=None, sparql_password=None):
+        '''
+        Function to return an rdflib Graph object containing the results of a query
+        '''
+        result_graph = Graph()
+        response = Source.submit_sparql_query(endpoint, q, sparql_username=sparql_username, sparql_password=sparql_password, accept_format='xml')
+        #print(response.encode('utf-8'))
+        result_graph.parse(data=response)
+        return result_graph
+    
+    @property
+    def graph(self):
+        if self._graph is not None:
+            return self._graph
+        
+        vocab = g.VOCABS[self.vocab_id]
+        
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+describe ?subject ?predicate ?object
+WHERE  {{ 
+    GRAPH ?graph {{
+        {{
+            ?subject ?predicate ?object .
+            filter(?subject = <{uri}>) 
+        }}
+        union
+        {{
+            ?subject ?predicate ?object .
+            filter(?object = <{uri}>) 
+        }}
+        union 
+        {{    # All concepts in scheme
+            ?subject ?predicate ?object .
+              ?subject skos:inScheme <{uri}>
+        }}
+        union
+        {{
+            ?subject ?predicate ?object .
+            ?object skos:inScheme <{uri}>
+        }}
+        union
+        {{    # All collections containing concepts
+            ?subject ?predicate ?object .
+            ?concept skos:inScheme <{uri}> .
+            ?subject skos:member ?concept .
+        }}
+    }}
+}}
+order by ?subject ?predicate ?object'''.format(uri=vocab.uri)
+        #print(q)
+            
+        return Source.get_graph(vocab.sparql_endpoint, q, sparql_username=vocab.sparql_username, sparql_password=vocab.sparql_password)
+            
+
+
 
     # @staticmethod
     # def sparql_query_in_memory_graph(vocab_id, q):

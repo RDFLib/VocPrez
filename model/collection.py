@@ -10,7 +10,8 @@ class Collection:
             uri,
             label,
             comment,
-            members
+            members,
+            source,
     ):
         self.vocab = vocab
         self.uri = uri

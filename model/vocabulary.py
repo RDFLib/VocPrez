@@ -26,6 +26,7 @@ class Vocabulary:
             sparql_username=None,
             sparql_password=None
     ):
+        self.source = None
         self.id = id
         self.uri = uri
         self.title = title
@@ -57,6 +58,7 @@ class Vocabulary:
 class VocabularyRenderer(Renderer):
     def __init__(self, request, vocab, language='en'):
         self.views = self._add_dcat_view()
+        self.views.update(self._add_skos_view())
         self.navs = [
             # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
             '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/concept/">Concepts</a> |'
@@ -85,6 +87,19 @@ class VocabularyRenderer(Renderer):
             )
         }
 
+    def _add_skos_view(self):
+        return {
+            'skos': View(
+                'Simple Knowledge Organization System (SKOS)',
+                'SKOS provides a standard way to represent knowledge organization systems using the Resource Description Framework (RDF). '
+                'Encoding this information in RDF allows it to be passed between computer applications in an interoperable way.',
+                ['text/html', 'application/json'] + self.RDF_MIMETYPES,
+                'text/html',
+                languages=['en'],  # default 'en' only for now
+                namespace='http://www.w3.org/2004/02/skos/core#'
+            )
+        }
+
     def render(self):
         if self.view == 'alternates':
             if self.format == 'text/html':
@@ -95,6 +110,13 @@ class VocabularyRenderer(Renderer):
                 return self._render_dcat_rdf()
             else:
                 return self._render_dcat_html()
+        elif self.view == 'skos':
+            if self.format in Renderer.RDF_SERIALIZER_MAP:
+                return self._render_skos_rdf()
+            #===================================================================
+            # else:
+            #     return self._render_skos_html()
+            #===================================================================
 
     def _render_dcat_rdf(self):
         # get vocab RDF
@@ -109,7 +131,7 @@ class VocabularyRenderer(Renderer):
         VOID = Namespace('http://rdfs.org/ns/void')
         g.namespace_manager.bind('void', VOID)
         s = URIRef(self.vocab.uri)
-
+ 
         g.add((s, RDF.type, DCAT.Dataset))
         if self.vocab.title:
             g.add((s, DCTERMS.title, Literal(self.vocab.title)))
@@ -136,6 +158,16 @@ class VocabularyRenderer(Renderer):
             g.add((s, DCAT.downloadURL, URIRef(self.vocab.downloadURL)))
         if self.vocab.sparql_endpoint:
             g.add((s, VOID.sparqlEndpoint, URIRef(self.vocab.sparql_endpoint)))
+
+        # serialise in the appropriate RDF format
+        if self.format in ['application/rdf+json', 'application/json']:
+            return Response(g.serialize(format='json-ld'), mimetype=self.format)
+        else:
+            return Response(g.serialize(format=self.format), mimetype=self.format)
+
+    def _render_skos_rdf(self):
+        # get vocab RDF
+        g = self.vocab.source.graph
 
         # serialise in the appropriate RDF format
         if self.format in ['application/rdf+json', 'application/json']:

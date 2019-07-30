@@ -12,13 +12,15 @@ class Concept:
             uri,
             prefLabel,
             related_objects,
-            semantic_properties
+            semantic_properties,
+            source,
     ):
         self.vocab_id = vocab_id
         self.uri = uri
         self.prefLabel = prefLabel
         self.related_objects = related_objects
         self.semantic_properties = semantic_properties
+        self.source = source
 
 
 class ConceptRenderer(Renderer):
@@ -67,7 +69,7 @@ class ConceptRenderer(Renderer):
         concept_g = Graph()
         concept_g.namespace_manager = namespace_manager
 
-        for s, p, o in g.triples((URIRef(self.concept.uri), None, None)):
+        for s, p, o in self.concept.source.graph.triples((URIRef(self.concept.uri), None, None)):
             concept_g.add((s, p, o))
 
         # serialise in the appropriate RDF format

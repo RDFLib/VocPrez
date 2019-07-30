@@ -257,7 +257,7 @@ def object():
     try:
         # TODO reuse object within if, rather than re-loading graph
         c = vocab_source.get_object_class()
-        print(c)
+        #print(c)
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
             concept = vocab_source.get_concept()
@@ -268,19 +268,11 @@ def object():
             
         elif c == 'http://www.w3.org/2004/02/skos/core#ConceptScheme':
             vocabulary = vocab_source.get_vocabulary()
-            vocabulary.view = _view
-            vocabulary.format = _view
 
-            vocabulary_renderer = VocabularyRenderer(
+            return VocabularyRenderer(
                 request,
                 vocabulary
-            )
-            
-            #TODO: Check with NC whether this is correct
-            vocabulary_renderer.view = _view
-            vocabulary_renderer.format = _format
-        
-            return vocabulary_renderer.render()
+            ).render()
 
         elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
             collection = vocab_source.get_collection(uri)
