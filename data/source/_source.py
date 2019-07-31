@@ -8,7 +8,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 import dateutil
 from model.concept import Concept
 from collections import OrderedDict
-from helper import make_title, url_decode
+from helper import make_title, url_decode, cache_read, cache_write
 import logging
 import base64
 import requests
@@ -580,6 +580,12 @@ WHERE {{
     
     @property
     def graph(self):
+        cache_file_name = self.vocab_id + '.p'
+        
+        if self._graph is not None:
+            return self._graph
+        
+        self._graph = cache_read(cache_file_name)        
         if self._graph is not None:
             return self._graph
         
@@ -612,7 +618,9 @@ WHERE  {{
 }}'''.format(uri=vocab.uri)
         #print(q)
             
-        return Source.get_graph(vocab.sparql_endpoint, q, sparql_username=vocab.sparql_username, sparql_password=vocab.sparql_password)
+        self._graph = Source.get_graph(vocab.sparql_endpoint, q, sparql_username=vocab.sparql_username, sparql_password=vocab.sparql_password)
+        cache_write(self._graph, cache_file_name)
+        return self._graph
             
 
 

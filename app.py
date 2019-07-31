@@ -11,19 +11,7 @@ import time
 app = Flask(__name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR)
 
 app.register_blueprint(routes.routes)
-
-if hasattr(config, 'VOCAB_CACHE_DAYS'):
-    cache_seconds = config.VOCAB_CACHE_DAYS * 86400
-else:
-    cache_seconds = 0
-
-if os.path.isfile(config.VOCAB_CACHE_PATH):
-    # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
-    vocab_file_creation_time = os.stat(config.VOCAB_CACHE_PATH).st_mtime
-    # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
-    if vocab_file_creation_time < time.time() - cache_seconds:
-        os.remove(config.VOCAB_CACHE_PATH)
-    
+   
 @app.before_request
 def before_request():
     """
@@ -37,32 +25,21 @@ def before_request():
     
 
     # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
-    if os.path.isfile(config.VOCAB_CACHE_PATH):
-        try:
-            with open(config.VOCAB_CACHE_PATH, 'rb') as f:
-                g.VOCABS = pickle.load(f)
-                f.close()
-            if g.VOCABS: # Ignore empty file
-                return
-        except Exception as e:
-            logging.debug('Unable to read vocab index file {}: {}'.format(config.VOCAB_CACHE_PATH, e))
-            pass
+    g.VOCABS = helper.cache_read('VOCABS.p')
 
-    # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
+    if not g.VOCABS:
+        # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
 
-    # check each vocab source and,
-    # using the appropriate class (from details['source']),
-    # load all the vocabs from it into this session's (g) VOCABS variable
-    g.VOCABS = {}
-    for _name, details in config.VOCAB_SOURCES.items():
-        getattr(source, details['source']).collect(details)
-
-    # also load all vocabs into VOCABS.p on disk for future use
-    if g.VOCABS: # Don't write empty file
-        with open(config.VOCAB_CACHE_PATH, 'wb') as f:
-            pickle.dump(g.VOCABS, f)
-            f.close()
-
+        # check each vocab source and,
+        # using the appropriate class (from details['source']),
+        # load all the vocabs from it into this session's (g) VOCABS variable
+        g.VOCABS = {}
+        for _name, details in config.VOCAB_SOURCES.items():
+            getattr(source, details['source']).collect(details)
+    
+        # also load all vocabs into VOCABS.p on disk for future use
+        helper.cache_write(g.VOCABS, 'VOCABS.p')
+        
 @app.context_processor
 def context_processor():
     """
