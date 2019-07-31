@@ -586,37 +586,30 @@ WHERE {{
         vocab = g.VOCABS[self.vocab_id]
         
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-describe ?subject ?predicate ?object
+PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+CONSTRUCT {{ ?subject ?predicate ?object }}
 WHERE  {{ 
     GRAPH ?graph {{
-        {{
+        {{    # conceptScheme
             ?subject ?predicate ?object .
-            filter(?subject = <{uri}>) 
+            ?subject a skos:ConceptScheme .
+            <{uri}> a skos:ConceptScheme .
         }}
         union
-        {{
+        {{    # conceptScheme members as subjects
             ?subject ?predicate ?object .
-            filter(?object = <{uri}>) 
-        }}
-        union 
-        {{    # All concepts in scheme
-            ?subject ?predicate ?object .
-              ?subject skos:inScheme <{uri}>
+            ?subject skos:inScheme <{uri}> .
         }}
         union
-        {{
+        {{    # conceptScheme members as objects
             ?subject ?predicate ?object .
-            ?object skos:inScheme <{uri}>
-        }}
-        union
-        {{    # All collections containing concepts
-            ?subject ?predicate ?object .
-            ?concept skos:inScheme <{uri}> .
-            ?subject skos:member ?concept .
+            ?object skos:inScheme <{uri}> .
         }}
     }}
-}}
-order by ?subject ?predicate ?object'''.format(uri=vocab.uri)
+    FILTER(STRSTARTS(STR(?predicate), STR(rdfs:))
+        || STRSTARTS(STR(?predicate), STR(skos:))
+        )
+}}'''.format(uri=vocab.uri)
         #print(q)
             
         return Source.get_graph(vocab.sparql_endpoint, q, sparql_username=vocab.sparql_username, sparql_password=vocab.sparql_password)

@@ -228,7 +228,7 @@ def object():
     :return: A Flask Response object
     :rtype: :class:`flask.Response`
     """
-    print(request.values)
+    #print(request.values)
     language = request.values.get('lang') or config.DEFAULT_LANGUAGE
     vocab_id = request.values.get('vocab_id')
     uri = request.values.get('uri')
