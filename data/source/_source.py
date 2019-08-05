@@ -1,5 +1,4 @@
 import _config as config
-import sys
 from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS
 import markdown
@@ -46,36 +45,60 @@ class Source:
 
     def list_collections(self):
         vocab = g.VOCABS[self.vocab_id]
-        q = '''
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT *
-            WHERE {{GRAPH ?g {{
-                ?c a skos:Collection .
-                {{?c (rdfs:label | skos:prefLabel) ?l .
-                    FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
-            }} }}'''.format(language=self.language)
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT *
+WHERE {{
+    {{ GRAPH ?g {{
+        ?c a skos:Collection .
+        {{?c (rdfs:label | skos:prefLabel) ?l .
+        FILTER(lang(?l) = "{language}" || lang(?l) = "") 
+        }}
+    }} }}
+    UNION
+    {{
+        ?c a skos:Collection .
+        {{?c (rdfs:label | skos:prefLabel) ?l .
+        FILTER(lang(?l) = "{language}" || lang(?l) = "") 
+        }}
+    }} 
+}}'''.format(language=self.language)
         collections = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         return [(x.get('c').get('value'), x.get('l').get('value')) for x in collections]
 
     def list_concepts(self):
         vocab = g.VOCABS[self.vocab_id]
-        q = '''
-             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-             PREFIX dct: <http://purl.org/dc/terms/>
-             SELECT *
-             WHERE {{GRAPH ?g {{
-                 ?c skos:inScheme <{concept_scheme_uri}> . 
-                 {{?c skos:prefLabel ?pl .
-                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
-                 OPTIONAL {{ ?c skos:definition ?d .
-                    FILTER(lang(?d) = "{language}" || lang(?d) = "") }}
-                 OPTIONAL {{ ?c dct:created ?created . }}
-                 OPTIONAL {{ ?c dct:modified ?modified . }}
-             }} }}
-             ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri, 
-                                    language=self.language)
+        q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+ PREFIX dct: <http://purl.org/dc/terms/>
+ SELECT *
+ WHERE {{
+    {{ GRAPH ?g {{
+        ?c skos:inScheme <{concept_scheme_uri}> . 
+        {{ ?c skos:prefLabel ?pl .
+        FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+        }}
+        OPTIONAL {{ ?c skos:definition ?d .
+        FILTER(lang(?d) = "{language}" || lang(?d) = "") 
+        }}
+        OPTIONAL {{ ?c dct:created ?created . }}
+        OPTIONAL {{ ?c dct:modified ?modified . }}
+    }} }}
+    UNION
+    {{
+        ?c skos:inScheme <{concept_scheme_uri}> . 
+        {{ ?c skos:prefLabel ?pl .
+        FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+        }}
+        OPTIONAL {{ ?c skos:definition ?d .
+        FILTER(lang(?d) = "{language}" || lang(?d) = "") 
+        }}
+        OPTIONAL {{ ?c dct:created ?created . }}
+        OPTIONAL {{ ?c dct:modified ?modified . }}
+    }}
+}}
+ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri, 
+                        language=self.language)
         concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         concept_items = []
@@ -109,24 +132,41 @@ class Source:
     def get_collection(self, uri):
         vocab = g.VOCABS[self.vocab_id]
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT *
-            WHERE {{ GRAPH ?g {{
-              {{ <{collection_uri}> (rdfs:label | skos:prefLabel) ?l .
-                  FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
-              OPTIONAL {{?s rdfs:comment ?c .
-                  FILTER(lang(?c) = "{language}" || lang(?c) = "") }}
-            }} }}'''.format(collection_uri=uri, 
-                            language=self.language)
+SELECT *
+WHERE {{ 
+    {{ GRAPH ?g {{
+        {{ <{collection_uri}> (rdfs:label | skos:prefLabel) ?l .
+        FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
+        OPTIONAL {{?s rdfs:comment ?c .
+        FILTER(lang(?c) = "{language}" || lang(?c) = "") }}
+    }} }}
+    UNION
+    {{
+        {{ <{collection_uri}> (rdfs:label | skos:prefLabel) ?l .
+        FILTER(lang(?l) = "{language}" || lang(?l) = "") }}
+        OPTIONAL {{?s rdfs:comment ?c .
+        FILTER(lang(?c) = "{language}" || lang(?c) = "") }}
+    }}
+}}'''.format(collection_uri=uri, 
+                language=self.language)
         metadata = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         # get the collection's members
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT *
-            WHERE {{ GRAPH ?g {{
-              <{}> skos:member ?m .
-              {{ ?n skos:prefLabel ?pl .
-                  FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
-            }} }}'''.format(collection_uri=uri, 
+SELECT *
+WHERE {{
+    {{ GRAPH ?g {{
+        <{}> skos:member ?m .
+        {{ ?n skos:prefLabel ?pl .
+        FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+    }} }}
+    UNION
+    {{
+        <{}> skos:member ?m .
+        {{ ?n skos:prefLabel ?pl .
+        FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+    }}
+}}'''.format(collection_uri=uri, 
                             language=self.language)
         members = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
@@ -149,7 +189,17 @@ PREFIX dct: <http://purl.org/dc/terms/>
 select *
 
 WHERE {{
-    GRAPH ?graph {{
+    {{ GRAPH ?graph {{
+        <{concept_uri}> ?predicate ?object .
+        optional {{GRAPH ?predicateGraph {{?predicate rdfs:label ?predicateLabel .}} 
+            FILTER(lang(?predicateLabel) = "{language}" || lang(?predicateLabel) = "")
+            }}
+        optional {{?object skos:prefLabel | rdfs:label ?objectLabel .
+            FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "") # Don't filter prefLabel language
+        }}
+    }} }}
+    UNION
+    {{
         <{concept_uri}> ?predicate ?object .
         optional {{GRAPH ?predicateGraph {{?predicate rdfs:label ?predicateLabel .}} 
             FILTER(lang(?predicateLabel) = "{language}" || lang(?predicateLabel) = "")
@@ -235,21 +285,29 @@ WHERE {{
 
     def get_concept_hierarchy(self):
         vocab = g.VOCABS[self.vocab_id]
-        q = """
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-            SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
-            WHERE {{GRAPH ?g {{   
-                <{concept_scheme_uri}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
-                ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
-                {{ ?c      skos:prefLabel                          ?pl .
-                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
-                ?c		(skos:topConceptOf | skos:broader)		?parent .
-            }} }}
-            GROUP BY ?c ?pl ?parent
-            ORDER BY ?length ?parent ?pl
-            """.format(concept_scheme_uri=vocab.concept_scheme_uri, 
-                       language=self.language)
+        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
+WHERE {{
+    {{ GRAPH ?g {{   
+        <{concept_scheme_uri}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
+        ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
+        {{ ?c  skos:prefLabel ?pl .
+        FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+        ?c (skos:topConceptOf | skos:broader) ?parent .
+    }} }}
+    UNION
+    {{   
+        <{concept_scheme_uri}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
+        ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
+        {{ ?c  skos:prefLabel ?pl .
+        FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
+        ?c (skos:topConceptOf | skos:broader) ?parent .
+    }}
+}}
+GROUP BY ?c ?pl ?parent
+ORDER BY ?length ?parent ?pl""".format(concept_scheme_uri=vocab.concept_scheme_uri, 
+                                       language=self.language)
+        #print(q)
         cs = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
 
         hierarchy = []
@@ -258,7 +316,7 @@ WHERE {{
 
         # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice
         pl_cache = []
-        if cs[0].get('parent') is not None:
+        if cs and cs[0].get('parent') is not None:
             for c in cs:
                 # insert all topConceptOf directly
                 if str(c['parent']['value']) == vocab.uri:
@@ -311,12 +369,16 @@ WHERE {{
     def get_object_class(self):
         #print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
         vocab = g.VOCABS[self.vocab_id]
-        q = '''
-            SELECT * 
-            WHERE {{ GRAPH ?g {{
-                <{uri}> a ?c .
-            }} }}
-            '''.format(uri=url_decode(self.request.values.get('uri')))
+        q = '''SELECT * 
+WHERE {{ 
+    {{ GRAPH ?g {{
+        <{uri}> a ?c .
+    }} }}
+    UNION
+    {{
+        <{uri}> a ?c .
+    }}
+}}'''.format(uri=url_decode(self.request.values.get('uri')))
         clses = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
         #print(clses)
         # look for classes we understand (SKOS)
@@ -453,20 +515,18 @@ ORDER BY ?pl
                 q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 SELECT DISTINCT ?tc ?pl
 WHERE {{
-    {{ GRAPH ?g 
+    {{ GRAPH ?g {{
         {{
-            {{
-                <{concept_scheme_uri}> skos:hasTopConcept ?tc .                
-            }}
-            UNION 
-            {{
-                ?tc skos:inScheme <{concept_scheme_uri}> .
-            }}
-            {{ ?tc skos:prefLabel ?pl .
-                FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
-            }}
+            <{concept_scheme_uri}> skos:hasTopConcept ?tc .                
         }}
-    }}
+        UNION 
+        {{
+            ?tc skos:inScheme <{concept_scheme_uri}> .
+        }}
+        {{ ?tc skos:prefLabel ?pl .
+            FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+        }}
+    }} }}
     UNION
     {{
         {{
@@ -484,7 +544,7 @@ WHERE {{
 ORDER BY ?pl
 '''.format(concept_scheme_uri=vocab.concept_scheme_uri,
                                            language=self.language)
-                print(q)
+                #print(q)
                 top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
                 for tc in top_concepts:
                     if tc.get('pl').get('value') not in pl_cache:  # only add if not already in cache
@@ -583,7 +643,25 @@ ORDER BY ?pl
 PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 CONSTRUCT {{ ?subject ?predicate ?object }}
 WHERE  {{ 
-    GRAPH ?graph {{
+    {{ GRAPH ?graph {{
+        {{    # conceptScheme
+            ?subject ?predicate ?object .
+            ?subject a skos:ConceptScheme .
+            <{uri}> a skos:ConceptScheme .
+        }}
+        union
+        {{    # conceptScheme members as subjects
+            ?subject ?predicate ?object .
+            ?subject skos:inScheme <{uri}> .
+        }}
+        union
+        {{    # conceptScheme members as objects
+            ?subject ?predicate ?object .
+            ?object skos:inScheme <{uri}> .
+        }}
+    }} }}
+    UNION
+    {{
         {{    # conceptScheme
             ?subject ?predicate ?object .
             ?subject a skos:ConceptScheme .
