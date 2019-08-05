@@ -391,7 +391,7 @@ WHERE {{
                                         # Narrower concept
                                         ((binding_dict.get('broader_concept') is not None) 
                                          and (binding_dict['broader_concept']['value'] == broader_concept))
-                             ], key=lambda binding_dict: binding_dict['concept']['value']) 
+                             ], key=lambda binding_dict: binding_dict['concept_preflabel']['value']) 
             #print(broader_concept, narrower_list)
             for binding_dict in narrower_list: 
                 concept = binding_dict['concept']['value']              
@@ -424,7 +424,7 @@ WHERE {{
         FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
     }}
 }}
-ORDER BY ?concept'''.format(vocab_uri=vocab.concept_scheme_uri, language=self.language)
+ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, language=self.language)
         #print(query)
         bindings_list = Source.sparql_query(vocab.sparql_endpoint, query, vocab.sparql_username, vocab.sparql_password)
         #print(bindings_list)
