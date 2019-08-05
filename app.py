@@ -4,9 +4,7 @@ from flask import Flask, g
 from controller import routes
 import helper
 import data.source as source
-import os
-import pickle
-import time
+
 
 app = Flask(__name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR)
 

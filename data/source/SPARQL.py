@@ -23,9 +23,16 @@ class SPARQL(Source):
         """
         For this source, one SPARQL endpoint is given for a series of vocabs which are all separate ConceptSchemes
 
-        'gsq-graphdb': {
+        'ga-jena-fuseki': {
             'source': VocabSource.SPARQL,
-            'sparql_endpoint': 'http://graphdb.gsq.digital:7200/repositories/GSQ_Vocabularies_core'
+            'sparql_endpoint': 'http://dev2.nextgen.vocabs.ga.gov.au/fuseki/vocabs',
+            'sparql_username': '<sparql_user>', # Optional username for SPARQL endpoint
+            'sparql_password': '<sparql_password>', # Optional password for SPARQL endpoint
+            #'uri_filter_regex': '.*', # Regular expression to filter vocabulary URIs - Everything
+            #'uri_filter_regex': '^http(s?)://pid.geoscience.gov.au/def/voc/ga/', # Regular expression to filter vocabulary URIs - GA
+            #'uri_filter_regex': '^https://gcmdservices.gsfc.nasa.gov', # Regular expression to filter vocabulary URIs - GCMD
+            'uri_filter_regex': '^http(s?)://resource.geosciml.org/', # Regular expression to filter vocabulary URIs - CGI
+
         },
         """
         logging.debug('SPARQL collect()...')
@@ -68,6 +75,7 @@ ORDER BY ?l'''.format(language=DEFAULT_LANGUAGE)
             # handling CS URIs that end with '/'
             vocab_id = cs['cs']['value'].replace('/conceptScheme', '').split('/')[-1]
             
+            #TODO: Investigate putting regex into SPARQL query
             #print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
             if details.get('uri_filter_regex') and not re.search(details['uri_filter_regex'], cs['cs']['value']):
                 logging.debug('Skipping vocabulary {}'.format(vocab_id))
