@@ -499,7 +499,7 @@ WHERE {{
         return items
 
     @staticmethod
-    def draw_concept_hierarchy(hierarchy, request, id):
+    def draw_concept_hierarchy(hierarchy, request, vocab_id):
         tab = '\t'
         previous_length = 1
 
@@ -525,7 +525,7 @@ WHERE {{
                 mult = item[0] - 1
 
             import helper as h
-            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + id + '&uri=' + h.url_encode(item[1]) + ')\n'
+            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + vocab_id + '&uri=' + h.url_encode(item[1]) + ')\n'
             text += t
             previous_length = mult
             tracked_items.append({'name': item[1], 'indent': mult})
