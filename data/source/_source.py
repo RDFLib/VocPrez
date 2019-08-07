@@ -47,7 +47,7 @@ class Source:
         vocab = g.VOCABS[self.vocab_id]
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT *
+SELECT DISTINCT *
 WHERE {{
     {{ GRAPH ?g {{
         ?c a skos:Collection .
@@ -71,7 +71,7 @@ WHERE {{
         vocab = g.VOCABS[self.vocab_id]
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
  PREFIX dct: <http://purl.org/dc/terms/>
- SELECT *
+ SELECT DISTINCT *
  WHERE {{
     {{ GRAPH ?g {{
         ?c skos:inScheme <{concept_scheme_uri}> . 
@@ -132,7 +132,7 @@ ORDER BY ?pl'''.format(concept_scheme_uri=vocab.concept_scheme_uri,
     def get_collection(self, uri):
         vocab = g.VOCABS[self.vocab_id]
         q = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT *
+SELECT DISTINCT *
 WHERE {{ 
     {{ GRAPH ?g {{
         {{ <{collection_uri}> (rdfs:label | skos:prefLabel) ?l .
@@ -153,7 +153,7 @@ WHERE {{
 
         # get the collection's members
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-SELECT *
+SELECT DISTINCT *
 WHERE {{
     {{ GRAPH ?g {{
         <{}> skos:member ?m .
@@ -437,7 +437,7 @@ ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, langua
     def get_object_class(self):
         #print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
         vocab = g.VOCABS[self.vocab_id]
-        q = '''SELECT * 
+        q = '''SELECT DISTINCT * 
 WHERE {{ 
     {{ GRAPH ?g {{
         <{uri}> a ?c .
@@ -709,6 +709,7 @@ ORDER BY ?pl
         
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dct: <http://purl.org/dc/terms/>
 CONSTRUCT {{ ?subject ?predicate ?object }}
 WHERE  {{ 
     {{ GRAPH ?graph {{
@@ -748,6 +749,7 @@ WHERE  {{
     }}
     FILTER(STRSTARTS(STR(?predicate), STR(rdfs:))
         || STRSTARTS(STR(?predicate), STR(skos:))
+        || STRSTARTS(STR(?predicate), STR(dct:))
         )
 }}'''.format(uri=vocab.uri)
         #print(q)
