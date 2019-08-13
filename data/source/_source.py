@@ -629,17 +629,17 @@ ORDER BY ?pl
         sparql.setQuery(q)
         sparql.setReturnFormat(JSON)
 
-        
         if sparql_username and sparql_password:            
             sparql.setHTTPAuth(BASIC)
             sparql.setCredentials(sparql_username, sparql_password)
             
         try:
-            metadata = sparql.query().convert()['results']['bindings']
-        except:
+            return sparql.query().convert()['results']['bindings']
+        except Exception as e:
+            logging.debug('SPARQL query failed: {}'.format(e))
+            logging.debug(q)
             return None
         
-        return metadata
     
     @staticmethod
     def submit_sparql_query(endpoint, q, sparql_username=None, sparql_password=None, accept_format='json'):

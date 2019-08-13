@@ -69,7 +69,9 @@ ORDER BY ?l'''.format(language=DEFAULT_LANGUAGE)
         # record just the IDs & title for the VocPrez in-memory vocabs list
         concept_schemes = Source.sparql_query(details['sparql_endpoint'], q, 
                                               sparql_username=details.get('sparql_username'), sparql_password=details.get('sparql_password')
-                                              ) or {}
+                                              )
+        assert concept_schemes is not None, 'Unable to query conceptSchemes'
+        
         sparql_vocabs = {}
         for cs in concept_schemes:
             # handling CS URIs that end with '/'
