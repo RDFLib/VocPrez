@@ -448,6 +448,7 @@ WHERE {{
     }}
 }}'''.format(uri=url_decode(self.request.values.get('uri')))
         clses = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
+        assert clses is not None, 'SPARQL class query failed'
         #print(clses)
         # look for classes we understand (SKOS)
         for cls in clses:
@@ -637,7 +638,7 @@ ORDER BY ?pl
             return sparql.query().convert()['results']['bindings']
         except Exception as e:
             logging.debug('SPARQL query failed: {}'.format(e))
-            logging.debug(q)
+            logging.debug('endpoint={}\nsparql_username={}\nsparql_password={}\n{}'.format(endpoint, sparql_username, sparql_password, q))
             return None
         
     

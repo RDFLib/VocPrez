@@ -90,22 +90,24 @@ def cache_read(cache_file_name):
     
     if os.path.isfile(cache_file_path):
         # if the cache file is younger than cache_hours days, then try to read it
-        cache_file_creation_time = os.stat(cache_file_path).st_mtime
-        logging.debug('Cache file age: {} hours'.format((time.time() - cache_file_creation_time) / 3600))
-        # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
-        if cache_file_creation_time >= time.time() - cache_seconds:
+        cache_file_age = time.time() - os.stat(cache_file_path).st_mtime
+        logging.debug('Cache file age: {0:.2f} hours'.format(cache_file_age / 3600))
+        # if the cache file is older than VOCAB_CACHE_HOURS, ignore it
+        if cache_file_age <= cache_seconds:
             try:
                 with open(cache_file_path, 'rb') as f:
                     cache_object = pickle.load(f)
                     f.close()
                 if cache_object: # Ignore empty file
-                    logging.debug('Reading cache file {}'.format(os.path.abspath(cache_file_path)))
+                    logging.debug('Read cache file {}'.format(os.path.abspath(cache_file_path)))
                     return cache_object
             except Exception as e:
                 logging.debug('Unable to read cache file {}: {}'.format(os.path.abspath(cache_file_path), e))
                 pass
+        else:
+            logging.debug('Ignoring old cache file {}'.format(os.path.abspath(cache_file_path)))
         
-    return None
+    return
 
 def cache_write(cache_object, cache_file_name):
     '''
@@ -115,13 +117,14 @@ def cache_write(cache_object, cache_file_name):
     cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
     
     if os.path.isfile(cache_file_path):
-        # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
-        cache_file_creation_time = os.stat(cache_file_path).st_mtime
-        # if the VOCABS.pickle file is older than VOCAB_CACHE_DAYS days, delete it
-        if cache_seconds and cache_file_creation_time < time.time() - cache_seconds:
+        # if the cache file is older than VOCAB_CACHE_HOURS days, delete it
+        cache_file_age = time.time() - os.stat(cache_file_path).st_mtime
+        # if the cache file is older than VOCAB_CACHE_HOURS days, delete it
+        if cache_seconds and cache_file_age > cache_seconds:
             logging.debug('Removing old cache file {}'.format(os.path.abspath(cache_file_path)))
             os.remove(cache_file_path)
         else:
+            logging.debug('Retaining recent cache file {}'.format(os.path.abspath(cache_file_path)))
             return # Don't do anything - cache file is too young to die
 
     try:
