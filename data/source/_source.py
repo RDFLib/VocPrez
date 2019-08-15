@@ -403,6 +403,8 @@ WHERE {{
                               ] + build_hierarchy(bindings_list, concept, level)
             #print(level, hierarchy)
             return hierarchy
+        
+        
         vocab = g.VOCABS[self.vocab_id]
                  
         query = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -428,6 +430,7 @@ ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, langua
         #print(query)
         bindings_list = Source.sparql_query(vocab.sparql_endpoint, query, vocab.sparql_username, vocab.sparql_password)
         #print(bindings_list)
+        assert bindings_list is not None, 'SPARQL concept hierarchy query failed'
          
         hierarchy = build_hierarchy(bindings_list)
  
