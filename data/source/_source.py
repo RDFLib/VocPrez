@@ -70,9 +70,9 @@ WHERE {{
     def list_concepts(self):
         vocab = g.VOCABS[self.vocab_id]
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
- PREFIX dct: <http://purl.org/dc/terms/>
- SELECT DISTINCT *
- WHERE {{
+PREFIX dct: <http://purl.org/dc/terms/>
+SELECT DISTINCT *
+WHERE {{
     {{ GRAPH ?g {{
         ?c skos:inScheme <{concept_scheme_uri}> . 
         {{ ?c skos:prefLabel ?pl .
@@ -283,91 +283,6 @@ WHERE {{
             source=self,
         )
 
-
-#===============================================================================
-#     def get_concept_hierarchy(self):
-#         vocab = g.VOCABS[self.vocab_id]
-#         q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-# SELECT (COUNT(?mid) AS ?length) ?c ?pl ?parent
-# WHERE {{
-#     {{ GRAPH ?g {{   
-#         <{concept_scheme_uri}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
-#         ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
-#         {{ ?c  skos:prefLabel ?pl .
-#         FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
-#         ?c (skos:topConceptOf | skos:broader) ?parent .
-#     }} }}
-#     UNION
-#     {{   
-#         <{concept_scheme_uri}>    (skos:hasTopConcept | skos:narrower)*   ?mid .
-#         ?mid    (skos:hasTopConcept | skos:narrower)+   ?c .                      
-#         {{ ?c  skos:prefLabel ?pl .
-#         FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
-#         ?c (skos:topConceptOf | skos:broader) ?parent .
-#     }}
-# }}
-# GROUP BY ?c ?pl ?parent
-# ORDER BY ?length ?parent ?pl""".format(concept_scheme_uri=vocab.concept_scheme_uri, 
-#                                        language=self.language)
-#         #print(q)
-#         cs = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
-#  
-#         hierarchy = []
-#         previous_parent_uri = None
-#         last_index = 0
-#  
-#         # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice
-#         pl_cache = []
-#         if cs and cs[0].get('parent') is not None:
-#             for c in cs:
-#                 # insert all topConceptOf directly
-#                 if str(c['parent']['value']) == vocab.uri:
-#                     if c['pl']['value'] not in pl_cache:  # only add if not already in cache
-#                         hierarchy.append((
-#                             int(c['length']['value']),
-#                             c['c']['value'],
-#                             c['pl']['value'],
-#                             None
-#                         ))
-#                         pl_cache.append(c['pl']['value'])
-#                 else:
-#                     if c['pl']['value'] not in pl_cache:  # only add if not already in cache
-#                         # If this is not a topConcept, see if it has the same URI as the previous inserted Concept
-#                         # If so, use that Concept's index + 1
-#                         this_parent = c['parent']['value']
-#                         if this_parent == previous_parent_uri:
-#                             # use last inserted index
-#                             hierarchy.insert(last_index + 1, (
-#                                 int(c['length']['value']),
-#                                 c['c']['value'],
-#                                 c['pl']['value'],
-#                                 c['parent']['value']
-#                             ))
-#                             last_index += 1
-#                         # This is not a TopConcept and it has a differnt parent from the previous insert
-#                         # So insert it after it's parent
-#                         else:
-#                             i = 0
-#                             parent_index = 0
-#                             for t in hierarchy:
-#                                 if this_parent in t[1]:
-#                                     parent_index = i
-#                                 i += 1
-#  
-#                             hierarchy.insert(parent_index + 1, (
-#                                 int(c['length']['value']),
-#                                 c['c']['value'],
-#                                 c['pl']['value'],
-#                                 c['parent']['value']
-#                             ))
-#  
-#                             last_index = parent_index + 1
-#                         previous_parent_uri = this_parent
-#                         pl_cache.append(c['pl']['value'])
-#             return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
-#         else:
-#             return ''  # empty HTML
-#===============================================================================
 
     def get_concept_hierarchy(self):
         '''
@@ -714,6 +629,8 @@ ORDER BY ?pl
         q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
 CONSTRUCT {{ ?subject ?predicate ?object }}
 WHERE  {{ 
     {{ GRAPH ?graph {{
@@ -754,6 +671,7 @@ WHERE  {{
     FILTER(STRSTARTS(STR(?predicate), STR(rdfs:))
         || STRSTARTS(STR(?predicate), STR(skos:))
         || STRSTARTS(STR(?predicate), STR(dct:))
+        || STRSTARTS(STR(?predicate), STR(owl:))
         )
 }}'''.format(uri=vocab.uri)
         #print(q)
