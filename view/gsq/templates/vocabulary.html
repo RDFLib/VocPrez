@@ -1,5 +1,5 @@
 {% extends "page.html" %}
-
+{% from "macros/concept_hierarchy.html" import render_concept_hierarchy with context %}
 {% block content %}
 <h1>Vocabulary: {{ vocab.title }}</h1>
 <p>View this vocabulary's register of <a href="{{ url_for('routes.vocabulary', vocab_id=vocab.id) }}/concept/">concepts</a>.</p>
@@ -53,7 +53,7 @@
         <tr>
             <th>Concept Hierarchy:</th>
             <td>
-                    {{ vocab.concept_hierarchy|safe }}
+                    {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
             </td>
         </tr>
         {% endif %}
