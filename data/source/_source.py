@@ -353,7 +353,7 @@ ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, langua
         assert bindings_list is not None, 'SPARQL concept hierarchy query failed'
          
         hierarchy = build_hierarchy(bindings_list)
-        print(hierarchy)
+        #print(hierarchy)
  
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
