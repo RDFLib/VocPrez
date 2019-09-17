@@ -123,7 +123,8 @@ class ConceptRenderer(Renderer):
             'uri': self.request.values.get('uri'),
             'concept': self.concept,
             'navs': self.navs,
-            'title': 'Concept: ' + self.concept.prefLabel
+            'title': 'Concept: ' + self.concept.prefLabel,
+            'config': config,
         }
 
         return Response(

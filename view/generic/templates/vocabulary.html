@@ -1,66 +1,70 @@
-{% extends "page.html" %}
-{% from "macros/concept_hierarchy.html" import render_concept_hierarchy with context %}
-{% block content %}
+{% extends "page.html" -%}
+{% from "macros/concept_hierarchy.html" import render_concept_hierarchy with context -%}
+{% block content -%}
 <h1>Vocabulary: {{ vocab.title }}</h1>
 <p>View this vocabulary's register of <a href="{{ url_for('routes.vocabulary', vocab_id=vocab.id) }}/concept/">concepts</a>.</p>
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <div class="overflow">
     <table class="metadata concept_scheme">
-        {%  if vocab.description is not none  %}
+        {%  if vocab.description is not none  -%}
         <tr>
             <th>Description:</th><td>{{ vocab.description }}</td>
         </tr>
-        {% endif %}
-        {%  if vocab.creator is not none  %}
+        {% endif -%}
+        {%  if vocab.creator is not none  -%}
         <tr>
             <th>Creator:</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
         </tr>
-        {% endif %}
-        {%  if vocab.created is not none  %}
+        {% endif -%}
+        {%  if vocab.created is not none  -%}
         <tr>
             <th>Created:</th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
         </tr>
-        {% endif %}
-        {%  if vocab.modified is not none  %}
+        {% endif -%}
+        {%  if vocab.modified is not none  -%}
         <tr>
             <th>Modified:</th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
         </tr>
-        {% endif %}
-        {%  if vocab.versionInfo is not none  %}
+        {% endif -%}
+        {%  if vocab.versionInfo is not none  -%}
         <tr>
             <th>Version Info:</th><td>{{ vocab.versionInfo }}</td>
         </tr>
-        {% endif %}
-        {% if vocab.downloadURL %}
+        {% endif -%}
+        {% if vocab.downloadURL -%}
         <tr>
             <th>Download:</th>
             <td>
                     <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
             </td>
         </tr>
-        {% endif %}
-        {%  if vocab.hasTopConcept is not none  %}
+        {% endif -%}
+        {%  if vocab.hasTopConcept is not none  -%}
         <tr>
             <th>Top Concepts:</th>
             <td>
-                {% for tc in vocab.hasTopConcept %}
+            {% for tc in vocab.hasTopConcept -%}
+                {% if config.LOCAL_URLS -%}
                     <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab.id }}&uri={{ h.url_encode(tc[0]) }}">{{ tc[1] }}</a><br />
-                {% endfor %}
+                {% else -%}
+                    <a href="{{ tc[0] }}">{{ tc[1] }}</a><br />
+                {% endif -%}
+            {% endfor -%}
             </td>
         </tr>
-        {% endif %}
-        {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  %}
+        {% endif -%}
+        {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  -%}
         <tr>
             <th>Concept Hierarchy:</th>
             <td>
                     {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
             </td>
         </tr>
-        {% endif %}
+        {% endif -%}
     </table>
 </div>
 <footer class="content-footer">
     <h3>Alternate views</h3>
     <p>Other model views of this Vocabulary are listed in the <a href="{{ request.base_url }}?_view=alternates">Alternates View</a>.</p>
 </footer>
-{% endblock %}
+{% endblock -%}

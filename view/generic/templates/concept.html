@@ -28,14 +28,18 @@
     {% if concept.related_objects[relationship] and concept.related_objects[relationship]['objects'] -%}
         <tr>
             <th style="padding-right: 10px;"><a href="{{ relationship }}">{{concept.related_objects[relationship]['label']}}</a>:</th>
-            <td class="list">
+            <td class="list">                 
             {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
 	            {% if concept_uri and concept_label -%}
+            		{% if config.LOCAL_URLS -%}
+	                <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
+	            	{% else -%}
 	                <a href="{{ concept_uri }}">{{ concept_label }}</a><br>
+	            	{% endif -%}
 	            {% else -%}
 	                {{ concept_uri }}<br>
 	            {% endif -%}
-            {% endfor -%}                    
+            {% endfor -%}                   
             </td>
         </tr>
     {% endif -%}

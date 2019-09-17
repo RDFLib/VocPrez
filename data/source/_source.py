@@ -12,6 +12,7 @@ import logging
 import base64
 import requests
 from time import sleep
+import helper as h
 
 # Default to English if no DEFAULT_LANGUAGE in config
 if hasattr(config, 'DEFAULT_LANGUAGE:'):
@@ -247,7 +248,7 @@ WHERE {{
                                   else make_title(row['predicate']['value']))
             
                 if row['object']['type'] == 'literal':
-                    related_object= row['object']['value']
+                    related_object = row['object']['value']
                     related_objectLabel = None
                 elif row['object']['type'] == 'uri':
                     related_object = row['object']['value']
@@ -262,7 +263,7 @@ WHERE {{
                 
             relationship_dict['objects'][related_object] = related_objectLabel
             
-
+        
         related_objects = OrderedDict([(predicate, {'label': related_objects[predicate]['label'],
                                                     'objects': OrderedDict([(key, related_objects[predicate]['objects'][key]) 
                                                                             for key in sorted(related_objects[predicate]['objects'].keys())
@@ -443,8 +444,13 @@ WHERE {{
             if mult is None: # else: # everything is normal
                 mult = item[0] - 1
 
-            import helper as h
-            t = tab * mult + '* [' + item[2] + '](' + request.url_root + 'object?vocab_id=' + vocab_id + '&uri=' + h.url_encode(item[1]) + ')\n'
+            # Default to showing local URLs unless told otherwise
+            if (not hasattr(config, 'LOCAL_URLS')) or config.LOCAL_URLS:
+                uri = request.url_root + 'object?vocab_id=' + vocab_id + '&uri=' + h.url_encode(item[1])
+            else:
+                uri = item[1]
+
+            t = tab * mult + '* [' + item[2] + '](' + uri + ')\n'
             text += t
             previous_length = mult
             tracked_items.append({'name': item[1], 'indent': mult})

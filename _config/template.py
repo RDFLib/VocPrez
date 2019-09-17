@@ -13,7 +13,8 @@ DEFAULT_LANGUAGE = 'en'
 SPARQL_QUERY_LIMIT = 2000 # Maximum number of results to return per SPARQL query
 MAX_RETRIES = 2
 RETRY_SLEEP_SECONDS = 10
-SPARQL_TIMEOUT=60
+SPARQL_TIMEOUT = 60
+LOCAL_URLS = True # Parameter governing whether URLs shown are local or external
 
 # Parameters for global SPARQL query endpoint
 SPARQL_ENDPOINT = 'http://sparql_endpoint.org'

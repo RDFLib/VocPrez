@@ -43,9 +43,13 @@
         <tr>
             <th>Top Concepts:</th>
             <td>
-                {% for tc in vocab.hasTopConcept %}
+            {% for tc in vocab.hasTopConcept %}
+                {% if config.LOCAL_URLS -%}
                     <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab.id }}&uri={{ h.url_encode(tc[0]) }}">{{ tc[1] }}</a><br />
-                {% endfor %}
+                {% else -%}
+                    <a href="{{ tc[0] }}">{{ tc[1] }}</a><br />
+                {% endif -%}
+            {% endfor %}
             </td>
         </tr>
         {% endif %}

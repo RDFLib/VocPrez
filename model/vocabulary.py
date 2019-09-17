@@ -2,7 +2,7 @@ from pyldapi import Renderer, View
 from flask import Response, render_template, url_for
 from rdflib import Graph, URIRef, Literal, XSD, RDF
 from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
-
+import _config as config
 
 class Vocabulary:
     def __init__(
@@ -180,7 +180,8 @@ class VocabularyRenderer(Renderer):
             'uri': self.uri,
             'vocab': self.vocab,
             'navs': self.navs,
-            'title': 'Voc: ' + self.vocab.title
+            'title': 'Voc: ' + self.vocab.title,
+            'config': config
         }
 
         return Response(
