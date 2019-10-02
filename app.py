@@ -25,7 +25,7 @@ def before_request():
     # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
     g.VOCABS = helper.cache_read('VOCABS.p')
 
-    if True: #not g.VOCABS:
+    if not g.VOCABS:
         # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
 
         # check each vocab source and,
