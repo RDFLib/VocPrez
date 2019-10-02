@@ -6,6 +6,7 @@ from model.skos_register import SkosRegisterRenderer
 import _config as config
 import markdown
 from data.source._source import Source
+from data.source.FILE import FILE
 from data.source.VOCBENCH import VbException
 import json
 from pyldapi import Renderer
@@ -19,13 +20,12 @@ routes = Blueprint('routes', __name__)
 def render_invalid_vocab_id_response():
     msg = """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """ + '\n* '.join(g.VOCABS.keys())
     msg = Markup(markdown.markdown(msg))
-    return render_template('error.html', title='Error - invalid vocab id', heading='Invalid Vocab ID', msg=msg)
-    # return Response(
-    #     'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-    #     '\n'.join(g.VOCABS.keys()),
-    #     status=400,
-    #     mimetype='text/plain'
-    # )
+    return render_template(
+        'error.html',
+        title='Error - invalid vocab id',
+        heading='Invalid Vocab ID',
+        msg=msg
+    )
 
 
 def render_vb_exception_response(e):
@@ -152,10 +152,13 @@ def vocabulary(vocab_id):
         return render_invalid_vocab_id_response()
 
     # get vocab details using appropriate source handler
-    try:
-        vocab = Source(vocab_id, request, language).get_vocabulary()
-    except VbException as e:
-        return render_vb_exception_response(e)
+    if g.VOCABS.get(vocab_id).data_source in ['RVA', 'SPARQL']:
+        try:
+            vocab = Source(vocab_id, request, language).get_vocabulary()
+        except VbException as e:
+            return render_vb_exception_response(e)
+    elif g.VOCABS.get(vocab_id).data_source == 'FILE':
+        vocab = FILE(vocab_id, request).get_vocabulary()
 
     return VocabularyRenderer(
         request,
@@ -251,13 +254,15 @@ def object():
             status=400,
             mimetype='text/plain'
         )
-        
-    vocab_source = Source(vocab_id, request, language)
+
+    if g.VOCABS.get(vocab_id).data_source in ['RVA', 'SPARQL']:
+        vocab_source = Source(vocab_id, request, language)
+    elif g.VOCABS.get(vocab_id).data_source == 'FILE':
+        vocab_source = FILE(vocab_id, request, language)
 
     try:
         # TODO reuse object within if, rather than re-loading graph
         c = vocab_source.get_object_class()
-        #print(c)
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
             concept = vocab_source.get_concept()
@@ -285,7 +290,6 @@ def object():
             return render_invalid_object_class_response(vocab_id, uri, c)
     except VbException as e:
         return render_vb_exception_response(e)
-
 
 
 @routes.route('/geosciml')

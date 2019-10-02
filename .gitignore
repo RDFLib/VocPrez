@@ -129,4 +129,4 @@ _config/server__init__.py
 app.wsgi
 
 # local vocab files
-data/vocabs
+data/vocab_files

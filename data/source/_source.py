@@ -34,7 +34,7 @@ class Source:
         self.request = request
         self.language = language or DEFAULT_LANGUAGE
         
-        self._graph = None # Property for rdflib Graph object to be populated on demand
+        self._graph = None  # Property for rdflib Graph object to be populated on demand
 
     @staticmethod
     def collect(details):
@@ -181,7 +181,7 @@ WHERE {{
         )
 
     def get_concept(self):
-        concept_uri=self.request.values.get('uri')
+        concept_uri = self.request.values.get('uri')
         vocab = g.VOCABS[self.vocab_id]
         q = """PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -211,12 +211,10 @@ WHERE {{
     }}
 }}""".format(concept_uri=concept_uri, 
              language=self.language)   
-        #print(q)
+
         result = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
         
         assert result, 'Unable to query concepts for {}'.format(self.request.values.get('uri'))
-        
-        #print(str(result).encode('utf-8'))
 
         prefLabel = None
         
@@ -262,8 +260,7 @@ WHERE {{
                 related_objects[predicateUri] = relationship_dict
                 
             relationship_dict['objects'][related_object] = related_objectLabel
-            
-        
+
         related_objects = OrderedDict([(predicate, {'label': related_objects[predicate]['label'],
                                                     'objects': OrderedDict([(key, related_objects[predicate]['objects'][key]) 
                                                                             for key in sorted(related_objects[predicate]['objects'].keys())
@@ -272,8 +269,6 @@ WHERE {{
                                         )
                                        for predicate in sorted(related_objects.keys())
                                        ])
-        
-        #print(repr(related_objects).encode('utf-8'))
         
         return Concept(
             vocab_id=self.vocab_id,
@@ -293,7 +288,7 @@ WHERE {{
             Recursive helper function to build hierarchy list from a bindings list
             Returns list of tuples: (<level>, <concept>, <concept_preflabel>, <broader_concept>)
             '''
-            level += 1 # Start with level 1 for top concepts
+            level += 1  # Start with level 1 for top concepts
             hierarchy = []
             
             narrower_list = sorted([binding_dict 
@@ -307,7 +302,7 @@ WHERE {{
                                         ((binding_dict.get('broader_concept') is not None) 
                                          and (binding_dict['broader_concept']['value'] == broader_concept))
                              ], key=lambda binding_dict: binding_dict['concept_preflabel']['value']) 
-            #print(broader_concept, narrower_list)
+
             for binding_dict in narrower_list: 
                 concept = binding_dict['concept']['value']              
                 hierarchy += [(level,
@@ -316,10 +311,9 @@ WHERE {{
                                binding_dict['broader_concept']['value'] if binding_dict.get('broader_concept') else None,
                                )
                               ] + build_hierarchy(bindings_list, concept, level)
-            #print(level, hierarchy)
+
             return hierarchy
-        
-        
+
         vocab = g.VOCABS[self.vocab_id]
                  
         query = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -346,18 +340,16 @@ WHERE {{
     }}
 }}
 ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, language=self.language)
-        #print(query)
+
         bindings_list = Source.sparql_query(vocab.sparql_endpoint, query, vocab.sparql_username, vocab.sparql_password)
-        #print(bindings_list)
+
         assert bindings_list is not None, 'SPARQL concept hierarchy query failed'
          
         hierarchy = build_hierarchy(bindings_list)
-        #print(hierarchy)
  
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     def get_object_class(self):
-        #print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
         vocab = g.VOCABS[self.vocab_id]
         q = '''SELECT DISTINCT * 
 WHERE {{ 
