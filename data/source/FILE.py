@@ -310,9 +310,6 @@ class FILE(Source):
             ]
         )
 
-        import pprint
-        pprint.pprint(related_objects)
-
         return Concept(
             vocab_id=self.vocab_id,
             uri=concept_uri,
