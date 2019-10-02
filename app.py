@@ -9,7 +9,8 @@ import data.source as source
 app = Flask(__name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR)
 
 app.register_blueprint(routes.routes)
-   
+
+
 @app.before_request
 def before_request():
     """
@@ -20,12 +21,11 @@ def before_request():
     # check to see if g.VOCABS exists, if so, do nothing
     if hasattr(g, 'VOCABS'):
         return
-    
 
     # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
     g.VOCABS = helper.cache_read('VOCABS.p')
 
-    if not g.VOCABS:
+    if True: #not g.VOCABS:
         # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
 
         # check each vocab source and,
@@ -37,7 +37,8 @@ def before_request():
     
         # also load all vocabs into VOCABS.p on disk for future use
         helper.cache_write(g.VOCABS, 'VOCABS.p')
-        
+
+
 @app.context_processor
 def context_processor():
     """

@@ -284,7 +284,6 @@ WHERE {{
             source=self,
         )
 
-
     def get_concept_hierarchy(self):
         '''
         Function to draw concept hierarchy for vocabulary
@@ -356,7 +355,6 @@ ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, langua
         #print(hierarchy)
  
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
-
 
     def get_object_class(self):
         #print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
@@ -569,8 +567,7 @@ ORDER BY ?pl
             logging.debug('SPARQL query failed: {}'.format(e))
             logging.debug('endpoint={}\nsparql_username={}\nsparql_password={}\n{}'.format(endpoint, sparql_username, sparql_password, q))
             return None
-        
-    
+
     @staticmethod
     def submit_sparql_query(endpoint, q, sparql_username=None, sparql_password=None, accept_format='json'):
         '''
@@ -690,21 +687,4 @@ WHERE  {{
         self._graph = Source.get_graph(vocab.sparql_endpoint, q, sparql_username=vocab.sparql_username, sparql_password=vocab.sparql_password)
         cache_write(self._graph, cache_file_name)
         return self._graph
-            
 
-
-
-    # @staticmethod
-    # def sparql_query_in_memory_graph(vocab_id, q):
-    #     # get the graph from the pickled file
-    #     g = Graph()
-    #     g = Source.load_pickle_graph(vocab_id)
-    #
-    #     # put the query to the graph
-    #     for r in g.query(q):
-    #
-    #
-    #
-    # @staticmethod
-    # def sparql_query_sparql_endpoint(vocab_id, q):
-    #     pass

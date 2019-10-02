@@ -5,9 +5,10 @@ import _config as config
 from rdflib import Graph, Literal, URIRef
 import os
 from helper import APP_DIR
-from vocbench import Vocbench
+# from vocbench import Vocbench
 
-global g # Flask globals
+global g  # Flask globals
+
 
 class VbAuthException(Exception):
     pass

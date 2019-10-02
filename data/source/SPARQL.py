@@ -11,6 +11,7 @@ if hasattr(config, 'DEFAULT_LANGUAGE:'):
 else:
     DEFAULT_LANGUAGE = 'en'
 
+
 class SPARQL(Source):
     """Source for a generic SPARQL endpoint
     """
@@ -70,9 +71,12 @@ SELECT * WHERE {{
 }} 
 ORDER BY ?title'''.format(language=DEFAULT_LANGUAGE)
         # record just the IDs & title for the VocPrez in-memory vocabs list
-        concept_schemes = Source.sparql_query(details['sparql_endpoint'], q, 
-                                              sparql_username=details.get('sparql_username'), sparql_password=details.get('sparql_password')
-                                              )
+        concept_schemes = Source.sparql_query(
+            details['sparql_endpoint'],
+            q,
+            sparql_username=details.get('sparql_username'),
+            sparql_password=details.get('sparql_password')
+        )
         assert concept_schemes is not None, 'Unable to query conceptSchemes'
         
         sparql_vocabs = {}
@@ -80,8 +84,8 @@ ORDER BY ?title'''.format(language=DEFAULT_LANGUAGE)
             # handling CS URIs that end with '/'
             vocab_id = cs['cs']['value'].replace('/conceptScheme', '').split('/')[-1]
             
-            #TODO: Investigate putting regex into SPARQL query
-            #print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
+            # TODO: Investigate putting regex into SPARQL query
+            # print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
             if details.get('uri_filter_regex') and not re.search(details['uri_filter_regex'], cs['cs']['value']):
                 logging.debug('Skipping vocabulary {}'.format(vocab_id))
                 continue
@@ -92,7 +96,7 @@ ORDER BY ?title'''.format(language=DEFAULT_LANGUAGE)
             sparql_vocabs[vocab_id] = Vocabulary(
                 vocab_id,
                 cs['cs']['value'].replace('/conceptScheme', ''),
-                cs['title'].get('value') or vocab_id if cs.get('title') else vocab_id, # Need string value for sorting, not None
+                cs['title'].get('value') or vocab_id if cs.get('title') else vocab_id,  # Need string, not None
                 cs['description'].get('value') if cs.get('description') is not None else None,
                 None,  # none of these SPARQL vocabs have creator info yet # TODO: add creator info to GSQ vocabs
                 dateutil.parser.parse(cs.get('created').get('value')) if cs.get('created') is not None else None,
