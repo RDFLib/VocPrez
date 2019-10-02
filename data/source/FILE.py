@@ -2,14 +2,20 @@ from data.source._source import Source
 from os.path import join
 import _config as config
 from rdflib import Graph, URIRef, RDF
-from rdflib.namespace import SKOS, DCTERMS, OWL
+from rdflib.namespace import SKOS
 import os
+import dateutil.parser
 import pickle
+from flask import g
 import logging
+from model.vocabulary import Vocabulary
 from helper import APP_DIR
 
+if hasattr(config, 'DEFAULT_LANGUAGE:'):
+    DEFAULT_LANGUAGE = config.DEFAULT_LANGUAGE
+else:
+    DEFAULT_LANGUAGE = 'en'
 
-global g # Flask globals
 
 class PickleLoadException(Exception):
     pass
@@ -25,68 +31,117 @@ class FILE(Source):
         'rdf': 'xml'
     }
 
-    def __init__(self, vocab_id, request, language=None):
-        super().__init__(vocab_id, request, language)
+    def __init__(self, vocab_id):
+        super().__init__(vocab_id, None, None)
         self.g = FILE.load_pickle_graph(vocab_id)
 
     @staticmethod
-    def init():
+    def collect(details):
+        file_vocabs = {}
         # find all files in project_directory/vocab_files
-        for path, subdirs, files in os.walk(join(config.APP_DIR, 'vocab_files')):
+        for path, subdirs, files in os.walk(join(config.APP_DIR, details['vocab_files_folder_path'])):
             for name in files:
                 if name.split('.')[-1] in FILE.MAPPER:
                     # load file
                     file_path = os.path.join(path, name)
                     file_format = FILE.MAPPER[name.split('.')[-1]]
                     # load graph
-                    g = Graph().parse(file_path, format=file_format)
+                    gr = Graph().parse(file_path, format=file_format)
                     file_name = name.split('.')[0]
                     # pickle to directory/vocab_files/
                     with open(join(path, file_name + '.p'), 'wb') as f:
-                        pickle.dump(g, f)
+                        pickle.dump(gr, f)
                         f.close()
 
-        # Get register item metadata
-        for vocab_id in g.VOCABS:
-            if vocab_id in g.VOCABS:
-                if g.VOCABS[vocab_id]['source'] != config.VocabSource.FILE:
-                    continue
-                
-                # Creators
-                creators = []
-                g = FILE.load_pickle_graph(vocab_id)
-                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                    for creator in g.objects(uri, DCTERMS.creator):
-                        creators.append(str(creator))
-                    break
-                g.VOCABS[vocab_id]['creators'] = creators
+                    # extract vocab metadata
+                    # Get the ConceptSchemes from the graph of the file
+                    # Interpret the CS as a Vocab
+                    q = '''
+                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                        PREFIX dcterms: <http://purl.org/dc/terms/>
+                        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+                        SELECT 
+                            ?cs          # 0
+                            ?title       # 1 
+                            ?created     # 2
+                            ?issued      # 3
+                            ?modified    # 4
+                            ?version     # 5
+                            ?description # 6
+                        WHERE {{
+                            ?cs a skos:ConceptScheme .
+                            OPTIONAL {{ 
+                                ?cs skos:prefLabel ?title .
+                                FILTER(lang(?title) = "{language}" || lang(?title) = "") 
+                            }}
+                            OPTIONAL {{ ?cs dcterms:created ?created }}
+                            OPTIONAL {{ ?cs dcterms:issued ?issued }}
+                            OPTIONAL {{ ?cs dcterms:modified ?modified }}
+                            OPTIONAL {{ ?cs owl:versionInfo ?version }}
+                            OPTIONAL {{ 
+                                ?cs skos:definition ?description .
+                                FILTER(lang(?description) = "{language}" || lang(?description) = "") 
+                            }}
+                        }}'''.format(language=DEFAULT_LANGUAGE)
 
-                # Date Created
-                created = None
-                # dct:created
-                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                    for date in g.objects(uri, DCTERMS.created):
-                        created = str(date)[:10]
-                if not created:
-                    # dct:date
-                    for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                        for date in g.objects(uri, DCTERMS.date):
-                            created = str(date)[:10]
-                g.VOCABS[vocab_id]['created'] = created
-
-                # Date Modified
-                modified = None
-                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                    for date in g.objects(uri, DCTERMS.modified):
-                        modified = str(date)[:10]
-                g.VOCABS[vocab_id]['modified'] = modified
-
-                # Version
-                version = None
-                for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
-                    for versionInfo in g.objects(uri, OWL.versionInfo):
-                        version = versionInfo
-                g.VOCABS[vocab_id]['version'] = version
+                    vocab_id = 'file-' + name
+                    for cs in gr.query(q):
+                        file_vocabs[vocab_id] = Vocabulary(
+                            vocab_id,
+                            str(cs[0]).replace('/conceptScheme', ''),
+                            str(cs[1]) or str(cs[0]) if str(cs[1]) else str(cs[0]),  # Need string, not None
+                            str(cs[6]) if cs[6] is not None else None,
+                            None,
+                            dateutil.parser.parse(str(cs[2])) if cs[2] is not None else None,
+                            dateutil.parser.parse(str(cs[4])) if cs[4] is not None else None,
+                            str(cs[5]) if cs[5] is not None else None,  # versionInfo
+                            config.VocabSource.FILE,
+                            cs[0]
+                        )
+        g.VOCABS = {**g.VOCABS, **file_vocabs}
+        logging.debug('FILE collect() complete.')
+        # # Get register item metadata
+        # for vocab_id in g.VOCABS:
+        #     if vocab_id in g.VOCABS:
+        #         if g.VOCABS[vocab_id]['source'] != config.VocabSource.FILE:
+        #             continue
+        #
+        #         # Creators
+        #         creators = []
+        #         g = FILE.load_pickle_graph(vocab_id)
+        #         for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+        #             for creator in g.objects(uri, DCTERMS.creator):
+        #                 creators.append(str(creator))
+        #             break
+        #         g.VOCABS[vocab_id]['creators'] = creators
+        #
+        #         # Date Created
+        #         created = None
+        #         # dct:created
+        #         for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+        #             for date in g.objects(uri, DCTERMS.created):
+        #                 created = str(date)[:10]
+        #         if not created:
+        #             # dct:date
+        #             for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+        #                 for date in g.objects(uri, DCTERMS.date):
+        #                     created = str(date)[:10]
+        #         g.VOCABS[vocab_id]['created'] = created
+        #
+        #         # Date Modified
+        #         modified = None
+        #         for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+        #             for date in g.objects(uri, DCTERMS.modified):
+        #                 modified = str(date)[:10]
+        #         g.VOCABS[vocab_id]['modified'] = modified
+        #
+        #         # Version
+        #         version = None
+        #         for uri in g.subjects(RDF.type, SKOS.ConceptScheme):
+        #             for versionInfo in g.objects(uri, OWL.versionInfo):
+        #                 version = versionInfo
+        #         g.VOCABS[vocab_id]['version'] = version
 
     @classmethod
     def list_vocabularies(self):
@@ -394,3 +449,10 @@ class FILE(Source):
             f.close()
 
         g.serialize(path + '.ttl', format='turtle')
+
+
+if __name__ == '__main__':
+    details = {
+        'vocab_files_folder_path': 'data/vocabs'
+    }
+    FILE.collect(details)
