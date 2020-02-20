@@ -181,7 +181,7 @@ WHERE {{
         )
 
     def get_concept(self):
-        concept_uri=self.request.values.get('uri')
+        concept_uri = self.request.values.get('uri')
         vocab = g.VOCABS[self.vocab_id]
         q = """PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -284,7 +284,6 @@ WHERE {{
             source=self,
         )
 
-
     def get_concept_hierarchy(self):
         '''
         Function to draw concept hierarchy for vocabulary
@@ -319,8 +318,7 @@ WHERE {{
                               ] + build_hierarchy(bindings_list, concept, level)
             #print(level, hierarchy)
             return hierarchy
-        
-        
+
         vocab = g.VOCABS[self.vocab_id]
                  
         query = '''PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -347,16 +345,14 @@ WHERE {{
     }}
 }}
 ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, language=self.language)
-        #print(query)
+
         bindings_list = Source.sparql_query(vocab.sparql_endpoint, query, vocab.sparql_username, vocab.sparql_password)
-        #print(bindings_list)
+
         assert bindings_list is not None, 'SPARQL concept hierarchy query failed'
          
         hierarchy = build_hierarchy(bindings_list)
-        #print(hierarchy)
  
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
-
 
     def get_object_class(self):
         #print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
@@ -564,13 +560,51 @@ ORDER BY ?pl
             sparql.setCredentials(sparql_username, sparql_password)
             
         try:
+            import requests
+            DEFAULT_LANGUAGE = 'en'
+            q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX dcterms: <http://purl.org/dc/terms/>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT * WHERE {{
+                {{ GRAPH ?g {{
+                    ?cs a skos:ConceptScheme .
+                    OPTIONAL {{ ?cs skos:prefLabel ?title .
+                        FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
+                    OPTIONAL {{ ?cs dcterms:created ?created }}
+                    OPTIONAL {{ ?cs dcterms:issued ?issued }}
+                    OPTIONAL {{ ?cs dcterms:modified ?modified }}
+                    OPTIONAL {{ ?cs owl:versionInfo ?version }}
+                    OPTIONAL {{ ?cs skos:definition ?description .
+                        FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
+                }} }}
+                UNION
+                {{
+                    ?cs a skos:ConceptScheme .
+                    OPTIONAL {{ ?cs skos:prefLabel ?title .
+                        FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
+                    OPTIONAL {{ ?cs dcterms:created ?created }}
+                    OPTIONAL {{ ?cs dcterms:issued ?issued }}
+                    OPTIONAL {{ ?cs dcterms:modified ?modified }}
+                    OPTIONAL {{ ?cs owl:versionInfo ?version }}
+                    OPTIONAL {{ ?cs skos:definition ?description .
+                        FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
+                }}
+            }} 
+            ORDER BY ?title'''.format(language=DEFAULT_LANGUAGE)
+            # print('requesting using requests')
+            # r = requests.get(
+            #     'http://localhost:7200/respositories/gsq',
+            #     data={'query': q}
+            # )
+            # print(r.text)
+            # print(sparql.query())
             return sparql.query().convert()['results']['bindings']
         except Exception as e:
             logging.debug('SPARQL query failed: {}'.format(e))
             logging.debug('endpoint={}\nsparql_username={}\nsparql_password={}\n{}'.format(endpoint, sparql_username, sparql_password, q))
             return None
-        
-    
+
     @staticmethod
     def submit_sparql_query(endpoint, q, sparql_username=None, sparql_password=None, accept_format='json'):
         '''
@@ -690,9 +724,6 @@ WHERE  {{
         self._graph = Source.get_graph(vocab.sparql_endpoint, q, sparql_username=vocab.sparql_username, sparql_password=vocab.sparql_password)
         cache_write(self._graph, cache_file_name)
         return self._graph
-            
-
-
 
     # @staticmethod
     # def sparql_query_in_memory_graph(vocab_id, q):
@@ -702,8 +733,6 @@ WHERE  {{
     #
     #     # put the query to the graph
     #     for r in g.query(q):
-    #
-    #
     #
     # @staticmethod
     # def sparql_query_sparql_endpoint(vocab_id, q):

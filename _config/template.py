@@ -67,16 +67,16 @@ VOCAB_SOURCES = {
             }
         ]
     },
-    #===========================================================================
+    # ===========================================================================
     # 'ga-jena-fuseki': {
     #     'source': VocabSource.SPARQL,
     #     'sparql_endpoint': 'http://sparql_endpoint.org',
     #     'sparql_username': 'sparql_user',
     #     'sparql_password': 'sparql_password',
     #     'uri_filter_regex': '.*', # Regular expression to filter vocabulary URIs - Everything
-    #     #'uri_filter_regex': '^http(s?)://pid.geoscience.gov.au/def/voc/ga/', # Regular expression to filter vocabulary URIs - GA
-    #     #'uri_filter_regex': '^https://gcmdservices.gsfc.nasa.gov', # Regular expression to filter vocabulary URIs - GCMD
-    #     #'uri_filter_regex': '^http(s?)://resource.geosciml.org/', # Regular expression to filter vocabulary URIs - CGI
+    #     #'uri_filter_regex': '^http(s?)://pid.geoscience.gov.au/def/voc/ga/', # Regex to filter vocabulary URIs - GA
+    #     #'uri_filter_regex': '^https://gcmdservices.gsfc.nasa.gov', # Regex to filter vocabulary URIs - GCMD
+    #     #'uri_filter_regex': '^http(s?)://resource.geosciml.org/', # Regex to filter vocabulary URIs - CGI
     # },  
-    #===========================================================================
+    # ===========================================================================
 }
