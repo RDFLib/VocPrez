@@ -22,7 +22,8 @@ class SkosRegisterRenderer(ContainerRenderer):
                 mediatypes=['application/json'],
                 default_mediatype='application/json',
                 languages=['en'],
-                default_language='en'
+                default_language='en',
+                profile_uri='https://ckan.org/',
             )
         }
 

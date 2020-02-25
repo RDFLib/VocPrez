@@ -47,6 +47,7 @@ class ConceptRenderer(Renderer):
                 mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
                 default_mediatype='text/html',
                 languages=['en'],  # default 'en' only for now
+                profile_uri='http://www.w3.org/2004/02/skos/core#',
             )
         }
 

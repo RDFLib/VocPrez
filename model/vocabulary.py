@@ -98,7 +98,8 @@ class VocabularyRenderer(Renderer):
                 mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
                 default_mediatype='text/html',
                 languages=['en'],  # default 'en' only for now
-                default_language='en'
+                default_language='en',
+                profile_uri='http://www.w3.org/2004/02/skos/core#',
             )
         }
 
