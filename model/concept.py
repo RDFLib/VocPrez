@@ -1,4 +1,4 @@
-from pyldapi import Renderer, View
+from pyldapi import Renderer, Profile
 from flask import Response, render_template, g
 import _config as config
 from rdflib import Graph, RDF, Literal, URIRef, XSD
@@ -26,7 +26,7 @@ class Concept:
 class ConceptRenderer(Renderer):
     def __init__(self, request, concept):
         self.request = request
-        self.views = self._add_views()
+        self.profiles = self._add_views()
         self.navs = []  # TODO: add in other nav items for Concept
 
         self.concept = concept
@@ -34,30 +34,30 @@ class ConceptRenderer(Renderer):
         super().__init__(
             self.request,
             self.concept.uri,
-            self.views,
+            self.profiles,
             'skos'
         )
 
     def _add_views(self):
         return {
-            'skos': View(
+            'skos': Profile(
+                'http://www.w3.org/2004/02/skos/core#',
                 'Simple Knowledge Organization System (SKOS)',
                 'SKOS is a W3C recommendation designed for representation of thesauri, classification schemes, '
                 'taxonomies, subject-heading systems, or any other type of structured controlled vocabulary.',
-                ['text/html', 'application/json'] + self.RDF_MIMETYPES,
+                ['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
                 'text/html',
                 languages=['en'],  # default 'en' only for now
-                namespace='http://www.w3.org/2004/02/skos/core#'
             )
         }
 
     def render(self):
-        if self.view == 'alternates':
-            if self.format == 'text/html':
-                return self._render_alternates_view_html({'title': 'Alternates View of ' + self.concept.prefLabel, 'name': self.concept.prefLabel, 'vocab_id': self.concept.vocab_id})
-            return self._render_alternates_view()
-        elif self.view == 'skos':
-            if self.format in Renderer.RDF_MIMETYPES or self.format in Renderer.RDF_SERIALIZER_MAP:
+        # try returning alt profile
+        response = super().render()
+        if response is not None:
+            return response
+        elif self.profile == 'skos':
+            if self.mediatype in Renderer.RDF_MEDIA_TYPES or self.mediatype in Renderer.RDF_SERIALIZER_TYPES_MAP:
                 return self._render_skos_rdf()
             else:
                 return self._render_skos_html()
@@ -73,10 +73,10 @@ class ConceptRenderer(Renderer):
             concept_g.add((s, p, o))
 
         # serialise in the appropriate RDF format
-        if self.format in ['application/rdf+json', 'application/json']:
-            return Response(concept_g.serialize(format='json-ld'), mimetype=self.format)
+        if self.mediatype in ['application/rdf+json', 'application/json']:
+            return Response(concept_g.serialize(format='json-ld'), mimetype=self.mediatype)
         else:
-            return Response(concept_g.serialize(format=self.format), mimetype=self.format)
+            return Response(concept_g.serialize(format=self.mediatype), mimetype=self.mediatype)
 
         # # Create a graph from the self.concept object for a SKOS view
         # namespace_manager = NamespaceManager(Graph())
@@ -111,10 +111,10 @@ class ConceptRenderer(Renderer):
         # # TODO: vocab_id, uri, semantic_properties
         #
         # # serialise in the appropriate RDF format
-        # if self.format in ['application/rdf+json', 'application/json']:
-        #     return Response(g.serialize(format='json-ld'), mimetype=self.format)
+        # if self.mediatype in ['application/rdf+json', 'application/json']:
+        #     return Response(g.serialize(format='json-ld'), mimetype=self.mediatype)
         # else:
-        #     return Response(g.serialize(format=self.format), mimetype=self.format)
+        #     return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
 
     def _render_skos_html(self):
         _template_context = {

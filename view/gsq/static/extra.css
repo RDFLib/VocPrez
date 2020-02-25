@@ -138,3 +138,11 @@ body {
     margin-top: 40px;
     border-top: 2px solid #f0f0f0;
 }
+
+dt {
+    font-weight: bold;
+}
+
+dd {
+    margin-left: 20px;
+}

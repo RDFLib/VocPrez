@@ -1,0 +1,37 @@
+{% extends "page.html" %}
+
+    {% block content %}
+        <h1>Alternate Profiles</h1>
+        <h3>Instance: <a href="{{ uri }}">{{ uri }}</a></h3>
+        <h4>Default Profile: <a href="{{ request.base_url }}?{% if request.args.get('vocab_id') is not none %}vocab_id={{ request.args.get('vocab_id') }}&{% endif %}uri={{ uri }}&_profile={{ default_profile_token }}">{{ default_profile_token }}</a></h4>
+        <div class="overflow">
+            <table class="layout">
+                <tr>
+                    <th style="font-weight: bold;">Token</th>
+                    <th style="font-weight: bold;">Name</th>
+                    <th style="font-weight: bold;">Formats</th>
+                    <th style="font-weight: bold; padding-right: 30px;">Languages</th>
+                    <th style="font-weight: bold;">Description</th>
+                    <th style="font-weight: bold;">Namespace</th>
+                </tr>
+            {% for token, profile in profiles.items() %}
+                <tr style="border-bottom: 1px solid black; border-top: 1px solid black;">
+                    <td style="padding-right: 30px;"><a href="{{ request.base_url }}?{% if request.args.get('vocab_id') is not none %}vocab_id={{ request.args.get('vocab_id') }}&{% endif %}uri={{ uri }}&_profile={{ token }}&_mediatype={{ profile['default_mediatype'] }}">{{ token }}</a></td>
+                    <td>{{ profile['label'] }}</td>
+                    <td>
+                    {% for f in profile['mediatypes'] %}
+                        <a href="{{ request.base_url }}?{% if request.args.get('vocab_id') is not none %}vocab_id={{ request.args.get('vocab_id') }}&{% endif %}uri={{ uri }}&_profile={{ token }}&_mediatype={{ f }}">{{ f }}</a><br />
+                    {% endfor %}
+                    </td>
+                    <td style="text-align: center;">
+                    {% for l in profile['languages'] %}
+                        <a href="{{ request.base_url }}?{% if request.args.get('vocab_id') is not none %}vocab_id={{ request.args.get('vocab_id') }}&{% endif %}uri={{ uri }}&_profile={{ token }}&_lang={{ l }}">{{ l }}</a><br />
+                    {% endfor %}
+                    </td>
+                    <td>{{ profile['comment'] }}</td>
+                    <td><a href="{{ profile['uri'] }}">{{ profile['uri'] }}</a></td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    {% endblock %}
