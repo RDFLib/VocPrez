@@ -41,12 +41,11 @@ class ConceptRenderer(Renderer):
     def _add_views(self):
         return {
             'skos': Profile(
-                'http://www.w3.org/2004/02/skos/core#',
-                'Simple Knowledge Organization System (SKOS)',
-                'SKOS is a W3C recommendation designed for representation of thesauri, classification schemes, '
+                label='http://www.w3.org/2004/02/skos/core#',
+                comment='Simple Knowledge Organization System (SKOS) is a W3C recommendation designed for representation of thesauri, classification schemes, '
                 'taxonomies, subject-heading systems, or any other type of structured controlled vocabulary.',
-                ['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
-                'text/html',
+                mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
+                default_mediatype='text/html',
                 languages=['en'],  # default 'en' only for now
             )
         }
