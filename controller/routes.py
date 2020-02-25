@@ -190,14 +190,15 @@ def vocabulary_list(vocab_id):
     end = start + per_page
     concepts = concepts[start:end]
 
+ 
     test = SkosRegisterRenderer(
-        request,
-        [],
-        concepts,
-        g.VOCABS[vocab_id].title + ' concepts',
-        total,
-        search_query=query,
+        request=request,
+        navs=[],
+        members=concepts,
+        register_item_type_string=g.VOCABS[vocab_id].title + ' concepts',
+        total=total,
         search_enabled=True,
+        search_query=query,
         vocabulary_url=[request.url_root + 'vocabulary/' + vocab_id],
         vocab_id=vocab_id
     )

@@ -4,11 +4,25 @@ from flask_paginate import Pagination
 
 
 class SkosRegisterRenderer(ContainerRenderer):
-    def __init__(
-            self, request, navs, members, register_item_type_string, total, search_enabled=None,
-            search_query=None, contained_item_classes=[], **kwargs):
+    def __init__(self, 
+                 request, 
+                 navs, 
+                 members, 
+                 register_item_type_string, 
+                 total, 
+                 search_enabled=None,
+                 search_query=None, 
+                 contained_item_classes=[], 
+                 **kwargs
+                 ):
+        
         self.navs = navs
-        self.members = [(x.uri, x.title) for x in members]
+        #TODO: Deal with this more elegantly
+        try:
+            self.members = [(x.uri, x.title) for x in members] # Vocabulary members
+        except:
+            self.members = [(x['uri'], x['title']) for x in members] # dict members  
+                
         self.register_item_type_string = register_item_type_string
         self.search_query = search_query
         self.search_enabled = search_enabled
