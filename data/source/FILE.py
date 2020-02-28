@@ -13,10 +13,10 @@ import logging
 from model.vocabulary import Vocabulary
 import helper as h
 
-if hasattr(config, 'DEFAULT_LANGUAGE:'):
+if hasattr(config, "DEFAULT_LANGUAGE:"):
     DEFAULT_LANGUAGE = config.DEFAULT_LANGUAGE
 else:
-    DEFAULT_LANGUAGE = 'en'
+    DEFAULT_LANGUAGE = "en"
 
 
 class PickleLoadException(Exception):
@@ -25,14 +25,14 @@ class PickleLoadException(Exception):
 
 class FILE(Source):
     hierarchy = {}
-    vocab_files_folder = ''
+    vocab_files_folder = ""
 
     # file extensions mapped to rdflib-supported formats
     # see supported rdflib formats at https://rdflib.readthedocs.io/en/stable/plugin_parsers.html?highlight=format
     MAPPER = {
-        'ttl': 'turtle',
-        'rdf': 'xml',
-        'owl': 'xml',
+        "ttl": "turtle",
+        "rdf": "xml",
+        "owl": "xml",
     }
 
     def __init__(self, vocab_id, request, language=None):
@@ -43,24 +43,26 @@ class FILE(Source):
     def collect(details):
         file_vocabs = {}
         # find all files in project_directory/data/source/vocab_files
-        for path, subdirs, files in os.walk(join(config.APP_DIR, 'data', 'vocab_files')):
+        for path, subdirs, files in os.walk(
+            join(config.APP_DIR, "data", "vocab_files")
+        ):
             for name in files:
-                if name.split('.')[-1] in FILE.MAPPER:
+                if name.split(".")[-1] in FILE.MAPPER:
                     # load file
                     file_path = os.path.join(path, name)
-                    file_format = FILE.MAPPER[name.split('.')[-1]]
+                    file_format = FILE.MAPPER[name.split(".")[-1]]
                     # load graph
                     gr = Graph().parse(file_path, format=file_format)
-                    file_name = name.split('.')[0]
+                    file_name = name.split(".")[0]
                     # pickle to directory/vocab_files/
-                    with open(join(path, file_name + '.p'), 'wb') as f:
+                    with open(join(path, file_name + ".p"), "wb") as f:
                         pickle.dump(gr, f)
                         f.close()
 
                     # extract vocab metadata
                     # Get the ConceptSchemes from the graph of the file
                     # Interpret the CS as a Vocab
-                    q = '''
+                    q = """
                         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                         PREFIX dcterms: <http://purl.org/dc/terms/>
@@ -87,25 +89,33 @@ class FILE(Source):
                                 ?cs skos:definition ?description .
                                 FILTER(lang(?description) = "{language}" || lang(?description) = "") 
                             }}
-                        }}'''.format(language=DEFAULT_LANGUAGE)
+                        }}""".format(
+                        language=DEFAULT_LANGUAGE
+                    )
 
-                    vocab_id = str(name).split('.')[0]
+                    vocab_id = str(name).split(".")[0]
                     for cs in gr.query(q):
                         file_vocabs[vocab_id] = Vocabulary(
                             vocab_id,
-                            str(cs[0]).replace('/conceptScheme', ''),
-                            str(cs[1]) or str(cs[0]) if str(cs[1]) else str(cs[0]),  # Need string, not None
+                            str(cs[0]).replace("/conceptScheme", ""),
+                            str(cs[1]) or str(cs[0])
+                            if str(cs[1])
+                            else str(cs[0]),  # Need string, not None
                             str(cs[6]) if cs[6] is not None else None,
                             None,
-                            dateutil.parser.parse(str(cs[2])) if cs[2] is not None else None,
-                            dateutil.parser.parse(str(cs[4])) if cs[4] is not None else None,
+                            dateutil.parser.parse(str(cs[2]))
+                            if cs[2] is not None
+                            else None,
+                            dateutil.parser.parse(str(cs[4]))
+                            if cs[4] is not None
+                            else None,
                             str(cs[5]) if cs[5] is not None else None,  # versionInfo
                             config.VocabSource.FILE,
-                            cs[0]
+                            cs[0],
                         )
         g.VOCABS = {**g.VOCABS, **file_vocabs}
 
-        logging.debug('FILE collect() complete.')
+        logging.debug("FILE collect() complete.")
         # # Get register item metadata
         # for vocab_id in g.VOCABS:
         #     if vocab_id in g.VOCABS:
@@ -149,15 +159,15 @@ class FILE(Source):
         #         g.VOCABS[vocab_id]['version'] = version
 
     def list_collections(self):
-        q = '''
+        q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             SELECT *
             WHERE {
               ?c a skos:Concept .
               ?c rdfs:label ?l .
-            }'''
-        return [(x['c'], x['l']) for x in self.g.query(q)]
+            }"""
+        return [(x["c"], x["l"]) for x in self.g.query(q)]
 
     def list_concepts(self):
         vocabs = []
@@ -167,7 +177,8 @@ class FILE(Source):
         #         'uri': str(s),
         #         'title': label
         #     })
-        result = self.g.query("""
+        result = self.g.query(
+            """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -197,16 +208,27 @@ class FILE(Source):
                     ?s dct:modified ?modified .
                 }}
             }}
-            """)
+            """
+        )
 
         for row in result:
-            vocabs.append({
-                'vocab_id': self.vocab_id,
-                'uri': str(row['s']),
-                'title': row['title'] if row['title'] is not None else ' '.join(str(row['s']).split('#')[-1].split('/')[-1].split('_')),
-                'created': row['created'][:10] if row['created'] is not None else None,
-                'modified': row['modified'][:10] if row['modified'] is not None else None,
-            })
+            vocabs.append(
+                {
+                    "vocab_id": self.vocab_id,
+                    "uri": str(row["s"]),
+                    "title": row["title"]
+                    if row["title"] is not None
+                    else " ".join(
+                        str(row["s"]).split("#")[-1].split("/")[-1].split("_")
+                    ),
+                    "created": row["created"][:10]
+                    if row["created"] is not None
+                    else None,
+                    "modified": row["modified"][:10]
+                    if row["modified"] is not None
+                    else None,
+                }
+            )
 
         return vocabs
 
@@ -215,7 +237,7 @@ class FILE(Source):
         pass
 
     def get_concept(self):
-        concept_uri = self.request.values.get('uri')
+        concept_uri = self.request.values.get("uri")
         q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -239,11 +261,15 @@ class FILE(Source):
                     FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "") 
                 }}
             }}
-            """.format(concept_uri=concept_uri, language=self.language)
+            """.format(
+            concept_uri=concept_uri, language=self.language
+        )
 
         result = self.gr.query(q)
 
-        assert result, 'FILE source is unable to query concepts for {}'.format(self.request.values.get('uri'))
+        assert result, "FILE source is unable to query concepts for {}".format(
+            self.request.values.get("uri")
+        )
 
         prefLabel = None
 
@@ -253,15 +279,13 @@ class FILE(Source):
             predicateUri = str(r[0])
 
             # Special case for prefLabels
-            if predicateUri == 'http://www.w3.org/2004/02/skos/core#prefLabel':
-                predicateLabel = 'Multilingual Labels'
-                preflabel_lang = 'en'  # because I don't know how to get lang out of an rdflib SPARQL query
+            if predicateUri == "http://www.w3.org/2004/02/skos/core#prefLabel":
+                predicateLabel = "Multilingual Labels"
+                preflabel_lang = "en"  # because I don't know how to get lang out of an rdflib SPARQL query
 
                 # Use default language or no language prefLabel as primary
-                if (
-                        (not prefLabel and not preflabel_lang)
-                        or
-                        (preflabel_lang == self.language)
+                if (not prefLabel and not preflabel_lang) or (
+                    preflabel_lang == self.language
                 ):
                     prefLabel = str(r[1])  # Set current language prefLabel
 
@@ -270,41 +294,45 @@ class FILE(Source):
                 #     continue
 
                 # Apend language code to prefLabel literal
-                related_object = '{} ({})'.format(str(r[1]), preflabel_lang)
+                related_object = "{} ({})".format(str(r[1]), preflabel_lang)
                 related_objectLabel = None
             else:
-                predicateLabel = (str(r[2]) if r[2] is not None else h.make_title(str(r[0])))
+                predicateLabel = (
+                    str(r[2]) if r[2] is not None else h.make_title(str(r[0]))
+                )
 
-                if not str(r[1]).startswith('http'):
+                if not str(r[1]).startswith("http"):
                     related_object = str(r[1])
                     related_objectLabel = None
                 else:
-                    print('uri')
+                    print("uri")
                     related_object = str(r[1])
-                    related_objectLabel = (str(r[3]) if r[3] is not None else h.make_title(str(r[1])))
+                    related_objectLabel = (
+                        str(r[3]) if r[3] is not None else h.make_title(str(r[1]))
+                    )
 
             relationship_dict = related_objects.get(predicateUri)
             if relationship_dict is None:
-                relationship_dict = {'label': predicateLabel,
-                                     'objects': {}}
+                relationship_dict = {"label": predicateLabel, "objects": {}}
                 related_objects[predicateUri] = relationship_dict
 
-            relationship_dict['objects'][related_object] = related_objectLabel
+            relationship_dict["objects"][related_object] = related_objectLabel
 
         related_objects = OrderedDict(
             [
                 (
-                    predicate, {
-                        'label': related_objects[predicate]['label'],
-                        'objects': OrderedDict(
+                    predicate,
+                    {
+                        "label": related_objects[predicate]["label"],
+                        "objects": OrderedDict(
                             [
-                                (
-                                    key,
-                                    related_objects[predicate]['objects'][key]
-                                ) for key in sorted(related_objects[predicate]['objects'].keys())
-                             ]
-                        )
-                    }
+                                (key, related_objects[predicate]["objects"][key])
+                                for key in sorted(
+                                    related_objects[predicate]["objects"].keys()
+                                )
+                            ]
+                        ),
+                    },
                 )
                 for predicate in sorted(related_objects.keys())
             ]
@@ -322,7 +350,7 @@ class FILE(Source):
     def get_top_concepts(self):
         # same as parent query, only running against rdflig in-memory graph, not SPARQL endpoint
         vocab = g.VOCABS[self.vocab_id]
-        q = '''
+        q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT DISTINCT ?tc ?pl
             WHERE {{
@@ -355,8 +383,12 @@ class FILE(Source):
                 }}
             }}
             ORDER BY ?pl
-            '''.format(concept_scheme_uri=vocab.concept_scheme_uri, language=self.language)
-        top_concepts = Source.sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
+            """.format(
+            concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
+        )
+        top_concepts = Source.sparql_query(
+            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
+        )
 
         if top_concepts is not None:
             # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice
@@ -368,7 +400,7 @@ class FILE(Source):
                     pl_cache.append(tc[1])
 
             if len(tcs) == 0:
-                q = '''
+                q = """
                     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                     SELECT DISTINCT ?tc ?pl
                     WHERE {{
@@ -399,7 +431,9 @@ class FILE(Source):
                         }}
                     }}
                     ORDER BY ?pl
-                    '''.format(concept_scheme_uri=vocab.concept_scheme_uri, language=self.language)
+                    """.format(
+                    concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
+                )
                 for tc in self.gr.query(q):
                     if tc[1] not in pl_cache:  # only add if not already in cache
                         tcs.append((tc[0], tc[1]))
@@ -425,33 +459,44 @@ class FILE(Source):
             level += 1  # Start with level 1 for top concepts
             hierarchy = []
 
-            narrower_list = sorted([binding_dict
-                                    for binding_dict in bindings_list
-                                    if
-                                    # Top concept
-                                    ((broader_concept is None)
-                                     and (binding_dict.get('broader_concept') is None))
-                                    or
-                                    # Narrower concept
-                                    ((binding_dict.get('broader_concept') is not None)
-                                     and (binding_dict['broader_concept'] == broader_concept))
-                                    ], key=lambda binding_dict: binding_dict['concept_preflabel'])
+            narrower_list = sorted(
+                [
+                    binding_dict
+                    for binding_dict in bindings_list
+                    if
+                    # Top concept
+                    (
+                        (broader_concept is None)
+                        and (binding_dict.get("broader_concept") is None)
+                    )
+                    or
+                    # Narrower concept
+                    (
+                        (binding_dict.get("broader_concept") is not None)
+                        and (binding_dict["broader_concept"] == broader_concept)
+                    )
+                ],
+                key=lambda binding_dict: binding_dict["concept_preflabel"],
+            )
 
             for binding_dict in narrower_list:
-                concept = binding_dict['concept']
-                hierarchy += [(level,
-                               concept,
-                               binding_dict['concept_preflabel'],
-                               binding_dict['broader_concept'] if binding_dict.get(
-                                   'broader_concept') else None,
-                               )
-                              ] + build_hierarchy(bindings_list, concept, level)
+                concept = binding_dict["concept"]
+                hierarchy += [
+                    (
+                        level,
+                        concept,
+                        binding_dict["concept_preflabel"],
+                        binding_dict["broader_concept"]
+                        if binding_dict.get("broader_concept")
+                        else None,
+                    )
+                ] + build_hierarchy(bindings_list, concept, level)
 
             return hierarchy
 
         vocab = g.VOCABS[self.vocab_id]
 
-        q = '''
+        q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX dct: <http://purl.org/dc/terms/>
@@ -464,35 +509,39 @@ class FILE(Source):
                     }}
                 FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
             }}
-            ORDER BY ?concept_preflabel'''.format(vocab_uri=vocab.concept_scheme_uri, language=self.language)
+            ORDER BY ?concept_preflabel""".format(
+            vocab_uri=vocab.concept_scheme_uri, language=self.language
+        )
 
         bindings_list = []
         for r in self.gr.query(q):
-            bindings_list.append({
-                # ?concept ?concept_preflabel ?broader_concept
-                'concept': r[0],
-                'concept_preflabel': r[1],
-                'broader_concept': r[2],
-            })
+            bindings_list.append(
+                {
+                    # ?concept ?concept_preflabel ?broader_concept
+                    "concept": r[0],
+                    "concept_preflabel": r[1],
+                    "broader_concept": r[2],
+                }
+            )
 
-        assert bindings_list is not None, 'FILE concept hierarchy query failed'
+        assert bindings_list is not None, "FILE concept hierarchy query failed"
 
         hierarchy = build_hierarchy(bindings_list)
 
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     def get_object_class(self):
-        uri = h.url_decode(self.request.values.get('uri'))
+        uri = h.url_decode(self.request.values.get("uri"))
         for s, p, o in self.gr.triples((URIRef(uri), RDF.type, SKOS.Concept)):
             return str(o)
 
     @staticmethod
     def load_pickle_graph(vocab_id):
-        pickled_file_path = join(config.APP_DIR, 'data', 'vocab_files', vocab_id + '.p')
+        pickled_file_path = join(config.APP_DIR, "data", "vocab_files", vocab_id + ".p")
         print(pickled_file_path)
 
         try:
-            with open(pickled_file_path, 'rb') as f:
+            with open(pickled_file_path, "rb") as f:
                 gr = pickle.load(f)
                 f.close()
                 return gr
@@ -501,18 +550,16 @@ class FILE(Source):
 
     @staticmethod
     def pickle_to_file(vocab_id, g):
-        logging.debug('Pickling file: {}'.format(vocab_id))
-        path = os.path.join(config.APP_DIR, 'vocab_files', vocab_id)
+        logging.debug("Pickling file: {}".format(vocab_id))
+        path = os.path.join(config.APP_DIR, "vocab_files", vocab_id)
         # TODO: Check if file_name already has extension
-        with open(path + '.p', 'wb') as f:
+        with open(path + ".p", "wb") as f:
             pickle.dump(g, f)
             f.close()
 
-        g.serialize(path + '.ttl', format='turtle')
+        g.serialize(path + ".ttl", format="turtle")
 
 
-if __name__ == '__main__':
-    details = {
-        'vocab_files_folder_path': 'data/vocabs'
-    }
+if __name__ == "__main__":
+    details = {"vocab_files_folder_path": "data/vocabs"}
     FILE.collect(details)

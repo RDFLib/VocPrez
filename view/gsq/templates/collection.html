@@ -7,7 +7,7 @@ An example "collection"
 
 {% block content %}
 <h1>Collection: {{ collection.label }}</h1>
-<p>{{collection.uri}}</p>
+<h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata collection">
     {%  if collection.comment is not none  %}

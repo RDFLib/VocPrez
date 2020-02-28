@@ -8,13 +8,7 @@ from model.profiles import profile_skos
 
 class Concept:
     def __init__(
-            self,
-            vocab_id,
-            uri,
-            prefLabel,
-            related_objects,
-            semantic_properties,
-            source,
+        self, vocab_id, uri, prefLabel, related_objects, semantic_properties, source,
     ):
         self.vocab_id = vocab_id
         self.uri = uri
@@ -32,44 +26,46 @@ class ConceptRenderer(Renderer):
 
         self.concept = concept
 
-        super().__init__(
-            self.request,
-            self.concept.uri,
-            self.profiles,
-            'skos'
-        )
+        super().__init__(self.request, self.concept.uri, self.profiles, "skos")
 
     def _add_views(self):
-        return {
-            'skos': profile_skos
-        }
+        return {"skos": profile_skos}
 
     def render(self):
         # try returning alt profile
         response = super().render()
         if response is not None:
             return response
-        elif self.profile == 'skos':
-            if self.mediatype in Renderer.RDF_MEDIA_TYPES or self.mediatype in Renderer.RDF_SERIALIZER_TYPES_MAP:
+        elif self.profile == "skos":
+            if (
+                self.mediatype in Renderer.RDF_MEDIA_TYPES
+                or self.mediatype in Renderer.RDF_SERIALIZER_TYPES_MAP
+            ):
                 return self._render_skos_rdf()
             else:
                 return self._render_skos_html()
 
     def _render_skos_rdf(self):
         namespace_manager = NamespaceManager(Graph())
-        namespace_manager.bind('dct', DCTERMS)
-        namespace_manager.bind('skos', SKOS)
+        namespace_manager.bind("dct", DCTERMS)
+        namespace_manager.bind("skos", SKOS)
         concept_g = Graph()
         concept_g.namespace_manager = namespace_manager
 
-        for s, p, o in self.concept.source.graph.triples((URIRef(self.concept.uri), None, None)):
+        for s, p, o in self.concept.source.graph.triples(
+            (URIRef(self.concept.uri), None, None)
+        ):
             concept_g.add((s, p, o))
 
         # serialise in the appropriate RDF format
-        if self.mediatype in ['application/rdf+json', 'application/json']:
-            return Response(concept_g.serialize(format='json-ld'), mimetype=self.mediatype)
+        if self.mediatype in ["application/rdf+json", "application/json"]:
+            return Response(
+                concept_g.serialize(format="json-ld"), mimetype=self.mediatype
+            )
         else:
-            return Response(concept_g.serialize(format=self.mediatype), mimetype=self.mediatype)
+            return Response(
+                concept_g.serialize(format=self.mediatype), mimetype=self.mediatype
+            )
 
         # # Create a graph from the self.concept object for a SKOS view
         # namespace_manager = NamespaceManager(Graph())
@@ -111,19 +107,15 @@ class ConceptRenderer(Renderer):
 
     def _render_skos_html(self):
         _template_context = {
-            'vocab_id': self.request.values.get('vocab_id'),
-            'vocab_title': g.VOCABS[self.request.values.get('vocab_id')].title,
-            'uri': self.request.values.get('uri'),
-            'concept': self.concept,
-            'navs': self.navs,
-            'title': 'Concept: ' + self.concept.prefLabel,
-            'config': config,
+            "vocab_id": self.request.values.get("vocab_id"),
+            "vocab_title": g.VOCABS[self.request.values.get("vocab_id")].title,
+            "uri": self.request.values.get("uri"),
+            "concept": self.concept,
+            "navs": self.navs,
+            "title": "Concept: " + self.concept.prefLabel,
+            "config": config,
         }
 
         return Response(
-            render_template(
-                'concept.html',
-                **_template_context
-            ),
-            headers=self.headers
+            render_template("concept.html", **_template_context), headers=self.headers
         )

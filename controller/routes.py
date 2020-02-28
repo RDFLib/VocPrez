@@ -1,4 +1,13 @@
-from flask import Blueprint, Response, request, render_template, Markup, g, redirect, url_for
+from flask import (
+    Blueprint,
+    Response,
+    request,
+    render_template,
+    Markup,
+    g,
+    redirect,
+    url_for,
+)
 from model.vocabulary import VocabularyRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
@@ -13,36 +22,50 @@ from controller import sparql_endpoint_functions
 import datetime
 import logging
 
-routes = Blueprint('routes', __name__)
+routes = Blueprint("routes", __name__)
 
 
 def render_invalid_vocab_id_response():
-    msg = """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """ + '\n* '.join(g.VOCABS.keys())
+    msg = (
+        """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """
+        + "\n* ".join(g.VOCABS.keys())
+    )
     msg = Markup(markdown.markdown(msg))
     return render_template(
-        'error.html',
-        title='Error - invalid vocab id',
-        heading='Invalid Vocab ID',
-        msg=msg
+        "error.html",
+        title="Error - invalid vocab id",
+        heading="Invalid Vocab ID",
+        msg=msg,
     )
 
 
 def render_vb_exception_response(e):
     e = json.loads(str(e))
-    msg = e['stresponse']['msg']
-    if 'not an open project' in msg:
-        invalid_vocab_id = msg.split('not an open project:')[-1]
-        msg = 'The VocBench instance returned with an error: **{}** is not an open project.'.format(invalid_vocab_id)
+    msg = e["stresponse"]["msg"]
+    if "not an open project" in msg:
+        invalid_vocab_id = msg.split("not an open project:")[-1]
+        msg = "The VocBench instance returned with an error: **{}** is not an open project.".format(
+            invalid_vocab_id
+        )
         msg = Markup(markdown.markdown(msg))
-    return render_template('error.html', title='Error', heading='VocBench Error', msg=msg)
+    return render_template(
+        "error.html", title="Error", heading="VocBench Error", msg=msg
+    )
 
 
 def render_invalid_object_class_response(vocab_id, uri, c_type):
     msg = """No valid *Object Class URI* found for vocab_id **{}** and uri **{}** 
     
-Instead, found **{}**.""".format(vocab_id, uri, c_type)
+Instead, found **{}**.""".format(
+        vocab_id, uri, c_type
+    )
     msg = Markup(markdown.markdown(msg))
-    return render_template('error.html', title='Error - Object Class URI', heading='Concept Class Type Error', msg=msg)
+    return render_template(
+        "error.html",
+        title="Error - Object Class URI",
+        heading="Concept Class Type Error",
+        msg=msg,
+    )
 
 
 def get_a_vocab_key():
@@ -60,17 +83,17 @@ def get_a_vocab_key():
 
 @routes.context_processor
 def inject_date():
-    return {'date': datetime.date.today()}
+    return {"date": datetime.date.today()}
 
 
-@routes.route('/')
+@routes.route("/")
 def index():
     return render_template(
-        'index.html',
+        "index.html",
         title=config.TITLE,
         navs={},
         config=config,
-        voc_key=get_a_vocab_source_key()
+        voc_key=get_a_vocab_source_key(),
     )
 
 
@@ -101,10 +124,16 @@ def match(vocabs, query):
             yield word
 
 
-@routes.route('/vocabulary/')
+@routes.route("/vocabulary/")
 def vocabularies():
-    page = int(request.values.get('page')) if request.values.get('page') is not None else 1
-    per_page = int(request.values.get('per_page')) if request.values.get('per_page') is not None else 20
+    page = (
+        int(request.values.get("page")) if request.values.get("page") is not None else 1
+    )
+    per_page = (
+        int(request.values.get("per_page"))
+        if request.values.get("per_page") is not None
+        else 20
+    )
 
     # TODO: replace this logic with the following
     #   1. read all static vocabs from g.VOCABS
@@ -116,7 +145,7 @@ def vocabularies():
     total = len(g.VOCABS.items())
 
     # Search
-    query = request.values.get('search')
+    query = request.values.get("search")
     results = []
     if query:
         for m in match(vocabs, query):
@@ -126,7 +155,7 @@ def vocabularies():
         total = len(vocabs)
 
     # generate vocabs list for requested page and per_page
-    start = (page-1)*per_page
+    start = (page - 1) * per_page
     end = start + per_page
     vocabs = vocabs[start:end]
 
@@ -135,17 +164,17 @@ def vocabularies():
         request,
         [],
         vocabs,
-        'Vocabularies',
+        "Vocabularies",
         total,
         search_query=query,
         search_enabled=True,
-        vocabulary_url=['http://www.w3.org/2004/02/skos/core#ConceptScheme']
+        vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
     ).render()
 
 
-@routes.route('/vocabulary/<vocab_id>')
+@routes.route("/vocabulary/<vocab_id>")
 def vocabulary(vocab_id):
-    language = request.values.get('lang') or config.DEFAULT_LANGUAGE
+    language = request.values.get("lang") or config.DEFAULT_LANGUAGE
 
     if vocab_id not in g.VOCABS.keys():
         return render_invalid_vocab_id_response()
@@ -156,66 +185,65 @@ def vocabulary(vocab_id):
     except VbException as e:
         return render_vb_exception_response(e)
 
-    return VocabularyRenderer(
-        request,
-        vocab
-    ).render()
+    return VocabularyRenderer(request, vocab).render()
 
 
-@routes.route('/vocabulary/<vocab_id>/concept/')
+@routes.route("/vocabulary/<vocab_id>/concept/")
 def vocabulary_list(vocab_id):
-    language = request.values.get('lang') or config.DEFAULT_LANGUAGE
+    language = request.values.get("lang") or config.DEFAULT_LANGUAGE
 
     if vocab_id not in g.VOCABS.keys():
         return render_invalid_vocab_id_response()
-    
+
     vocab_source = Source(vocab_id, request, language)
     concepts = vocab_source.list_concepts()
-    concepts.sort(key=lambda x: x['title'])
+    concepts.sort(key=lambda x: x["title"])
     total = len(concepts)
 
     # Search
-    query = request.values.get('search')
+    query = request.values.get("search")
     results = []
     if query:
         for m in match(concepts, query):
             results.append(m)
         concepts[:] = results
-        concepts.sort(key=lambda x: x['title'])
+        concepts.sort(key=lambda x: x["title"])
         total = len(concepts)
 
-    page = int(request.values.get('page')) if request.values.get('page') is not None else 1
-    per_page = int(request.values.get('per_page')) if request.values.get('per_page') is not None else 20
+    page = (
+        int(request.values.get("page")) if request.values.get("page") is not None else 1
+    )
+    per_page = (
+        int(request.values.get("per_page"))
+        if request.values.get("per_page") is not None
+        else 20
+    )
     start = (page - 1) * per_page
     end = start + per_page
     concepts = concepts[start:end]
 
- 
     test = SkosRegisterRenderer(
         request=request,
         navs=[],
         members=concepts,
-        register_item_type_string=g.VOCABS[vocab_id].title + ' concepts',
+        register_item_type_string=g.VOCABS[vocab_id].title + " concepts",
         total=total,
         search_enabled=True,
         search_query=query,
-        vocabulary_url=[request.url_root + 'vocabulary/' + vocab_id],
-        vocab_id=vocab_id
+        vocabulary_url=[request.url_root + "vocabulary/" + vocab_id],
+        vocab_id=vocab_id,
     )
     return test.render()
 
 
-@routes.route('/collection/')
+@routes.route("/collection/")
 def collections():
     return render_template(
-        'register.html',
-        title='Collections',
-        register_class='Collections',
-        navs={}
+        "register.html", title="Collections", register_class="Collections", navs={}
     )
 
 
-@routes.route('/object')
+@routes.route("/object")
 def object():
     """
     This is the general RESTful endpoint and corresponding Python function to handle requests for individual objects,
@@ -228,100 +256,85 @@ def object():
     :return: A Flask Response object
     :rtype: :class:`flask.Response`
     """
-    language = request.values.get('lang') or config.DEFAULT_LANGUAGE
-    vocab_id = request.values.get('vocab_id')
-    uri = request.values.get('uri')
-    _view = request.values.get('_view')
-    _format = request.values.get('_format')
+    language = request.values.get("lang") or config.DEFAULT_LANGUAGE
+    vocab_id = request.values.get("vocab_id")
+    uri = request.values.get("uri")
+    _view = request.values.get("_view")
+    _format = request.values.get("_format")
 
     # check this vocab ID is known
     if vocab_id not in g.VOCABS.keys():
         return Response(
-            'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-            '\n'.join(g.VOCABS.keys()),
+            "The vocabulary ID you've supplied is not known. Must be one of:\n "
+            + "\n".join(g.VOCABS.keys()),
             status=400,
-            mimetype='text/plain'
+            mimetype="text/plain",
         )
 
     if uri is None:
         return Response(
-            'A Query String Argument \'uri\' must be supplied for this endpoint, '
-            'indicating an object within a vocabulary',
+            "A Query String Argument 'uri' must be supplied for this endpoint, "
+            "indicating an object within a vocabulary",
             status=400,
-            mimetype='text/plain'
+            mimetype="text/plain",
         )
-        
+
     vocab_source = Source(vocab_id, request, language)
 
     try:
         # TODO reuse object within if, rather than re-loading graph
         c = vocab_source.get_object_class()
 
-        if c == 'http://www.w3.org/2004/02/skos/core#Concept':
+        if c == "http://www.w3.org/2004/02/skos/core#Concept":
             concept = vocab_source.get_concept()
-            return ConceptRenderer(
-                request,
-                concept
-            ).render()
-            
-        elif c == 'http://www.w3.org/2004/02/skos/core#ConceptScheme':
+            return ConceptRenderer(request, concept).render()
+
+        elif c == "http://www.w3.org/2004/02/skos/core#ConceptScheme":
             vocabulary = vocab_source.get_vocabulary()
 
-            return VocabularyRenderer(
-                request,
-                vocabulary
-            ).render()
+            return VocabularyRenderer(request, vocabulary).render()
 
-        elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
+        elif c == "http://www.w3.org/2004/02/skos/core#Collection":
             collection = vocab_source.get_collection(uri)
-            return CollectionRenderer(
-                request,
-                collection
-            ).render()
+            return CollectionRenderer(request, collection).render()
         else:
             return render_invalid_object_class_response(vocab_id, uri, c)
     except VbException as e:
         return render_vb_exception_response(e)
 
 
-@routes.route('/geosciml')
+@routes.route("/geosciml")
 def geosciml():
-    return render_template(
-        'geosciml_home.html'
-    )
+    return render_template("geosciml_home.html")
 
 
-@routes.route('/about')
+@routes.route("/about")
 def about():
     import os
 
     # using basic Markdown method from http://flask.pocoo.org/snippets/19/
-    with open(os.path.join(config.APP_DIR, 'README.md')) as f:
+    with open(os.path.join(config.APP_DIR, "README.md")) as f:
         content = f.read()
 
     # make images come from wed dir
-    content = content.replace('view/static/system.svg',
-                              request.url_root + 'static/system.svg')
+    content = content.replace(
+        "view/static/system.svg", request.url_root + "static/system.svg"
+    )
     content = Markup(markdown.markdown(content))
 
-    return render_template(
-        'about.html',
-        title='About',
-        navs={},
-        content=content
-    )
+    return render_template("about.html", title="About", navs={}, content=content)
 
 
 # the SPARQL UI
-@routes.route('/sparql', methods=['GET', 'POST'])
+@routes.route("/sparql", methods=["GET", "POST"])
 def sparql():
-    return render_template('sparql.html')
+    return render_template("sparql.html")
 
 
 # the SPARQL endpoint under-the-hood
-@routes.route('/endpoint', methods=['GET', 'POST'])
+@routes.route("/endpoint", methods=["GET", "POST"])
 def endpoint():
-    '''
+    """
     TESTS
 
     Form POST:
@@ -343,18 +356,18 @@ def endpoint():
         WHERE {?s a skos:ConceptScheme}
     curl -H 'Accept: application/ld+json' http://localhost:5000/endpoint?query=PREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fco23%3E%0ACONSTRUCT%20%7B%3Fs%20a%20rdf%3AResource%7D%0AWHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%7D
 
-    '''
-    logging.debug('request: {}'.format(request.__dict__))
-    
+    """
+    logging.debug("request: {}".format(request.__dict__))
+
     # TODO: Find a slightly less hacky way of getting the format_mimetime value
-    format_mimetype = request.__dict__['environ']['HTTP_ACCEPT']
-    
+    format_mimetype = request.__dict__["environ"]["HTTP_ACCEPT"]
+
     # Query submitted
-    if request.method == 'POST':
-        '''Pass on the SPARQL query to the underlying endpoint defined in config
-        '''
-        if 'application/x-www-form-urlencoded' in request.content_type:
-            '''
+    if request.method == "POST":
+        """Pass on the SPARQL query to the underlying endpoint defined in config
+        """
+        if "application/x-www-form-urlencoded" in request.content_type:
+            """
             https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-via-post-urlencoded
 
             2.1.2 query via POST with URL-encoded parameters
@@ -364,18 +377,21 @@ def endpoint():
             request body via the application/x-www-form-urlencoded media type with the name given above. Parameters must
             be separated with the ampersand (&) character. Clients may include the parameters in any order. The content
             type header of the HTTP request must be set to application/x-www-form-urlencoded.
-            '''
-            if request.values.get('query') is None or len(request.values.get('query')) < 5:
+            """
+            if (
+                request.values.get("query") is None
+                or len(request.values.get("query")) < 5
+            ):
                 return Response(
-                    'Your POST request to the SPARQL endpoint must contain a \'query\' parameter if form posting '
-                    'is used.',
+                    "Your POST request to the SPARQL endpoint must contain a 'query' parameter if form posting "
+                    "is used.",
                     status=400,
-                    mimetype='text/plain'
+                    mimetype="text/plain",
                 )
             else:
-                query = request.values.get('query')
-        elif 'application/sparql-query' in request.content_type:
-            '''
+                query = request.values.get("query")
+        elif "application/sparql-query" in request.content_type:
+            """
             https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-via-post-direct
 
             2.1.3 query via POST directly
@@ -386,46 +402,48 @@ def endpoint():
             header of the HTTP request to application/sparql-query. Clients may include the optional default-graph-uri
             and named-graph-uri parameters as HTTP query string parameters in the request URI. Note that UTF-8 is the
             only valid charset here.
-            '''
-            query = request.data.decode('utf-8')  # get the raw request
+            """
+            query = request.data.decode("utf-8")  # get the raw request
             if query is None:
                 return Response(
-                    'Your POST request to this SPARQL endpoint must contain the query in plain text in the '
-                    'POST body if the Content-Type \'application/sparql-query\' is used.',
-                    status=400
+                    "Your POST request to this SPARQL endpoint must contain the query in plain text in the "
+                    "POST body if the Content-Type 'application/sparql-query' is used.",
+                    status=400,
                 )
         else:
             return Response(
-                'Your POST request to this SPARQL endpoint must either the \'application/x-www-form-urlencoded\' or'
-                '\'application/sparql-query\' ContentType.',
-                status=400
+                "Your POST request to this SPARQL endpoint must either the 'application/x-www-form-urlencoded' or"
+                "'application/sparql-query' ContentType.",
+                status=400,
             )
 
         try:
-            if 'CONSTRUCT' in query:
-                format_mimetype = 'text/turtle'
+            if "CONSTRUCT" in query:
+                format_mimetype = "text/turtle"
                 return Response(
-                    sparql_endpoint_functions.sparql_query(query, format_mimetype=format_mimetype),
+                    sparql_endpoint_functions.sparql_query(
+                        query, format_mimetype=format_mimetype
+                    ),
                     status=200,
-                    mimetype=format_mimetype
+                    mimetype=format_mimetype,
                 )
             else:
                 return Response(
                     sparql_endpoint_functions.sparql_query(query, format_mimetype),
-                    status=200
+                    status=200,
                 )
         except ValueError as e:
             return Response(
-                'Input error for query {}.\n\nError message: {}'.format(query, str(e)),
+                "Input error for query {}.\n\nError message: {}".format(query, str(e)),
                 status=400,
-                mimetype='text/plain'
+                mimetype="text/plain",
             )
         except ConnectionError as e:
             return Response(str(e), status=500)
     else:  # GET
-        if request.args.get('query') is not None:
+        if request.args.get("query") is not None:
             # SPARQL GET request
-            '''
+            """
             https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-via-get
 
             2.1.1 query via GET
@@ -437,46 +455,52 @@ def endpoint():
             query string parameters in any order.
 
             The HTTP request MUST NOT include a message body.
-            '''
-            query = request.args.get('query')
-            if 'CONSTRUCT' in query:
+            """
+            query = request.args.get("query")
+            if "CONSTRUCT" in query:
                 acceptable_mimes = [x for x in Renderer.RDF_MEDIA_TYPES]
                 best = request.accept_mimetypes.best_match(acceptable_mimes)
-                query_result = sparql_endpoint_functions.sparql_query(query, format_mimetype=best)
+                query_result = sparql_endpoint_functions.sparql_query(
+                    query, format_mimetype=best
+                )
                 file_ext = {
-                    'text/turtle': 'ttl',
-                    'application/rdf+xml': 'rdf',
-                    'application/ld+json': 'json',
-                    'text/n3': 'n3',
-                    'application/n-triples': 'nt'
+                    "text/turtle": "ttl",
+                    "application/rdf+xml": "rdf",
+                    "application/ld+json": "json",
+                    "text/n3": "n3",
+                    "application/n-triples": "nt",
                 }
                 return Response(
                     query_result,
                     status=200,
                     mimetype=best,
                     headers={
-                        'Content-Disposition': 'attachment; filename=query_result.{}'.format(file_ext[best])
-                    }
+                        "Content-Disposition": "attachment; filename=query_result.{}".format(
+                            file_ext[best]
+                        )
+                    },
                 )
             else:
                 query_result = sparql_endpoint_functions.sparql_query(query)
-                return Response(query_result, status=200, mimetype='application/sparql-results+json')
+                return Response(
+                    query_result, status=200, mimetype="application/sparql-results+json"
+                )
         else:
             # SPARQL Service Description
-            '''
+            """
             https://www.w3.org/TR/sparql11-service-description/#accessing
 
             SPARQL services made available via the SPARQL Protocol should return a service description document at the
             service endpoint when dereferenced using the HTTP GET operation without any query parameter strings
             provided. This service description must be made available in an RDF serialization, may be embedded in
             (X)HTML by way of RDFa, and should use content negotiation if available in other RDF representations.
-            '''
+            """
 
-            acceptable_mimes = [x for x in Renderer.RDF_MEDIA_TYPES] + ['text/html']
+            acceptable_mimes = [x for x in Renderer.RDF_MEDIA_TYPES] + ["text/html"]
             best = request.accept_mimetypes.best_match(acceptable_mimes)
-            if best == 'text/html':
+            if best == "text/html":
                 # show the SPARQL query form
-                return redirect(url_for('routes.sparql'))
+                return redirect(url_for("routes.sparql"))
             elif best is not None:
                 for item in Renderer.RDF_MEDIA_TYPES:
                     if item == best:
@@ -486,14 +510,15 @@ def endpoint():
                                 rdf_format=rdf_format
                             ),
                             status=200,
-                            mimetype=best)
+                            mimetype=best,
+                        )
 
                 return Response(
-                    'Accept header must be one of ' + ', '.join(acceptable_mimes) + '.',
-                    status=400
+                    "Accept header must be one of " + ", ".join(acceptable_mimes) + ".",
+                    status=400,
                 )
             else:
                 return Response(
-                    'Accept header must be one of ' + ', '.join(acceptable_mimes) + '.',
-                    status=400
+                    "Accept header must be one of " + ", ".join(acceptable_mimes) + ".",
+                    status=400,
                 )

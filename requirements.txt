@@ -8,3 +8,4 @@ pytest
 SPARQLWrapper
 requests
 python-dateutil
+black

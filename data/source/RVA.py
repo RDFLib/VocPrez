@@ -41,30 +41,34 @@ class RVA(Source):
         """
 
         # Get the details for each vocab from the RVA catalogue API
-        logging.debug('RVA collect()...')
+        logging.debug("RVA collect()...")
         rva_vocabs = {}
-        for vocab in details['vocabs']:
+        for vocab in details["vocabs"]:
             r = requests.get(
-                    details['api_endpoint'].format(vocab['ardc_id']),
-                    headers={'Accept': 'application/json'}
+                details["api_endpoint"].format(vocab["ardc_id"]),
+                headers={"Accept": "application/json"},
             )
             if r.status_code == 200:
                 j = json.loads(r.text)
-                vocab_id = 'rva-' + str(vocab['ardc_id'])
+                vocab_id = "rva-" + str(vocab["ardc_id"])
                 rva_vocabs[vocab_id] = Vocabulary(
                     vocab_id,
-                    vocab['uri'],
-                    j['title'],
-                    j.get('description'),
-                    j.get('creator'),
-                    dateutil.parser.parse(j.get('creation-date')),
+                    vocab["uri"],
+                    j["title"],
+                    j.get("description"),
+                    j.get("creator"),
+                    dateutil.parser.parse(j.get("creation-date")),
                     None,
-                    j['version'][0]['title'],
+                    j["version"][0]["title"],
                     config.VocabSource.RVA,
-                    vocab['uri'],
-                    sparql_endpoint=j['version'][0]['access-point'][0]['ap-api-sparql']['url']
+                    vocab["uri"],
+                    sparql_endpoint=j["version"][0]["access-point"][0]["ap-api-sparql"][
+                        "url"
+                    ],
                 )
             else:
-                logging.error('Could not get vocab {} from RVA'.format(vocab['ardc_id']))
+                logging.error(
+                    "Could not get vocab {} from RVA".format(vocab["ardc_id"])
+                )
         g.VOCABS = {**g.VOCABS, **rva_vocabs}
-        logging.debug('RVA collect() complete')
+        logging.debug("RVA collect() complete")
