@@ -84,8 +84,8 @@ ORDER BY ?title'''.format(language=DEFAULT_LANGUAGE)
             # handling CS URIs that end with '/'
             vocab_id = cs['cs']['value'].replace('/conceptScheme', '').split('/')[-1]
             
-            #TODO: Investigate putting regex into SPARQL query
-            #print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
+            # TODO: Investigate putting regex into SPARQL query
+            # print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
             if details.get('uri_filter_regex') and not re.search(details['uri_filter_regex'], cs['cs']['value']):
                 logging.debug('Skipping vocabulary {}'.format(vocab_id))
                 continue

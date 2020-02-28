@@ -1,8 +1,9 @@
-from pyldapi import Renderer, Profile
+from pyldapi import Renderer
 from flask import Response, render_template, g
 import _config as config
-from rdflib import Graph, RDF, Literal, URIRef, XSD
+from rdflib import Graph, URIRef
 from rdflib.namespace import SKOS, DCTERMS, NamespaceManager
+from model.profiles import profile_skos
 
 
 class Concept:
@@ -40,15 +41,7 @@ class ConceptRenderer(Renderer):
 
     def _add_views(self):
         return {
-            'skos': Profile(
-                label='http://www.w3.org/2004/02/skos/core#',
-                comment='Simple Knowledge Organization System (SKOS) is a W3C recommendation designed for representation of thesauri, classification schemes, '
-                'taxonomies, subject-heading systems, or any other type of structured controlled vocabulary.',
-                mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
-                default_mediatype='text/html',
-                languages=['en'],  # default 'en' only for now
-                profile_uri='http://www.w3.org/2004/02/skos/core#',
-            )
+            'skos': profile_skos
         }
 
     def render(self):

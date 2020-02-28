@@ -228,7 +228,6 @@ def object():
     :return: A Flask Response object
     :rtype: :class:`flask.Response`
     """
-    #print(request.values)
     language = request.values.get('lang') or config.DEFAULT_LANGUAGE
     vocab_id = request.values.get('vocab_id')
     uri = request.values.get('uri')
@@ -275,7 +274,6 @@ def object():
 
         elif c == 'http://www.w3.org/2004/02/skos/core#Collection':
             collection = vocab_source.get_collection(uri)
-
             return CollectionRenderer(
                 request,
                 collection
@@ -348,7 +346,7 @@ def endpoint():
     '''
     logging.debug('request: {}'.format(request.__dict__))
     
-    #TODO: Find a slightly less hacky way of getting the format_mimetime value
+    # TODO: Find a slightly less hacky way of getting the format_mimetime value
     format_mimetype = request.__dict__['environ']['HTTP_ACCEPT']
     
     # Query submitted

@@ -1,6 +1,7 @@
 from pyldapi import Renderer, Profile
-from flask import Response, render_template
+from flask import Response, render_template, g
 from rdflib import Graph
+from model.profiles import profile_skos
 
 
 class Collection:
@@ -35,15 +36,7 @@ class CollectionRenderer(Renderer):
 
     def _add_skos_profile(self):
         return {
-            'skos': Profile(
-                label='http://www.w3.org/2004/02/skos/core#',
-                comment='Simple Knowledge Organization System (SKOS) is a W3C recommendation designed for representation of thesauri, classification schemes, '
-                'taxonomies, subject-heading systems, or any other type of structured controlled vocabulary.',
-                mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
-                default_mediatype='text/html',
-                languages=['en'],  # default 'en' only for now
-                profile_uri='http://www.w3.org/2004/02/skos/core#',
-            )
+            'skos': profile_skos
         }
 
     def render(self):
@@ -70,6 +63,8 @@ class CollectionRenderer(Renderer):
 
     def _render_skos_html(self):
         _template_context = {
+            'vocab_id': self.request.values.get('vocab_id'),
+            'vocab_title': g.VOCABS[self.request.values.get('vocab_id')].title,
             'uri': self.instance_uri,
             'collection': self.collection,
             'navs': self.navs

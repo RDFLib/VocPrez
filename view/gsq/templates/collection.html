@@ -7,23 +7,22 @@ An example "collection"
 
 {% block content %}
 <h1>Collection: {{ collection.label }}</h1>
-<h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=collection.vocab.id) }}">{{ collection.vocab.title }}</a></h3>
+<p>{{collection.uri}}</p>
+<h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
 <table class="metadata collection">
     {%  if collection.comment is not none  %}
     <tr>
-        <th>Comment</th><td>{{ concept.comment }}</td>
+        <th>Comment</th><td>{{ collection.comment }}</td>
     </tr>
     {% endif %}
     {% if collection.members|length > 0 %}
     <tr>
-        {% if collection.broaders is defined %}
-        <th>Broader</th>
+        <th>Members</th>
         <td class="list">
             {% for member in collection.members -%}
-            <a href="{{ member.url }}">{{ member.prefLabel }}</a><br />
+            <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(member[0]) }}">{{ member[1] }}</a><br />
             {% endfor %}
         </td>
-        {% endif %}
     </tr>
     {% endif %}
 </table>

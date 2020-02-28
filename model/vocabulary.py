@@ -3,6 +3,7 @@ from flask import Response, render_template, url_for
 from rdflib import Graph, URIRef, Literal, XSD, RDF
 from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
 import _config as config
+from model.profiles import profile_skos, profile_dcat
 
 
 class Vocabulary:
@@ -19,7 +20,9 @@ class Vocabulary:
             data_source,
             concept_scheme_uri,
             hasTopConcept=None,
+            concepts=None,
             concept_hierarchy=None,
+            collections=None,
             accessURL=None,
             downloadURL=None,
             sparql_endpoint=None,
@@ -47,7 +50,9 @@ class Vocabulary:
         if hasTopConcept:
             hasTopConcept.sort()
         self.hasTopConcepts = hasTopConcept
+        self.concepts = concepts
         self.conceptHierarchy = concept_hierarchy
+        self.collection = collections
         self.accessURL = accessURL
         self.downloadURL = downloadURL
         self.sparql_endpoint = sparql_endpoint
@@ -59,8 +64,8 @@ class Vocabulary:
 class VocabularyRenderer(Renderer):
     def __init__(self, request, vocab, language='en'):
         self.uri = request.base_url
-        self.profiles = self._add_dcat_profile()
-        self.profiles.update(self._add_skos_profile())
+        self.profiles = {'dcat': profile_dcat}
+        self.profiles.update({'skos': profile_skos})
         self.navs = [
             # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
             '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/concept/">Concepts</a> |'
@@ -75,33 +80,6 @@ class VocabularyRenderer(Renderer):
             self.profiles,
             'dcat'
         )
-
-    def _add_dcat_profile(self):
-        return {
-            'dcat': Profile(
-                label='https://www.w3.org/TR/vocab-dcat/',
-                comment='Dataset Catalogue Vocabulary (DCAT) is a W3C-authored RDF vocabulary designed to facilitate interoperability between data catalogs '
-                'published on the Web.',
-                mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
-                default_mediatype='text/html',
-                languages=['en'],  # default 'en' only for now
-                default_language='en'
-            )
-        }
-
-    def _add_skos_profile(self):
-        return {
-            'skos': Profile(
-                label='https://www.w3.org/TR/skos-reference/',
-                comment='Simple Knowledge Organization System (SKOS)is a W3C-authored, common data model for sharing and linking knowledge organization systems '
-                'via the Web.',
-                mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
-                default_mediatype='text/html',
-                languages=['en'],  # default 'en' only for now
-                default_language='en',
-                profile_uri='http://www.w3.org/2004/02/skos/core#',
-            )
-        }
 
     def render(self):
         # try returning alt profile
@@ -151,8 +129,8 @@ class VocabularyRenderer(Renderer):
             g.add((s, DCTERMS.modified, Literal(self.vocab.modified, datatype=XSD.date)))
         if self.vocab.versionInfo:
             g.add((s, OWL.versionInfo, Literal(self.vocab.versionInfo)))
-        if self.vocab.hasTopConcepts:
-            for c in self.vocab.hasTopConcepts:
+        if self.vocab.hasTopConcept:
+            for c in self.vocab.hasTopConcept:
                 g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
                 g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
         if self.vocab.accessURL:
@@ -169,8 +147,20 @@ class VocabularyRenderer(Renderer):
             return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
 
     def _render_skos_rdf(self):
-        # get vocab RDF
-        g = self.vocab.source.graph
+        g = Graph()
+        g.bind('skos', SKOS)
+        s = URIRef(self.vocab.uri)
+        g.add((s, RDF.type, SKOS.ConceptScheme))
+        g.add((s, SKOS.prefLabel, Literal(self.vocab.title)))
+        g.add((s, SKOS.definition, Literal(self.vocab.description)))
+        if self.vocab.hasTopConcept:
+            for c in self.vocab.hasTopConcept:
+                g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
+                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
+        if self.vocab.concepts:
+            for c in self.vocab.concepts:
+                g.add((s, SKOS.inScheme, URIRef(c[0])))
+                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ['application/rdf+json', 'application/json']:

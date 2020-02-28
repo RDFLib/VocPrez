@@ -5,7 +5,6 @@ import _config as config
 from rdflib import Graph
 import os
 from helper import APP_DIR
-from vocbench import Vocbench
 
 global g  # Flask globals
 
