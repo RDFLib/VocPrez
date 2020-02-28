@@ -1,38 +1,43 @@
-from pyldapi import RegisterRenderer, View
+from pyldapi import Renderer, ContainerRenderer, Profile
 from flask import Response, render_template, jsonify
 from flask_paginate import Pagination
 
 
-class SkosRegisterRenderer(RegisterRenderer):
-    def __init__(self, request, navs, items, register_item_type_string, total, search_enabled=None, search_query=None, contained_item_classes=[], **kwargs):
+class SkosRegisterRenderer(ContainerRenderer):
+    def __init__(
+            self, request, navs, members, register_item_type_string, total, search_enabled=None,
+            search_query=None, contained_item_classes=[], **kwargs):
         self.navs = navs
-        self.items = items
+        self.members = [(x.uri, x.title) for x in members]
         self.register_item_type_string = register_item_type_string
         self.search_query = search_query
         self.search_enabled = search_enabled
         self.vocabulary_url = contained_item_classes
         self.template_extras = kwargs
-        views = {
-            'ckan': View(
-                'Comprehensive Knowledge Archive Network',
+        profiles = {
+            'ckan': Profile(
+                'https://ckan.org/',
+                'Comprehensive Knowledge Archive Network Profile',
                 'The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for '
-                'the storage and distribution of open data.',
+                'the storage and distribution of open data. This profile it it\'s native data model',
                 ['application/json'],
                 'application/json',
                 languages=['en'],
-                namespace='https://ckan.org/'
+                default_language='en'
             )
         }
 
         super().__init__(
             request,
             request.base_url,
-            "Test Label",
-            "Test Comment",
-            items,
-            contained_item_classes,
-            total,
-            views=views
+            'Vocabularies',
+            'This is a container of vocabularies or taxonomies are hierarchically-related collections of concepts. '
+            'These vocabularies are all formulated according to the SKOS model.',
+            None,
+            None,
+            self.members,
+            members_total_count=len(members),
+            profiles=profiles
         )
 
     def render(self):
@@ -42,19 +47,27 @@ class SkosRegisterRenderer(RegisterRenderer):
         :return: A Flask Response object.
         :rtype: :py:class:`flask.Response`
         """
-        response = super(RegisterRenderer, self).render()
-        if not response and self.view == 'reg':
+        # try returning alt profile
+        response = Renderer.render(self)
+        if response is not None:
+            return response
+        elif self.profile == 'mem':
             if self.paging_error is None:
-                self.headers['Profile'] = str(self.views['reg'].namespace)
-                response = self._render_reg_view()
+                self.headers['Profile'] = str(self.profiles['mem'].uri)
+                if self.mediatype == 'text/html':
+                    response = self._render_mem_profile_html()
+                # elif self.mediatype in ContainerRenderer.RDF_MEDIA_TYPES:
+                #     response = self._render_mem_profile_rdf()
+                else:
+                    response = self._render_mem_profile_rdf()
             else:  # there is a paging error (e.g. page > last_page)
                 response = Response(self.paging_error, status=400, mimetype='text/plain')
-        elif not response and self.view == 'ckan':
+        elif self.profile == 'ckan':
             if self.paging_error is None:
-                response = self._render_ckan_view()
+                response = self._render_ckan_profile()
         return response
 
-    def _render_ckan_view(self):
+    def _render_ckan_profile(self):
         """
         Render a CKAN view, which is formatted as an application/sparql-results+json response.
 
@@ -62,67 +75,29 @@ class SkosRegisterRenderer(RegisterRenderer):
         :rtype: JSON
         """
         response = {
-            "head": {
-                "vars": [
-                    "s",
-                    "pl"
+            'head': {
+                'vars': [
+                    's',
+                    'pl'
                 ]
             },
-            "results": {
-                "bindings": []
+            'results': {
+                'bindings': []
             }
         }
-        for item in self.items:
+        for member in self.members:
             response['results']['bindings'].append({
-                "pl": {
-                    "xml:lang": "en",
-                    "type": "literal",
-                    "value": item['title']
+                'pl': {
+                    'xml:lang': 'en',
+                    'type': 'literal',
+                    'value': member[1]
                 },
-                "s": {
-                    "type": "uri",
-                    "value": self.request.base_url + item['vocab_id']
-                }
+                's': {
+                    'type': 'uri',
+                    'value': member[0]
+                    }
             })
 
         response = jsonify(response)
         response.headers.add('Access-Control-Allow-origin', '*')
         return response
-
-    def _render_reg_view_html(self, template_context=None):
-        pagination = Pagination(page=self.page,
-                                per_page=self.per_page,
-                                total=self.register_total_count,
-                                page_parameter='page',
-                                per_page_parameter='per_page')
-        _template_context = {
-            'label': self.label,
-            'comment': self.comment,
-            'register_item_type_string': self.register_item_type_string,
-            'register_items': self.items,
-            'page': self.page,
-            'per_page': self.per_page,
-            'first_page': self.first_page,
-            'prev_page': self.prev_page,
-            'next_page': self.next_page,
-            'last_page': self.last_page,
-            'super_register': self.super_register,
-            'pagination': pagination,
-            'navs': self.navs,
-            'query': self.search_query,
-            'search_enabled': self.search_enabled,
-            'vocabulary_url': self.vocabulary_url,
-            'title': self.register_item_type_string
-        }
-        if self.template_extras is not None:
-            _template_context.update(self.template_extras)
-        if template_context is not None and isinstance(template_context, dict):
-            _template_context.update(template_context)
-
-        return Response(
-            render_template(
-                self.register_template or 'register.html',
-                **_template_context
-            ),
-            headers=self.headers
-        )
