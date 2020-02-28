@@ -16,7 +16,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 def render_concept_tree(html_doc):
     soup = BeautifulSoup(html_doc, 'html.parser')
 
-    #concept_hierarchy = soup.find(id='concept-hierarchy')
+    # concept_hierarchy = soup.find(id='concept-hierarchy')
 
     uls = soup.find_all('ul')
 
@@ -50,7 +50,7 @@ def make_title(s):
     title = ' '.join(s.split('#')[-1].split('/')[-1].split('_')).title()
 
     # replace dashes and periods with whitespace
-    title = re.sub('[-\.]+', ' ', title).title()
+    title = re.sub('[-.]+', ' ', title).title()
 
     return title
 
@@ -100,10 +100,11 @@ def is_url(url):
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     return True if re.search(pattern, url) is not None else False
 
+
 def cache_read(cache_file_name):
-    '''
+    """
     Function to read object from cache if cache file is younger than cache_hours. Returns None on failure
-    '''
+    """
     cache_seconds = config.VOCAB_CACHE_HOURS * 3600
     cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
     
@@ -128,10 +129,11 @@ def cache_read(cache_file_name):
         
     return
 
+
 def cache_write(cache_object, cache_file_name):
-    '''
+    """
     Function to write object to cache if cache file is older than cache_hours.
-    '''
+    """
     cache_seconds = config.VOCAB_CACHE_HOURS * 3600
     cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
     
@@ -162,4 +164,3 @@ def cache_write(cache_object, cache_file_name):
         logging.debug('Cache file {} written'.format(cache_file_path))
     else:
         logging.debug('Empty object ignored')
-         

@@ -1,7 +1,7 @@
 # VocPrez
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
 
-<img src="view/static/system.svg" style="width:60%;" />  
+<img src="view/generic/static/system.svg" style="width:60%;" />  
 
 **Figure 1**: An overview diagram of where VocPrez fits in relation to sources of vocab data.
 

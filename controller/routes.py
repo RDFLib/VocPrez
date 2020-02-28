@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request, render_template, Markup, g, redirect, url_for, send_file
+from flask import Blueprint, Response, request, render_template, Markup, g, redirect, url_for
 from model.vocabulary import VocabularyRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
@@ -9,7 +9,7 @@ from data.source._source import Source
 from data.source.VOCBENCH import VbException
 import json
 from pyldapi import Renderer
-import controller.sparql_endpoint_functions
+from controller import sparql_endpoint_functions
 import datetime
 import logging
 
@@ -19,13 +19,12 @@ routes = Blueprint('routes', __name__)
 def render_invalid_vocab_id_response():
     msg = """The vocabulary ID that was supplied was not known. It must be one of these: \n\n* """ + '\n* '.join(g.VOCABS.keys())
     msg = Markup(markdown.markdown(msg))
-    return render_template('error.html', title='Error - invalid vocab id', heading='Invalid Vocab ID', msg=msg)
-    # return Response(
-    #     'The vocabulary ID you\'ve supplied is not known. Must be one of:\n ' +
-    #     '\n'.join(g.VOCABS.keys()),
-    #     status=400,
-    #     mimetype='text/plain'
-    # )
+    return render_template(
+        'error.html',
+        title='Error - invalid vocab id',
+        heading='Invalid Vocab ID',
+        msg=msg
+    )
 
 
 def render_vb_exception_response(e):
@@ -191,14 +190,15 @@ def vocabulary_list(vocab_id):
     end = start + per_page
     concepts = concepts[start:end]
 
+ 
     test = SkosRegisterRenderer(
-        request,
-        [],
-        concepts,
-        g.VOCABS[vocab_id].title + ' concepts',
-        total,
-        search_query=query,
+        request=request,
+        navs=[],
+        members=concepts,
+        register_item_type_string=g.VOCABS[vocab_id].title + ' concepts',
+        total=total,
         search_enabled=True,
+        search_query=query,
         vocabulary_url=[request.url_root + 'vocabulary/' + vocab_id],
         vocab_id=vocab_id
     )
@@ -257,7 +257,6 @@ def object():
     try:
         # TODO reuse object within if, rather than re-loading graph
         c = vocab_source.get_object_class()
-        #print(c)
 
         if c == 'http://www.w3.org/2004/02/skos/core#Concept':
             concept = vocab_source.get_concept()
@@ -285,7 +284,6 @@ def object():
             return render_invalid_object_class_response(vocab_id, uri, c)
     except VbException as e:
         return render_vb_exception_response(e)
-
 
 
 @routes.route('/geosciml')
@@ -409,13 +407,13 @@ def endpoint():
             if 'CONSTRUCT' in query:
                 format_mimetype = 'text/turtle'
                 return Response(
-                    controller.sparql_endpoint_functions.sparql_query(query, format_mimetype=format_mimetype),
+                    sparql_endpoint_functions.sparql_query(query, format_mimetype=format_mimetype),
                     status=200,
                     mimetype=format_mimetype
                 )
             else:
                 return Response(
-                    controller.sparql_endpoint_functions.sparql_query(query, format_mimetype),
+                    sparql_endpoint_functions.sparql_query(query, format_mimetype),
                     status=200
                 )
         except ValueError as e:
@@ -444,9 +442,9 @@ def endpoint():
             '''
             query = request.args.get('query')
             if 'CONSTRUCT' in query:
-                acceptable_mimes = [x for x in Renderer.RDF_MIMETYPES]
+                acceptable_mimes = [x for x in Renderer.RDF_MEDIA_TYPES]
                 best = request.accept_mimetypes.best_match(acceptable_mimes)
-                query_result = controller.sparql_endpoint_functions.sparql_query(query, format_mimetype=best)
+                query_result = sparql_endpoint_functions.sparql_query(query, format_mimetype=best)
                 file_ext = {
                     'text/turtle': 'ttl',
                     'application/rdf+xml': 'rdf',
@@ -463,7 +461,7 @@ def endpoint():
                     }
                 )
             else:
-                query_result = controller.sparql_endpoint_functions.sparql_query(query)
+                query_result = sparql_endpoint_functions.sparql_query(query)
                 return Response(query_result, status=200, mimetype='application/sparql-results+json')
         else:
             # SPARQL Service Description
@@ -476,17 +474,17 @@ def endpoint():
             (X)HTML by way of RDFa, and should use content negotiation if available in other RDF representations.
             '''
 
-            acceptable_mimes = [x for x in Renderer.RDF_MIMETYPES] + ['text/html']
+            acceptable_mimes = [x for x in Renderer.RDF_MEDIA_TYPES] + ['text/html']
             best = request.accept_mimetypes.best_match(acceptable_mimes)
             if best == 'text/html':
                 # show the SPARQL query form
                 return redirect(url_for('routes.sparql'))
             elif best is not None:
-                for item in Renderer.RDF_MIMETYPES:
+                for item in Renderer.RDF_MEDIA_TYPES:
                     if item == best:
                         rdf_format = best
                         return Response(
-                            controller.sparql_endpoint_functions.get_sparql_service_description(
+                            sparql_endpoint_functions.get_sparql_service_description(
                                 rdf_format=rdf_format
                             ),
                             status=200,

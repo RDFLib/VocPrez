@@ -560,45 +560,6 @@ ORDER BY ?pl
             sparql.setCredentials(sparql_username, sparql_password)
             
         try:
-            import requests
-            DEFAULT_LANGUAGE = 'en'
-            q = '''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            PREFIX dcterms: <http://purl.org/dc/terms/>
-            PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            SELECT * WHERE {{
-                {{ GRAPH ?g {{
-                    ?cs a skos:ConceptScheme .
-                    OPTIONAL {{ ?cs skos:prefLabel ?title .
-                        FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
-                    OPTIONAL {{ ?cs dcterms:created ?created }}
-                    OPTIONAL {{ ?cs dcterms:issued ?issued }}
-                    OPTIONAL {{ ?cs dcterms:modified ?modified }}
-                    OPTIONAL {{ ?cs owl:versionInfo ?version }}
-                    OPTIONAL {{ ?cs skos:definition ?description .
-                        FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
-                }} }}
-                UNION
-                {{
-                    ?cs a skos:ConceptScheme .
-                    OPTIONAL {{ ?cs skos:prefLabel ?title .
-                        FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
-                    OPTIONAL {{ ?cs dcterms:created ?created }}
-                    OPTIONAL {{ ?cs dcterms:issued ?issued }}
-                    OPTIONAL {{ ?cs dcterms:modified ?modified }}
-                    OPTIONAL {{ ?cs owl:versionInfo ?version }}
-                    OPTIONAL {{ ?cs skos:definition ?description .
-                        FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
-                }}
-            }} 
-            ORDER BY ?title'''.format(language=DEFAULT_LANGUAGE)
-            # print('requesting using requests')
-            # r = requests.get(
-            #     'http://localhost:7200/respositories/gsq',
-            #     data={'query': q}
-            # )
-            # print(r.text)
-            # print(sparql.query())
             return sparql.query().convert()['results']['bindings']
         except Exception as e:
             logging.debug('SPARQL query failed: {}'.format(e))
@@ -724,16 +685,3 @@ WHERE  {{
         self._graph = Source.get_graph(vocab.sparql_endpoint, q, sparql_username=vocab.sparql_username, sparql_password=vocab.sparql_password)
         cache_write(self._graph, cache_file_name)
         return self._graph
-
-    # @staticmethod
-    # def sparql_query_in_memory_graph(vocab_id, q):
-    #     # get the graph from the pickled file
-    #     g = Graph()
-    #     g = Source.load_pickle_graph(vocab_id)
-    #
-    #     # put the query to the graph
-    #     for r in g.query(q):
-    #
-    # @staticmethod
-    # def sparql_query_sparql_endpoint(vocab_id, q):
-    #     pass

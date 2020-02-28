@@ -127,3 +127,6 @@ _config/server__init__.py
 
 # implementation-specific launch file
 app.wsgi
+
+# local vocab files
+data/vocab_files

@@ -5,7 +5,7 @@ import _config as config
 from rdflib import Graph
 import os
 from helper import APP_DIR
-import data.source as source
+from vocbench import Vocbench
 
 global g  # Flask globals
 
@@ -24,7 +24,7 @@ class VOCBENCH(Source):
 
     @staticmethod
     def init():
-        VOCBENCH.voc = source.Vocbench(config.VB_USER, config.VB_PASSWORD, config.VB_ENDPOINT)
+        VOCBENCH.voc = Vocbench(config.VB_USER, config.VB_PASSWORD, config.VB_ENDPOINT)
 
         # Get register item metadata
         for k in g.VOCABS:
@@ -455,6 +455,7 @@ class VOCBENCH(Source):
     def get_concept_hierarchy(self):
         # returns an ordered list of tuples, (hierarchy level, Concept URI, Concept prefLabel)
         s = VOCBENCH('x', self.request)._authed_request_object()
+        vocab = g.VOCABS[self.vocab_id]
         r = s.post(
             config.VB_ENDPOINT + '/SPARQL/evaluateQuery',
             data={
@@ -493,7 +494,7 @@ class VOCBENCH(Source):
                 test = c
                 if 'parent' not in c:
                     continue
-                if str(c['parent']['value']) == concept_scheme_uri:
+                if str(c['parent']['value']) == vocab.concept_scheme_uri:
                     hierarchy.append((
                         int(c['length']['value']),
                         c['c']['value'],

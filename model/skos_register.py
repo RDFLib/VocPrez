@@ -4,11 +4,25 @@ from flask_paginate import Pagination
 
 
 class SkosRegisterRenderer(ContainerRenderer):
-    def __init__(
-            self, request, navs, members, register_item_type_string, total, search_enabled=None,
-            search_query=None, contained_item_classes=[], **kwargs):
+    def __init__(self, 
+                 request, 
+                 navs, 
+                 members, 
+                 register_item_type_string, 
+                 total, 
+                 search_enabled=None,
+                 search_query=None, 
+                 contained_item_classes=[], 
+                 **kwargs
+                 ):
+        
         self.navs = navs
-        self.members = [(x.uri, x.title) for x in members]
+        #TODO: Deal with this more elegantly
+        try:
+            self.members = [(x.uri, x.title) for x in members] # Vocabulary members
+        except:
+            self.members = [(x['uri'], x['title']) for x in members] # dict members  
+                
         self.register_item_type_string = register_item_type_string
         self.search_query = search_query
         self.search_enabled = search_enabled
@@ -16,14 +30,14 @@ class SkosRegisterRenderer(ContainerRenderer):
         self.template_extras = kwargs
         profiles = {
             'ckan': Profile(
-                'https://ckan.org/',
-                'Comprehensive Knowledge Archive Network Profile',
-                'The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for '
+                label='https://ckan.org/',
+                comment='The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for '
                 'the storage and distribution of open data. This profile it it\'s native data model',
-                ['application/json'],
-                'application/json',
+                mediatypes=['application/json'],
+                default_mediatype='application/json',
                 languages=['en'],
-                default_language='en'
+                default_language='en',
+                profile_uri='https://ckan.org/',
             )
         }
 
@@ -53,7 +67,7 @@ class SkosRegisterRenderer(ContainerRenderer):
             return response
         elif self.profile == 'mem':
             if self.paging_error is None:
-                self.headers['Profile'] = str(self.profiles['mem'].uri)
+                self.headers['Profile'] = str(self.profiles['mem'].namespace)
                 if self.mediatype == 'text/html':
                     response = self._render_mem_profile_html()
                 # elif self.mediatype in ContainerRenderer.RDF_MEDIA_TYPES:

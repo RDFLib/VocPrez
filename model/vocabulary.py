@@ -79,12 +79,11 @@ class VocabularyRenderer(Renderer):
     def _add_dcat_profile(self):
         return {
             'dcat': Profile(
-                'https://www.w3.org/TR/vocab-dcat/',
-                'Dataset Catalogue Vocabulary (DCAT)',
-                'DCAT is a W3C-authored RDF vocabulary designed to facilitate interoperability between data catalogs '
+                label='https://www.w3.org/TR/vocab-dcat/',
+                comment='Dataset Catalogue Vocabulary (DCAT) is a W3C-authored RDF vocabulary designed to facilitate interoperability between data catalogs '
                 'published on the Web.',
-                ['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
-                'text/html',
+                mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
+                default_mediatype='text/html',
                 languages=['en'],  # default 'en' only for now
                 default_language='en'
             )
@@ -93,14 +92,14 @@ class VocabularyRenderer(Renderer):
     def _add_skos_profile(self):
         return {
             'skos': Profile(
-                'https://www.w3.org/TR/skos-reference/',
-                'Simple Knowledge Organization System (SKOS)',
-                'SKOS is a W3C-authored, common data model for sharing and linking knowledge organization systems '
+                label='https://www.w3.org/TR/skos-reference/',
+                comment='Simple Knowledge Organization System (SKOS)is a W3C-authored, common data model for sharing and linking knowledge organization systems '
                 'via the Web.',
-                ['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
-                'text/html',
+                mediatypes=['text/html', 'application/json'] + self.RDF_MEDIA_TYPES,
+                default_mediatype='text/html',
                 languages=['en'],  # default 'en' only for now
-                default_language='en'
+                default_language='en',
+                profile_uri='http://www.w3.org/2004/02/skos/core#',
             )
         }
 

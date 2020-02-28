@@ -35,7 +35,7 @@ def get_sparql_service_description(rdf_format='turtle'):
         .
     '''
     g = Graph().parse(io.StringIO(sd_ttl), format='turtle')
-    rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_MAP]))
+    rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_TYPES_MAP]))
     if rdf_format[0][1] in rdf_formats:
         return g.serialize(format=rdf_format[0][1])
     else:
