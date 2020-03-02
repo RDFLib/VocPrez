@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-8">
             <h1>{{ label }}</h1>
             <dl>
               <dt>IRI</dt>
@@ -20,14 +20,6 @@
               {% endif %}
               {% endif %}
             </dl>
-        </div>
-        <div class="col-md-8">
-            <h3>Members</h3>
-            <ul>
-            {%- for member in members -%}
-            <li><a href="{{ member[0].replace('http://linked.data.gov.au/def/', url_for('routes.vocabularies') ) }}">{{ member[1] }}</a></li>
-            {%- endfor -%}
-            </ul>
         </div>
         <div class="col-md-4">
             <div class="altview">
@@ -51,6 +43,14 @@
                 <p>If you want to page through the whole collection, start at <code>first</code> and follow link headers until you reach <code>last</code> or until no <code>last</code> is given. You shouldn't try to calculate each <code>page</code> query string argument yourself.</p>
                 </div>
             </div>
+        </div>
+        <div class="col-md-12">
+            <h3>Members</h3>
+            <ul>
+            {%- for member in members -%}
+            <li><a href="{{ member[0].replace('http://linked.data.gov.au/def/', url_for('routes.vocabularies') ) }}">{{ member[1] }}</a></li>
+            {%- endfor -%}
+            </ul>
         </div>
     </div>
     <!-- pagination links as per MediaTypes -->
