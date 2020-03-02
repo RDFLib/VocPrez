@@ -1,6 +1,7 @@
 from pyldapi import Renderer, ContainerRenderer, Profile
-from flask import Response, render_template, jsonify
+from flask import Response, render_template, jsonify, g
 from flask_paginate import Pagination
+from model.profiles import *
 
 
 class SkosRegisterRenderer(ContainerRenderer):
@@ -17,6 +18,7 @@ class SkosRegisterRenderer(ContainerRenderer):
         **kwargs
     ):
 
+        self.vocab_id = kwargs.get('vocab_id')
         self.navs = navs
         # TODO: Deal with this more elegantly
         try:
@@ -30,24 +32,21 @@ class SkosRegisterRenderer(ContainerRenderer):
         self.vocabulary_url = contained_item_classes
         self.template_extras = kwargs
         profiles = {
-            "ckan": Profile(
-                "https://ckan.org/",
-                "CKAN",
-                comment="The Comprehensive Knowledge Archive Network (CKAN) is a web-based open-source management system for "
-                "the storage and distribution of open data. This profile it it's native data model",
-                mediatypes=["application/json"],
-                default_mediatype="application/json",
-                languages=["en"],
-                default_language="en",
-            )
+            "ckan": profile_ckan
         }
+
+        if "/concept/" in request.base_url:
+            label = "Concepts within " + g.VOCABS[self.vocab_id].title
+            description = "All of the Concepts for the Vocabulary <a href=\"" + request.base_url.replace('/concept/', '') + "\">" + g.VOCABS[self.vocab_id].title + '</a>'
+        else:
+            label = "Vocabularies"
+            description = "All of the Vocabularies published by this instance of VocPrez"
 
         super().__init__(
             request,
             request.base_url,
-            "Vocabularies",
-            "This is a container of vocabularies or taxonomies are hierarchically-related collections of concepts. "
-            "These vocabularies are all formulated according to the SKOS model.",
+            label,
+            description,
             None,
             None,
             self.members,

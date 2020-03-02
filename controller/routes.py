@@ -189,7 +189,7 @@ def vocabulary(vocab_id):
 
 
 @routes.route("/vocabulary/<vocab_id>/concept/")
-def vocabulary_list(vocab_id):
+def concepts(vocab_id):
     language = request.values.get("lang") or config.DEFAULT_LANGUAGE
 
     if vocab_id not in g.VOCABS.keys():

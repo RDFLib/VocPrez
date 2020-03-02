@@ -174,7 +174,7 @@ class VocabularyRenderer(Renderer):
         _template_context = {
             "uri": self.uri,
             "vocab": self.vocab,
-            "navs": self.navs,
+            # "navs": self.navs,
             "title": "Voc: " + self.vocab.title,
             "config": config,
         }

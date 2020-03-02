@@ -100,10 +100,12 @@
             {% for nav in navs %}
                 {{ nav|safe }}
             {% endfor %}
-            <a href="{{ url_for('routes.index') }}">System Home</a> /
-            <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a> /
-            <a href="{{ url_for('routes.sparql') }}">SPARQL</a> /
-            <a href="{{ url_for('routes.about') }}">About</a>
+            <div id="nav-links">
+              <a href="{{ url_for('routes.index') }}">VocPrez Home</a>
+              <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a>
+              <a href="{{ url_for('routes.sparql') }}">SPARQL Queries</a>
+              <a href="{{ url_for('routes.about') }}">About</a>
+            </div>
         </div>
     </div>
 

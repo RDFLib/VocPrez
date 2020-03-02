@@ -1,30 +1,22 @@
 {% extends "page.html" %}
 
 {% block content %}
-    <h1>System Home</h1>
+    <h1>VocPrez Home</h1>
 
     {% set title = title %}
 
-<p>
-    Welcome to
+<p>Welcome to an instance of VocPrez, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.</p>
 
-    {% if title != 'VocPrez' %}
-        {{ title }},
-    {% endif %}
-
-    an instance of <a href="https://github.com/CSIRO-enviro-informatics/skos-styler">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
-</p>
-
-<p>VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbench.uniroma2.it/">VocBench</a>. </p>
+<p>VocPrez presents different views, or <em>profiles</em>, of vocabularies which it can get from a number of different RDF sources, such as local RDF files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> (a vocabulary management system), the <a href="http://vocbench.uniroma2.it/">VocBench</a> too or a SPARQL endpoint. </p>
 
 <p>See the <a href="about">About page</a> for more information.</p>
 
 <h2>Vocabularies</h2>
-<p>See the <a href="vocabulary">Vocabularies Register</a> for a list of vocabularies.</p>
+<p>See the <a href="{{ url_for('routes.vocabularies') }}">list of Vocabularies</a>.</p>
 
 <h2>Concepts</h2>
-<p>SKOS concepts will be listed within a vocabulary's landing page. When within a vocabulary, a Concepts Register will be accessible in the navigation bar. </p>
-<p>Example <a href="vocabulary/{{ voc_key }}/concept/">Concepts Register</a> for {{ voc_key }}.</p>
+<p>SKOS concepts are listed in a couple of different ways listed within a vocabulary's landing page. Also, the pure list of concepts is accessible via a dedicated endpoint which is the vocabulary endpoint + <code>/concepts/</code>, e.g.:</p>
+  <ul><li><a href="{{ url_for('routes.vocabularies') }}{{ voc_key }}/concept/">Concepts</a> - for the <em>{{ voc_key }}</em> vocabulary</li></ul>
 
 <h2>Collections</h2>
 <p><i>Coming soon.</i></p>
