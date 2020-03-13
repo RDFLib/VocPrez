@@ -5,20 +5,8 @@
         <div class="col-lg-8">
             <h1>{{ label }}</h1>
             <dl>
-              <dt>IRI</dt>
-              <dd><strong><a href="{{ uri }}">{{ uri }}</a></strong></dd>
-              {% if comment is not none %}
               <dt>Description</dt>
               <dd>{{ comment|safe }}</dd>
-              {% endif %}
-              {% if parent_container_uri is not none %}
-              <dt>Parent Container</dt>
-              {% if parent_container_label is not none %}
-              <dd><a href="{{ parent_container_uri }}">{{ parent_container_uri }}</a></dd>
-              {% else %}
-              <dd><a href="{{ parent_container_uri }}">{{ parent_container_label }}</a></dd>
-              {% endif %}
-              {% endif %}
             </dl>
         </div>
         <div class="col-md-4">
@@ -45,7 +33,7 @@
             </div>
         </div>
         <div class="col-md-12">
-            <h3>Members</h3>
+            <h3>Vocabularies by label</h3>
             <ul>
             {%- for member in members -%}
             <li><a href="{{ member[0].replace('http://linked.data.gov.au/def/', url_for('routes.vocabularies') ) }}">{{ member[1] }}</a></li>

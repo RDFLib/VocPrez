@@ -17,7 +17,7 @@ import markdown
 from data.source._source import Source
 from data.source.VOCBENCH import VbException
 import json
-from pyldapi import Renderer
+from pyldapi import Renderer, ContainerRenderer
 from controller import sparql_endpoint_functions
 import datetime
 import logging
@@ -134,41 +134,52 @@ def vocabularies():
         if request.values.get("per_page") is not None
         else 20
     )
-
-    # TODO: replace this logic with the following
-    #   1. read all static vocabs from g.VOCABS
+    #
+    # # TODO: replace this logic with the following
+    # #   1. read all static vocabs from g.VOCABS
     # get this instance's list of vocabs
     vocabs = []  # local copy (to this request) for sorting
     for k, voc in g.VOCABS.items():
-        vocabs.append(voc)
-    vocabs.sort(key=lambda v: v.title)
+        vocabs.append((voc.uri, voc.title))
+    vocabs.sort(key=lambda tup: tup[1])
     total = len(g.VOCABS.items())
-
-    # Search
-    query = request.values.get("search")
-    results = []
-    if query:
-        for m in match(vocabs, query):
-            results.append(m)
-        vocabs[:] = results
-        vocabs.sort(key=lambda v: v.title)
-        total = len(vocabs)
-
-    # generate vocabs list for requested page and per_page
+    #
+    # # Search
+    # query = request.values.get("search")
+    # results = []
+    # if query:
+    #     for m in match(vocabs, query):
+    #         results.append(m)
+    #     vocabs[:] = results
+    #     vocabs.sort(key=lambda v: v.title)
+    #     total = len(vocabs)
+    #
+    # # generate vocabs list for requested page and per_page
     start = (page - 1) * per_page
     end = start + per_page
     vocabs = vocabs[start:end]
+    #
+    # # render the list of vocabs
+    # return SkosRegisterRenderer(
+    #     request,
+    #     [],
+    #     vocabs,
+    #     "Vocabularies",
+    #     total,
+    #     search_query=query,
+    #     search_enabled=True,
+    #     vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
+    # ).render()
 
-    # render the list of vocabs
-    return SkosRegisterRenderer(
+    return ContainerRenderer(
         request,
-        [],
+        'https://vocab.gsq/digital/vocabulary/',
+        'Vocabularies',
+        'Vocabularies published by the Geological Survey of Queensland',
+        None,
+        None,
         vocabs,
-        "Vocabularies",
-        total,
-        search_query=query,
-        search_enabled=True,
-        vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
+        total
     ).render()
 
 

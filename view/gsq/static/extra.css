@@ -153,3 +153,7 @@ dd {
 #nav-links a {
     margin-right: 20px;
 }
+
+.pagination ul li {
+    border-width: 0;
+}
