@@ -183,8 +183,15 @@ def vocabularies():
     ).render()
 
 
-@routes.route("/vocabulary/<vocab_id>")
+@routes.route("/vocabulary/<path:vocab_id>")
 def vocabulary(vocab_id):
+    if "/concept/" in vocab_id:
+        return redirect(url_for(concepts(vocab_id.split("/")[0])))
+    else:
+        parts = vocab_id.split("/")
+        if len(parts) > 1:
+            vocab_id = parts[1]
+
     language = request.values.get("lang") or config.DEFAULT_LANGUAGE
 
     if vocab_id not in g.VOCABS.keys():
