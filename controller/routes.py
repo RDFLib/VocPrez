@@ -9,6 +9,7 @@ from flask import (
     url_for,
 )
 from model.vocabulary import VocabularyRenderer
+from model.vocabularies import VocabulariesRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
 from model.skos_register import SkosRegisterRenderer
@@ -132,7 +133,7 @@ def vocabularies():
     per_page = (
         int(request.values.get("per_page"))
         if request.values.get("per_page") is not None
-        else 20
+        else 50
     )
     #
     # # TODO: replace this logic with the following
@@ -142,7 +143,7 @@ def vocabularies():
     for k, voc in g.VOCABS.items():
         vocabs.append((voc.uri, voc.title))
     vocabs.sort(key=lambda tup: tup[1])
-    total = len(g.VOCABS.items())
+    total = len(g.VOCABS.items()) - 1
     #
     # # Search
     # query = request.values.get("search")
@@ -171,11 +172,11 @@ def vocabularies():
     #     vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
     # ).render()
 
-    return ContainerRenderer(
+    return VocabulariesRenderer(
         request,
-        'https://vocab.gsq/digital/vocabulary/',
+        'https://example.com/vocabulary/',
         'Vocabularies',
-        'Vocabularies published by the Geological Survey of Queensland',
+        'Vocabularies published by NERC',
         None,
         None,
         vocabs,

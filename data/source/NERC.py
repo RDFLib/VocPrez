@@ -12,8 +12,8 @@ else:
     DEFAULT_LANGUAGE = "en"
 
 
-class SPARQL(Source):
-    """Source for a generic SPARQL endpoint
+class NERC(Source):
+    """Source for a NERC's SPARQL endpoint
     """
 
     def __init__(self, vocab_id, request, language=None):
@@ -36,9 +36,9 @@ class SPARQL(Source):
 
         },
         """
-        logging.debug("SPARQL collect()...")
+        logging.debug("NERC collect()...")
 
-        # Get all the ConceptSchemes from the SPARQL endpoint
+        # Get all the ConceptSchemes from the NERC endpoint
         # Interpret each CS as a Vocab
         q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -87,9 +87,8 @@ ORDER BY ?title""".format(
 
         sparql_vocabs = {}
         for cs in concept_schemes:
-            print("cs: " + str(cs))
-            # handling CS URIs that end with '/'
-            vocab_id = cs["cs"]["value"].replace("/conceptScheme", "").split("/")[-1].split("#")[-1]
+            # handling URIs like http://vocab.nerc.ac.uk/scheme/NETOC_VCOV/current/
+            vocab_id = cs["cs"]["value"].split("/scheme/")[1].split("/")[0]
 
             # TODO: Investigate putting regex into SPARQL query
             # print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
@@ -111,7 +110,7 @@ ORDER BY ?title""".format(
                 cs["description"].get("value")
                 if cs.get("description") is not None
                 else None,
-                None,  # none of these SPARQL vocabs have creator info yet # TODO: add creator info to GSQ vocabs
+                None,  # none of these NERC vocabs have creator info yet # TODO: add creator info to GSQ vocabs
                 dateutil.parser.parse(cs.get("created").get("value"))
                 if cs.get("created") is not None
                 else None,
@@ -123,11 +122,11 @@ ORDER BY ?title""".format(
                 cs["version"].get("value")
                 if cs.get("version") is not None
                 else None,  # versionInfo
-                config.VocabSource.SPARQL,
+                config.VocabSource.NERC,
                 cs["cs"]["value"],
                 sparql_endpoint=details["sparql_endpoint"],
                 sparql_username=details["sparql_username"],
                 sparql_password=details["sparql_password"],
             )
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
-        logging.debug("SPARQL collect() complete.")
+        logging.debug("NERC collect() complete.")

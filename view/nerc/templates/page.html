@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% from "macros/format.html" import format with context %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='vanilla_theme.css')}}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-grid.css') }}" />
+</head>
+<body class="container">
+    <div>
+        <div id="header">
+            <div style="float:left;">
+                <em>Logo Placeholder</em>
+            </div>
+            <div style="float:right;">
+                {% for nav in navs %}
+                    {{ nav|safe }}
+                {% endfor %}
+                <a href="{{ url_for('routes.index') }}">VocPrez Home</a> |
+                <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a> |
+                <a href="{{ url_for('routes.sparql') }}">SPARQL</a> |
+                <a href="{{ url_for('routes.about') }}">About</a>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+
+        <div>
+            {% block content %}{% endblock %}
+        </div>
+        <footer>
+
+        </footer>
+    </div>
+</body>
+</html>

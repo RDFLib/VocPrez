@@ -1,0 +1,102 @@
+{% extends "page.html" %}
+
+{% block content %}
+    <h1>VocPrez</h1>
+    <h2>SPARQL UI</h2>
+    <p>
+        This page allows you to lodge <a href="https://en.wikipedia.org/wiki/SPARQL">SPARQL</a> queries against the
+        <a href="https://en.wikipedia.org/wiki/Triplestore">triplestore</a> (graph database) that stores all of this
+        VocPrez instance's data.
+    </p>
+    <style>
+        table.layout {
+            border: none;
+        }
+        table.layout td {
+            vertical-align: top;
+            border: none;
+        }
+    </style>
+    <table class="layout">
+        <tr>
+            <td>
+                <table class="layout">
+                    <tr>
+                        <td>
+                            <h3>Endpoint</h3>
+                            <p>
+                                This web page forwards all SPARQL queries entered into the Query UI below to its SPARQL endpoint,
+                                which is:
+                            </p>
+                            <p>
+                                <code>
+                                    <a href="{{ url_for('routes.endpoint', _external=True) }}">{{ url_for('routes.endpoint', _external=True) }}</a>
+                                </code>
+                            </p>
+                            <p>
+                                Use the Query UI below to lodge queries.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3>Test Query</h3>
+                            <p>
+                                Here is an example query you can copy 'n paste into the Query UI text area below to test with. It counts the number of
+                                vocabulary <em>Concepts</em> in the all vocabularies in this system and will return an integer:
+                            </p>
+                            <pre><code>
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+SELECT (COUNT(?c) AS ?count)
+WHERE {
+    ?c a skos:Concept .
+}
+                            </code></pre>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <h3>Raw queries</h3>
+                <p>
+                    If you would like to lodge queries directly against this SPARQL endpoint without using the Query UI
+                    below, first create the query, URL-encode it, and lodge it like this:
+                </p>
+                <pre>
+{{ url_for('routes.endpoint', _external=True) }}?query={YOUR_QUERY_URL_ENCODED}
+                </pre>
+                <p>
+                    Enter your SPARQL query into this text box and click "URL Encode" to URL encode it. That will
+                    generate a single encoded string with spaces replaced by "%20" and other character replacements
+                    which you can then use in place of <code>{YOUR_QUERY_URL_ENCODED}</code> above.
+                </p>
+                <p>
+                    You might like to test out your query first using the Query UI below too.
+                </p>
+                <textarea id="encoding_query" style="width:100%; min-height:100px;"></textarea>
+                <button id="url_encode">URL Encode</button> <button id="url_decode">URL Decode</button>
+            </td>
+        </tr>
+    </table>
+
+    <h3>Query UI</h3>
+    <p>Enter SPARQL queries in the text box below to lodge them against this VocPrez' endpoint:</p>
+    <div id="yasgui" style="margin-bottom: 25px;"></div>
+
+    <link href='//cdn.jsdelivr.net/npm/yasgui@2.7.29/dist/yasgui.min.css' rel='stylesheet' type='text/css'/>
+    <script src='//cdn.jsdelivr.net/npm/yasgui@2.7.29/dist/yasgui.min.js'></script>
+
+    <script type="text/javascript">
+        var yasgui = YASGUI(document.getElementById("yasgui"), {
+            yasqe:{sparql:{endpoint:'{{ url_for('routes.endpoint') }}'}} // default endpoint
+          });
+
+        document.getElementById("url_encode").addEventListener("click", function() {
+          document.getElementById("encoding_query").value = encodeURIComponent(document.getElementById("encoding_query").value);
+        });
+
+        document.getElementById("url_decode").addEventListener("click", function() {
+          document.getElementById("encoding_query").value = decodeURIComponent(document.getElementById("encoding_query").value);
+        });
+    </script>
+{% endblock %}
