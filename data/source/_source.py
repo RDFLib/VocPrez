@@ -738,7 +738,6 @@ ORDER BY ?pl
         """
         Function to submit a sparql query and return the textual response
         """
-        # logging.debug('sparql_query = {}'.format(sparql_query))
         accept_format = {
             "json": "application/json",
             "xml": "application/rdf+xml",
