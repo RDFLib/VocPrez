@@ -63,17 +63,10 @@ class Vocabulary:
 
 class VocabularyRenderer(Renderer):
     def __init__(self, request, vocab, language="en"):
-        self.uri = request.base_url
         self.profiles = {"dcat": profile_dcat}
         self.profiles.update({"skos": profile_skos})
-        self.navs = [
-            # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
-            '<a href="'
-            + url_for("routes.vocabulary", vocab_id=vocab.id)
-            + '/concept/">Concepts</a> |'
-        ]
-
         self.vocab = vocab
+        self.uri = self.vocab.uri
         self.language = language
 
         super().__init__(request, self.vocab.uri, self.profiles, "dcat")
