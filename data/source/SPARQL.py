@@ -99,7 +99,7 @@ ORDER BY ?title""".format(
 
             sparql_vocabs[vocab_id] = Vocabulary(
                 vocab_id,
-                cs["cs"]["value"].replace("/conceptScheme", ""),
+                cs["cs"]["value"],
                 cs["title"].get("value") or vocab_id
                 if cs.get("title")
                 else vocab_id,  # Need string value for sorting, not None

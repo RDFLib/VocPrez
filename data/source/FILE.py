@@ -8,7 +8,7 @@ import dateutil.parser
 from collections import OrderedDict
 import pickle
 from model.concept import Concept
-from flask import g
+from flask import g, url_for
 import logging
 from model.vocabulary import Vocabulary
 import helper as h
@@ -97,7 +97,7 @@ class FILE(Source):
                     for cs in gr.query(q):
                         file_vocabs[vocab_id] = Vocabulary(
                             vocab_id,
-                            str(cs[0]).replace("/conceptScheme", ""),
+                            str(cs[0]),
                             str(cs[1]) or str(cs[0])
                             if str(cs[1])
                             else str(cs[0]),  # Need string, not None
@@ -167,70 +167,82 @@ class FILE(Source):
               ?c a skos:Concept .
               ?c rdfs:label ?l .
             }"""
-        return [(x["c"], x["l"]) for x in self.g.query(q)]
+        return [(x["c"], x["l"]) for x in self.gr.query(q)]
 
     def list_concepts(self):
-        vocabs = []
-        # for s, p, o in self.g.triples((None, SKOS.inScheme, None)):
-        #     label = ' '.join(str(s).split('#')[-1].split('/')[-1].split('_'))
-        #     vocabs.append({
-        #         'uri': str(s),
-        #         'title': label
-        #     })
-        result = self.g.query(
-            """
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX dct: <http://purl.org/dc/terms/>
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT * 
-            WHERE {{
-                {{
-                    ?s a skos:Concept .
-                    ?s skos:prefLabel ?title .                    
-                }}
-                UNION
-                {{
-                    ?s a skos:Concept .
-                    ?s dct:title ?title . 
-                    MINUS { ?s skos:prefLabel ?prefLabel }
-                }}
-                UNION
-                {{
-                    ?s a skos:Concept .
-                    ?s rdfs:label ?title . 
-                    MINUS { ?s skos:prefLabel ?prefLabel }
-                    MINUS { ?s dct:title ?prefLabel }
-                }}
-                OPTIONAL {{
-                    ?s dct:created ?created .
-                }}
-                OPTIONAL {{
-                    ?s dct:modified ?modified .
-                }}
-            }}
-            """
-        )
+        concepts = []
+        for s, p, o in self.gr.triples((None, SKOS.hasTopConcept, None)):
+            uri = None
+            title = None
+            for s2, p2, o2 in self.gr.triples((o, None, None)):
+                if p2 in [
+                    URIRef('http://purl.org/dc/terms/title'),
+                    URIRef('http://www.w3.org/2004/02/skos/core#prefLabel'),
+                    URIRef('http://www.w3.org/2000/01/rdf-schema#label'),
+                ] and o2.language == config.DEFAULT_LANGUAGE:
+                    uri = str(o)
+                    title = str(o2)
+            concepts.append({
+                'uri': url_for("routes.object", vocab_id=self.vocab_id, uri=uri),
+                'title': title
+            })
 
-        for row in result:
-            vocabs.append(
-                {
-                    "vocab_id": self.vocab_id,
-                    "uri": str(row["s"]),
-                    "title": row["title"]
-                    if row["title"] is not None
-                    else " ".join(
-                        str(row["s"]).split("#")[-1].split("/")[-1].split("_")
-                    ),
-                    "created": row["created"][:10]
-                    if row["created"] is not None
-                    else None,
-                    "modified": row["modified"][:10]
-                    if row["modified"] is not None
-                    else None,
-                }
-            )
+        # result = self.gr.query(
+        #     """
+        #     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        #     PREFIX dct: <http://purl.org/dc/terms/>
+        #     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        #     SELECT ?s ?title
+        #     WHERE {{
+        #         {{
+        #             ?s a skos:Concept .
+        #             ?s skos:prefLabel ?title .
+        #         }}
+        #         UNION
+        #         {{
+        #             ?s a skos:Concept .
+        #             ?s dct:title ?title .
+        #             MINUS { ?s skos:prefLabel ?prefLabel }
+        #         }}
+        #         UNION
+        #         {{
+        #             ?s a skos:Concept .
+        #             ?s rdfs:label ?title .
+        #             MINUS { ?s skos:prefLabel ?prefLabel }
+        #             MINUS { ?s dct:title ?prefLabel }
+        #         }}
+        #     }}
+        #     """
+        # )
+        #
+        # for row in result:
+        #     concepts.append(
+        #         {
+        #             "vocab_id": self.vocab_id,
+        #             "uri": str(row["s"]),
+        #             "title": row["title"]
+        #             if row["title"] is not None
+        #             else " ".join(
+        #                 str(row["s"]).split("#")[-1].split("/")[-1].split("_")
+        #             )
+        #         }
+        #     )
 
-        return vocabs
+        return concepts
+
+    def get_vocabulary(self):
+        """
+        Get a vocab from the cache
+        :return:
+        :rtype:
+        """
+        vocab = g.VOCABS[self.vocab_id]
+
+        vocab.hasTopConcept = self.get_top_concepts()
+        vocab.concept_hierarchy = self.get_concept_hierarchy()
+        vocab.concepts = self.get_concepts()
+        vocab.collections = self.list_collections()
+        return vocab
 
     # stub
     def get_collection(self, uri):
@@ -249,16 +261,19 @@ class FILE(Source):
                 ?predicateLabel # 2
                 ?objectLabel    # 3
                 ?prefLabel      # 4
+                ?lang           # 5
             WHERE {{
                 <{concept_uri}> ?predicate ?object .
                 OPTIONAL {{
                     ?predicate rdfs:label ?predicateLabel .
                     FILTER(lang(?predicateLabel) = "{language}" || lang(?predicateLabel) = "")
+                    BIND(lang(?predicateLabel) AS ?lang)
                 }}
                 OPTIONAL {{
                     ?object skos:prefLabel|rdfs:label ?objectLabel .
                     # Don't filter prefLabel language
                     FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "") 
+                    BIND(lang(?objectLabel) AS ?lang)
                 }}
             }}
             """.format(
@@ -281,7 +296,7 @@ class FILE(Source):
             # Special case for prefLabels
             if predicateUri == "http://www.w3.org/2004/02/skos/core#prefLabel":
                 predicateLabel = "Multilingual Labels"
-                preflabel_lang = "en"  # because I don't know how to get lang out of an rdflib SPARQL query
+                preflabel_lang = r[1].language if hasattr(r[1], "language") else "en"
 
                 # Use default language or no language prefLabel as primary
                 if (not prefLabel and not preflabel_lang) or (
@@ -305,7 +320,6 @@ class FILE(Source):
                     related_object = str(r[1])
                     related_objectLabel = None
                 else:
-                    print("uri")
                     related_object = str(r[1])
                     related_objectLabel = (
                         str(r[3]) if r[3] is not None else h.make_title(str(r[1]))
@@ -348,7 +362,7 @@ class FILE(Source):
         )
 
     def get_top_concepts(self):
-        # same as parent query, only running against rdflig in-memory graph, not SPARQL endpoint
+        # same as parent query, only running against rdflib in-memory graph, not SPARQL endpoint
         vocab = g.VOCABS[self.vocab_id]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -502,7 +516,11 @@ class FILE(Source):
             PREFIX dct: <http://purl.org/dc/terms/>
             SELECT DISTINCT ?concept ?concept_preflabel ?broader_concept
             WHERE {{
-                ?concept skos:inScheme <{vocab_uri}> .
+                {{ ?concept skos:inScheme <{vocab_uri}> . }}
+                UNION
+                {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
+                UNION
+                {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}                
                 ?concept skos:prefLabel ?concept_preflabel .
                 OPTIONAL {{ ?concept skos:broader ?broader_concept .
                     ?broader_concept skos:inScheme <{vocab_uri}> .
@@ -538,7 +556,6 @@ class FILE(Source):
     @staticmethod
     def load_pickle_graph(vocab_id):
         pickled_file_path = join(config.APP_DIR, "data", "vocab_files", vocab_id + ".p")
-        print(pickled_file_path)
 
         try:
             with open(pickled_file_path, "rb") as f:

@@ -80,30 +80,30 @@ WHERE {{
         vocab = g.VOCABS[self.vocab_id]
         q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dct: <http://purl.org/dc/terms/>
-SELECT DISTINCT *
+SELECT DISTINCT ?c ?pl
 WHERE {{
     {{ GRAPH ?g {{
-        ?c skos:inScheme <{concept_scheme_uri}> . 
+        {{ ?c skos:inScheme <{concept_scheme_uri}> . }}
+        UNION
+        {{ ?c skos:topConceptOf <{concept_scheme_uri}> . }}
+        UNION
+        {{ <{concept_scheme_uri}> skos:hasTopConcept ?c . }}
+         
         {{ ?c skos:prefLabel ?pl .
         FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
         }}
-        OPTIONAL {{ ?c skos:definition ?d .
-        FILTER(lang(?d) = "{language}" || lang(?d) = "") 
-        }}
-        OPTIONAL {{ ?c dct:created ?created . }}
-        OPTIONAL {{ ?c dct:modified ?modified . }}
     }} }}
     UNION
     {{
-        ?c skos:inScheme <{concept_scheme_uri}> . 
+        {{ ?c skos:inScheme <{concept_scheme_uri}> . }}
+        UNION
+        {{ ?c skos:topConceptOf <{concept_scheme_uri}> . }}
+        UNION
+        {{ <{concept_scheme_uri}> skos:hasTopConcept ?c . }}
+        
         {{ ?c skos:prefLabel ?pl .
         FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
         }}
-        OPTIONAL {{ ?c skos:definition ?d .
-        FILTER(lang(?d) = "{language}" || lang(?d) = "") 
-        }}
-        OPTIONAL {{ ?c dct:created ?created . }}
-        OPTIONAL {{ ?c dct:modified ?modified . }}
     }}
 }}
 ORDER BY ?pl""".format(
@@ -144,7 +144,6 @@ ORDER BY ?pl""".format(
         vocab.concept_hierarchy = self.get_concept_hierarchy()
         vocab.concepts = self.get_concepts()
         vocab.collections = self.list_collections()
-        # vocab.source =
         return vocab
 
     def get_collection(self, uri):
@@ -194,7 +193,7 @@ WHERE {{
             """.format(
             collection_uri=uri, language=self.language
         )
-        print(q)
+
         members = Source.sparql_query(
             vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
         )
@@ -323,8 +322,6 @@ WHERE {{
             ]
         )
 
-        # print(repr(related_objects).encode('utf-8'))
-
         return Concept(
             vocab_id=self.vocab_id,
             uri=concept_uri,
@@ -451,7 +448,11 @@ PREFIX dct: <http://purl.org/dc/terms/>
 SELECT distinct ?concept ?concept_preflabel ?broader_concept
 WHERE {{
     {{ GRAPH ?graph {{
-        ?concept skos:inScheme <{vocab_uri}> .
+        {{ ?concept skos:inScheme <{vocab_uri}> . }}
+        UNION
+        {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
+        UNION
+        {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
         ?concept skos:prefLabel ?concept_preflabel .
         OPTIONAL {{ ?concept skos:broader ?broader_concept .
             ?broader_concept skos:inScheme <{vocab_uri}> .
@@ -460,7 +461,11 @@ WHERE {{
     }} }}
     UNION
     {{
-        ?concept skos:inScheme <{vocab_uri}> .
+        {{ ?concept skos:inScheme <{vocab_uri}> . }}
+        UNION
+        {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
+        UNION
+        {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
         ?concept skos:prefLabel ?concept_preflabel .
         OPTIONAL {{ ?concept skos:broader ?broader_concept .
             ?broader_concept skos:inScheme <{vocab_uri}> .
@@ -483,7 +488,6 @@ ORDER BY ?concept_preflabel""".format(
         return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     def get_object_class(self):
-        # print('get_object_class uri = {}'.format(url_decode(self.request.values.get('uri'))))
         vocab = g.VOCABS[self.vocab_id]
         q = """SELECT DISTINCT * 
 WHERE {{ 

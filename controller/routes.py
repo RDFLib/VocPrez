@@ -15,6 +15,7 @@ from model.skos_register import SkosRegisterRenderer
 import _config as config
 import markdown
 from data.source._source import Source
+import data.source as source
 from data.source.VOCBENCH import VbException
 import json
 from pyldapi import Renderer, ContainerRenderer
@@ -140,7 +141,7 @@ def vocabularies():
     # get this instance's list of vocabs
     vocabs = []  # local copy (to this request) for sorting
     for k, voc in g.VOCABS.items():
-        vocabs.append((voc.uri, voc.title))
+        vocabs.append((url_for("routes.vocabulary", vocab_id=k), voc.title))
     vocabs.sort(key=lambda tup: tup[1])
     total = len(g.VOCABS.items())
     #
@@ -199,7 +200,8 @@ def vocabulary(vocab_id):
 
     # get vocab details using appropriate source handler
     try:
-        vocab = Source(vocab_id, request, language).get_vocabulary()
+        vocab = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=language) \
+            .get_vocabulary()
     except VbException as e:
         return render_vb_exception_response(e)
 
@@ -213,7 +215,7 @@ def concepts(vocab_id):
     if vocab_id not in g.VOCABS.keys():
         return render_invalid_vocab_id_response()
 
-    vocab_source = Source(vocab_id, request, language)
+    vocab_source = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=config.DEFAULT_LANGUAGE)
     concepts = vocab_source.list_concepts()
     concepts.sort(key=lambda x: x["title"])
     total = len(concepts)
@@ -297,7 +299,8 @@ def object():
             mimetype="text/plain",
         )
 
-    vocab_source = Source(vocab_id, request, language)
+    # vocab_source = Source(vocab_id, request, language)
+    vocab_source = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=config.DEFAULT_LANGUAGE)
 
     try:
         # TODO reuse object within if, rather than re-loading graph
