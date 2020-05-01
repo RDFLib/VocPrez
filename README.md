@@ -6,7 +6,7 @@ VocPrez is used by:
 &nbsp; | ![](style/logo-gsq.jpg) | ![](style/logo-ga.jpg)
 --- | --- | ---
 &nbsp; | [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq) | [Geoscience Australia](https://www.ga.gov.au)
-VocPrez Instance| <https://vocabs.gsq.digital> | *coming!*
+Instance| <https://vocabs.gsq.digital> | *coming!*
 
 ## VocPrez structure
 
