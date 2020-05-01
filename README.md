@@ -1,11 +1,22 @@
 # VocPrez
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
 
+VocPrez is used by:
+
+&nbsp; | ![](style/logo-gsq.jpg) | ![](style/logo-ga.jpg)
+--- | --- | ---
+&nbsp; | [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq) | [Geoscience Australia](https://www.ga.gov.au)
+VocPrez Instance| <https://vocabs.gsq.digital> | *coming!*
+
+## VocPrez structure
+
 <img src="view/generic/static/system.svg" style="width:60%;" />  
 
 **Figure 1**: An overview diagram of where VocPrez fits in relation to sources of vocab data.
 
-This tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats; it turns RDF data into *[Linked Data](https://www.w3.org/standards/semanticweb/data)*. 
+VocPrez can get vocabularies from one or more *sources* and any instance can be tuned to use any set of *sources*. This allows for use with a wide range of back-end vocabulary management.
+
+Technically, the tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats; it turns RDF data into *[Linked Data](https://www.w3.org/standards/semanticweb/data)*. 
 
 ## SKOS
 pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. VocPrez is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them. It also assumes that a `ConceptScheme` is synonymous with a *Vocabulary*.
@@ -46,14 +57,11 @@ We use [pytest](https://docs.pytest.org/en/latest/) as our testing framework. Te
 
 
 ## Contacts
-*Author*:<br />
-**Nicholas Car**<br />
-*Senior Experimental Scientist*<br />
-CSIRO Land & Water, Environmental Informatics Group<br />
-<nicholas.car@csiro.au>
+*Author*:  
+**Nicholas Car**  
+*Data Systems Architect*  
+[SURROUND Australia Pty Ltd](http://surroundaustralia.com)  
+<nicholas.car@surroundaustralia.com>
 
-
-**Edmond Chuc**<br />
-*Software Engineer*<br />
-CSIRO Land & Water, Environmental Informatics Group<br />
-<edmond.chuc@csiro.au>
+*Geoscience Australia contacts*:  
+GA's Data Manager: <dataman@ga.gov.au>  
