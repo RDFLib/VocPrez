@@ -1,0 +1,64 @@
+{% extends "page.html" %}
+
+{% block content %}
+<h1>Collection: {{ properties["dcterms:title"][1] }}</h1>
+<table class="metadata properties">
+    {% if properties["dcterms:alternative"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["dcterms:alternative"][1] }}">Alternatives</a></th><td>{{ properties["dcterms:alternative"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["dcterms:description"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["dcterms:description"][1] }}">Description</a></th><td>{{ properties["dcterms:description"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["rdfs:comment"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["rdfs:comment"][1] }}">Comment</a></th><td>{{ properties["rdfs:comment"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["dcterms:date"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["dcterms:date"][1] }}">Date</a></th><td>{{ properties["dcterms:date"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["owl:versionInfo"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["owl:versionInfo"][1] }}">Version Info</a></th><td>{{ properties["owl:versionInfo"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["dcterms:creator"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["dcterms:creator"][1] }}">Creator</a></th><td>{{ properties["dcterms:creator"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["dcterms:publisher"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["dcterms:publisher"][1] }}">Publisher</a></th><td>{{ properties["dcterms:publisher"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["grg:RE_RegisterOwner"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["grg:RE_RegisterOwner"][1] }}">Register Owner</a></th><td>{{ properties["grg:RE_RegisterOwner"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if properties["grg:RE_RegisterManager"] is not none  %}
+    <tr>
+        <th><a href="{{ properties["grg:RE_RegisterManager"][1] }}">Register Manager</a></th><td>{{ properties["grg:RE_RegisterManager"][1] }}</td>
+    </tr>
+    {% endif %}
+    {% if members|length > 0 %}
+    <tr>
+      <th><a href="http://www.w3.org/2004/02/skos/core#member">Members</a></th>
+        <td class="list">
+            {% for member in members -%}
+            <a href="{{ member[0] }}">{{ member[1] }}</a><br />
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+</table>
+<h3>Alternate views</h3>
+<p>Other model views of this properties are listed in the <a href="{{ url_for("routes.collection") }}?uri={{ collection_uri }}&_profile=alt">Alternates View</a>.</p>
+{% endblock %}

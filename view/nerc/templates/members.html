@@ -25,7 +25,7 @@
             <h3>Members</h3>
             <ul>
             {%- for member in members -%}
-            <li><a href="{{ member[0] }}">{{ member[1] }}</a></li>
+            <li><a href="{{ member["uri"] }}">{{ member["title"] }}</a></li>
             {%- endfor -%}
             </ul>
         </div>

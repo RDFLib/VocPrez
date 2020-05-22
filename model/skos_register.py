@@ -10,11 +10,6 @@ class SkosRegisterRenderer(ContainerRenderer):
         request,
         navs,
         members,
-        register_item_type_string,
-        total,
-        search_enabled=None,
-        search_query=None,
-        contained_item_classes=[],
         **kwargs
     ):
 
@@ -26,10 +21,6 @@ class SkosRegisterRenderer(ContainerRenderer):
         except:
             self.members = [(x["uri"], x["title"]) for x in members]  # dict members
 
-        self.register_item_type_string = register_item_type_string
-        self.search_query = search_query
-        self.search_enabled = search_enabled
-        self.vocabulary_url = contained_item_classes
         self.template_extras = kwargs
         profiles = {
             "ckan": profile_ckan
@@ -38,9 +29,12 @@ class SkosRegisterRenderer(ContainerRenderer):
         if "/concept/" in request.base_url:
             label = "Concepts within " + g.VOCABS[self.vocab_id].title
             description = "All of the Concepts for the Vocabulary <a href=\"" + request.base_url.replace('/concept/', '') + "\">" + g.VOCABS[self.vocab_id].title + '</a>'
+        elif "/collection/" in request.base_url:
+            label = "NERC Collections"
+            description = "All of the Collections published by NERC"
         else:
-            label = "Vocabularies"
-            description = "All of the Vocabularies published by this instance of VocPrez"
+            label = "NERC Concept Schemes"
+            description = "All of the Concepts Schemes published by NERC"
 
         super().__init__(
             request,
@@ -49,8 +43,8 @@ class SkosRegisterRenderer(ContainerRenderer):
             description,
             None,
             None,
-            self.members,
-            members_total_count=len(members),
+            members,
+            members_total_count=len(self.members),
             profiles=profiles,
         )
 
@@ -66,6 +60,11 @@ class SkosRegisterRenderer(ContainerRenderer):
         if response is not None:
             return response
         elif self.profile == "mem":
+            start = self.per_page * (self.page - 1)
+            end = self.per_page * (self.page)
+            self.members = self.members[start:end]
+            print(self.members)
+
             if self.paging_error is None:
                 self.headers["Profile"] = str(self.profiles["mem"].uri)
                 if self.mediatype == "text/html":

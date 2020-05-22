@@ -69,7 +69,7 @@ class VocabularyRenderer(Renderer):
         self.navs = [
             # '<a href="' + url_for('routes.vocabulary', vocab_id=vocab.id) + '/collection/">Collections</a> |',
             '<a href="'
-            + url_for("routes.vocabulary", vocab_id=vocab.id)
+            + url_for("routes.conceptscheme", vocab_id=vocab.id)
             + '/concept/">Concepts</a> |'
         ]
 

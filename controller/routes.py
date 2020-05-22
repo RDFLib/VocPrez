@@ -13,15 +13,17 @@ from model.vocabularies import VocabulariesRenderer
 from model.concept import ConceptRenderer
 from model.collection import CollectionRenderer
 from model.skos_register import SkosRegisterRenderer
+from model.nerc_collection import NercCollectionRenderer
 import _config as config
 import markdown
 from data.source._source import Source
 from data.source.VOCBENCH import VbException
 import json
-from pyldapi import Renderer, ContainerRenderer
+from pyldapi import Renderer
 from controller import sparql_endpoint_functions
 import datetime
 import logging
+from SPARQLWrapper import SPARQLWrapper, JSON, XML
 
 routes = Blueprint("routes", __name__)
 
@@ -82,6 +84,22 @@ def get_a_vocab_key():
         return None
 
 
+def curie(uri):
+    prefixes = {
+        "grg": "http://www.isotc211.org/schemas/grg/",
+        "dcterms": "http://purl.org/dc/terms/",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "skos": "http://www.w3.org/2004/02/skos/core#"
+    }
+    for prefix, namespace in prefixes.items():
+        if namespace in uri:
+            return prefix + ":" + uri.replace(namespace, "")
+    # can't match a know prefixe, return the last URI segment only
+    return uri.split("#")[-1].split("/")[-1]
+
+
 @routes.context_processor
 def inject_date():
     return {"date": datetime.date.today()}
@@ -125,8 +143,33 @@ def match(vocabs, query):
             yield word
 
 
-@routes.route("/vocabulary/")
-def vocabularies():
+@routes.route("/conceptscheme/")
+def conceptschemes():
+    # sparql = SPARQLWrapper("http://vocab.nerc.ac.uk/sparql/sparql")
+    # # get the collection members
+    # sparql.setQuery("""
+    #     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    #
+    #     SELECT ?c ?pl
+    #     WHERE {
+    #         ?c a skos:ConceptScheme .
+    #         ?c skos:prefLabel ?pl .
+    #     }
+    #     ORDER BY ?pl
+    #     """)
+    # sparql.setReturnFormat(JSON)
+    # results = sparql.query().convert()
+    #
+    # members = []
+    # for result in results["results"]["bindings"]:
+    #     members.append({"uri": url_for("routes.vocabulary") + "?url=" + result["c"]["value"], "title": result["pl"]["value"]})
+    #
+    # return SkosRegisterRenderer(
+    #     request=request,
+    #     navs=[],
+    #     members=members,
+    #     register_item_type_string="NERC Concept Schemes",
+    # ).render()
     page = (
         int(request.values.get("page")) if request.values.get("page") is not None else 1
     )
@@ -135,48 +178,22 @@ def vocabularies():
         if request.values.get("per_page") is not None
         else 50
     )
-    #
-    # # TODO: replace this logic with the following
-    # #   1. read all static vocabs from g.VOCABS
-    # get this instance's list of vocabs
+
     vocabs = []  # local copy (to this request) for sorting
     for k, voc in g.VOCABS.items():
         vocabs.append((voc.uri, voc.title))
     vocabs.sort(key=lambda tup: tup[1])
     total = len(g.VOCABS.items()) - 1
-    #
-    # # Search
-    # query = request.values.get("search")
-    # results = []
-    # if query:
-    #     for m in match(vocabs, query):
-    #         results.append(m)
-    #     vocabs[:] = results
-    #     vocabs.sort(key=lambda v: v.title)
-    #     total = len(vocabs)
-    #
-    # # generate vocabs list for requested page and per_page
+
     start = (page - 1) * per_page
     end = start + per_page
     vocabs = vocabs[start:end]
-    #
-    # # render the list of vocabs
-    # return SkosRegisterRenderer(
-    #     request,
-    #     [],
-    #     vocabs,
-    #     "Vocabularies",
-    #     total,
-    #     search_query=query,
-    #     search_enabled=True,
-    #     vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
-    # ).render()
 
     return VocabulariesRenderer(
         request,
         'https://example.com/vocabulary/',
-        'Vocabularies',
-        'Vocabularies published by NERC',
+        'Concept Schemes',
+        'Concept Schemes published by NERC',
         None,
         None,
         vocabs,
@@ -184,8 +201,8 @@ def vocabularies():
     ).render()
 
 
-@routes.route("/vocabulary/<path:vocab_id>")
-def vocabulary(vocab_id):
+@routes.route("/cs/<path:vocab_id>")
+def conceptscheme(vocab_id):
     if "/concept/" in vocab_id:
         return redirect(url_for(concepts(vocab_id.split("/")[0])))
     else:
@@ -207,7 +224,7 @@ def vocabulary(vocab_id):
     return VocabularyRenderer(request, vocab).render()
 
 
-@routes.route("/vocabulary/<vocab_id>/concept/")
+@routes.route("/cs/<vocab_id>/concept/")
 def concepts(vocab_id):
     language = request.values.get("lang") or config.DEFAULT_LANGUAGE
 
@@ -257,9 +274,36 @@ def concepts(vocab_id):
 
 @routes.route("/collection/")
 def collections():
-    return render_template(
-        "register.html", title="Collections", register_class="Collections", navs={}
-    )
+    sparql = SPARQLWrapper("http://vocab.nerc.ac.uk/sparql/sparql")
+    # get the collection members
+    sparql.setQuery("""
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        
+        SELECT ?c ?pl
+        WHERE {
+            ?c a skos:Collection .
+            ?c skos:prefLabel ?pl .
+        }
+        ORDER BY ?pl
+        """)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+
+    members = []
+    for result in results["results"]["bindings"]:
+        members.append({"uri": url_for("routes.collection") + "?url=" + result["c"]["value"], "title": result["pl"]["value"]})
+
+    return SkosRegisterRenderer(
+        request=request,
+        navs=[],
+        members=members,
+        register_item_type_string="NERC Collections",
+    ).render()
+
+
+@routes.route("/coll")
+def collection():
+    return NercCollectionRenderer(request=request).render()
 
 
 @routes.route("/object")

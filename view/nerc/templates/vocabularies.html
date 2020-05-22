@@ -25,7 +25,7 @@
             <h3>Members</h3>
             <ul>
             {%- for member in members -%}
-            <li><a href="{{ url_for("routes.vocabulary", vocab_id=member[0].split("/scheme/")[1].split("/")[0]) }}">{{ member[1] }}</a></li>
+            <li><a href="{{ url_for("routes.conceptscheme", vocab_id=member[0].split("/scheme/")[1].split("/")[0]) }}">{{ member[1] }}</a></li>
             {%- endfor -%}
             </ul>
         </div>
