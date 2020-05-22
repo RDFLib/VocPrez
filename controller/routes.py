@@ -291,7 +291,7 @@ def collections():
 
     members = []
     for result in results["results"]["bindings"]:
-        members.append({"uri": url_for("routes.collection") + "?url=" + result["c"]["value"], "title": result["pl"]["value"]})
+        members.append({"uri": url_for("routes.collection") + "?uri=" + result["c"]["value"], "title": result["pl"]["value"]})
 
     return SkosRegisterRenderer(
         request=request,
