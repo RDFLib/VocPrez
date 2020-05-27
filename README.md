@@ -1,3 +1,5 @@
+![](style/VocPrez.300.png)  
+
 # VocPrez
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
 
@@ -10,8 +12,7 @@ Instance| <https://vocabs.gsq.digital> | *coming!*
 
 ## VocPrez structure
 
-<img src="view/generic/static/system.svg" style="width:60%;" />  
-
+![](style/system.500.png)  
 **Figure 1**: An overview diagram of where VocPrez fits in relation to sources of vocab data.
 
 VocPrez can get vocabularies from one or more *sources* and any instance can be tuned to use any set of *sources*. This allows for use with a wide range of back-end vocabulary management.
