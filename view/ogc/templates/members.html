@@ -25,7 +25,7 @@
             <h3>Members</h3>
             <ul>
             {%- for member in members -%}
-            <li><a href="{{ member[0].replace('http://linked.data.gov.au/dataset/qld-structural-framework', 'http://localhost:5000') }}">{{ member[1] }}</a></li>
+            <li><a href="{{ member[0].replace('http://linked.data.gov.au/def/', url_for('routes.vocabularies') ) }}">{{ member[1] }}</a></li>
             {%- endfor -%}
             </ul>
         </div>
