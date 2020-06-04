@@ -36,16 +36,41 @@ Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are
 
 
 ## Installation
-* follow the instructions as per pyLDAPI (see [its documentation](https://pyldapi.readthedocs.io))
-* ensure your config file is correct
-    * you need to copy the file `_config/template.py` to `_config/__init__.py` and configure carables within it. See the template.py` file for examples
+
+### Configuration 
+
+You need to copy the file `_config/template.py` to `_config/__init__.py` and configure carables within it. See the template.py` file for examples
+
 * configure your data source(s)
     * you will need to supply this tool with SKOS data from any sort of data source: a triplestore, a relational database or even a local file
     * see the [DATA_SOURCES.md](https://github.com/CSIRO-enviro-informatics/VocPrez/blob/master/DATA_SOURCES.md) file for examples
 
-
-## Dependencies
+### Dependencies
 See the [requirements.txt](https://github.com/CSIRO-enviro-informatics/VocPrez/blob/master/requirements.txt) standard Python dependency listing file.
+
+### Setup & Run
+
+In root directory install Python Virtual Environment and install dependancies.  
+
+```bash
+python3 -mt venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install upgrade pip
+``` 
+Check contents of requirements have been added
+
+```bash
+pip freeze
+```
+
+to run 
+
+```bash
+python app.py
+```
+
+Vocbench should now be running at http://localhost:XXXX
 
 
 ## License
