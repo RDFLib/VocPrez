@@ -43,34 +43,71 @@ You need to copy the file `_config/template.py` to `_config/__init__.py` and con
 
 * configure your data source(s)
     * you will need to supply this tool with SKOS data from any sort of data source: a triplestore, a relational database or even a local file
-    * see the [DATA_SOURCES.md](https://github.com/CSIRO-enviro-informatics/VocPrez/blob/master/DATA_SOURCES.md) file for examples
+    * see the [DATA_SOURCES.md](https://github.com/RDFlib/VocPrez/blob/master/DATA_SOURCES.md) file for examples
 
 ### Dependencies
-See the [requirements.txt](https://github.com/CSIRO-enviro-informatics/VocPrez/blob/master/requirements.txt) standard Python dependency listing file.
+See the [requirements.txt](https://github.com/RDFlib/VocPrez/blob/master/requirements.txt) standard Python dependency listing file.
 
 ### Setup & Run
+VocPrez runs as any normal Python [Flask](https://pypi.org/project/Flask/) application runs: via Python's WSGI web server interface being called by a web server.
+
+To run VocPrez then, you'll need to install the dependencies and activate the server. You will also need to configure the "back end" of VocPrez to connect to a particular data source of your vocabularies.
 
 In root directory install Python Virtual Environment and install dependancies.  
 
+1. create a virtual Python environment for VocPrez' requirem packages
 ```bash
 python3 -mt venv venv
+```
+This creates a Python virtual environment within the folder `venv/`
+
+2. Activate, turn on, the created virtual environment
+```bash
 source venv/bin/activate
+```
+
+3. Install the Python packages required in the virtual environment
+```bash
 pip install -r requirements.txt
+```
+
+4. Just update the package pip!
+```bash
 pip install upgrade pip
 ``` 
-Check contents of requirements have been added
 
+5. Check contents of requirements have been added
 ```bash
 pip freeze
 ```
 
-to run 
+To run VocPrez now, you still need to configure a *source* (where you get the vocabulary data from) and, once that's done, you can run the application.
+
+
+#### Run for development
+Run using Python Flask's in-built web server:
 
 ```bash
 python app.py
 ```
 
-Vocbench should now be running at http://localhost:XXXX
+Vocbench should now be running at http://localhost:5000
+
+#### Run for production
+Rather than using Flask's in-built web server to run for production, you need to have a regular web server such as apache or nginx call the VocPrez application. So, rather than just running `python app.py`, you need to:
+
+a. Install VocPrez as above
+b. Install Apache/nginx
+c. Configure Apache/nginx to hand off requests to Flask
+d. Configure Flask to accept those requests
+
+a. is addressed above. For b., just install the web server as normal.
+
+For c., if using Apache, install the Apache/Python 3 WSGI module:
+
+```bash
+sudo apt-get -y install libapache2-mod-wsgi-py3
+```
 
 
 ## License
