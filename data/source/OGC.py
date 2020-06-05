@@ -4,7 +4,6 @@ from flask import g
 from data.source._source import Source
 from model.vocabulary import Vocabulary
 import _config as config
-import re
 
 if hasattr(config, "DEFAULT_LANGUAGE:"):
     DEFAULT_LANGUAGE = config.DEFAULT_LANGUAGE
@@ -42,84 +41,78 @@ class OGC(Source):
         # Interpret each CS as a Vocab
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
             PREFIX dcterms: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            SELECT * WHERE {
-                ?cs a skos:ConceptScheme .
-                OPTIONAL { ?cs skos:prefLabel ?title }
-                OPTIONAL { ?cs dcterms:created ?created }
-                OPTIONAL { ?cs dcterms:issued ?issued }
-                OPTIONAL { ?cs dcterms:modified ?modified }
-                OPTIONAL { ?cs owl:versionInfo ?version }
-                OPTIONAL { ?cs skos:definition ?description }
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT * 
+            WHERE {
+              ?cs a skos:ConceptScheme .
+              OPTIONAL { 
+                { ?cs skos:prefLabel ?title }
+                UNION
+                { ?cs rdfs:label ?title }  
+              }
+              OPTIONAL { 
+                { ?cs dcterms:created ?created }
+                UNION
+                { ?cs dc:date ?created }  
+              }
+              OPTIONAL { ?cs dcterms:issued ?issued }
+              OPTIONAL { ?cs dcterms:modified ?modified }
+              OPTIONAL { ?cs owl:versionInfo ?version }
+              OPTIONAL { ?cs skos:definition ?description }
             }
             ORDER BY ?title
             """
-        from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
-        from rdflib import Graph
-        print(config.VOCAB_SOURCES["ogc"]["sparql_endpoint"])
-        sparql = SPARQLWrapper("http://defs-dev.opengis.net:8080/rdf4j-workbench/repositories/ogc-na/query")  # (config.VOCAB_SOURCES["ogc"]["sparql_endpoint"])
+        from SPARQLWrapper import SPARQLWrapper
+        sparql = SPARQLWrapper(config.VOCAB_SOURCES["ogc"]["sparql_endpoint"])
         sparql.setQuery(q)
 
         results = sparql.query().convert().getElementsByTagName('result')
+
+        def get_node_text(node):
+            nodelist = node.childNodes
+            result = []
+            for node in nodelist:
+                if node.nodeType == node.TEXT_NODE:
+                    result.append(node.data)
+            return ''.join(result)
+
+        vocabs = {}
         for result in results:
-            print(result.toprettyxml(indent="\t", newl="\n", encoding=None))
-        #     uri = result.getElementsByTagName('url')
-        #     print(uri)
-        # print(results.toprettyxml(indent="\t", newl="\n", encoding=None))
+            uri_xml = result.getElementsByTagName('uri')[0]
+            uri = get_node_text(uri_xml)
+            vocab_id = uri[uri.rfind("/")+1:]
 
+            title = None
+            description = None
+            created = None
+            bindings = result.getElementsByTagName('binding')
+            for binding in bindings:
+                name = binding.getAttribute("name")
+                if name == "title":
+                    title_xml = binding.getElementsByTagName('literal')[0]
+                    title = get_node_text(title_xml)
+                if name == "description":
+                    description_xml = binding.getElementsByTagName('literal')[0]
+                    description = get_node_text(description_xml)
+                if name == "created":
+                    created_xml = binding.getElementsByTagName('literal')[0]
+                    created = get_node_text(created_xml)
 
-        # record just the IDs & title for the VocPrez in-memory vocabs list
-        concept_schemes = Source.sparql_query(
-            details["sparql_endpoint"],
-            q,
-            sparql_username=details.get("sparql_username"),
-            sparql_password=details.get("sparql_password"),
-        )
-        assert concept_schemes is not None, "Unable to query conceptSchemes"
-
-        sparql_vocabs = {}
-        for cs in concept_schemes:
-            # handling CS URIs that end with '/'
-            vocab_id = cs["cs"]["value"].replace("/conceptScheme", "").split("/")[-1]
-
-            # TODO: Investigate putting regex into SPARQL query
-            # print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
-            if details.get("uri_filter_regex") and not re.search(
-                details["uri_filter_regex"], cs["cs"]["value"]
-            ):
-                logging.debug("Skipping vocabulary {}".format(vocab_id))
-                continue
-
-            if len(vocab_id) < 2:
-                vocab_id = cs["cs"]["value"].split("/")[-2]
-
-            sparql_vocabs[vocab_id] = Vocabulary(
+            vocabs[vocab_id] = Vocabulary(
                 vocab_id,
-                cs["cs"]["value"],
-                cs["title"].get("value") or vocab_id
-                if cs.get("title")
-                else vocab_id,  # Need string value for sorting, not None
-                cs["description"].get("value")
-                if cs.get("description") is not None
-                else None,
-                None,  # none of these SPARQL vocabs have creator info yet # TODO: add creator info to GSQ vocabs
-                dateutil.parser.parse(cs.get("created").get("value"))
-                if cs.get("created") is not None
-                else None,
-                # dct:issued not in Vocabulary
-                # dateutil.parser.parse(cs.get('issued').get('value')) if cs.get('issued') is not None else None,
-                dateutil.parser.parse(cs.get("modified").get("value"))
-                if cs.get("modified") is not None
-                else None,
-                cs["version"].get("value")
-                if cs.get("version") is not None
-                else None,  # versionInfo
-                config.VocabSource.SPARQL,
-                cs["cs"]["value"],
-                sparql_endpoint=details["sparql_endpoint"],
-                sparql_username=details["sparql_username"],
-                sparql_password=details["sparql_password"],
+                uri,
+                title if title is not None else "x",
+                description,
+                None,
+                created,
+                None,
+                None,
+                config.VocabSource.OGC,
+                uri
             )
-        g.VOCABS = {**g.VOCABS, **sparql_vocabs}
+
+        g.VOCABS = {**g.VOCABS, **vocabs}
         logging.debug("SPARQL collect() complete.")
