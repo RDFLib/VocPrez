@@ -182,7 +182,7 @@ def conceptschemes():
 
     vocabs = []  # local copy (to this request) for sorting
     for k, voc in g.VOCABS.items():
-        vocabs.append((url_for("routes.vocabulary", vocab_id=k), voc.title))
+        vocabs.append((url_for("routes.conceptscheme", vocab_id=k), voc.title))
     vocabs.sort(key=lambda tup: tup[1])
     total = len(g.VOCABS.items()) - 1
 

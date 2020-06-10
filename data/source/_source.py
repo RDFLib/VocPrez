@@ -13,6 +13,7 @@ import base64
 import requests
 from time import sleep
 import helper as h
+from xml.dom.minidom import Document as xml_Document
 
 # Default to English if no DEFAULT_LANGUAGE in config
 if hasattr(config, "DEFAULT_LANGUAGE:"):
@@ -721,7 +722,33 @@ ORDER BY ?pl
             sparql.setCredentials(sparql_username, sparql_password)
 
         try:
-            return sparql.query().convert()["results"]["bindings"]
+            r = sparql.queryAndConvert()
+
+            if isinstance(r, xml_Document):
+                def getText(node):
+                    nodelist = node.childNodes
+                    result = []
+                    for node in nodelist:
+                        if node.nodeType == node.TEXT_NODE:
+                            result.append(node.data)
+                    return ''.join(result)
+
+                results = []
+                for result in r.getElementsByTagName('result'):
+                    bindings = {}
+                    for binding in result.getElementsByTagName('binding'):
+                        for val in binding.childNodes:
+                            bindings[binding.getAttribute("name")] = {
+                                "type": "uri" if val.tagName == "uri" else "literal",
+                                "value": getText(val)
+                            }
+                    results.append(bindings)
+                return results
+            elif isinstance(r, dict):
+                # JSON
+                return r["results"]["bindings"]
+            else:
+                raise Exception("Could not convert results from SPARQL endpoint")
         except Exception as e:
             logging.debug("SPARQL query failed: {}".format(e))
             logging.debug(

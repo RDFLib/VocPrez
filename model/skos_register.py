@@ -63,7 +63,6 @@ class SkosRegisterRenderer(ContainerRenderer):
             start = self.per_page * (self.page - 1)
             end = self.per_page * (self.page)
             self.members = self.members[start:end]
-            print(self.members)
 
             if self.paging_error is None:
                 self.headers["Profile"] = str(self.profiles["mem"].uri)
@@ -91,12 +90,20 @@ class SkosRegisterRenderer(ContainerRenderer):
         """
         response = {"head": {"vars": ["s", "pl"]}, "results": {"bindings": []}}
         for member in self.members:
-            response["results"]["bindings"].append(
-                {
-                    "pl": {"xml:lang": "en", "type": "literal", "value": member[1]},
-                    "s": {"type": "uri", "value": member[0]},
-                }
-            )
+            if "uri" in member:
+                response["results"]["bindings"].append(
+                    {
+                        "pl": {"xml:lang": "en", "type": "literal", "value": member["title"]},
+                        "s": {"type": "uri", "value": member["uri"]},
+                    }
+                )
+            else:
+                response["results"]["bindings"].append(
+                    {
+                        "pl": {"xml:lang": "en", "type": "literal", "value": member[1]},
+                        "s": {"type": "uri", "value": member[0]},
+                    }
+                )
 
         response = jsonify(response)
         response.headers.add("Access-Control-Allow-origin", "*")

@@ -91,7 +91,6 @@ ORDER BY ?title""".format(
             vocab_id = cs["cs"]["value"].split("/scheme/")[1].split("/")[0]
 
             # TODO: Investigate putting regex into SPARQL query
-            # print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
             if details.get("uri_filter_regex") and not re.search(
                 details["uri_filter_regex"], cs["cs"]["value"]
             ):
