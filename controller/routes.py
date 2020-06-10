@@ -186,6 +186,8 @@ def vocabularies():
 
 @routes.route("/vocabulary/<path:vocab_id>")
 def vocabulary(vocab_id):
+    vocab = g.VOCABS[vocab_id]
+
     if "/concept/" in vocab_id:
         return redirect(url_for(concepts(vocab_id.split("/")[0])))
     else:
