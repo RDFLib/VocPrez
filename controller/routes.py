@@ -200,8 +200,7 @@ def vocabulary(vocab_id):
 
     # get vocab details using appropriate source handler
     try:
-        vocab = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=language) \
-            .get_vocabulary()
+        vocab = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=language).get_vocabulary()
     except VbException as e:
         return render_vb_exception_response(e)
 
