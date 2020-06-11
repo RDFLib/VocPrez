@@ -121,8 +121,8 @@ ORDER BY ?title""".format(
                 config.VocabSource.SPARQL,
                 cs["cs"]["value"],
                 sparql_endpoint=details["sparql_endpoint"],
-                sparql_username=details["sparql_username"],
-                sparql_password=details["sparql_password"],
+                sparql_username=details.get("sparql_username"),
+                sparql_password=details.get("sparql_password"),
             )
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
         logging.debug("SPARQL collect() complete.")

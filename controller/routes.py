@@ -174,9 +174,9 @@ def vocabularies():
 
     return ContainerRenderer(
         request,
-        'https://vocab.gsq/digital/vocabulary/',
+        'https://www.opengis.net/def/',
         'Vocabularies',
-        'Vocabularies published by the Geological Survey of Queensland',
+        'Vocabularies published by the Open Geospatial Consortium',
         None,
         None,
         vocabs,
