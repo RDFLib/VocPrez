@@ -60,4 +60,4 @@ if __name__ == "__main__":
         format="%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s",
     )
 
-    app.run(debug=config.DEBUG, threaded=True)
+    app.run(debug=config.DEBUG, threaded=True, port=5001)

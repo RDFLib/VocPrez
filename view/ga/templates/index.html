@@ -1,0 +1,42 @@
+{% extends "page.html" %}
+
+{% block content %}
+    <h1>System Home</h1>
+
+    {% set title = title %}
+
+<p>
+    Welcome to GA's instance of <a href="https://github.com/RDFlib/VocPrez">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+</p>
+
+<p>
+    VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbench.uniroma2.it/">VocBench</a>.
+</p>
+
+<p>See the <a href="{{ url_for('routes.about') }}">About page</a> for more information about the VocPrez system and its use.</p>
+
+<h2>Starting Points</h2>
+<p>
+    Geoscience Australia conceives of <em>vocabularies</em> as being synonymous with SKOS' Concept Scheme class, so each GA vocab is an instance of <code>skos:ConceptScheme</code>. Not all users of SKOS make this conception.
+</p>
+<h3>Vocabularies</h3>
+<ul>
+    <li>All GA's <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a></li>
+</ul>
+
+<h3>Collections</h3>
+<p><i>Coming soon.</i></p>
+
+<h3>Concepts</h3>
+<p>Each vocabulary's home page provides access to all of the <code>skos:Concept</code> and <code>skos:Collection</code> instances within it, however, direct access to the list of a vocab's concepts is also available, for example:
+<ul>
+    <li><code>skos:Concept</code> instances within the vocab X</li>
+</ul>
+
+<h3>SPARQL Endpoint</h3>
+<p>All the content of all vocabs can be accessed by this single SPARQL endpoint:</p>
+<ul>
+    <li><a href="{{ url_for('routes.sparql') }}">SPARQL Endpoint</a></li>
+</ul>
+
+{% endblock %}
