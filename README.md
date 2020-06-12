@@ -5,10 +5,20 @@ A read-only web delivery system for Simple Knowledge Organization System (SKOS)-
 
 VocPrez is used by:
 
-&nbsp; | ![](style/logo-gsq.jpg) | ![](style/logo-ga.jpg)
---- | --- | ---
-&nbsp; | [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq) | [Geoscience Australia](https://www.ga.gov.au)
-Instance| <https://vocabs.gsq.digital> | *coming!*
+
+
+<a href="https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq">
+    <img src="style/logo-gsq.jpg" alt="GSQ Logo" style="width:80px;" />
+</a>
+<a href="https://www.ga.gov.au">
+    <img src="style/logo-ga.jpg" alt="GA Logo" style="width:100px;" />
+</a> 
+
+
+* [Geological Survey of Queensland](ttps://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq)
+    * System link: <https://vocabs.gsq.digital> 
+ * [Geoscience Australia](https://www.ga.gov.au)
+     * System link coming! 
 
 ## VocPrez structure
 
@@ -63,6 +73,3 @@ We use [pytest](https://docs.pytest.org/en/latest/) as our testing framework. Te
 *Data Systems Architect*  
 [SURROUND Australia Pty Ltd](http://surroundaustralia.com)  
 <nicholas.car@surroundaustralia.com>
-
-*Geoscience Australia contacts*:  
-GA's Data Manager: <dataman@ga.gov.au>  

@@ -91,7 +91,7 @@ def inject_date():
 def index():
     return render_template(
         "index.html",
-        title=config.TITLE,
+        title="OGC VocPrez",
         navs={},
         config=config,
         voc_key=get_a_vocab_source_key(),

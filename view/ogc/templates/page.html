@@ -19,6 +19,11 @@
     </div>
   </div>
   <div id="maingrid">
+    <div id="vp-menu">
+        <a href="{{ url_for('routes.index') }}">VocPrez Home</a>
+        <a href="{{ url_for('routes.about') }}">About</a>
+        <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a>
+    </div>
       {% block content %}{% endblock %}
   </div>
   <div id="footerwhite"></div>

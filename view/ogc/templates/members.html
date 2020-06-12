@@ -1,7 +1,7 @@
 {% extends "page.html" %}
 
 {% block content %}
-    <div style="display:grid; grid-template-rows: 100px auto auto auto; grid-template-columns: 70% auto;">
+    <div style="display:grid; grid-template-rows: 50px auto auto auto; grid-template-columns: 70% auto;">
         <div style="grid-column: 1; grid-row: 1;">
             <h1>{{ label }}</h1>
         </div>
@@ -45,15 +45,15 @@
           <div class="autopaginationinfo">
           <div><h4>Automated Pagination&nbsp;<span id="collapsible-toggle" class="collapsible" style="font-size: 14px;">(more)</span></h4></div>
           <div id="content-pagination" class="collapsible-content">
-                    <p>To page through these items, use query string arguments 'page' and 'per_page'. HTTP <code>Link</code> headers of <code>first</code>, <code>prev</code>, <code>next</code> &amp; <code>last</code> are given in web responses.</p>
-                <p>Example, assuming 500 items, page 7, of 50 per page, is given by:</p>
-                <pre>.../?page=7&amp;per_page=50
-                </pre>
+            <p>To page through these items, use query string arguments 'page' and 'per_page'.</p>
+            <p>HTTP <code>Link</code> headers of <code>first</code>, <code>prev</code>, <code>next</code> &amp; <code>last</code> are given in web responses.</p>
+                <p>Example: assuming 500 items, page 7, of 50 per page, is given by:</p>
+                <pre>{{ request.url }}?page=7&amp;per_page=50</pre>
                 <p>Link header with a response assuming 500 items would be:</p>
-                <pre>Link:   &lt;.../?per_page=500&gt; rel="first",
-&lt;.../?per_page=500&amp;page=6&gt; rel="prev",
-&lt;.../?per_page=500&amp;page=8&gt; rel="next",
-&lt;.../?per_page=500&amp;page=10&gt; rel="last"
+                <pre>Link:   &lt;{{ request.url }}?per_page=500&gt; rel="first",
+&lt;{{ request.url }}?per_page=500&amp;page=6&gt; rel="prev",
+&lt;{{ request.url }}?per_page=500&amp;page=8&gt; rel="next",
+&lt;{{ request.url }}?per_page=500&amp;page=10&gt; rel="last"
                 </pre>
                 <p>If you want to page through the whole collection, start at <code>first</code> and follow link headers until you reach <code>last</code> or until no <code>last</code> is given. You shouldn't try to calculate each <code>page</code> query string argument yourself.</p>
                 </div>
