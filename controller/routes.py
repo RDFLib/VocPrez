@@ -241,11 +241,20 @@ def vocabulary(vocab_id):
         #     vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
         # ).render()
 
+        descriptions = {
+            "ga": "Vocabularies created and published by Geoscience Australia",
+            "ggic": "Vocabularies published by Geoscience Australia on behalf of GGIC",
+            "iso": "Vocabularies from the International Organization for Standardization",
+            "nasa": "Vocabularies by NASA",
+            "odm2": "Vocabularies by the Observation Data Model 2 group",
+            "abs": "Vocabularies by the Australian Bureau of Statistics"
+        }
+
         return ContainerRenderer(
             request,
             'https://pid.geoscience.gov.au/def/voc/' + vocab_id + "/",
             'Vocabularies',
-            'Vocabularies created and published by Geoscience Australia',
+            descriptions[vocab_id],
             None,
             None,
             vocabs,
