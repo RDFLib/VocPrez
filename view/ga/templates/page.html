@@ -43,12 +43,12 @@
             <a href="{{ url_for('routes.sparql') }}">SPARQL</a> &nbsp;
             <a href="{{ url_for('routes.about') }}">About</a> &nbsp;
             <span style="color:#666;">Vocabs &rarr;</span> &nbsp;
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='ga') }}">GA</a> &nbsp;
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='ggic') }}">GGIC</a> &nbsp;
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='iso') }}">ISO</a> &nbsp;
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='nasa') }}">NASA</a> &nbsp;
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='odm2') }}">ODM2</a> &nbsp;
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='abs') }}">ABS</a> &nbsp;
+            <a href="{{ url_for('routes.vocabulary', vocab_id='ga') }}">GA</a> &nbsp;
+            <a href="{{ url_for('routes.vocabulary', vocab_id='ggic') }}">GGIC</a> &nbsp;
+            <a href="{{ url_for('routes.vocabulary', vocab_id='iso') }}">ISO</a> &nbsp;
+            <a href="{{ url_for('routes.vocabulary', vocab_id='nasa') }}">NASA</a> &nbsp;
+            <a href="{{ url_for('routes.vocabulary', vocab_id='odm2') }}">ODM2</a> &nbsp;
+            <a href="{{ url_for('routes.vocabulary', vocab_id='abs') }}">ABS</a> &nbsp;
         </div>
     </div>
     <div id="container-content" style="text-align:center;">
@@ -59,7 +59,7 @@
     <div id="footer-container">
 	<div id="footer-links">
         <p style="text-align:left;">
-            <a href="http://creativecommons.org/licenses/by/4.0/legalcode"><img src="{{ url_for('static', filename = 'by.png') }}" style="width:88px;" /></a>
+            <a href="http://creativecommons.org/licenses/by/4.0/legalvocab_id"><img src="{{ url_for('static', filename = 'by.png') }}" style="width:88px;" /></a>
         </p>
         <a href="http://www.gov.au">&copy; Commonwealth of Australia</a>
 		<a href="http://www.ga.gov.au/copyright">Copyright</a>

@@ -12,32 +12,32 @@
     </p>
     <p>Vocabulary sources:</p>
     <ul>
-        <li><a href="{{ url_for('routes.vocabularies_creator', publisher_code='ga') }}">Geoscience Australia</a></li>
-        <li><a href="{{ url_for('routes.vocabularies_creator', publisher_code='ggic') }}">Government Geoscience Information Committee (GGIC)</a></li>
+        <li><a href="{{ url_for('routes.vocabulary', vocab_id='ga') }}">Geoscience Australia</a></li>
+        <li><a href="{{ url_for('routes.vocabulary', vocab_id='ggic') }}">Government Geoscience Information Committee (GGIC)</a></li>
         <li>
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='iso') }}">International Organization for Standardization (ISO)</a>
+            <a href="{{ url_for('routes.vocabulary', vocab_id='iso') }}">International Organization for Standardization (ISO)</a>
             <ul>
                 <li>From <a href="https://committee.iso.org/home/tc211">Technical Committee 211</a>'s Geospatial-related vocabularies</li>
             </ul>
         </li>
         <li>
-            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='nasa') }}">NASA</a>
+            <a href="{{ url_for('routes.vocabulary', vocab_id='nasa') }}">NASA</a>
             <ul>
                 <li>From <a href="https://gcmd.nasa.gov/">Global Change Master Directory</a>'s keywords vocabulary</li>
             </ul>
         </li>
-        <li><a href="{{ url_for('routes.vocabularies_creator', publisher_code='odm2') }}">Observations Data Model 2 (ODM2)</a></li>
+        <li><a href="{{ url_for('routes.vocabulary', vocab_id='odm2') }}">Observations Data Model 2 (ODM2)</a></li>
         <li>
             Research Vocabularies Australia (RVA)
             <ul>
-                <li>From the <a href="{{ url_for('routes.vocabularies_creator', publisher_code='abs') }}">Australian Bureau of Statistics (ABS)</a></li>
+                <li>From the <a href="{{ url_for('routes.vocabulary', vocab_id='abs') }}">Australian Bureau of Statistics (ABS)</a></li>
             </ul>
         </li>
     </ul>
 
     <h3>Vocabulary Modelling</h3>
     <p>
-        Geoscience Australia conceives of <em>vocabularies</em> as being synonymous with SKOS' <code>skos:ConceptScheme</code> class, so each GA vocab is an instance of <code>skos:ConceptScheme</code>. Not all users of SKOS make this conception.
+        Geoscience Australia conceives of <em>vocabularies</em> as being synonymous with SKOS' <vocab_id>skos:ConceptScheme</vocab_id> class, so each GA vocab is an instance of <vocab_id>skos:ConceptScheme</vocab_id>. Not all users of SKOS make this conception.
     </p>
 
     <h2>Tools</h2>
@@ -49,9 +49,9 @@
         <li><a href="{{ url_for('routes.sparql') }}">SPARQL Endpoint</a></li>
     </ul>
 
-    <h2>Code</h2>
+    <h2>vocab_id</h2>
     <p>
-        The code for this vocabulary publication system - VocPrez - is available online:
+        The vocab_id for this vocabulary publication system - VocPrez - is available online:
     </p>
     <ul>
         <li><a href="https://github.com/RDFLib/VocPrez/">VocPrez @ RDFlib on GitHub</a></li>
