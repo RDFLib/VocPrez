@@ -243,7 +243,7 @@ def vocabulary(vocab_id):
 
         return ContainerRenderer(
             request,
-            'https://pid.geoscience.gov.au/def/voc/ga/',
+            'https://pid.geoscience.gov.au/def/voc/' + vocab_id + "/",
             'Vocabularies',
             'Vocabularies created and published by Geoscience Australia',
             None,

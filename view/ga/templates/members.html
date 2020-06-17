@@ -2,7 +2,7 @@
 
 {% block content %}
     <div style="display:grid; grid-template-rows: 50px auto auto auto; grid-template-columns: 70% auto;">
-      <div style="grid-column: 1; grid-row: 1;">
+      <div style="grid-column: 1/3; grid-row: 1;">
           <h1>{{ label }}</h1>
       </div>
       <div style="grid-column: 1; grid-row: 2;">
@@ -32,13 +32,13 @@
           </ul>
       </div>
       <div style="grid-column: 2; grid-row: 2;">
-          <div class="altprofiles">
-            <h4>Alternates Profiles</h4>
-            <p>Different views of and formats:</p>
-            <ul>
-              <li><a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a></li>
-            </ul>
-          </div>
+        <div class="altprofiles">
+          <h4>Alternate Profiles</h4>
+          <p>Different views of and formats:</p>
+          <ul>
+            <li><a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a></li>
+          </ul>
+        </div>
       </div>
       <div style="grid-column: 1; grid-row: 4; margin-top:20px;">
           {{ pagination.links }}

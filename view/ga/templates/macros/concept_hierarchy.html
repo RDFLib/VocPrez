@@ -2,7 +2,6 @@
 <style>
 ul {
   list-style-type: none;
-  font-weight: bold;
 }
 
 .active {
@@ -16,7 +15,6 @@ ul {
   -ms-user-select: none; /* IE 10+ */
   user-select: none;
   margin-left: -20px;
-  font-weight: bold;
 }
 
 .caret::before {
@@ -42,7 +40,7 @@ ul {
 </style>
 
     {% if hierarchy %}
-    <h5 class="display-inline">Concept Hierarchy</h5> <span class="tree-action" id="tree-toggler">expand all</span>
+    &nbsp<span class="tree-action" id="tree-toggler" style="font-size:smaller; font-style:italic;">expand all</span>
 
         {{ h.render_concept_tree(hierarchy)|safe }}
     {% endif %}

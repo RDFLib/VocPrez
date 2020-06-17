@@ -20,32 +20,44 @@
 %}
 
 {% block content %}
-<h1>Concept: {{ concept.prefLabel }}</h1>
-<h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
-<h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
-<table class="metadata concept">
-{% for relationship in displayed_relationships -%}
+  <div style="display:grid; grid-template-rows: 50px auto; grid-template-columns: 70% auto;">
+    <div style="grid-column:1/3; grid-row:1;">
+      <h1>Concept: {{ concept.prefLabel }}</h1>
+    </div>
+    <div style="grid-column:1; grid-row:2;">
+      <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
+      <h3>Within vocab <a href="{{ url_for('routes.vocabulary', vocab_id=vocab_id) }}">{{ vocab_title }}</a></h3>
+      <table class="metadata concept">
+  {% for relationship in displayed_relationships -%}
     {% if concept.related_objects[relationship] and concept.related_objects[relationship]['objects'] -%}
         <tr>
             <th style="padding-right: 10px;"><a href="{{ relationship }}">{{concept.related_objects[relationship]['label']}}</a>:</th>
             <td class="list">
             {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
-	            {% if concept_uri and concept_label -%}
-            		{% if config.LOCAL_URLS -%}
-	                <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
-	            	{% else -%}
-	                <a href="{{ concept_uri }}">{{ concept_label }}</a><br>
-	            	{% endif -%}
-	            {% else -%}
-	                {{ concept_uri }}<br>
-	            {% endif -%}
-            {% endfor -%}                    
+              {% if concept_uri and concept_label -%}
+                {% if config.LOCAL_URLS -%}
+                  <a href="{{ url_for('routes.object') }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
+                {% else -%}
+                  <a href="{{ concept_uri }}">{{ concept_label }}</a><br>
+                {% endif -%}
+              {% else -%}
+                  {{ concept_uri }}<br>
+              {% endif -%}
+            {% endfor -%}
             </td>
         </tr>
     {% endif -%}
-{% endfor -%}
-</table>
-<hr>
-<h3>Alternate views</h3>
-<p>Other model views of this Concept are listed in the <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(uri) }}&_profile=alt">Alternates View</a>.</p>
+  {% endfor -%}
+  </table>
+    </div>
+    <div style="grid-column:2; grid-row:2;">
+      <div class="altprofiles">
+        <h4>Alternate Profiles</h4>
+        <p>Different views of and formats:</p>
+        <ul>
+          <li><a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(uri) }}&_profile=alt">Alternate Profiles</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 {% endblock %}
