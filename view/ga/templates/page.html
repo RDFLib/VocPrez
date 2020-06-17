@@ -34,25 +34,28 @@
           </div>
         </div>
     </header>
-
     <div class="breadcrumbs" style="height:75px; padding-top:30px; text-align:center;">
         <div id="inner flex" style="margin: 0 auto; width:1245px; text-align:left;">
             {% for nav in navs %}
                 {{ nav|safe }}
             {% endfor %}
             <a href="{{ url_for('routes.index') }}">System Home</a> &nbsp;
-            <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a> &nbsp;
             <a href="{{ url_for('routes.sparql') }}">SPARQL</a> &nbsp;
-            <a href="{{ url_for('routes.about') }}">About</a>
+            <a href="{{ url_for('routes.about') }}">About</a> &nbsp;
+            <span style="color:#666;">Vocabs &rarr;</span> &nbsp;
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='ga') }}">GA</a> &nbsp;
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='ggic') }}">GGIC</a> &nbsp;
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='iso') }}">ISO</a> &nbsp;
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='nasa') }}">NASA</a> &nbsp;
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='odm2') }}">ODM2</a> &nbsp;
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='abs') }}">ABS</a> &nbsp;
         </div>
     </div>
-
     <div id="container-content" style="text-align:center;">
         <div style="margin: 0 auto; width:1245px; text-align:left;" class="content">
             {% block content %}{% endblock %}
         </div>
     </div>
-
     <div id="footer-container">
 	<div id="footer-links">
         <p style="text-align:left;">
@@ -69,7 +72,5 @@
 	</div>
     <p id="footer-text">Geoscience Australia acknowledges the traditional owners of the country throughout Australia and their continuing connection to land, sea and community. We pay our respect to them and their cultures and to the elders past and present.</p>
 </div>
-
-
 </body>
 </html>

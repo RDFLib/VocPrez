@@ -174,13 +174,81 @@ def vocabularies():
 
     return ContainerRenderer(
         request,
-        'https://www.opengis.net/def/',
+        'https://pid.geoscience.gov.au/def/voc/',
         'Vocabularies',
-        'Vocabularies published by the Open Geospatial Consortium',
+        'Vocabularies published by Geoscience Australia from multiple sources',
         None,
         None,
         vocabs,
         total
+    ).render()
+
+
+@routes.route("/vocabulary/<string:publisher_code>/")
+def vocabularies_creator(publisher_code):
+    page = (
+        int(request.values.get("page")) if request.values.get("page") is not None else 1
+    )
+    per_page = (
+        int(request.values.get("per_page"))
+        if request.values.get("per_page") is not None
+        else 20
+    )
+
+    # get this instance's list of vocabs
+    vocabs = []
+    publishers = {
+        "ga": "https://linked.data.gov.au/org/ga",
+        "ggic": "http://www.geoscience.gov.au",
+        "iso": "https://linked.data.gov.au/org/iso",
+        "nasa": "https://nasa.gov",
+        "odm2": "http://www.odm2.org",
+        "abs": "https://linked.data.gov.au/org/abs"
+    }
+    q = """
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX dcterms: <http://purl.org/dc/terms/>
+
+        SELECT ?uri ?pl
+        WHERE {{
+            ?uri a skos:ConceptScheme ;
+                skos:prefLabel ?pl ;
+                dcterms:publisher <{}> .
+        }}
+        ORDER BY ?pl
+    """.format(publishers[publisher_code])
+
+    for r in Source.sparql_query(config.SPARQL_ENDPOINT, q):
+        vocabs.append((
+            str(r["uri"]["value"]),
+            str(r["pl"]["value"])
+        ))
+
+    start = (page - 1) * per_page
+    end = start + per_page
+    vocabs = vocabs[start:end]
+    #
+    # # render the list of vocabs
+    # return SkosRegisterRenderer(
+    #     request,
+    #     [],
+    #     vocabs,
+    #     "Vocabularies",
+    #     total,
+    #     search_query=query,
+    #     search_enabled=True,
+    #     vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
+    # ).render()
+
+    return ContainerRenderer(
+        request,
+        'https://pid.geoscience.gov.au/def/voc/ga/',
+        'Vocabularies',
+        'Vocabularies created and published by Geoscience Australia',
+        None,
+        None,
+        vocabs,
+        len(vocabs)
     ).render()
 
 

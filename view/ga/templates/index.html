@@ -1,42 +1,61 @@
 {% extends "page.html" %}
 
 {% block content %}
-    <h1>System Home</h1>
+    <h1>GA Vocabularies System</h1>
+    <p>
+        Welcome to GA's public vocabulary system. This tool is an instance of <a href="https://github.com/RDFlib/VocPrez">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+    </p>
 
-    {% set title = title %}
+    <h2>Vocabularies</h2>
+    <p>
+        This system publishes vocabularies from multiple sources: some from GA itself, some from others. These multi-source vocabs are all presented here to provide a single endpoint for all the vocabularies that GA staff use and that GA recommends others to use.
+    </p>
+    <p>Vocabulary sources:</p>
+    <ul>
+        <li><a href="{{ url_for('routes.vocabularies_creator', publisher_code='ga') }}">Geoscience Australia</a></li>
+        <li><a href="{{ url_for('routes.vocabularies_creator', publisher_code='ggic') }}">Government Geoscience Information Committee (GGIC)</a></li>
+        <li>
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='iso') }}">International Organization for Standardization (ISO)</a>
+            <ul>
+                <li>From <a href="https://committee.iso.org/home/tc211">Technical Committee 211</a>'s Geospatial-related vocabularies</li>
+            </ul>
+        </li>
+        <li>
+            <a href="{{ url_for('routes.vocabularies_creator', publisher_code='nasa') }}">NASA</a>
+            <ul>
+                <li>From <a href="https://gcmd.nasa.gov/">Global Change Master Directory</a>'s keywords vocabulary</li>
+            </ul>
+        </li>
+        <li><a href="{{ url_for('routes.vocabularies_creator', publisher_code='odm2') }}">Observations Data Model 2 (ODM2)</a></li>
+        <li>
+            Research Vocabularies Australia (RVA)
+            <ul>
+                <li>From the <a href="{{ url_for('routes.vocabularies_creator', publisher_code='abs') }}">Australian Bureau of Statistics (ABS)</a></li>
+            </ul>
+        </li>
+    </ul>
 
-<p>
-    Welcome to GA's instance of <a href="https://github.com/RDFlib/VocPrez">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
-</p>
+    <h3>Vocabulary Modelling</h3>
+    <p>
+        Geoscience Australia conceives of <em>vocabularies</em> as being synonymous with SKOS' <code>skos:ConceptScheme</code> class, so each GA vocab is an instance of <code>skos:ConceptScheme</code>. Not all users of SKOS make this conception.
+    </p>
 
-<p>
-    VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbench.uniroma2.it/">VocBench</a>.
-</p>
+    <h2>Tools</h2>
+    <h3>Profiles</h3>
+<p>All the content of all vocabs can be accessed individually in web page (HTML) and machine-readable forms. Each list fo vocabs, vocabulary and Concept web page contains a link to the listing of all profiles and formats available for that object. Look for the <strong><em>Alternate Profiles</em></strong> hyperlink.</p>
+    <h3>Services</h3>
+    <p>All of the vocabularies in this system are accessible via a single <a href="https://en.wikipedia.org/wiki/SPARQL">SPARQL endpoint</a>:</p>
+    <ul>
+        <li><a href="{{ url_for('routes.sparql') }}">SPARQL Endpoint</a></li>
+    </ul>
 
-<p>See the <a href="{{ url_for('routes.about') }}">About page</a> for more information about the VocPrez system and its use.</p>
-
-<h2>Starting Points</h2>
-<p>
-    Geoscience Australia conceives of <em>vocabularies</em> as being synonymous with SKOS' Concept Scheme class, so each GA vocab is an instance of <code>skos:ConceptScheme</code>. Not all users of SKOS make this conception.
-</p>
-<h3>Vocabularies</h3>
-<ul>
-    <li>All GA's <a href="{{ url_for('routes.vocabularies') }}">Vocabularies</a></li>
-</ul>
-
-<h3>Collections</h3>
-<p><i>Coming soon.</i></p>
-
-<h3>Concepts</h3>
-<p>Each vocabulary's home page provides access to all of the <code>skos:Concept</code> and <code>skos:Collection</code> instances within it, however, direct access to the list of a vocab's concepts is also available, for example:
-<ul>
-    <li><code>skos:Concept</code> instances within the vocab X</li>
-</ul>
-
-<h3>SPARQL Endpoint</h3>
-<p>All the content of all vocabs can be accessed by this single SPARQL endpoint:</p>
-<ul>
-    <li><a href="{{ url_for('routes.sparql') }}">SPARQL Endpoint</a></li>
-</ul>
+    <h2>Code</h2>
+    <p>
+        The code for this vocabulary publication system - VocPrez - is available online:
+    </p>
+    <ul>
+        <li><a href="https://github.com/RDFLib/VocPrez/">VocPrez @ RDFlib on GitHub</a></li>
+    </ul>
+    <p>Note that this particular instance of VocPrez contains some configuration and styling that isn't present in that main VocPrez repository</p>
 
 {% endblock %}
