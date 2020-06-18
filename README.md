@@ -1,6 +1,5 @@
-![](style/VocPrez.300.png)  
+![](vocprez/view/style/VocPrez.300.png)  
 
-# VocPrez
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
 
 VocPrez is used by:
@@ -8,21 +7,21 @@ VocPrez is used by:
 
 
 <a href="https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq">
-    <img src="style/logo-gsq.jpg" alt="GSQ Logo" style="width:80px;" />
+    <img src="vocprez/view/style/logo-gsq.jpg" alt="GSQ Logo" style="width:80px;" />
 </a>
 <a href="https://www.ga.gov.au">
-    <img src="style/logo-ga.jpg" alt="GA Logo" style="width:100px;" />
+    <img src="vocprez/view/style/logo-ga.jpg" alt="GA Logo" style="width:100px;" />
 </a> 
 
 
-* [Geological Survey of Queensland](ttps://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq)
+* [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq)
     * System link: <https://vocabs.gsq.digital> 
  * [Geoscience Australia](https://www.ga.gov.au)
-     * System link coming! 
+     * System link (demo): <http://ga.surroundaustralia.com> 
 
 ## VocPrez structure
 
-![](style/system.500.png)  
+![](vocprez/view/style/system.500.png)  
 **Figure 1**: An overview diagram of where VocPrez fits in relation to sources of vocab data.
 
 VocPrez can get vocabularies from one or more *sources* and any instance can be tuned to use any set of *sources*. This allows for use with a wide range of back-end vocabulary management.

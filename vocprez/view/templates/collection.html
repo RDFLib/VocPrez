@@ -1,0 +1,32 @@
+{#
+An example "collection" 
+    
+#}
+
+{% extends "page.html" %}
+
+{% block content %}
+<h1>Collection: {{ collection.label }}</h1>
+<h3>Within vocab <a href="{{ url_for('vocabulary', vocab_id=collection.vocab.id) }}">{{ collection.vocab.title }}</a></h3>
+<table class="metadata collection">
+    {%  if collection.comment is not none  %}
+    <tr>
+        <th>Comment</th><td>{{ concept.comment }}</td>
+    </tr>
+    {% endif %}
+    {% if collection.members|length > 0 %}
+    <tr>
+        {% if collection.broaders is defined %}
+        <th>Broader</th>
+        <td class="list">
+            {% for member in collection.members -%}
+            <a href="{{ member.url }}">{{ member.prefLabel }}</a><br />
+            {% endfor %}
+        </td>
+        {% endif %}
+    </tr>
+    {% endif %}
+</table>
+<h3>Alternate Profiles</h3>
+<p>Different views and formats of this register are here: <a href="{{ request.url }}&_profile=alt">Alternates Profiles</a>.</p>
+{% endblock %}
