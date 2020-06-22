@@ -1,8 +1,7 @@
 {% extends "page.html" -%}
-{% from "macros/concept_hierarchy.html" import render_concept_hierarchy with context -%}
+{% from "concept_hierarchy.html" import render_concept_hierarchy with context -%}
 {% block content -%}
 <h1>Vocabulary: {{ vocab.title }}</h1>
-<p>View this vocabulary's register of <a href="{{ url_for('vocabulary', vocab_id=vocab.id) }}/concept/">concepts</a>.</p>
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
 <div class="overflow">
     <table class="metadata concept_scheme">
@@ -35,7 +34,7 @@
         <tr>
             <th>Download:</th>
             <td>
-                    <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
+                <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
             </td>
         </tr>
         {% endif -%}
@@ -43,7 +42,7 @@
         <tr>
             <th>Concept Hierarchy:</th>
             <td>
-                    {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
+                {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
             </td>
         </tr>
         {% endif -%}
@@ -51,6 +50,6 @@
 </div>
 <footer class="content-footer">
     <h3>Alternate Profiles</h3>
-    <p>Different views and formats of this vocabulary are here: : <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>
+    <p>Different views and formats of this vocabulary are here: <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>
 </footer>
 {% endblock -%}

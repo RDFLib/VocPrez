@@ -9,16 +9,16 @@ Output:
 #}
 
 {% macro format(s, markdown=false, safe=false) %}
-    {% if h.is_email(s) %}
-        {% if h.contains_mailto(s) %}
-            <a href="{{ s }}">{{ h.strip_mailto(s) }}</a>
+    {% if utils.is_email(s) %}
+        {% if utils.contains_mailto(s) %}
+            <a href="{{ s }}">{{ utils.strip_mailto(s) }}</a>
         {% else %}
             <a href="mailto:{{ s }}">{{ s }}</a>
         {% endif %}
-    {% elif h.is_url(s) %}
+    {% elif utils.is_url(s) %}
         <a href="{{ s }}">{{ s }}</a>
     {% elif markdown %}
-        {{ h.parse_markdown(s)|safe }}
+        {{ utils.parse_markdown(s)|safe }}
     {% elif safe %}
         {{ s|safe }}
     {% else %}

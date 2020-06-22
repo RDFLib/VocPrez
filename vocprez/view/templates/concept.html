@@ -32,7 +32,7 @@
             {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
 	            {% if concept_uri and concept_label -%}
             		{% if config.LOCAL_URLS -%}
-	                <a href="{{ url_for('object') }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
+	                <a href="{{ url_for('object') }}?vocab_id={{ vocab_id }}&uri={{ utils.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
 	            	{% else -%}
 	                <a href="{{ concept_uri }}">{{ concept_label }}</a><br>
 	            	{% endif -%}
@@ -47,5 +47,5 @@
 </table>
 <hr>
 <h3>Alternate Profiles</h3>
-<p>Different views and formats of this concept are here:  <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ h.url_encode(uri) }}&_profile=alt">Alternates View</a>.</p>
+<p>Different views and formats of this concept are here:  <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ utils.url_encode(uri) }}&_profile=alt">Alternates View</a>.</p>
 {% endblock %}
