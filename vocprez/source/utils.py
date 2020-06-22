@@ -10,6 +10,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON, BASIC
 from rdflib import Graph, SKOS, URIRef
 from vocprez import _config as config
 from xml.dom.minidom import Document as xml_Document
+import urllib
 
 __all__ = [
     "cache_read",

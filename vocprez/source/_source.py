@@ -2,7 +2,7 @@ from collections import OrderedDict
 import dateutil
 from flask import g
 from vocprez.model.concept import Concept
-from .utils import cache_read, cache_write, url_decode
+from .utils import cache_read, cache_write, url_decode, sparql_query, draw_concept_hierarchy
 
 
 __all__ = [
@@ -136,7 +136,7 @@ WHERE {{
 }}""".format(
             vocab_uri=vocab.uri, language=self.language
         )
-        collections = Source.sparql_query(
+        collections = sparql_query(
             vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
         )
 
@@ -442,7 +442,7 @@ WHERE {{
         """.format(
             concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
         )
-        top_concepts = Source.sparql_query(
+        top_concepts = sparql_query(
             vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
         )
         if top_concepts is not None:
@@ -508,42 +508,31 @@ WHERE {{
 
         vocab = g.VOCABS[self.vocab_id]
 
-        query = """PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX dct: <http://purl.org/dc/terms/>
-SELECT distinct ?concept ?concept_preflabel ?broader_concept
-WHERE {{
-    {{ GRAPH ?graph {{
-        {{ ?concept skos:inScheme <{vocab_uri}> . }}
-        UNION
-        {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
-        UNION
-        {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
-        ?concept skos:prefLabel ?concept_preflabel .
-        OPTIONAL {{ ?concept skos:broader ?broader_concept .
-            ?broader_concept skos:inScheme <{vocab_uri}> .
+        query = """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX dct: <http://purl.org/dc/terms/>
+            SELECT distinct ?concept ?concept_preflabel ?broader_concept
+            WHERE {{
+                {{ ?concept skos:inScheme <{vocab_uri}> . }}
+                UNION
+                {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
+                UNION
+                {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
+                ?concept skos:prefLabel ?concept_preflabel .
+                OPTIONAL {{ 
+                    ?concept skos:broader ?broader_concept .
+                    ?broader_concept skos:inScheme <{vocab_uri}> .
+                }}
+                FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
             }}
-        FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
-    }} }}
-    UNION
-    {{
-        {{ ?concept skos:inScheme <{vocab_uri}> . }}
-        UNION
-        {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
-        UNION
-        {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
-        ?concept skos:prefLabel ?concept_preflabel .
-        OPTIONAL {{ ?concept skos:broader ?broader_concept .
-            ?broader_concept skos:inScheme <{vocab_uri}> .
-            }}
-        FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
-    }}
-}}
-ORDER BY ?concept_preflabel""".format(
-            vocab_uri=vocab.concept_scheme_uri, language=self.language
-        )
+            ORDER BY ?concept_preflabel
+            """.format(
+                vocab_uri=vocab.concept_scheme_uri,
+                language=self.language
+            )
 
-        bindings_list = Source.sparql_query(
+        bindings_list = sparql_query(
             vocab.sparql_endpoint, query, vocab.sparql_username, vocab.sparql_password
         )
 
@@ -551,7 +540,7 @@ ORDER BY ?concept_preflabel""".format(
 
         hierarchy = build_hierarchy(bindings_list)
 
-        return Source.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
+        return draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
 
     def get_object_class(self):
         vocab = g.VOCABS[self.vocab_id]
@@ -615,7 +604,7 @@ ORDER BY ?pl
 """.format(
             concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
         )
-        top_concepts = Source.sparql_query(
+        top_concepts = sparql_query(
             vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
         )
 
