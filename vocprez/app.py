@@ -17,7 +17,7 @@ from flask import (
 from vocprez.model import *
 from vocprez import _config as config
 import markdown
-from vocprez.source.utils import cache_read, cache_write
+from vocprez.source.utils import cache_read, cache_write, sparql_query
 from pyldapi import Renderer, ContainerRenderer
 import datetime
 import logging
@@ -61,14 +61,15 @@ def before_request():
         cache_write(g.VOCABS, "VOCABS.p")
 
 
-# @app.context_processor
-# def context_processor():
-#     """
-#     A set of global variables available to 'globally' for jinja templates.
-#     :return: A dictionary of variables
-#     :rtype: dict
-#     """
-#     return dict(h=helper)
+@app.context_processor
+def context_processor():
+    """
+    A set of global variables available to 'globally' for jinja templates.
+    :return: A dictionary of variables
+    :rtype: dict
+    """
+    import vocprez.source.utils as u
+    return dict(utils=u)
 
 
 @app.context_processor
@@ -367,14 +368,6 @@ def object():
         return render_vb_exception_response(e)
 
 
-@app.route("/geosciml")
-def geosciml():
-    return render_template(
-        "geosciml_home.html",
-        version=__version__,
-    )
-
-
 @app.route("/about")
 def about():
     import os
@@ -497,7 +490,7 @@ def endpoint():
             if "CONSTRUCT" in query:
                 format_mimetype = "text/turtle"
                 return Response(
-                    sparql_query(
+                    sparql_query2(
                         query, format_mimetype=format_mimetype
                     ),
                     status=200,
@@ -505,7 +498,7 @@ def endpoint():
                 )
             else:
                 return Response(
-                    sparql_query(query, format_mimetype),
+                    sparql_query2(query, format_mimetype),
                     status=200,
                 )
         except ValueError as e:
@@ -536,7 +529,7 @@ def endpoint():
             if "CONSTRUCT" in query:
                 acceptable_mimes = [x for x in Renderer.RDF_MEDIA_TYPES]
                 best = request.accept_mimetypes.best_match(acceptable_mimes)
-                query_result = sparql_query(
+                query_result = sparql_query2(
                     query, format_mimetype=best
                 )
                 file_ext = {
@@ -638,8 +631,9 @@ def get_sparql_service_description(rdf_format="turtle"):
         )
 
 
-def sparql_query(query, format_mimetype="application/json"):
+def sparql_query2(query, format_mimetype="application/json"):
     """ Make a SPARQL query"""
+    logging.debug("sparql_query2: {}".format(query))
     data = query
 
     headers = {

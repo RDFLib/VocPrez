@@ -2,7 +2,7 @@ from collections import OrderedDict
 import dateutil
 from flask import g
 from vocprez.model.concept import Concept
-from .utils import cache_read, cache_write, url_decode, sparql_query, draw_concept_hierarchy
+from .utils import cache_read, cache_write, url_decode, sparql_query, draw_concept_hierarchy, make_title
 
 
 __all__ = [
@@ -308,7 +308,7 @@ WHERE {{
 }}""".format(
             concept_uri=concept_uri, language=self.language
         )
-        result = Source.sparql_query(
+        result = sparql_query(
             vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
         )
 
@@ -556,7 +556,7 @@ WHERE {{
 }}""".format(
             uri=url_decode(self.request.values.get("uri"))
         )
-        clses = Source.sparql_query(
+        clses = sparql_query(
             vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
         )
         assert clses is not None, "SPARQL class query failed"

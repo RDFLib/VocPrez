@@ -11,6 +11,9 @@ from rdflib import Graph, SKOS, URIRef
 from vocprez import _config as config
 from xml.dom.minidom import Document as xml_Document
 import urllib
+import re
+from bs4 import BeautifulSoup
+
 
 __all__ = [
     "cache_read",
@@ -142,6 +145,26 @@ def draw_concept_hierarchy(hierarchy, request, vocab_id):
             tracked_items.append({"name": item[1], "indent": mult})
 
         return markdown.markdown(text)
+
+
+def render_concept_tree(html_doc):
+    soup = BeautifulSoup(html_doc, "html.parser")
+
+    # concept_hierarchy = soup.find(id='concept-hierarchy')
+
+    uls = soup.find_all("ul")
+
+    for i, ul in enumerate(uls):
+        # Don't add HTML class nested to the first 'ul' found.
+        if not i == 0:
+            ul["class"] = "nested"
+            if ul.parent.name == "li":
+                temp = BeautifulSoup(str(ul.parent.a.extract()), "html.parser")
+                ul.parent.insert(
+                    0, BeautifulSoup('<span class="caret">', "html.parser")
+                )
+                ul.parent.span.insert(0, temp)
+    return soup
 
 
 def get_graph(endpoint, q, sparql_username=None, sparql_password=None):
@@ -318,3 +341,18 @@ def url_encode(s):
         return urllib.parse.quote(s)
     except:
         pass
+
+
+def make_title(s):
+    # make title from URI
+    title = " ".join(s.split("#")[-1].split("/")[-1].split("_")).title()
+
+    # replace dashes and periods with whitespace
+    title = re.sub("[-.]+", " ", title).title()
+
+    return title
+
+
+def version():
+    from vocprez import __version__ as v
+    return v
