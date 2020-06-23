@@ -23,5 +23,5 @@
     {% endif %}
 </table>
 <h3>Alternate Profiles</h3>
-<p>Different views and formats of this register are here: <a href="{{ request.url }}&_profile=alt">Alternates Profiles</a>.</p>
+<p>Different views and formats of this concept are here:  <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ utils.url_encode(uri) }}&_profile=alt">Alternate Profiles</a>.</p>
 {% endblock %}
