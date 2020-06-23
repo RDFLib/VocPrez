@@ -3,6 +3,7 @@ import dateutil
 from flask import g
 from vocprez.model.concept import Concept
 from .utils import cache_read, cache_write, url_decode, sparql_query, draw_concept_hierarchy, make_title
+import vocprez._config as config
 
 
 __all__ = [
@@ -21,7 +22,7 @@ class Source:
     def __init__(self, vocab_id, request, language=None):
         self.vocab_id = vocab_id
         self.request = request
-        self.language = language or DEFAULT_LANGUAGE
+        self.language = language or config.DEFAULT_LANGUAGE
 
         self._graph = None  # Property for rdflib Graph object to be populated on demand
 
