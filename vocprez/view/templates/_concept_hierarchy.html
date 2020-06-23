@@ -37,7 +37,7 @@
   </style>
 
   {% if hierarchy %}
-    <h5 class="display-inline">Concept Hierarchy</h5> <span class="tree-action" id="tree-toggler">expand all</span>
+    <span class="tree-action" id="tree-toggler">expand all</span>
     {{ utils.render_concept_tree(hierarchy)|safe }}
   {% endif %}
 
