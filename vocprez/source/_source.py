@@ -136,9 +136,7 @@ WHERE {{
 }}""".format(
             vocab_uri=vocab.uri, language=self.language
         )
-        collections = sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
-        )
+        collections = sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
 
         return [(x.get("c").get("value"), x.get("l").get("value")) for x in collections]
 
@@ -148,29 +146,14 @@ WHERE {{
 PREFIX dct: <http://purl.org/dc/terms/>
 SELECT DISTINCT ?c ?pl
 WHERE {{
-    {{ GRAPH ?g {{
         {{ ?c skos:inScheme <{concept_scheme_uri}> . }}
         UNION
         {{ ?c skos:topConceptOf <{concept_scheme_uri}> . }}
         UNION
         {{ <{concept_scheme_uri}> skos:hasTopConcept ?c . }}
 
-        {{ ?c skos:prefLabel ?pl .
+        ?c skos:prefLabel ?pl .
         FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
-        }}
-    }} }}
-    UNION
-    {{
-        {{ ?c skos:inScheme <{concept_scheme_uri}> . }}
-        UNION
-        {{ ?c skos:topConceptOf <{concept_scheme_uri}> . }}
-        UNION
-        {{ <{concept_scheme_uri}> skos:hasTopConcept ?c . }}
-
-        {{ ?c skos:prefLabel ?pl .
-        FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
-        }}
-    }}
 }}
 ORDER BY ?pl""".format(
             concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
@@ -308,9 +291,7 @@ WHERE {{
 }}""".format(
             concept_uri=concept_uri, language=self.language
         )
-        result = sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
-        )
+        result = sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
 
         assert result, "Unable to query concepts for {}".format(
             self.request.values.get("uri")
@@ -442,9 +423,7 @@ WHERE {{
         """.format(
             concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
         )
-        top_concepts = sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
-        )
+        top_concepts = sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
         if top_concepts is not None:
             # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice
             pl_cache = []
@@ -532,9 +511,7 @@ WHERE {{
                 language=self.language
             )
 
-        bindings_list = sparql_query(
-            vocab.sparql_endpoint, query, vocab.sparql_username, vocab.sparql_password
-        )
+        bindings_list = sparql_query(query, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
 
         assert bindings_list is not None, "SPARQL concept hierarchy query failed"
 
@@ -556,9 +533,7 @@ WHERE {{
 }}""".format(
             uri=url_decode(self.request.values.get("uri"))
         )
-        clses = sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
-        )
+        clses = sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
         assert clses is not None, "SPARQL class query failed"
         # look for classes we understand (SKOS)
         for cls in clses:
@@ -604,9 +579,7 @@ ORDER BY ?pl
 """.format(
             concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
         )
-        top_concepts = sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
-        )
+        top_concepts = sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
 
         if top_concepts is not None:
             # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice

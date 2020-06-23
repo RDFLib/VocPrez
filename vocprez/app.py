@@ -183,7 +183,7 @@ def vocabulary(vocab_id):
             ORDER BY ?pl
         """.format(publishers[vocab_id])
 
-        for r in sparql_query(config.SPARQL_ENDPOINT, q):
+        for r in sparql_query(q):
             vocabs.append((
                 str(url_for("vocabulary", vocab_id=r["uri"]["value"].split("/")[-1])),
                 str(r["pl"]["value"])

@@ -13,6 +13,7 @@ from xml.dom.minidom import Document as xml_Document
 import urllib
 import re
 from bs4 import BeautifulSoup
+import vocprez._config as config
 
 
 __all__ = [
@@ -183,8 +184,8 @@ def get_graph(endpoint, q, sparql_username=None, sparql_password=None):
     return result_graph
 
 
-def sparql_query(endpoint, q, sparql_username=None, sparql_password=None):
-    sparql = SPARQLWrapper(endpoint)
+def sparql_query(q, sparql_endpoint=config.SPARQL_ENDPOINT, sparql_username=None, sparql_password=None):
+    sparql = SPARQLWrapper(sparql_endpoint)
     sparql.setQuery(q)
     sparql.setReturnFormat(JSON)
 
@@ -224,7 +225,7 @@ def sparql_query(endpoint, q, sparql_username=None, sparql_password=None):
         logging.debug("SPARQL query failed: {}".format(e))
         logging.debug(
             "endpoint={}\nsparql_username={}\nsparql_password={}\n{}".format(
-                endpoint, sparql_username, sparql_password, q
+               q,  sparql_endpoint, sparql_username, sparql_password
             )
         )
         return None

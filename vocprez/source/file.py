@@ -369,41 +369,22 @@ class File(Source):
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT DISTINCT ?tc ?pl
             WHERE {{
-                {{ GRAPH ?g 
-                    {{
-                        {{
-                            <{concept_scheme_uri}> skos:hasTopConcept ?tc .                
-                        }}
-                        UNION 
-                        {{
-                            ?tc skos:topConceptOf <{concept_scheme_uri}> .
-                        }}
-                        {{ ?tc skos:prefLabel ?pl .
-                            FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
-                        }}
-                    }}
-                }}
-                UNION
                 {{
-                    {{
-                        <{concept_scheme_uri}> skos:hasTopConcept ?tc .                
-                    }}
-                    UNION 
-                    {{
-                        ?tc skos:topConceptOf <{concept_scheme_uri}> .
-                    }}
-                    {{ ?tc skos:prefLabel ?pl .
-                        FILTER(lang(?pl) = "{language}" || lang(?pl) = "")
-                    }}
+                    <{concept_scheme_uri}> skos:hasTopConcept ?tc .                
+                }}
+                UNION 
+                {{
+                    ?tc skos:topConceptOf <{concept_scheme_uri}> .
+                }}
+                {{ ?tc skos:prefLabel ?pl .
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "")
                 }}
             }}
             ORDER BY ?pl
             """.format(
             concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
         )
-        top_concepts = vocprez.source.utils.sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
-        )
+        top_concepts = self.gr.query(q)
 
         if top_concepts is not None:
             # cache prefLabels and do not add duplicates. This prevents Concepts with sameAs properties appearing twice

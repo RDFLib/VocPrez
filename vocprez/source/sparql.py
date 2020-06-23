@@ -57,10 +57,10 @@ class SPARQL(Source):
             """.format(language=DEFAULT_LANGUAGE)
         # record just the IDs & title for the VocPrez in-memory vocabs list
         concept_schemes = vocprez.source.utils.sparql_query(
-            details["sparql_endpoint"],
             q,
-            sparql_username=details.get("sparql_username"),
-            sparql_password=details.get("sparql_password"),
+            details["sparql_endpoint"],  # must specify a SPARQL endpoint if this source is to be a SPARQL source
+            details.get("sparql_username"),
+            details.get("sparql_password"),
         )
         assert concept_schemes is not None, "Unable to query for ConceptSchemes"
 
