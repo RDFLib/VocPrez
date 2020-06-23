@@ -1,6 +1,5 @@
 import io
 import json
-import re
 import requests
 from rdflib import Graph
 from vocprez import __version__
@@ -217,7 +216,6 @@ def collections():
         version=__version__,
         title="Collections",
         register_class="Collections",
-        navs={}
     )
 
 
