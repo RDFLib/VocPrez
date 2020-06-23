@@ -113,33 +113,22 @@ class Source:
 
     def list_collections(self):
         vocab = g.VOCABS[self.vocab_id]
-        q = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT DISTINCT ?c ?l
-WHERE {{
-    {{ GRAPH ?g {{
-        {{?c a skos:Collection .
-        FILTER (REGEX(STR(?c), "^{vocab_uri}", "i"))
-        }}
-        {{?c (rdfs:label | skos:prefLabel) ?l .
-        FILTER(lang(?l) = "{language}" || lang(?l) = "") 
-        }}
-    }} }}
-    UNION
-    {{
-        {{?c a skos:Collection .
-        FILTER (REGEX(STR(?c), "^{vocab_uri}", "i"))
-        }}
-        {{?c (rdfs:label | skos:prefLabel) ?l .
-        FILTER(lang(?l) = "{language}" || lang(?l) = "") 
-        }}
-    }} 
-}}""".format(
-            vocab_uri=vocab.uri, language=self.language
-        )
+        q = """
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT DISTINCT ?c ?pl
+            WHERE {{
+                GRAPH <{vocab_uri}> {{
+                    ?c  a skos:Collection ;
+                        skos:prefLabel ?pl .
+                        
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+                }}
+            }}
+            """.format(vocab_uri=vocab.uri, language=self.language)
         collections = sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
 
-        return [(x.get("c").get("value"), x.get("l").get("value")) for x in collections]
+        return [(x.get("c").get("value"), x.get("pl").get("value")) for x in collections]
 
     def list_concepts(self):
         vocab = g.VOCABS[self.vocab_id]

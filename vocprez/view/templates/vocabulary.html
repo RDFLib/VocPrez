@@ -46,6 +46,16 @@
             </td>
         </tr>
         {% endif -%}
+        {%  if vocab.collections is not none and vocab.collections|length > 0  -%}
+        <tr>
+            <th>Collections:</th>
+            <td>
+              {% for collection in vocab.collections %}
+                <a href="{{ collection[0] }}">{{ collection[1] }}</a><br />
+              {% endfor %}
+            </td>
+        </tr>
+        {% endif -%}
     </table>
 </div>
 <footer class="content-footer">
