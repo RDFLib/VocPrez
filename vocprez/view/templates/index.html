@@ -14,11 +14,13 @@
     <p>See the <a href="vocabulary">Vocabularies Register</a> for a list of vocabularies this instance of VocPrez knows about.</p>
 
     <h2>Concepts</h2>
-    <p>SKOS concepts are listed within a vocabulary's home page.</p>
-    <p>Example <a href="vocabulary/{{ voc_key }}/concept/">Concepts Register</a> for {{ voc_key }}.</p>
+    <p>SKOS concepts are listed within a vocabulary's home page. Each vocabulary presents both a concept heirarchy (tree) view and a link to a flat list of its concepts.</p>
 
+    <h2>Collections</h2>
+    <p>In VocPrez, <code>skos:Collection</code> instances are always contaned within a <code>skos:ConceptScheme</code> so, to find a <code>skos:Collection</code>, visit the relevant <code>skos:ConceptScheme</code> instance's page and you will see it listed.</p>
+    <p>This behaviour of nesting <code>skos:Collection</code> instances may be overridden and has been by some VocPrez implementers so that Collections appear as a top-level item in the VocPrez API.</p>
     <div style="border-top:solid 2px grey;">
         <h3>Alternate Profiles</h3>
-        <p>Different views and formats of this system and its collection of vocabularies: <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>
+        <p>Different views and formats of list of Concepts: <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>
     </div>
 {% endblock %}

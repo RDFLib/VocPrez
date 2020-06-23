@@ -2,7 +2,6 @@ import io
 import json
 import requests
 from rdflib import Graph
-from vocprez import __version__
 from flask import (
     Flask,
     Response,
@@ -80,7 +79,6 @@ def inject_date():
 def index():
     return render_template(
         "index.html",
-        version=__version__,
     )
 
 
@@ -118,18 +116,6 @@ def vocabularies():
     start = (page - 1) * per_page
     end = start + per_page
     vocabs = vocabs[start:end]
-    #
-    # # render the list of vocabs
-    # return SkosRegisterRenderer(
-    #     request,
-    #     [],
-    #     vocabs,
-    #     "Vocabularies",
-    #     total,
-    #     search_query=query,
-    #     search_enabled=True,
-    #     vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
-    # ).render()
 
     return ContainerRenderer(
         request,
@@ -170,18 +156,18 @@ def concepts(vocab_id):
 
     vocab_source = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request)
     concepts = vocab_source.list_concepts()
-    concepts.sort(key=lambda x: x["title"])
+    # concepts.sort(key=lambda x: x["prefLabel"]) -- sort not needed when receiving pre-sorted tuples
     total = len(concepts)
 
-    # Search
-    query = request.values.get("search")
-    results = []
-    if query:
-        for m in match(concepts, query):
-            results.append(m)
-        concepts[:] = results
-        concepts.sort(key=lambda x: x["title"])
-        total = len(concepts)
+    # # Search
+    # query = request.values.get("search")
+    # results = []
+    # if query:
+    #     for m in match(concepts, query):
+    #         results.append(m)
+    #     concepts[:] = results
+    #     concepts.sort(key=lambda x: x["prefLabel"])
+    #     total = len(concepts)
 
     page = (
         int(request.values.get("page")) if request.values.get("page") is not None else 1
@@ -195,25 +181,22 @@ def concepts(vocab_id):
     end = start + per_page
     members = concepts[start:end]
 
-    test = SkosRegisterRenderer(
-        request=request,
-        navs=[],
-        members=members,
-        register_item_type_string=g.VOCABS[vocab_id].title + " concepts",
-        total=total,
-        search_enabled=True,
-        search_query=query,
-        vocabulary_url=[request.url_root + "vocabulary/" + vocab_id],
-        vocab_id=vocab_id,
-    )
-    return test.render()
+    return ContainerRenderer(
+        request,
+        url_for("concepts", vocab_id=vocab_id),
+        "All Concepts",
+        'All Concepts within Vocab {}'.format(vocab_id),
+        None,
+        None,
+        members,
+        total
+    ).render()
 
 
 @app.route("/collection/")
 def collections():
     return render_template(
         "members.html",
-        version=__version__,
         title="Collections",
         register_class="Collections",
     )
@@ -295,7 +278,6 @@ def about():
 
     return render_template(
         "about.html",
-        version=__version__,
         title="About",
         navs={},
         content=content
@@ -307,7 +289,6 @@ def about():
 def sparql():
     return render_template(
         "sparql.html",
-        version=__version__,
     )
 
 
@@ -580,7 +561,6 @@ def render_invalid_vocab_id_response():
     msg = Markup(markdown.markdown(msg))
     return render_template(
         "error.html",
-        version=__version__,
         title="Error - invalid vocab id",
         heading="Invalid Vocab ID",
         msg=msg,
@@ -590,7 +570,6 @@ def render_invalid_vocab_id_response():
 def render_vocprez_response(message):
     return render_template(
         "error.html",
-        version=__version__,
         title="Error - invalid vocab id",
         heading="Invalid Vocab ID",
         msg=message,
@@ -608,7 +587,6 @@ def render_vb_exception_response(e):
         msg = Markup(markdown.markdown(msg))
     return render_template(
         "error.html",
-        version=__version__,
         title="Error",
         heading="VocBench Error",
         msg=msg
@@ -624,7 +602,6 @@ Instead, found **{}**.""".format(
     msg = Markup(markdown.markdown(msg))
     return render_template(
         "error.html",
-        version=__version__,
         title="Error - Object Class URI",
         heading="Concept Class Type Error",
         msg=msg,

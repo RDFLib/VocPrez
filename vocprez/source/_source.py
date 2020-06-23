@@ -149,27 +149,24 @@ class Source:
             ORDER BY ?pl
             """.format(uri=vocab.uri, language=self.language)
         concepts = sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
+            q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password
         )
 
-        concept_items = []
+        members = []
         for concept in concepts:
+            # TODO: use more complex object to make cards for Concepts, not just single links
             metadata = {
-                "key": self.vocab_id,
+                "vocab_id": self.vocab_id,
                 "uri": concept["c"]["value"],
-                "title": concept["pl"]["value"],
+                "prefLabel": concept["pl"]["value"],
                 "definition": concept.get("d")["value"] if concept.get("d") else None,
-                "created": dateutil.parser.parse(concept["created"]["value"])
-                if concept.get("created")
-                else None,
-                "modified": dateutil.parser.parse(concept["modified"]["value"])
-                if concept.get("modified")
-                else None,
+                "created": dateutil.parser.parse(concept["created"]["value"]) if concept.get("created") else None,
+                "modified": dateutil.parser.parse(concept["modified"]["value"]) if concept.get("modified") else None,
             }
 
-            concept_items.append(metadata)
+            members.append((concept["c"]["value"], concept["pl"]["value"]))
 
-        return concept_items
+        return members
 
     def get_vocabulary(self):
         """
