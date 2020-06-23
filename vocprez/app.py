@@ -16,7 +16,7 @@ from flask import (
 from vocprez.model import *
 from vocprez import _config as config
 import markdown
-from vocprez.source.utils import cache_read, cache_write, match
+from vocprez.source.utils import cache_read, cache_write, match, sparql_query
 from pyldapi import Renderer, ContainerRenderer
 import datetime
 import logging
