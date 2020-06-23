@@ -148,104 +148,89 @@ def vocabularies():
     ).render()
 
 
+@app.route("/vocabularies/<string:set_id>/")
+def vocabularies_set(set_id):
+    sets = [
+        "EarthResourceML",
+        "GeoSciML"
+    ]
+    if set_id not in sets:
+        return render_vocprez_response(
+            "The vocab set ID supplied is invalid. It must be one of {}".format(", ".join(sets))
+        )
+
+    page = (
+        int(request.values.get("page")) if request.values.get("page") is not None else 1
+    )
+    per_page = (
+        int(request.values.get("per_page"))
+        if request.values.get("per_page") is not None
+        else 20
+    )
+
+    # get this set's list of vocabs
+    vocabs = []
+    q = """
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX dcterms: <http://purl.org/dc/terms/>
+        
+        SELECT ?uri ?pl ?prov
+        WHERE {{
+            ?uri a skos:ConceptScheme ;
+                 skos:prefLabel ?pl ;
+                 dcterms:provenance ?prov .
+        
+                FILTER REGEX(?prov, "{}", "i")
+        }}
+        ORDER BY ?pl
+    """.format(set_id)
+
+    desc = ""
+    concept_schemes = sparql_query(
+        q,
+        config.VOCAB_SOURCES["cgi"]["sparql_endpoint"],
+        config.VOCAB_SOURCES["cgi"].get("sparql_username"),
+        config.VOCAB_SOURCES["cgi"].get("sparql_password"),
+    )
+
+    assert concept_schemes is not None, "Unable to query for ConceptSchemes"
+
+    for cs in concept_schemes:
+        vocabs.append((
+            str(url_for("vocabulary", vocab_id=cs["uri"]["value"].split("/")[-1])),
+            str(cs["pl"]["value"])
+        ))
+        desc = str(cs["prov"]["value"])
+
+    start = (page - 1) * per_page
+    end = start + per_page
+    vocabs = vocabs[start:end]
+
+    return ContainerRenderer(
+        request,
+        request.base_url,
+        set_id + ' Vocabularies',
+        desc,
+        None,
+        None,
+        vocabs,
+        len(vocabs)
+    ).render()
+
+
 @app.route("/vocabulary/<string:vocab_id>/")
 def vocabulary(vocab_id):
-    publishers = {
-        "ga": "https://linked.data.gov.au/org/ga",
-        "ggic": "http://www.geoscience.gov.au",
-        "iso": "https://linked.data.gov.au/org/iso",
-        "nasa": "https://nasa.gov",
-        "odm2": "http://www.odm2.org",
-        "abs": "https://linked.data.gov.au/org/abs"
-    }
-    if vocab_id in publishers.keys():
-        page = (
-            int(request.values.get("page")) if request.values.get("page") is not None else 1
-        )
-        per_page = (
-            int(request.values.get("per_page"))
-            if request.values.get("per_page") is not None
-            else 20
-        )
+    # check the vocab id is valid
+    if vocab_id not in g.VOCABS.keys():
+        return render_invalid_vocab_id_response()
 
-        # get this instance's list of vocabs
-        vocabs = []
-        q = """
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX dcterms: <http://purl.org/dc/terms/>
+    # get vocab details using appropriate source handler
+    try:
+        vocab = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=request.values.get("lang")).get_vocabulary()
+    except VbException as e:
+        return render_vb_exception_response(e)
 
-            SELECT ?uri ?pl
-            WHERE {{
-                ?uri a skos:ConceptScheme ;
-                    skos:prefLabel ?pl ;
-                    dcterms:publisher <{}> .
-            }}
-            ORDER BY ?pl
-        """.format(publishers[vocab_id])
-
-        for r in sparql_query(q):
-            vocabs.append((
-                str(url_for("vocabulary", vocab_id=r["uri"]["value"].split("/")[-1])),
-                str(r["pl"]["value"])
-            ))
-
-        start = (page - 1) * per_page
-        end = start + per_page
-        vocabs = vocabs[start:end]
-        #
-        # # render the list of vocabs
-        # return SkosRegisterRenderer(
-        #     request,
-        #     [],
-        #     vocabs,
-        #     "Vocabularies",
-        #     total,
-        #     search_query=query,
-        #     search_enabled=True,
-        #     vocabulary_url=["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
-        # ).render()
-
-        descriptions = {
-            "ga": "Vocabularies created and published by Geoscience Australia",
-            "ggic": "Vocabularies published by Geoscience Australia on behalf of GGIC",
-            "iso": "Vocabularies from the International Organization for Standardization",
-            "nasa": "Vocabularies by NASA",
-            "odm2": "Vocabularies by the Observation Data Model 2 group",
-            "abs": "Vocabularies by the Australian Bureau of Statistics"
-        }
-
-        return ContainerRenderer(
-            request,
-            'https://pid.geoscience.gov.au/def/voc/' + vocab_id + "/",
-            'Vocabularies',
-            descriptions[vocab_id],
-            None,
-            None,
-            vocabs,
-            len(vocabs)
-        ).render()
-    else:
-        vocab = g.VOCABS[vocab_id]
-
-        if "/concept/" in vocab_id:
-            return redirect(url_for(concepts(vocab_id.split("/")[0])))
-        else:
-            parts = vocab_id.split("/")
-            if len(parts) > 1:
-                vocab_id = parts[1]
-
-        language = request.values.get("lang") or config.DEFAULT_LANGUAGE
-
-        if vocab_id not in g.VOCABS.keys():
-            return render_invalid_vocab_id_response()
-
-        # get vocab details using appropriate source handler
-        try:
-            vocab = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=language).get_vocabulary()
-        except VbException as e:
-            return render_vb_exception_response(e)
-
-        return VocabularyRenderer(request, vocab).render()
+    return VocabularyRenderer(request, vocab).render()
 
 
 @app.route("/vocabulary/<vocab_id>/concept/")
@@ -550,7 +535,7 @@ def endpoint():
                     },
                 )
             else:
-                query_result = sparql_query(query)
+                query_result = sparql_query2(query)
                 return Response(
                     query_result, status=200, mimetype="application/sparql-results+json"
                 )
@@ -673,6 +658,16 @@ def render_invalid_vocab_id_response():
         title="Error - invalid vocab id",
         heading="Invalid Vocab ID",
         msg=msg,
+    )
+
+
+def render_vocprez_response(message):
+    return render_template(
+        "error.html",
+        version=__version__,
+        title="Error - invalid vocab id",
+        heading="Invalid Vocab ID",
+        msg=message,
     )
 
 

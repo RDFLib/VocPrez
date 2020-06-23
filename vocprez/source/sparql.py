@@ -34,7 +34,6 @@ class SPARQL(Source):
         """
         logging.debug("SPARQL collect()...")
 
-        DEFAULT_LANGUAGE = "en"
         # Get all the ConceptSchemes from the SPARQL endpoint
         # Interpret each CS as a Vocab
         q = """
@@ -54,7 +53,7 @@ class SPARQL(Source):
                     FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
             }} 
             ORDER BY ?title
-            """.format(language=DEFAULT_LANGUAGE)
+            """.format(language=config.DEFAULT_LANGUAGE)
         # record just the IDs & title for the VocPrez in-memory vocabs list
         concept_schemes = vocprez.source.utils.sparql_query(
             q,
