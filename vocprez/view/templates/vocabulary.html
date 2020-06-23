@@ -1,5 +1,5 @@
 {% extends "page.html" -%}
-{% from "concept_hierarchy.html" import render_concept_hierarchy with context -%}
+{% from "_concept_hierarchy.html" import render_concept_hierarchy with context -%}
 {% block content -%}
 <h1>Vocabulary: {{ vocab.title }}</h1>
 <h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>

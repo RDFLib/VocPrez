@@ -10,22 +10,21 @@ class Vocabulary:
     def __init__(
         self,
         id,
-        uri,  # DCAT
-        title,  # DCAT
-        description,  # DCAT
-        creator,  # DCAT
-        created,  # DCAT
-        modified,  # DCAT
+        uri,                    # DCAT
+        title,                  # DCAT
+        description,            # DCAT
+        creator,                # DCAT
+        created,                # DCAT
+        modified,               # DCAT
         versionInfo,
         data_source,
-        concept_scheme_uri,
         hasTopConcept=None,
         concepts=None,
         concept_hierarchy=None,
         collections=None,
-        accessURL=None,
-        downloadURL=None,
-        sparql_endpoint=None,
+        accessURL=None,         # DCAT
+        downloadURL=None,       # DCAT
+        sparql_endpoint=None,   # DCAT
         collection_uris=None,
         sparql_username=None,
         sparql_password=None,
@@ -46,7 +45,6 @@ class Vocabulary:
             self.modified = modified
         self.versionInfo = versionInfo
         self.data_source = data_source
-        self.concept_scheme_uri = concept_scheme_uri
         if hasTopConcept:
             hasTopConcept.sort()
         self.hasTopConcepts = hasTopConcept

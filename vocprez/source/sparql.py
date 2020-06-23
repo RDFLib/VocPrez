@@ -48,6 +48,8 @@ class SPARQL(Source):
                 OPTIONAL {{ ?cs dcterms:created ?created }}
                 OPTIONAL {{ ?cs dcterms:issued ?issued }}
                 OPTIONAL {{ ?cs dcterms:modified ?modified }}
+                OPTIONAL {{ ?cs dcterms:creator ?creator }}
+                OPTIONAL {{ ?cs dcterms:publisher ?publisher }}
                 OPTIONAL {{ ?cs owl:versionInfo ?version }}
                 OPTIONAL {{ ?cs skos:definition ?description .
                     FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
@@ -82,26 +84,15 @@ class SPARQL(Source):
             sparql_vocabs[vocab_id] = Vocabulary(
                 vocab_id,
                 cs["cs"]["value"],
-                cs["title"].get("value") or vocab_id
-                if cs.get("title")
-                else vocab_id,  # Need string value for sorting, not None
-                cs["description"].get("value")
-                if cs.get("description") is not None
-                else None,
-                None,  # none of these SPARQL vocabs have creator info yet # TODO: add creator info to GSQ vocabs
-                dateutil.parser.parse(cs.get("created").get("value"))
-                if cs.get("created") is not None
-                else None,
+                cs["title"].get("value") or vocab_id if cs.get("title") else vocab_id,  # Need str for sorting, not None
+                cs["description"].get("value") if cs.get("description") is not None else None,
+                cs["creator"].get("value") if cs.get("creator") is not None else None,
+                dateutil.parser.parse(cs.get("created").get("value")) if cs.get("created") is not None else None,
                 # dct:issued not in Vocabulary
                 # dateutil.parser.parse(cs.get('issued').get('value')) if cs.get('issued') is not None else None,
-                dateutil.parser.parse(cs.get("modified").get("value"))
-                if cs.get("modified") is not None
-                else None,
-                cs["version"].get("value")
-                if cs.get("version") is not None
-                else None,  # versionInfo
+                dateutil.parser.parse(cs.get("modified").get("value")) if cs.get("modified") is not None else None,
+                cs["version"].get("value") if cs.get("version") is not None else None,  # versionInfo
                 config.VocabSource.SPARQL,
-                cs["cs"]["value"],
                 sparql_endpoint=details["sparql_endpoint"],
                 sparql_username=details.get("sparql_username"),
                 sparql_password=details.get("sparql_password"),

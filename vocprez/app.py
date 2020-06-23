@@ -2,7 +2,7 @@ import io
 import json
 import re
 import requests
-from rdflib import Graph, URIRef
+from rdflib import Graph
 from vocprez import __version__
 from flask import (
     Flask,
@@ -17,7 +17,7 @@ from flask import (
 from vocprez.model import *
 from vocprez import _config as config
 import markdown
-from vocprez.source.utils import cache_read, cache_write, sparql_query
+from vocprez.source.utils import cache_read, cache_write, match
 from pyldapi import Renderer, ContainerRenderer
 import datetime
 import logging
@@ -82,10 +82,6 @@ def index():
     return render_template(
         "index.html",
         version=__version__,
-        title="GA VocPrez",
-        navs={},
-        config=config,
-        voc_key=get_a_vocab_source_key(),
     )
 
 
@@ -148,85 +144,18 @@ def vocabularies():
     ).render()
 
 
-@app.route("/vocabularies/<string:set_id>/")
-def vocabularies_set(set_id):
-    sets = [
-        "EarthResourceML",
-        "GeoSciML"
-    ]
-    if set_id not in sets:
-        return render_vocprez_response(
-            "The vocab set ID supplied is invalid. It must be one of {}".format(", ".join(sets))
-        )
-
-    page = (
-        int(request.values.get("page")) if request.values.get("page") is not None else 1
-    )
-    per_page = (
-        int(request.values.get("per_page"))
-        if request.values.get("per_page") is not None
-        else 20
-    )
-
-    # get this set's list of vocabs
-    vocabs = []
-    q = """
-        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        PREFIX dcterms: <http://purl.org/dc/terms/>
-        
-        SELECT ?uri ?pl ?prov
-        WHERE {{
-            ?uri a skos:ConceptScheme ;
-                 skos:prefLabel ?pl ;
-                 dcterms:provenance ?prov .
-        
-                FILTER REGEX(?prov, "{}", "i")
-        }}
-        ORDER BY ?pl
-    """.format(set_id)
-
-    desc = ""
-    concept_schemes = sparql_query(
-        q,
-        config.VOCAB_SOURCES["cgi"]["sparql_endpoint"],
-        config.VOCAB_SOURCES["cgi"].get("sparql_username"),
-        config.VOCAB_SOURCES["cgi"].get("sparql_password"),
-    )
-
-    assert concept_schemes is not None, "Unable to query for ConceptSchemes"
-
-    for cs in concept_schemes:
-        vocabs.append((
-            str(url_for("vocabulary", vocab_id=cs["uri"]["value"].split("/")[-1])),
-            str(cs["pl"]["value"])
-        ))
-        desc = str(cs["prov"]["value"])
-
-    start = (page - 1) * per_page
-    end = start + per_page
-    vocabs = vocabs[start:end]
-
-    return ContainerRenderer(
-        request,
-        request.base_url,
-        set_id + ' Vocabularies',
-        desc,
-        None,
-        None,
-        vocabs,
-        len(vocabs)
-    ).render()
-
-
 @app.route("/vocabulary/<string:vocab_id>/")
 def vocabulary(vocab_id):
     # check the vocab id is valid
     if vocab_id not in g.VOCABS.keys():
-        return render_invalid_vocab_id_response()
+        msg = "The vocabulary ID that was supplied was not known. " \
+              "It must be one of these: {}".format(", ".join(g.VOCABS.keys()))
+        return render_vb_exception_response(msg)
 
     # get vocab details using appropriate source handler
     try:
-        vocab = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=request.values.get("lang")).get_vocabulary()
+        vocab = getattr(source, g.VOCABS[vocab_id].data_source)\
+            (vocab_id, request, language=request.values.get("lang")).get_vocabulary()
     except VbException as e:
         return render_vb_exception_response(e)
 
@@ -235,12 +164,12 @@ def vocabulary(vocab_id):
 
 @app.route("/vocabulary/<vocab_id>/concept/")
 def concepts(vocab_id):
-    language = request.values.get("lang") or config.DEFAULT_LANGUAGE
-
     if vocab_id not in g.VOCABS.keys():
-        return render_invalid_vocab_id_response()
+        msg = "The vocabulary ID that was supplied was not known. " \
+              "It must be one of these: {}".format(", ".join(g.VOCABS.keys()))
+        return render_vb_exception_response(msg)
 
-    vocab_source = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=config.DEFAULT_LANGUAGE)
+    vocab_source = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request)
     concepts = vocab_source.list_concepts()
     concepts.sort(key=lambda x: x["title"])
     total = len(concepts)
@@ -265,12 +194,12 @@ def concepts(vocab_id):
     )
     start = (page - 1) * per_page
     end = start + per_page
-    concepts = concepts[start:end]
+    members = concepts[start:end]
 
     test = SkosRegisterRenderer(
         request=request,
         navs=[],
-        members=concepts,
+        members=members,
         register_item_type_string=g.VOCABS[vocab_id].title + " concepts",
         total=total,
         search_enabled=True,
@@ -284,7 +213,7 @@ def concepts(vocab_id):
 @app.route("/collection/")
 def collections():
     return render_template(
-        "register.html",
+        "members.html",
         version=__version__,
         title="Collections",
         register_class="Collections",
@@ -305,7 +234,6 @@ def object():
     :return: A Flask Response object
     :rtype: :class:`flask.Response`
     """
-    language = request.values.get("lang") or config.DEFAULT_LANGUAGE
     vocab_id = request.values.get("vocab_id")
     uri = request.values.get("uri")
     _view = request.values.get("_view")
@@ -703,104 +631,6 @@ Instead, found **{}**.""".format(
         heading="Concept Class Type Error",
         msg=msg,
     )
-
-
-def get_a_vocab_key():
-    """
-    Get the first key from the g.VOCABS dictionary.
-
-    :return: Key name
-    :rtype: str
-    """
-    try:
-        return next(iter(g.VOCABS))
-    except:
-        return None
-
-
-def get_a_vocab_source_key():
-    """
-    Get the first key from the config.VOCABS dictionary.
-
-    :return: Key name
-    :rtype: str
-    """
-    try:
-        return next(iter(g.VOCABS))
-    except:
-        return None
-
-
-def match(vocabs, query):
-    """
-    Generate a generator of vocabulary items that match the search query
-
-    :param vocabs: The vocabulary list of items.
-    :param query: The search query string.
-    :return: A generator of words that match the search query.
-    :rtype: generator
-    """
-    for word in vocabs:
-        if query.lower() in word.title.lower():
-            yield word
-
-
-def make_title(s):
-    # make title from URI
-    title = " ".join(s.split("#")[-1].split("/")[-1].split("_")).title()
-
-    # replace dashes and periods with whitespace
-    title = re.sub("[-.]+", " ", title).title()
-
-    return title
-
-
-def parse_markdown(s):
-    return markdown.markdown(s)
-
-
-def is_email(email):
-    """
-    Check if the email is a valid email.
-    :param email: The email to be tested.
-    :return: True if the email matches the static regular expression, else false.
-    :rtype: bool
-    """
-    pattern = r"[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
-    return True if re.search(pattern, email) is not None else False
-
-
-def strip_mailto(email):
-    return email[7:]
-
-
-def contains_mailto(email):
-    if email[:7] == "mailto:":
-        return True
-    return False
-
-
-def is_url(url):
-    """
-    Check if the url is a valid url.
-    :param url: The url to be tested.
-    :type url: str
-    :return: True if the url passes the validation, else false.
-    :rtype: bool
-    """
-    if isinstance(url, URIRef):
-        return True
-
-    pattern = re.compile(
-        r"^(?:http|ftp)s?://"  # http:// or https://
-        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
-        r"localhost|"  # localhost...
-        r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
-        r"(?::\d+)?"  # optional port
-        r"(?:/?|[/?]\S+)$",
-        re.IGNORECASE,
-    )
-    return True if re.search(pattern, url) is not None else False
 
 
 # run the Flask app

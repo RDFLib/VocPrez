@@ -180,50 +180,6 @@ class VocBench(Source):
         else:
             raise VbException("There was an error: " + r.content.decode("utf-8"))
 
-    def list_concepts(self):
-        s = VocBench("x", self.request)._authed_request_object()
-        r = s.post(
-            config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={
-                "query": """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                    PREFIX dct: <http://purl.org/dc/terms/>
-                    SELECT *
-                    WHERE {
-                        ?c  a skos:Concept ;
-                            skos:prefLabel ?pl .
-                            ?c dct:created ?created .
-                        OPTIONAL {{
-                            ?c dct:modified ?modified .
-                        }}
-                    }""",
-                "ctx_project": self.vocab_id,
-            },
-        )
-        concepts = json.loads(r.content.decode("utf-8"))["result"]["sparql"]["results"][
-            "bindings"
-        ]
-
-        if r.status_code == 200:
-            concept_items = []
-            for concept in concepts:
-                metadata = {}
-                metadata.update({"key": self.vocab_id})
-                metadata.update({"uri": concept.get("c").get("value")})
-                metadata.update({"title": concept.get("pl").get("value")})
-                metadata.update({"created": concept.get("created").get("value")[:10]})
-                try:
-                    metadata.update(
-                        {"modified": concept.get("modified").get("value")[:10]}
-                    )
-                except:
-                    metadata.update({"modified": None})
-
-                concept_items.append(metadata)
-
-            return concept_items
-        else:
-            raise VbException("There was an error: " + r.content.decode("utf-8"))
-
     def get_vocabulary(self):
         s = VocBench("x", self.request)._authed_request_object()
         r = s.post(
@@ -540,7 +496,7 @@ class VocBench(Source):
                 test = c
                 if "parent" not in c:
                     continue
-                if str(c["parent"]["value"]) == vocab.concept_scheme_uri:
+                if str(c["parent"]["value"]) == vocab.uri:
                     hierarchy.append(
                         (
                             int(c["length"]["value"]),

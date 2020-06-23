@@ -112,7 +112,6 @@ class File(Source):
                             else None,
                             str(cs[5]) if cs[5] is not None else None,  # versionInfo
                             config.VocabSource.FILE,
-                            cs[0],
                         )
         g.VOCABS = {**g.VOCABS, **file_vocabs}
 
@@ -382,7 +381,7 @@ class File(Source):
             }}
             ORDER BY ?pl
             """.format(
-            concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
+            concept_scheme_uri=vocab.uri, language=self.language
         )
         top_concepts = self.gr.query(q)
 
@@ -428,7 +427,7 @@ class File(Source):
                     }}
                     ORDER BY ?pl
                     """.format(
-                    concept_scheme_uri=vocab.concept_scheme_uri, language=self.language
+                    concept_scheme_uri=vocab.uri, language=self.language
                 )
                 for tc in self.gr.query(q):
                     if tc[1] not in pl_cache:  # only add if not already in cache
@@ -510,7 +509,7 @@ class File(Source):
                 FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
             }}
             ORDER BY ?concept_preflabel""".format(
-            vocab_uri=vocab.concept_scheme_uri, language=self.language
+            vocab_uri=vocab.uri, language=self.language
         )
 
         bindings_list = []
