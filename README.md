@@ -4,8 +4,6 @@ A read-only web delivery system for Simple Knowledge Organization System (SKOS)-
 
 VocPrez is used by:
 
-
-
 <a href="https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq">
     <img src="vocprez/view/style/logo-gsq.jpg" alt="GSQ Logo" style="width:80px;" />
 </a>
@@ -55,6 +53,10 @@ Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are
 
 ## Dependencies
 See the [requirements.txt](https://github.com/CSIRO-enviro-informatics/VocPrez/blob/master/requirements.txt) standard Python dependency listing file.
+
+
+## Releases
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for notes on major releases and plans for future releases.
 
 
 ## License
