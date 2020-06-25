@@ -271,7 +271,12 @@ def object():
             SELECT DISTINCT *
             WHERE {{ 
                 GRAPH ?g {{
-                    <{uri}> a ?c ;
+                    <{uri}> a ?c .
+                    OPTIONAL {{
+                        <{uri}> skos:inScheme ?cs .
+                    }}
+                    
+                    BIND (COALESCE(?cs, ?g) AS ?x)
                 }}                
             }}
             """.format(uri=uri)
@@ -279,7 +284,7 @@ def object():
             if r["c"]["value"] in source.Source.VOC_TYPES:
                 # if we find it and it's of a known class, return it
                 # for wither a Concept or a Collection, we know the relevant vocab since vocab ==  CS ==  graph
-                vocab_uri = r["g"]["value"]
+                vocab_uri = r["x"]["value"]
                 if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
                     concept = source.Source(vocab_uri, request).get_concept(uri)
                     return ConceptRenderer(request, concept, vocab_uri=vocab_uri).render()
