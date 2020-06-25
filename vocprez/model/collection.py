@@ -7,20 +7,19 @@ from vocprez.model.profiles import profile_skos
 
 class Collection:
     def __init__(
-        self, vocab, uri, label, comment, members,
+        self, vocab, uri, prefLabel, definition, members,
     ):
         self.vocab = vocab
         self.uri = uri
-        self.label = label
-        self.comment = comment
+        self.prefLabel = prefLabel
+        self.definition = definition
         self.members = members
 
 
 class CollectionRenderer(Renderer):
-    def __init__(self, request, collection):
+    def __init__(self, request, collection, vocab_uri=None):
         self.profiles = self._add_skos_profile()
-        self.navs = []  # TODO: add in other nav items for Collection
-
+        self.vocab_uri = vocab_uri
         self.collection = collection
 
         super().__init__(request, self.collection.uri, self.profiles, "skos")
@@ -53,11 +52,10 @@ class CollectionRenderer(Renderer):
     def _render_skos_html(self):
         _template_context = {
             "version": __version__,
-            "vocab_id": self.request.values.get("vocab_id"),
-            "vocab_title": g.VOCABS[self.request.values.get("vocab_id")].title,
+            "vocab_id": self.vocab_uri if self.vocab_uri is not None else self.request.values.get("vocab_uri"),
+            "vocab_title": g.VOCABS[self.vocab_uri].title,
             "uri": self.instance_uri,
             "collection": self.collection,
-            "navs": self.navs,
         }
 
         return Response(

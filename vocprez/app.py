@@ -19,10 +19,11 @@ from flask import (
 from vocprez.model import *
 from vocprez import _config as config
 import markdown
-from vocprez.source.utils import cache_read, cache_write, match, sparql_query
+from vocprez.source.utils import cache_read, cache_write, sparql_query
 from pyldapi import Renderer, ContainerRenderer
 import datetime
 import logging
+import urllib.parse
 import vocprez.source as source
 
 
@@ -103,7 +104,7 @@ def vocabularies():
     # get this instance's list of vocabs
     vocabs = []  # local copy (to this request) for sorting
     for k, voc in g.VOCABS.items():
-        vocabs.append((url_for("vocabulary", vocab_id=k), voc.title))
+        vocabs.append((url_for("object", uri=k), voc.title))
     vocabs.sort(key=lambda tup: tup[1])
     total = len(g.VOCABS.items())
     #
@@ -134,20 +135,34 @@ def vocabularies():
     ).render()
 
 
-@app.route("/vocabulary/<string:vocab_id>/")
+@app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
     # check the vocab id is valid
-    if vocab_id not in g.VOCABS.keys():
-        msg = "The vocabulary ID that was supplied was not known. " \
-              "It must be one of these: {}".format(", ".join(g.VOCABS.keys()))
-        return render_vb_exception_response(msg)
+    vocab_ids = {}
+    for x in g.VOCABS.keys():
+        vocab_ids[x.split("#")[-1].split("/")[-1]] = x
 
-    # get vocab details using appropriate source handler
+    if vocab_id not in vocab_ids.keys():
+        msg = "The vocabulary ID that was supplied was not known. " \
+              "It must be one of these: {}".format(", ".join(vocab_ids.keys()))
+        return Response(
+            msg,
+            status=400,
+            mimetype="text/plain"
+        )
+
+    # vocab_id is valid so get vocab details using appropriate source handler
+    # this is the same as /object?uri=vocab_ids[vocab_id]
     try:
-        vocab = getattr(source, g.VOCABS[vocab_id].data_source)\
-            (vocab_id, request, language=request.values.get("lang")).get_vocabulary()
+        vocab_uri = vocab_ids[vocab_id]
+        vocab = getattr(source, g.VOCABS[vocab_uri].data_source) \
+            (vocab_uri, request, language=request.values.get("lang")).get_vocabulary()
     except VbException as e:
-        return render_vb_exception_response(e)
+        return Response(
+            str(e),
+            status=400,
+            mimetype="text/plain"
+        )
 
     return VocabularyRenderer(request, vocab).render()
 
@@ -220,51 +235,111 @@ def object():
     :return: A Flask Response object
     :rtype: :class:`flask.Response`
     """
-    vocab_id = request.values.get("vocab_id")
-    uri = request.values.get("uri")
-    _view = request.values.get("_view")
-    _format = request.values.get("_format")
 
-    # check this vocab ID is known
-    if vocab_id not in g.VOCABS.keys():
+    # must have a URI supplied, for any scenario
+    if request.values.get("uri") is None and request.values.get("vocab_uri") is None:
         return Response(
-            "The vocabulary ID you've supplied is not known. Must be one of:\n "
-            + "\n".join(g.VOCABS.keys()),
+            "A Query String Argument of 'uri' and/or 'vocab_uri' must be supplied for this endpoint",
             status=400,
             mimetype="text/plain",
         )
 
-    if uri is None:
-        return Response(
-            "A Query String Argument 'uri' must be supplied for this endpoint, "
-            "indicating an object within a vocabulary",
-            status=400,
-            mimetype="text/plain",
-        )
+    if request.values.get("uri") is not None:
+        uri = urllib.parse.unquote(request.values.get("uri"))
+    elif request.values.get("vocab_uri") is not None:
+        uri = urllib.parse.unquote(request.values.get("vocab_uri"))
 
-    # vocab_source = Source(vocab_id, request, language)
-    vocab_source = getattr(source, g.VOCABS[vocab_id].data_source)(vocab_id, request, language=config.DEFAULT_LANGUAGE)
+    # any ConnegP vars
+    _profile = request.values.get("_profile")
+    _mediatype = request.values.get("_mediatype") if request.values.get("_mediatype") is not None else request.values.get("_format")
 
-    try:
-        # TODO reuse object within if, rather than re-loading graph
-        c = vocab_source.get_object_class()
+    # if it's a vocab, return that
+    if uri in g.VOCABS.keys():
+        # get vocab details using appropriate source handler
+        try:
+            vocab = getattr(source, g.VOCABS[uri].data_source) \
+                (uri, request, language=request.values.get("lang")).get_vocabulary()
+        except VbException as e:
+            return render_vb_exception_response(e)
 
-        if c == "http://www.w3.org/2004/02/skos/core#Concept":
-            concept = vocab_source.get_concept()
-            return ConceptRenderer(request, concept).render()
+        return VocabularyRenderer(request, vocab).render()
+    else:
+        # if it's not a vocab, see if we can find it in the main cache and a class for it
+        q = """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            
+            SELECT DISTINCT *
+            WHERE {{ 
+                GRAPH ?g {{
+                    <{uri}x> a ?c ;
+                }}                
+            }}
+            """.format(uri=uri)
+        for r in sparql_query(q):
+            if r["c"]["value"] in source.Source.VOC_TYPES:
+                # if we find it and it's of a known class, return it
+                # for wither a Concept or a Collection, we know the relevant vocab since vocab ==  CS ==  graph
+                vocab_uri = r["g"]["value"]
+                if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
+                    concept = source.Source(vocab_uri, request).get_concept(uri)
+                    return ConceptRenderer(request, concept, vocab_uri=vocab_uri).render()
+                elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
+                    collection = source.Source(vocab_uri, request).get_collection(uri)
+                    return CollectionRenderer(request, collection, vocab_uri=vocab_uri).render()
 
-        elif c == "http://www.w3.org/2004/02/skos/core#ConceptScheme":
-            vocabulary = vocab_source.get_vocabulary()
+        # we only get here if it's not found in the main cache
+        # now we need a vocab_uri to find it per vocab source
+        if request.values.get("vocab_uri") is None:
+            if uri is None:
+                return Response(
+                    "A Query String Argument of 'uri' must be supplied for this endpoint",
+                    status=400,
+                    mimetype="text/plain",
+                )
 
-            return VocabularyRenderer(request, vocabulary).render()
+        if request.values.get("vocab_uri") is None:
+            return Response(
+                "The URI of the object you requested cannot be found locally or its type is not a known type. "
+                "We may still be able to find it but you need to supply a vocab_uri parameter as well as uri so we "
+                "can look this up elsewhere.\n\nKnown types are:\n\n- {}".format("\n- ".join(source.Source.VOC_TYPES)),
+                status=400,
+                mimetype="text/plain",
+            )
 
-        elif c == "http://www.w3.org/2004/02/skos/core#Collection":
-            collection = vocab_source.get_collection(uri)
-            return CollectionRenderer(request, collection).render()
-        else:
-            return render_invalid_object_class_response(vocab_id, uri, c)
-    except VbException as e:
-        return render_vb_exception_response(e)
+        vocab_uri = urllib.parse.unquote(request.values.get("vocab_uri"))
+
+        # if we have a vocab_uri, it must be a real one
+        if vocab_uri not in g.VOCABS.keys():
+            return Response(
+                "You have supplied an invalid vocab_uri. It must be one of\n\n- {}".format("\n- ".join(g.VOCABS.keys())),
+                status=400,
+                mimetype="text/plain",
+            )
+
+        # the vocab_id is valid so query that vocab's source for the object
+        # the uri is either a Concept or Collection. If a Concept, it will be listed
+        try:
+            concept = getattr(source, g.VOCABS[vocab_uri].data_source) \
+                (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
+
+            return ConceptRenderer(request, concept, vocab_uri=vocab_uri).render()
+        except:
+            try:
+                collection = getattr(source, g.VOCABS[vocab_uri].data_source) \
+                    (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
+
+                if collection.prefLabel is None:
+                    raise Exception
+
+                return CollectionRenderer(request, collection, vocab_uri=vocab_uri).render()
+            except:
+                return Response(
+                    "Nothing found.\n\nNo information about the object you identified with {} could be found within the data source of "
+                    "the vocab {}".format(uri, vocab_uri),
+                    status=400,
+                    mimetype="text/plain",
+                )
 
 
 @app.route("/about")

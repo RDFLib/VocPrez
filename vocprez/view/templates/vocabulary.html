@@ -51,7 +51,7 @@
             <th>Collections:</th>
             <td>
               {% for collection in vocab.collections %}
-                <a href="{{ collection[0] }}">{{ collection[1] }}</a><br />
+                <a href="{{ url_for("object") }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br />
               {% endfor %}
             </td>
         </tr>

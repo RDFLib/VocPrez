@@ -13,7 +13,6 @@ __all__ = [
 
 class Source:
     VOC_TYPES = [
-        "http://purl.org/vocommons/voaf#Vocabulary",
         "http://www.w3.org/2004/02/skos/core#ConceptScheme",
         "http://www.w3.org/2004/02/skos/core#Collection",
         "http://www.w3.org/2004/02/skos/core#Concept",
@@ -181,49 +180,37 @@ class Source:
 
     def get_collection(self, uri):
         vocab = g.VOCABS[self.vocab_id]
+        # get the collection's metadata and members
         q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT DISTINCT ?pl ?d
-            WHERE {{ 
-                <{collection_uri}> skos:prefLabel ?pl .
-                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") }}
-                    OPTIONAL {{<{collection_uri}> skos:definition ?d .
-                    FILTER(lang(?d) = "{language}" || lang(?d) = "") }}
+            
+            SELECT *
+            WHERE {{
+                <{collection_uri}> ?p ?o .
+                OPTIONAL {{
+                    ?o skos:prefLabel ?mpl .
+                }}      
+                
+                FILTER(lang(?o) = "{language}" || lang(?o) = "" || ISURI(?o))
             }}
             """.format(collection_uri=uri, language=self.language)
-        metadata = sparql_query(vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password)
-
-        # get the collection's members
-        q = """
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT DISTINCT ?m ?pl
-            WHERE {{
-                <{collection_uri}> skos:member ?m .
-                ?m skos:prefLabel ?pl .
-                FILTER(lang(?pl) = "{language}" || lang(?pl) = "")
-            }}
-            ORDER BY ?pl
-            """.format(
-            collection_uri=uri, language=self.language
-        )
-
-        members = sparql_query(
-            vocab.sparql_endpoint, q, vocab.sparql_username, vocab.sparql_password
-        )
+        pl = None
+        d = None
+        m = []
+        for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+            if r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#prefLabel":
+                pl = r["o"]["value"]
+            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
+                d = r["o"]["value"]
+            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#member":
+                m.append((r["o"]["value"], r["mpl"]["value"]))
 
         from vocprez.model.collection import Collection
 
-        return Collection(
-            self.vocab_id,
-            uri,
-            metadata[0]["l"]["value"],
-            metadata[0].get("c").get("value") if metadata[0].get("c") is not None else None,
-            [(x.get("m").get("value"), x.get("pl").get("value")) for x in members],
-        )
+        return Collection(self.vocab_id, uri, pl, d, m)
 
-    def get_concept(self):
-        concept_uri = self.request.values.get("uri")
+    def get_concept(self, uri):
         vocab = g.VOCABS[self.vocab_id]
         q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -244,13 +231,11 @@ class Source:
                 }}
             }}
             """.format(
-            concept_uri=concept_uri, language=self.language
+            concept_uri=uri, language=self.language
         )
         result = sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
 
-        assert result, "Unable to query concepts for {}".format(
-            self.request.values.get("uri")
-        )
+        assert result, "Unable to get details from vocab cache for Concept {}".format(uri)
 
         prefLabel = None
 
@@ -326,7 +311,7 @@ class Source:
 
         return Concept(
             vocab_id=self.vocab_id,
-            uri=concept_uri,
+            uri=uri,
             prefLabel=prefLabel,
             related_objects=related_objects,
             semantic_properties=None,

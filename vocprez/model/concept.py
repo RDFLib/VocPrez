@@ -19,11 +19,10 @@ class Concept:
 
 
 class ConceptRenderer(Renderer):
-    def __init__(self, request, concept):
+    def __init__(self, request, concept, vocab_uri=None):
         self.request = request
         self.profiles = self._add_views()
-        self.navs = []  # TODO: add in other nav items for Concept
-
+        self.vocab_uri = vocab_uri
         self.concept = concept
 
         super().__init__(self.request, self.concept.uri, self.profiles, "skos")
@@ -108,11 +107,10 @@ class ConceptRenderer(Renderer):
     def _render_skos_html(self):
         _template_context = {
             "version": __version__,
-            "vocab_id": self.request.values.get("vocab_id"),
-            "vocab_title": g.VOCABS[self.request.values.get("vocab_id")].title,
+            "vocab_id": self.vocab_uri if self.vocab_uri is not None else self.request.values.get("vocab_id"),
+            "vocab_title": g.VOCABS[self.vocab_uri].title,
             "uri": self.request.values.get("uri"),
             "concept": self.concept,
-            "navs": self.navs,
             "title": "Concept: " + self.concept.prefLabel,
         }
 

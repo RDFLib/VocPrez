@@ -3,7 +3,7 @@ import dateutil.parser
 from flask import g
 import vocprez.source.utils
 from vocprez import _config as config
-import re
+import urllib.parse
 from vocprez.model.vocabulary import Vocabulary
 from ._source import Source
 
@@ -67,22 +67,13 @@ class SPARQL(Source):
 
         sparql_vocabs = {}
         for cs in concept_schemes:
-            # handling CS URIs that end with '/'
-            vocab_id = cs["cs"]["value"].replace("/conceptScheme", "").split("/")[-1]
+            vocab_id = cs["cs"]["value"]
 
-            # TODO: Investigate putting regex into SPARQL query
-            # print("re.search('{}', '{}')".format(details.get('uri_filter_regex'), cs['cs']['value']))
-            if details.get("uri_filter_regex") and not re.search(
-                details["uri_filter_regex"], cs["cs"]["value"]
-            ):
-                logging.debug("Skipping vocabulary {}".format(vocab_id))
-                continue
-
-            if len(vocab_id) < 2:
-                vocab_id = cs["cs"]["value"].split("/")[-2]
+            # if len(vocab_id) < 2:
+            #     vocab_id = cs["cs"]["value"].split("/")[-2]
 
             sparql_vocabs[vocab_id] = Vocabulary(
-                vocab_id,
+                cs["cs"]["value"],
                 cs["cs"]["value"],
                 cs["title"].get("value") or vocab_id if cs.get("title") else vocab_id,  # Need str for sorting, not None
                 cs["description"].get("value") if cs.get("description") is not None else None,
@@ -99,3 +90,4 @@ class SPARQL(Source):
             )
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
         logging.debug("SPARQL collect() complete.")
+

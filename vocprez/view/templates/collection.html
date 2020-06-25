@@ -1,24 +1,24 @@
 {% extends "page.html" %}
 
 {% block content %}
-<h1>Collection: {{ collection.label }}</h1>
-<h3>Within vocab <a href="{{ url_for('vocabulary', vocab_id=collection.vocab.id) }}">{{ collection.vocab.title }}</a></h3>
+<h1>Collection: {{ collection.prefLabel }}</h1>
+{%  if vocab_id is not none %}
+<h3>Within vocab <a href="{{ url_for('object', uri=vocab_id) }}">{{ vocab_title }}</a></h3>
+{% endif %}
 <table class="metadata collection">
     {%  if collection.comment is not none  %}
     <tr>
-        <th>Comment</th><td>{{ concept.comment }}</td>
+        <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th><td>{{ collection.definition }}</td>
     </tr>
     {% endif %}
     {% if collection.members|length > 0 %}
     <tr>
-        {% if collection.broaders is defined %}
-        <th>Broader</th>
+      <th><a href="http://www.w3.org/2004/02/skos/core#member">Members</a></th>
         <td class="list">
             {% for member in collection.members -%}
-            <a href="{{ member.url }}">{{ member.prefLabel }}</a><br />
+            <a href="{{ url_for("object") }}?vocab_uri={{ uri }}&uri={{ member[0] }}">{{ member[1] }}</a><br />
             {% endfor %}
         </td>
-        {% endif %}
     </tr>
     {% endif %}
 </table>
