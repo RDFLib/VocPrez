@@ -1,3 +1,7 @@
+import sys
+sys.path.insert(0, '../../')
+sys.path.insert(0, '../vocprez/')
+
 import io
 import json
 import requests
@@ -20,6 +24,7 @@ from pyldapi import Renderer, ContainerRenderer
 import datetime
 import logging
 import vocprez.source as source
+
 
 app = Flask(
     __name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR
