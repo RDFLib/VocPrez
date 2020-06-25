@@ -276,12 +276,10 @@ def object():
             }}
             """.format(uri=uri)
         for r in sparql_query(q):
-            print(r)
             if r["c"]["value"] in source.Source.VOC_TYPES:
                 # if we find it and it's of a known class, return it
                 # for wither a Concept or a Collection, we know the relevant vocab since vocab ==  CS ==  graph
                 vocab_uri = r["g"]["value"]
-                print(r["c"]["value"])
                 if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
                     concept = source.Source(vocab_uri, request).get_concept(uri)
                     return ConceptRenderer(request, concept, vocab_uri=vocab_uri).render()
