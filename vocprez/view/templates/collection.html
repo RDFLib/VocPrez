@@ -1,10 +1,17 @@
 {% extends "page.html" %}
 
 {% block content %}
-<h1>Collection: {{ collection.prefLabel }}</h1>
-{%  if vocab_id is not none %}
-<h3>Within vocab <a href="{{ url_for('object', uri=vocab_id) }}">{{ vocab_title }}</a></h3>
-{% endif %}
+<h1>Collection</h1>
+<dl>
+  <dt>Preferred Label</dt>
+  <dd><h2>{{ collection.prefLabel }}</h2></dd>
+  <dt>URI</dt>
+  <dd><a href="{{ uri }}">{{ uri }}</a></dd>
+  {%  if vocab_id is not none %}
+  <dt>Within Vocab</dt>
+  <dd><a href="{{ url_for('object', uri=vocab_id) }}">{{ vocab_title }}</a></dd>
+  {% endif %}
+</dl>
 <table class="metadata collection">
     {%  if collection.comment is not none  %}
     <tr>
@@ -22,6 +29,8 @@
     </tr>
     {% endif %}
 </table>
-<h3>Alternate Profiles</h3>
-<p>Different views and formats of this concept are here:  <a href="{{ request.base_url }}?vocab_id={{ vocab_id }}&uri={{ utils.url_encode(uri) }}&_profile=alt">Alternate Profiles</a>.</p>
+<div class="altprof">
+  <h3>Alternate Profiles</h3>
+  <p>Different views and formats of this concept are here: <a href="{{ url_for("object") }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+</div>
 {% endblock %}

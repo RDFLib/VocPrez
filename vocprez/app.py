@@ -236,10 +236,10 @@ def object():
     :rtype: :class:`flask.Response`
     """
 
-    # must have a URI supplied, for any scenario
+    # must have a URI or Vocab URI supplied, for any scenario
     if request.values.get("uri") is None and request.values.get("vocab_uri") is None:
         return Response(
-            "A Query String Argument of 'uri' and/or 'vocab_uri' must be supplied for this endpoint",
+            "INPUT ERROR: A Query String Argument of 'uri' and/or 'vocab_uri' must be supplied for this endpoint",
             status=400,
             mimetype="text/plain",
         )
@@ -266,21 +266,22 @@ def object():
     else:
         # if it's not a vocab, see if we can find it in the main cache and a class for it
         q = """
-            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             
             SELECT DISTINCT *
             WHERE {{ 
                 GRAPH ?g {{
-                    <{uri}x> a ?c ;
+                    <{uri}> a ?c ;
                 }}                
             }}
             """.format(uri=uri)
         for r in sparql_query(q):
+            print(r)
             if r["c"]["value"] in source.Source.VOC_TYPES:
                 # if we find it and it's of a known class, return it
                 # for wither a Concept or a Collection, we know the relevant vocab since vocab ==  CS ==  graph
                 vocab_uri = r["g"]["value"]
+                print(r["c"]["value"])
                 if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
                     concept = source.Source(vocab_uri, request).get_concept(uri)
                     return ConceptRenderer(request, concept, vocab_uri=vocab_uri).render()
@@ -298,7 +299,7 @@ def object():
                     mimetype="text/plain",
                 )
 
-        if request.values.get("vocab_uri") is None:
+        if request.values.get("vocab_uri") is not None:
             return Response(
                 "The URI of the object you requested cannot be found locally or its type is not a known type. "
                 "We may still be able to find it but you need to supply a vocab_uri parameter as well as uri so we "
@@ -322,6 +323,9 @@ def object():
         try:
             concept = getattr(source, g.VOCABS[vocab_uri].data_source) \
                 (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
+
+            if concept.prefLabel is None:
+                raise Exception
 
             return ConceptRenderer(request, concept, vocab_uri=vocab_uri).render()
         except:

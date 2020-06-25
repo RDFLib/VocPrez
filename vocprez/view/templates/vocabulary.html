@@ -1,65 +1,70 @@
 {% extends "page.html" -%}
 {% from "_concept_hierarchy.html" import render_concept_hierarchy with context -%}
 {% block content -%}
-<h1>Vocabulary: {{ vocab.title }}</h1>
-<h3>URI: <a href="{{ uri }}">{{ uri }}</a></h3>
+<h1>Vocabulary</h1>
+<dl>
+  <dt><a href="http://purl.org/dc/terms/title">Title</a></dt>
+  <dd><h2>{{ vocab.title }}</h2></dd>
+  <dt>URI</dt>
+  <dd><a href="{{ uri }}">{{ uri }}</a></dd>
+</dl>
 <div class="overflow">
     <table class="metadata concept_scheme">
         {%  if vocab.description is not none  -%}
         <tr>
-            <th>Description:</th><td>{{ vocab.description }}</td>
+          <th><a href="http://purl.org/dc/terms/description">Description</a>:</th><td>{{ vocab.description }}</td>
         </tr>
         {% endif -%}
         {%  if vocab.creator is not none  -%}
         <tr>
-            <th>Creator:</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
+          <th><a href="http://purl.org/dc/terms/creator">Creator</a>:</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
         </tr>
         {% endif -%}
         {%  if vocab.created is not none  -%}
         <tr>
-            <th>Created:</th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
+          <th><a href="http://purl.org/dc/terms/created">Created</a>:</th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
         </tr>
         {% endif -%}
         {%  if vocab.modified is not none  -%}
         <tr>
-            <th>Modified:</th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
+          <th><a href="http://purl.org/dc/terms/modified">Modified</a>:</th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
         </tr>
         {% endif -%}
         {%  if vocab.versionInfo is not none  -%}
         <tr>
-            <th>Version Info:</th><td>{{ vocab.versionInfo }}</td>
+          <th><a href="http://www.w3.org/2002/07/owl#versionInfo">Version Info</a>:</th><td>{{ vocab.versionInfo }}</td>
         </tr>
         {% endif -%}
         {% if vocab.downloadURL -%}
         <tr>
-            <th>Download:</th>
-            <td>
-                <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
-            </td>
+          <th>Download:</th>
+          <td>
+            <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
+          </td>
         </tr>
         {% endif -%}
         {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  -%}
         <tr>
-            <th>Concept Hierarchy:</th>
-            <td>
-                {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
-            </td>
+          <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Concept Hierarchy</a>:</th>
+          <td>
+              {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
+          </td>
         </tr>
         {% endif -%}
         {%  if vocab.collections is not none and vocab.collections|length > 0  -%}
         <tr>
-            <th>Collections:</th>
-            <td>
-              {% for collection in vocab.collections %}
-                <a href="{{ url_for("object") }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br />
-              {% endfor %}
-            </td>
+          <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a>:</th>
+          <td>
+            {% for collection in vocab.collections %}
+              <a href="{{ url_for("object") }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br />
+            {% endfor %}
+          </td>
         </tr>
         {% endif -%}
     </table>
 </div>
-<footer class="content-footer">
-    <h3>Alternate Profiles</h3>
-    <p>Different views and formats of this vocabulary are here: <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>
-</footer>
+<div class="altprof">
+  <h3>Alternate Profiles</h3>
+  <p>Different views and formats of this vocabulary are here: <a href="{{ url_for("object") }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+</div>
 {% endblock -%}
