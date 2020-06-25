@@ -261,7 +261,7 @@ class Source:
 
                 # Append language code to prefLabel literal
                 related_object = "{} ({})".format(
-                    row["object"]["value"], preflabel_lang
+                    row["o"]["value"], preflabel_lang
                 )
                 related_objectLabel = None
             else:
