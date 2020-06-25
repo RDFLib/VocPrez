@@ -88,7 +88,7 @@ def index():
     )
 
 
-@app.route("/vocabulary/")
+@app.route("/vocab/")
 def vocabularies():
     page = (
         int(request.values.get("page")) if request.values.get("page") is not None else 1
@@ -125,9 +125,9 @@ def vocabularies():
 
     return ContainerRenderer(
         request,
-        'https://pid.geoscience.gov.au/def/voc/',
-        'Vocabularies',
-        'Vocabularies published by Geoscience Australia from multiple sources',
+        config.VOCS_URI if config.VOCS_URI is not None else url_for("vocabularies"),
+        config.VOCS_TITLE if config.VOCS_TITLE is not None else 'Vocabularies',
+        config.VOCS_DESC if config.VOCS_DESC is not None else None,
         None,
         None,
         vocabs,
