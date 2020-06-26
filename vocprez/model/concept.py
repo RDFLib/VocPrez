@@ -1,28 +1,29 @@
 from vocprez import __version__
 from pyldapi import Renderer
 from flask import Response, render_template, g
-from rdflib import Graph, URIRef
-from rdflib.namespace import SKOS, DCTERMS, NamespaceManager
+from rdflib import Graph, URIRef, Literal
+from rdflib.namespace import DCTERMS, RDF, RDFS, SKOS
 from vocprez.model.profiles import profile_skos
+import vocprez._config as config
 
 
 class Concept:
     def __init__(
-        self, vocab_id, uri, prefLabel, related_objects, semantic_properties, source,
+        self, vocab_uri, uri, prefLabel, definition, related_instances
     ):
-        self.vocab_id = vocab_id
+        self.vocab_uri = vocab_uri
         self.uri = uri
         self.prefLabel = prefLabel
-        self.related_objects = related_objects
-        self.semantic_properties = semantic_properties
-        self.source = source
+        self.definition = definition
+        self.related_instances = related_instances
+        self.annotations = None
+        self.agents = None
 
 
 class ConceptRenderer(Renderer):
-    def __init__(self, request, concept, vocab_uri=None):
+    def __init__(self, request, concept):
         self.request = request
         self.profiles = self._add_views()
-        self.vocab_uri = vocab_uri
         self.concept = concept
 
         super().__init__(self.request, self.concept.uri, self.profiles, "skos")
@@ -45,26 +46,51 @@ class ConceptRenderer(Renderer):
                 return self._render_skos_html()
 
     def _render_skos_rdf(self):
-        namespace_manager = NamespaceManager(Graph())
-        namespace_manager.bind("dct", DCTERMS)
-        namespace_manager.bind("skos", SKOS)
-        concept_g = Graph()
-        concept_g.namespace_manager = namespace_manager
+        print("_render_skos_rdf")
+        g = Graph()
+        g.bind("dct", DCTERMS)
+        g.bind("skos", SKOS)
 
-        for s, p, o in self.concept.source.graph.triples(
-            (URIRef(self.concept.uri), None, None)
-        ):
-            concept_g.add((s, p, o))
+        c = URIRef(self.concept.uri)
+
+        # Concept SKOS metadata
+        g.add((
+            c,
+            RDF.type,
+            SKOS.Concept
+        ))
+        g.add((
+            c,
+            SKOS.prefLabel,
+            Literal(self.concept.prefLabel, lang=config.DEFAULT_LANGUAGE)
+        ))
+        g.add((
+            c,
+            SKOS.definition,
+            Literal(self.concept.definition, lang=config.DEFAULT_LANGUAGE)
+        ))
+
+        for k, v in self.concept.related_instances.items():
+            for k2, v2 in v.items():
+                if k2 == "instances":
+                    for inst in v2:
+                        g.add((
+                            c,
+                            URIRef(k),
+                            URIRef(inst[0])  # only URIs for RDF, not prefLabels too
+                        ))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
-            return Response(
-                concept_g.serialize(format="json-ld"), mimetype=self.mediatype
-            )
+            graph_text = g.serialize(format="json-ld")
         else:
-            return Response(
-                concept_g.serialize(format=self.mediatype), mimetype=self.mediatype
-            )
+            graph_text = g.serialize(format=self.mediatype)
+
+        return Response(
+            graph_text,
+            mimetype=self.mediatype,
+            headers=self.headers,
+        )
 
         # # Create a graph from the self.concept object for a SKOS view
         # namespace_manager = NamespaceManager(Graph())
@@ -96,7 +122,7 @@ class ConceptRenderer(Renderer):
         #     for n in self.concept.narrowers:
         #         g.add((s, SKOS.narrower, URIRef(n['uri'])))
         #         g.add((URIRef(n['uri']), SKOS.prefLabel, Literal(n['prefLabel'])))
-        # # TODO: vocab_id, uri, semantic_properties
+        # # TODO: vocab_uri, uri, semantic_properties
         #
         # # serialise in the appropriate RDF format
         # if self.mediatype in ['application/rdf+json', 'application/json']:
@@ -105,13 +131,13 @@ class ConceptRenderer(Renderer):
         #     return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
 
     def _render_skos_html(self):
+        print("_render_skos_html")
         _template_context = {
             "version": __version__,
-            "vocab_id": self.vocab_uri if self.vocab_uri is not None else self.request.values.get("vocab_id"),
-            "vocab_title": g.VOCABS[self.vocab_uri].title,
+            "vocab_uri": self.concept.vocab_uri if self.concept.vocab_uri is not None else self.request.values.get("vocab_uri"),
+            "vocab_title": g.VOCABS[self.concept.vocab_uri].title,
             "uri": self.request.values.get("uri"),
             "concept": self.concept,
-            "title": "Concept: " + self.concept.prefLabel,
         }
 
         return Response(

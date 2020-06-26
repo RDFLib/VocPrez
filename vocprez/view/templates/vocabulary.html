@@ -56,7 +56,11 @@
           <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a>:</th>
           <td>
             {% for collection in vocab.collections %}
-              <a href="{{ url_for("object") }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br />
+              {% if LOCAL_URLS -%}
+                <a href="{{ url_for('object') }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br>
+              {% else -%}
+                <a href="{{ collection[0] }}">{{ collection[1] }}</a><br>
+              {% endif -%}
             {% endfor %}
           </td>
         </tr>
@@ -65,6 +69,10 @@
 </div>
 <div class="altprof">
   <h3>Alternate Profiles</h3>
-  <p>Different views and formats of this vocabulary are here: <a href="{{ url_for("object") }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+  {% if LOCAL_URLS -%}
+    <p>Different views and formats of this vocabulary are here: <a href="{{ url_for("object") }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+  {% else -%}
+    <p>Different views and formats of this vocabulary are here: <a href="{{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+  {% endif -%}
 </div>
 {% endblock -%}

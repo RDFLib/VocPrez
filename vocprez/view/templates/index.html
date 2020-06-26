@@ -8,17 +8,18 @@
 
     <p>VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbencutils.uniroma2.it/">VocBench</a>. </p>
 
-    <p>See the <a href="about">About page</a> for more information.</p>
+    <p>See the <a href="{{ url_for("about") }}">About page</a> for more information.</p>
 
     <h2>Vocabularies</h2>
-    <p>See the <a href="vocabulary">Vocabularies Register</a> for a list of vocabularies this instance of VocPrez knows about.</p>
+    <p>See the <a href="{{ url_for("vocabularies") }}">Vocabularies Register</a> for a list of vocabularies this instance of VocPrez knows about.</p>
+
+    <h2>Collections</h2>
+    <p>In VocPrez, <code>skos:Collection</code> instances are always contained within a <code>skos:ConceptScheme</code> so, to find a <code>skos:Collection</code>, visit the relevant <code>skos:ConceptScheme</code> instance's page and you will see it listed.</p>
+    <p>This behaviour of nesting <code>skos:Collection</code> instances may be overridden and has been by some VocPrez implementers so that Collections appear as a top-level item in the VocPrez API.</p>
 
     <h2>Concepts</h2>
     <p>SKOS concepts are listed within a vocabulary's home page. Each vocabulary presents both a concept heirarchy (tree) view and a link to a flat list of its concepts.</p>
 
-    <h2>Collections</h2>
-    <p>In VocPrez, <code>skos:Collection</code> instances are always contaned within a <code>skos:ConceptScheme</code> so, to find a <code>skos:Collection</code>, visit the relevant <code>skos:ConceptScheme</code> instance's page and you will see it listed.</p>
-    <p>This behaviour of nesting <code>skos:Collection</code> instances may be overridden and has been by some VocPrez implementers so that Collections appear as a top-level item in the VocPrez API.</p>
     <div style="border-top:solid 2px grey;">
         <h3>Alternate Profiles</h3>
         <p>Different views and formats of list of Concepts: <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>

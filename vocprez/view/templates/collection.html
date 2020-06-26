@@ -7,9 +7,9 @@
   <dd><h2>{{ collection.prefLabel }}</h2></dd>
   <dt>URI</dt>
   <dd><a href="{{ uri }}">{{ uri }}</a></dd>
-  {%  if vocab_id is not none %}
+  {%  if vocab_uri is not none %}
   <dt>Within Vocab</dt>
-  <dd><a href="{{ url_for('object', uri=vocab_id) }}">{{ vocab_title }}</a></dd>
+  <dd><a href="{{ url_for('object', uri=vocab_uri) }}">{{ vocab_title }}</a></dd>
   {% endif %}
 </dl>
 <table class="metadata collection">
@@ -22,15 +22,19 @@
     <tr>
       <th><a href="http://www.w3.org/2004/02/skos/core#member">Members</a></th>
         <td class="list">
-            {% for member in collection.members -%}
-            <a href="{{ url_for("object") }}?vocab_uri={{ uri }}&uri={{ member[0] }}">{{ member[1] }}</a><br />
-            {% endfor %}
+          {% for member in collection.members -%}
+            {% if LOCAL_URLS -%}
+              <a href="{{ url_for('object') }}?vocab_uri={{ vocab_uri }}&uri={{ member[0] }}">{{ member[1] }}</a><br>
+            {% else -%}
+              <a href="{{ member[0] }}">{{ member[1] }}</a><br>
+            {% endif -%}
+          {% endfor %}
         </td>
     </tr>
     {% endif %}
 </table>
 <div class="altprof">
   <h3>Alternate Profiles</h3>
-  <p>Different views and formats of this concept are here: <a href="{{ url_for("object") }}?vocab_uri={{ vocab_id }}&uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+  <p>Different views and formats of this concept are here: <a href="{{ url_for("object") }}?vocab_uri={{ vocab_uri }}&uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
 </div>
 {% endblock %}

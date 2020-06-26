@@ -10,12 +10,7 @@
     'http://www.w3.org/2000/01/rdf-schema#comment',
     'http://purl.org/dc/terms/source',
     'http://purl.org/dc/terms/contributor',
-    'http://www.w3.org/2004/02/skos/core#exactMatch',
-    'http://www.w3.org/2004/02/skos/core#closeMatch',
-    'http://www.w3.org/2004/02/skos/core#broadMatch',
-    'http://www.w3.org/2004/02/skos/core#narrowMatch',
-    'http://www.w3.org/2004/02/skos/core#broader',
-    'http://www.w3.org/2004/02/skos/core#narrower'
+
     ]         
 %}
 
@@ -26,35 +21,57 @@
   <dd><h2>{{ concept.prefLabel }}</h2></dd>
   <dt>URI</dt>
   <dd><a href="{{ uri }}">{{ uri }}</a></dd>
-  {%  if vocab_id is not none %}
+  {%  if vocab_uri is not none %}
   <dt>Within Vocab</dt>
-  <dd><a href="{{ url_for('object', uri=vocab_id) }}">{{ vocab_title }}</a></dd>
+  <dd><a href="{{ url_for('object', uri=vocab_uri) }}">{{ vocab_title }}</a></dd>
   {% endif %}
 </dl>
 <table class="metadata concept">
-{% for relationship in displayed_relationships -%}
-    {% if concept.related_objects[relationship] and concept.related_objects[relationship]['objects'] -%}
-        <tr>
-            <th style="padding-right: 10px;"><a href="{{ relationship }}">{{concept.related_objects[relationship]['label']}}</a>:</th>
-            <td class="list">                 
-            {% for concept_uri, concept_label in concept.related_objects[relationship]['objects'].items() -%}
-	            {% if concept_uri and concept_label -%}
-            		{% if config.LOCAL_URLS -%}
-	                <a href="{{ url_for('object') }}?vocab_id={{ vocab_id }}&uri={{ utils.url_encode(concept_uri) }}">{{ concept_label }}</a><br>
-	            	{% else -%}
-	                <a href="{{ url_for("object") }}?vocab_uri={{ uri }}&uri={{ concept_uri }}">{{ concept_label }}</a><br>
-	            	{% endif -%}
-	            {% else -%}
-	                {{ concept_uri }}<br>
-	            {% endif -%}
-            {% endfor -%}                   
-            </td>
-        </tr>
-    {% endif -%}
-{% endfor -%}
+  <tr>
+    <th><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></th>
+    <td>{{ concept.prefLabel }}</td>
+  </tr>
+  {% if concept.altLabels|length > 0 %}
+  <tr>
+    <th><a href="http://www.w3.org/2004/02/skos/core#altLabel">Alternative Labels</a></th>
+    <td>
+      {% for a in concept.altLabels %}
+        {{ a }}
+      {% endfor %}
+    </td>
+  </tr>
+  {% endif %}
+  <tr>
+    <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
+    <td>{{ concept.definition }}</td>
+  </tr>
+  {% if concept.related_instances|length > 0 %}
+    {% for k, v in concept.related_instances.items() %}
+    <tr>
+      <th><a href="{{ k }}">{{ v["label"] }}</a></th>
+      <td>
+        {%  for inst in v["instances"] %}
+          {% if LOCAL_URLS -%}
+            <a href="{{ url_for('object') }}?uri={{ inst[0] }}">{{ inst[1] }}</a><br />
+          {% else %}
+            <a href="{{ inst[0] }}">{{ inst[1] }}</a><br />
+          {% endif -%}
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+{% endif %}
 </table>
 <div class="altprof">
   <h3>Alternate Profiles</h3>
-  <p>Different views and formats of this concept are here: <a href="{{ request.base_url }}?vocab_uri={{ vocab_id }}&uri={{ utils.url_encode(uri) }}&_profile=alt">Alternate Profiles</a>.</p>
+  {% if LOCAL_URLS -%}
+    {% if vocab_uri is not none %}
+      <p>Different views and formats of this concept are here: <a href="{{ url_for('object') }}?vocab_uri={{ vocab_uri }}&uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+    {% else %}
+      <p>Different views and formats of this concept are here: <a href="{{ url_for('object') }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+    {% endif %}
+  {% else -%}
+    <p>Different views and formats of this concept are here: <a href="{{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
+  {% endif -%}
 </div>
 {% endblock %}
