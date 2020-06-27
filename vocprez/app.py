@@ -142,40 +142,44 @@ def vocabularies():
     ).render()
 
 
+def translate_vocab_id_to_vocab_uri(vocab_id):
+    vocab_ids = {}
+
+    for x in g.VOCABS.keys():
+        vocab_ids[x.split("#")[-1].split("/")[-1].lower()] = x
+
+    if vocab_id in vocab_ids.keys():
+        return vocab_ids[vocab_id]
+    else:
+        return None
+
+
+def make_vocab_id_list():
+    return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
+
+
 @app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
-    # check the vocab id is valid
-    vocab_ids = {}
-    for x in g.VOCABS.keys():
-        vocab_ids[x.split("#")[-1].split("/")[-1]] = x
+    vocab_uri = translate_vocab_id_to_vocab_uri(vocab_id)
 
-    if vocab_id not in vocab_ids.keys():
-        msg = "The vocabulary ID that was supplied was not known. " \
-              "It must be one of these: {}".format(", ".join(vocab_ids.keys()))
-        return Response(
-            msg,
-            status=400,
-            mimetype="text/plain"
+    if vocab_uri is None:
+        return return_vocrez_error(
+            "vocab_id not valid",
+            400,
+            markdown.markdown(
+                "The 'vocab_id' you supplied could not be translated to a valid vocab's URI. Valid vocab_ids are:\n\n"                
+                "{}".format("".join(["* [{id}]({uri})   \n".format(**{"uri": url_for("vocabulary", vocab_id=x), "id": x}) for x in make_vocab_id_list()]))
+                # "{}".format(",".join(make_vocab_id_list()))
+            ),
         )
 
-    # vocab_id is valid so get vocab details using appropriate source handler
-    # this is the same as /object?uri=vocab_ids[vocab_id]
-    try:
-        vocab_uri = vocab_ids[vocab_id]
-        vocab = getattr(source, g.VOCABS[vocab_uri].source) \
-            (vocab_uri, request, language=request.values.get("lang")).get_vocabulary()
-    except Exception as e:
-        return Response(
-            str(e),
-            status=400,
-            mimetype="text/plain"
-        )
-
-    return VocabularyRenderer(request, vocab).render()
+    return return_vocab(vocab_uri)
 
 
 @app.route("/vocab/<vocab_id>/concept/")
 def concepts(vocab_id):
+    return "/concept/"
+
     # check the vocab id is valid
     vocab_ids = {}
     for x in g.VOCABS.keys():
