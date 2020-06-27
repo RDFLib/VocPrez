@@ -70,7 +70,16 @@ def context_processor():
     import vocprez.source.utils as u
     return dict(
         utils=u,
-        LOCAL_URLS=config.LOCAL_URLS
+        LOCAL_URLS=config.LOCAL_URLS,
+        MEDIATYPE_NAMES={
+            "text/html": "HTML",
+            "application/json": "JSON",
+            "text/turtle": "Turtle",
+            "application/rdf+xml": "RDX/XML",
+            "application/ld+json": "JSON-LD",
+            "text/n3": "Notation-3",
+            "application/n-triples": "N-Triples",
+        }
     )
 
 
