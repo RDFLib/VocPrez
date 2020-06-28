@@ -128,3 +128,6 @@ app.wsgi
 
 # local vocab files
 data/vocab_files
+
+# testing files
+scratch.py

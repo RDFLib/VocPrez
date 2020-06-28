@@ -239,7 +239,7 @@ class Source:
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-            SELECT *            
+            SELECT DISTINCT *            
             WHERE {{
                 <{concept_uri}> a skos:Concept ;
                                 ?p ?o .
@@ -259,9 +259,9 @@ class Source:
             "source": None,
             "wasDerivedFrom": None,
         }
-        annotation_types = [
-
-        ]
+        annotation_types = {
+            "http://www.opengis.net/def/metamodel/ogc-na/status": "Status"
+        }
         annotations = {}
         agent_types = [
             'http://purl.org/dc/terms/contributor',
@@ -278,7 +278,6 @@ class Source:
             'http://www.w3.org/2004/02/skos/core#narrower': "Narrower"
         }
         related_instances = {}
-
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
             if r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#prefLabel":
                 pl = r["o"]["value"]
@@ -290,8 +289,14 @@ class Source:
                 s["source"] = r["o"]["value"]
             elif r["p"]["value"] == "http://www.w3.org/ns/prov#wasDerivedFrom":
                 s["wasDerivedFrom"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/ns/prov#wasDerivedFrom":
-                s["wasDerivedFrom"] = r["o"]["value"]
+
+            elif r["p"]["value"] in annotation_types.keys():
+                if r.get("ropl") is not None:
+                    # annotation value has a labe too
+                    annotations[r["p"]["value"]] = (annotation_types[r["p"]["value"]], r["o"]["value"], r["ropl"]["value"])
+                else:
+                    # no label
+                    annotations[r["p"]["value"]] = (annotation_types[r["p"]["value"]], r["o"]["value"])
 
             elif r["p"]["value"] in related_instance_types.keys():
                 if related_instances.get(r["p"]["value"]) is None:
@@ -306,7 +311,7 @@ class Source:
 
             # TODO: Agents
 
-            # TODO: Annotations
+            # TODO: more Annotations
 
         from vocprez.model.concept import Concept
 
@@ -316,6 +321,7 @@ class Source:
             pl,
             d,
             related_instances,
+            annotations
         )
 
     def get_concept_hierarchy(self):

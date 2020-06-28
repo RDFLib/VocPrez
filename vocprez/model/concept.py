@@ -9,14 +9,14 @@ import vocprez._config as config
 
 class Concept:
     def __init__(
-        self, vocab_uri, uri, prefLabel, definition, related_instances
+        self, vocab_uri, uri, prefLabel, definition, related_instances, annotations=None
     ):
         self.vocab_uri = vocab_uri
         self.uri = uri
         self.prefLabel = prefLabel
         self.definition = definition
         self.related_instances = related_instances
-        self.annotations = None
+        self.annotations = annotations
         self.agents = None
 
 

@@ -67,19 +67,36 @@ def context_processor():
     :return: A dictionary of variables
     :rtype: dict
     """
+
+    MEDIATYPE_NAMES = {
+        "text/html": "HTML",
+        "application/json": "JSON",
+        "text/turtle": "Turtle",
+        "application/rdf+xml": "RDX/XML",
+        "application/ld+json": "JSON-LD",
+        "text/n3": "Notation-3",
+        "application/n-triples": "N-Triples",
+    }
+
+    STATUSES = {
+        "http://www.opengis.net/def/status/accepted": "accepted",
+        "http://www.opengis.net/def/status/deprecated": "deprecated",
+        "http://www.opengis.net/def/status/experimental": "experimental",
+        "http://www.opengis.net/def/status/invalid": "invalid",
+        "http://www.opengis.net/def/status/notAccepted": "notAccepted",
+        "http://www.opengis.net/def/status/reserved": "reserved",
+        "http://www.opengis.net/def/status/retired": "retired",
+        "http://www.opengis.net/def/status/stable": "stable",
+        "http://www.opengis.net/def/status/submitted": "submitted",
+        "http://www.opengis.net/def/status/superseded": "superseded",
+        "http://www.opengis.net/def/status/valid": "valid",
+    }
     import vocprez.source.utils as u
     return dict(
         utils=u,
         LOCAL_URLS=config.LOCAL_URLS,
-        MEDIATYPE_NAMES={
-            "text/html": "HTML",
-            "application/json": "JSON",
-            "text/turtle": "Turtle",
-            "application/rdf+xml": "RDX/XML",
-            "application/ld+json": "JSON-LD",
-            "text/n3": "Notation-3",
-            "application/n-triples": "N-Triples",
-        }
+        MEDIATYPE_NAMES=MEDIATYPE_NAMES,
+        STATUSES=STATUSES
     )
 
 

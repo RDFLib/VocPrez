@@ -1,21 +1,13 @@
 {% extends "page.html" %}
-
-<!-- Set list of predicates for display -->
-{% set displayed_relationships = [
-    'http://purl.org/dc/terms/created',
-    'http://purl.org/dc/terms/modified',
-    'http://www.w3.org/2004/02/skos/core#prefLabel',
-    'http://www.w3.org/2004/02/skos/core#altLabel',
-    'http://www.w3.org/2004/02/skos/core#definition',
-    'http://www.w3.org/2000/01/rdf-schema#comment',
-    'http://purl.org/dc/terms/source',
-    'http://purl.org/dc/terms/contributor',
-
-    ]         
-%}
-
 {% block content %}
+
 <h1>Concept</h1>
+
+{# status #}
+{% if "http://www.opengis.net/def/metamodel/ogc-na/status" in concept.annotations.keys() %} {# we have a status marker #}
+  <div class="status {{ concept.annotations["http://www.opengis.net/def/metamodel/ogc-na/status"][1].split("/")[-1] }}"></div>
+{% endif %}
+
 <dl>
   <dt>Preferred Label</dt>
   <dd><h2>{{ concept.prefLabel }}</h2></dd>
@@ -60,6 +52,18 @@
       </td>
     </tr>
     {% endfor %}
+{% endif %}
+{% if concept.annotations|length > 0 %}
+  {% for k, v in concept.annotations.items() %}
+  <tr>
+    <th><a href="{{ k }}">{{ v[0] }}</a></th>
+    {%  if v|length == 3 %}
+    <td><a href="{{ v[1] }}">{{ v[2] }}</a></td>
+    {% else %}
+      <td>{{ v[1] }}</td>
+    {% endif %}
+  </tr>
+  {% endfor %}
 {% endif %}
 </table>
 <div class="altprof">
