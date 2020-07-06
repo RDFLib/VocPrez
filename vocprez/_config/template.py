@@ -1,4 +1,5 @@
 from os import path
+from os import environ
 
 APP_DIR = path.dirname(path.dirname(path.realpath(__file__)))
 SKIN_DIR = path.join(APP_DIR, "view")
@@ -33,7 +34,7 @@ class VocabSource:
 # Main cache (SPARQL DB) variables
 # BEGIN Instance Vars
 DEBUG = True
-SPARQL_ENDPOINT = ""
+SPARQL_ENDPOINT = environ.get("ENDPOINT", "")
 SPARQL_USERNAME = ""
 SPARQL_PASSWORD = ""
 SOURCE_NAME = ""
@@ -48,15 +49,15 @@ VOCAB_SOURCES = {
         "sparql_password": SPARQL_PASSWORD,
     },
     # example source of individual vocabs from https://vocabs.ardc.edu.au/ using their JSON API
-    "rva": {
-        "source": VocabSource.RVA,
-        "api_endpoint": "",
-        "vocabs": [
-            {"ardc_id": -99, "uri": "",},
-            {"ardc_id": -99, "uri": "",},
-            {"ardc_id": -99, "uri": "",},
-        ],
-    },
+    #"rva": {
+    #    "source": VocabSource.RVA,
+    #    "api_endpoint": "",
+    #    "vocabs": [
+    #        {"ardc_id": -99, "uri": "",},
+    #        {"ardc_id": -99, "uri": "",},
+    #        {"ardc_id": -99, "uri": "",},
+    #    ],
+    #},
 }
 
 # Details for the main vocabulary list. Can be overriden in the vocabularies.html template
