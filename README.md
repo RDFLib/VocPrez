@@ -67,6 +67,12 @@ This code is licensed using the GPL v3 licence. See the [LICENSE file](LICENSE) 
 We use [pytest](https://docs.pytest.org/en/latest/) as our testing framework. Tests live in the [tests directory](_tests). These tests ensure that the endpoints are functioning as intended. See the [README.md](_tests/README.md) for the tests for more information.
 
 
+## Running in docker 
+
+To override the endpoint in the template set the ENDPOINT environment variable
+* `docker run -it -v $PWD/vocprez/_config/template.py:/vocprez/_config/__init__.py -p 8002:8001 vocpreztest`
+
+
 
 ## Contacts
 *Author*:  
