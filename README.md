@@ -2,7 +2,9 @@
 
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
 
-VocPrez is used by:
+See the Documentation at https://stratigraphy.org/timescale/
+
+VocPrez is used by: https://RDFLib.github.io/VocPrez/
 
 <a href="https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq">
     <img src="vocprez/view/style/logo-gsq.jpg" alt="GSQ Logo" style="width:80px;" />
