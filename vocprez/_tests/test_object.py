@@ -15,13 +15,13 @@ def test_no_uri_or_vocab_uri():
     assert r.status_code == 400
 
     r = requests.get(
-        "http://localhost:5000/object?vocab_id="
+        "http://localhost:5000/object?vocab_uri="
     )
 
     assert r.status_code == 400
 
     r = requests.get(
-        "http://localhost:5000/object?vocab_id=&uri="
+        "http://localhost:5000/object?vocab_uri=&uri="
     )
 
     assert r.status_code == 400

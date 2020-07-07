@@ -1,27 +1,41 @@
 {% extends "page.html" %}
 
 {% block content %}
-    <h1>System Home</h1>
+    <h1>CGI's Vocabularies System</h1>
     <p>
-        Welcome to an instance of <a href="https://github.com/CSIRO-enviro-informatics/skos-styler">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+        Welcome to the <a href=" http://www.cgi-iugs.org/">Commission for the Management and Application of Geosceicne Information (CGI)</a>'s public vocabulary system. This tool is an instance of <a href="https://github.com/RDFlib/VocPrez">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
     </p>
 
-    <p>VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbencutils.uniroma2.it/">VocBench</a>. </p>
-
-    <p>See the <a href="{{ url_for("about") }}">About page</a> for more information.</p>
-
     <h2>Vocabularies</h2>
-    <p>See the <a href="{{ url_for("vocabularies") }}">Vocabularies Register</a> for a list of vocabularies this instance of VocPrez knows about.</p>
+    <p>
+        This system publishes vocabularies from two sources: <a href="http://geosciml.org/">GeoSciML</a> &amp; <a href="http://earthresourceml.org/">EarthResourceML</a>.
+    </p>
+    <p>Vocabulary sources:</p>
+    <ul>
+        <li><a href="{{ url_for('vocabularies_set', set_id='GeoSciML') }}">GeoSciML</a></li>
+        <li><a href="{{ url_for('vocabularies_set', set_id='EarthResourceML') }}">EarthResourceML</a></li>
+    </ul>
 
-    <h2>Collections</h2>
-    <p>In VocPrez, <code>skos:Collection</code> instances are always contained within a <code>skos:ConceptScheme</code> so, to find a <code>skos:Collection</code>, visit the relevant <code>skos:ConceptScheme</code> instance's page and you will see it listed.</p>
-    <p>This behaviour of nesting <code>skos:Collection</code> instances may be overridden and has been by some VocPrez implementers so that Collections appear as a top-level item in the VocPrez API.</p>
+    <h3>Vocabulary Modelling</h3>
+    <p>
+        CGI conceives of <em>vocabularies</em> as being synonymous with SKOS' <vocab_id>skos:ConceptScheme</vocab_id> class, so each GA vocab is an instance of <vocab_id>skos:ConceptScheme</vocab_id>. Not all users of SKOS make this conception.
+    </p>
 
-    <h2>Concepts</h2>
-    <p>SKOS concepts are listed within a vocabulary's home page. Each vocabulary presents both a concept heirarchy (tree) view and a link to a flat list of its concepts.</p>
+    <h2>Tools</h2>
+    <h3>Profiles</h3>
+<p>All the content of all vocabs can be accessed individually in web page (HTML) and machine-readable forms. Each list fo vocabs, vocabulary and Concept web page contains a link to the listing of all profiles and formats available for that object. Look for the <strong><em>Alternate Profiles</em></strong> hyperlink.</p>
+    <h3>Services</h3>
+    <p>All of the vocabularies in this system are accessible via a single <a href="https://en.wikipedia.org/wiki/SPARQL">SPARQL endpoint</a>:</p>
+    <ul>
+        <li><a href="{{ url_for('sparql') }}">SPARQL Endpoint</a></li>
+    </ul>
+    <h3>System Code</h3>
+    <p>
+        The code for this vocabulary publication system - VocPrez - is available online:
+    </p>
+    <ul>
+        <li><a href="https://github.com/RDFLib/VocPrez/">VocPrez @ RDFlib on GitHub</a></li>
+    </ul>
+    <p>Note that this particular instance of VocPrez contains some configuration and styling that isn't present in that main VocPrez repository</p>
 
-    <div style="border-top:solid 2px grey;">
-        <h3>Alternate Profiles</h3>
-        <p>Different views and formats of list of Concepts: <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>
-    </div>
 {% endblock %}

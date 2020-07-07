@@ -1,320 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head lang="en">
-  <meta charset="UTF-8">
-  <title>VocPrez</title>
-
-  <style type="text/css">
-    body {
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+      body {
         display:grid;
         grid-template-columns: 1fr 3fr 1fr ;
-        grid-template-rows: 140px 50px auto 50px;
+        grid-template-rows: 140px 10px 50px auto 100px;
 
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family:Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
         line-height: 1.2em;
-    }
+      }
 
-    #vocprez {
+      #vocprez {
         position: fixed;
         top: 240px;
         left: -50px;
         font-size: small;
         transform: rotate(-90deg);
         color: grey;
-    }
-
-    #vocprez a {
+      }
+      #vocprez a {
         font-size: 2em;
         font-weight: bold;
         text-decoration: none;
         color: #005A9C;
-    }
-    #vocprez a:hover {
+      }
+      #vocprez a:hover {
         color: #333;
-    }
-
-    #vocprez a#versionlink {
+      }
+      #vocprez a#versionlink {
         font-size: 1em;
-    }
+      }     
+      
+      #header a {
+        margin: 0 5px 0 5px;        
+        color:#2f2f2f;
+        text-decoration: none;
+      }
 
-    #header {
-        background-color: lightgrey;
-        padding: 20px;
-        color: white;
-        font-size: 100px;
-        font-weight: bold;
-    }
+      #mainmenu {
+        margin-top:20px;
+        text-align:center;
+      }
 
-    #mainmenu {
-	      margin-top: 10px;
-        text-align: center;
-    }
+      #mainmenu a {
+        margin: 0 5px 0 5px;
+        color:#2f2f2f;
+        text-decoration: none;
+      }
 
-    #footer {
-        background-color: #eee;
-    }
+      #footer {
+        background-color:rgb(151,119,26); 
+        text-align: center; 
+        color:white; 
+        padding-top: 20px;
+        font-size: smaller;
+      }
 
-    .disabled a {
-        color: gray;
-    }
+      #footer a {
+        color:white;
+      }
 
-    table, th, td {
-        border: 1px solid #e4e4e4;
-        text-align: left;
-    }
-
-    h1 {
-        color: darkgrey;
+      h1 {
+        color:#2f2f2f;
         font-size: 2em;
-        font-weight: bold;
-        line-height: 1em;
-    }
+      }
 
-    h2 {
-        color: darkgrey;
+      h2 {
+        color:#2f2f2f;
         font-size: 1.5em;
-        font-weight: bold;
-    }
+      }
 
-    h3 {
-        color: darkgrey;
+      h3 {
+        color:#2f2f2f;
         font-size: 1.25em;
-        font-weight: bold;
-    }
+      }
 
-    h4 {
-        color: darkgrey;
-        font-size: 1.15em;
-        font-weight: bold;
-    }    
+      p,li,th,td {
+        color:#000000;        
+      }
 
-    dt {
-        font-weight: bold;
-        margin-top: 10px;
-    }
-    
-    p, a, li, td, th {
-        font-size: 100%;
-        font-family: Verdana, Arial, Helvetica, sans-serif;
-    }
+      a { 
+        color:#0f4a84
+      }
 
-    a {
+      a:visited { 
+        color:#0f4a84
+      }
+
+      a:hover {
+        color:blue
+      }
+
+      .figure{text-align:center}
+
+      .caption{font-size:small}
+
+      .definition{font-style:italic;text-decoration:none;border-bottom:1px dashed}
+
+      img#ga-logo{height:100px}
+
+      td#quote{font-size:1.5em;font-family:sans-serif}
+
+      #ga-colour-strip-container{width:100%}
+
+      #ga-colour-strip{height:10px;width:100%;background-color:#F0E78A}
+
+      #footer-container{text-align:center;background-color:#97771A;height:40px;padding:25px 0 0 0}
+
+      #footer-links{margin:0 auto;color:white;font-family:sans-serif;font-size:0.8em;width:900px}
+
+      #footer-links a{color:white}
+
+      #footer-links a:hover{text-decoration:underline}
+
+      ul>li>p,ol>li>p{margin:0}
+
+      dt {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      dd {
+        margin-bottom: 1em;
+      }
+      code {
+        font-size: 1.2em;
+        font-family: "Courier New", sans-serif;
+      }
+
+      /*
+      * Pagination
+      */
+      /* Borrowed from Bootstrap3 compiled CSS */
+      .pagination {
+        display: inline-block;
+        padding-left: 0;
+        margin: 20px 0 20px 0;
+        border-radius: 4px;
+      }
+      .pagination li {
+        display: inline;
+      }
+      .pagination li > a,
+      .pagination li > span {
+        position: relative;
+        float: left;
+        padding: 6px 12px;
+        margin-left: -1px;
+        line-height: 1.42857143;
         color: #337ab7;
         text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-        color: darkblue;
-    }
-
-    code {
-      font-size: 1.2em ;
-    }
-
-    table.alternates td {
-        vertical-align: top;
-        padding: 5px;
-    }
-
-    table.content td {
-        padding: 5px;
-    }
-
-    #box {
-        margin: 0 auto;
-        max-width: 1000px;
-        text-align: left;
-        box-shadow: 0px 10px 10px 10px rgba(0,0,0,0.34);
-    }
-
-    ul {
-        line-height: 1.5em;
-    }
-
-    .metadata {
-        margin-top: 10px;
-        border-collapse: collapse;
-    }
-    .metadata td,
-    .metadata th {
-        padding: 5px;
-    }
-
-    .content {
-        margin-bottom: 40px;
-        padding: 40px;
-        width: 75%;
-        box-shadow: 0 0 10px rgba(53, 52, 53, 0.1);
-        border: 1px solid rgba(53, 52, 53, 0.1);
-        border-radius: 2px;
-        background: white;
-        margin-left: 200px;
-    }
-
-    .content > h1 {
-        margin-bottom: 26px;
-        padding-bottom: 5px;
-        font-size: 40px;
-        line-height: 42px;
-        font-weight: 700;
-        border-bottom: 2px solid #f0f0f0;
-    }
-
-    .collapsible {
-        font-weight: normal;
-        color: #4294B0;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-
-    .collapsible-content {
-        display: none;
-        overflow: hidden;
-        background-color: #f1f1f1;
-    }
-
-    .overflow {
-        overflow: auto;
-        min-height: 28px;
-    }
-
-    .content-footer {
-        margin-top: 40px;
-        border-top: 2px solid #f0f0f0;
-    }
-
-    .altprof {
-
-    }
-    /*
-    * Pagination
-    */
-    /* Borrowed from Bootstrap3 compiled CSS */
-    .pagination {
-    display: inline-block;
-    padding-left: 0;
-    margin: 0 0;
-    border-radius: 4px;
-    }
-    .pagination li {
-    display: inline;
-    }
-    .pagination li > a,
-    .pagination li > span {
-    position: relative;
-    float: left;
-    padding: 6px 12px;
-    margin-left: -1px;
-    line-height: 1.42857143;
-    color: #337ab7;
-    text-decoration: none;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    }
-    .pagination li:first-child > a,
-    .pagination li:first-child > span {
-    margin-left: 0;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    }
-    .pagination li:last-child > a,
-    .pagination li:last-child > span {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    }
-    .pagination li > a:hover,
-    .pagination li > span:hover,
-    .pagination li > a:focus,
-    .pagination li > span:focus {
-    z-index: 2;
-    color: #23527c;
-    background-color: #eee;
-    border-color: #ddd;
-    }
-    .pagination .active > a,
-    .pagination .active > span,
-    .pagination .active > a:hover,
-    .pagination .active > span:hover,
-    .pagination .active > a:focus,
-    .pagination .active > span:focus {
-    z-index: 3;
-    color: #fff;
-    cursor: default;
-    background-color: #337ab7;
-    border-color: #337ab7;
-    }
-    .pagination .disabled > span,
-    .pagination .disabled > span:hover,
-    .pagination .disabled > span:focus,
-    .pagination .disabled > a,
-    .pagination .disabled > a:hover,
-    .pagination .disabled > a:focus {
-    color: #777;
-    cursor: not-allowed;
-    background-color: #fff;
-    border-color: #ddd;
-    }
-    .pagination-lg li > a,
-    .pagination-lg li > span {
-    padding: 10px 16px;
-    font-size: 18px;
-    line-height: 1.3333333;
-    }
-    .pagination-lg li:first-child > a,
-    .pagination-lg li:first-child > span {
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-    }
-    .pagination-lg li:last-child > a,
-    .pagination-lg li:last-child > span {
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-    }
-    .pagination-sm li > a,
-    .pagination-sm li > span {
-    padding: 5px 10px;
-    font-size: 12px;
-    line-height: 1.5;
-    }
-    .pagination-sm li:first-child > a,
-    .pagination-sm li:first-child > span {
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-    }
-    .pagination-sm li:last-child > a,
-    .pagination-sm li:last-child > span {
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-    }
-
-    /*
-    *   Automated pagination info
-    */
-    .collapsible-content {
-        display: none;
-        overflow: hidden;
-        background-color: #f1f1f1;
-    }
-  </style>
+        background-color: #fff;
+        border: 1px solid #ddd;
+      }
+      .pagination li:first-child > a,
+      .pagination li:first-child > span {
+        margin-left: 0;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+      .pagination li:last-child > a,
+      .pagination li:last-child > span {
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
+      .pagination li > a:hover,
+      .pagination li > span:hover,
+      .pagination li > a:focus,
+      .pagination li > span:focus {
+        z-index: 2;
+        color: #23527c;
+        background-color: #eee;
+        border-color: #ddd;
+      }
+      .pagination .active > a,
+      .pagination .active > span,
+      .pagination .active > a:hover,
+      .pagination .active > span:hover,
+      .pagination .active > a:focus,
+      .pagination .active > span:focus {
+        z-index: 3;
+        color: #fff;
+        cursor: default;
+        background-color: #337ab7;
+        border-color: #337ab7;
+      }
+      .pagination .disabled > span,
+      .pagination .disabled > span:hover,
+      .pagination .disabled > span:focus,
+      .pagination .disabled > a,
+      .pagination .disabled > a:hover,
+      .pagination .disabled > a:focus {
+        color: #777;
+        cursor: not-allowed;
+        background-color: #fff;
+        border-color: #ddd;
+      }
+      .pagination-lg li > a,
+      .pagination-lg li > span {
+        padding: 10px 16px;
+        font-size: 18px;
+        line-height: 1.3333333;
+      }
+      .pagination-lg li:first-child > a,
+      .pagination-lg li:first-child > span {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+      }
+      .pagination-lg li:last-child > a,
+      .pagination-lg li:last-child > span {
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+      .pagination-sm li > a,
+      .pagination-sm li > span {
+        padding: 5px 10px;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .pagination-sm li:first-child > a,
+      .pagination-sm li:first-child > span {
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+      }
+      .pagination-sm li:last-child > a,
+      .pagination-sm li:last-child > span {
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+      
+      /*
+      *   Automated pagination info
+      */
+      .collapsible-content {
+          display: none;
+          overflow: hidden;
+          background-color: #f1f1f1;
+      } 
+    </style>
 </head>
 <body>
   <div id="vocprez">
     made by <a href="http://github.com/rdflib/VocPrez">VocPrez</a>&nbsp;
     <a id="versionlink" href="https://github.com/RDFLib/VocPrez/releases/tag/{{ utils.version() }}">{{ utils.version() }}</a>
+  </div>  
+  <div id="header" style="grid-column:2; display:grid; grid-template-rows:70px 70px; text-align:center;">
+    <div style="grid-row: 1;">
+      <img id="IUGS_logo" src="{{ url_for('static', filename = 'IUGS_logo.png') }}" />
+      <img id="CGI_logo" src="{{ url_for('static', filename = 'CGI_logo.jpg') }}" />
+      <img id="GeoSciML_logo" src="{{ url_for('static', filename = 'GeoSciML_logo.png') }}" />
+      <img id="ERML_logo" src="{{ url_for('static', filename = 'ERML_logo.png') }}" />
+    </div>
+    <div style="grid-row: 2; margin-top:20px;">
+        <a href="http://www.cgi-iugs.org">CGI Home</a> |
+        <a href="http://www.geosciml.org">GeoSciML</a> |
+        <a href="http://external.opengeospatial.org/twiki_public/GeoSciMLswg/WebHome">GeoSciML Wiki</a> |
+        <a href="http://www.earthresourceml.org">EarthResourceML</a>   
+    </div>
   </div>
-  <div id="header" style="grid-column:2;">
-    VocPrez
-  </div><!-- #header -->
+  <div id="strip" style="grid-column:1/4; background-color:rgb(240, 231, 138);"></div>
   <div id="mainmenu" style="grid-column:2;">
     <a href="{{ url_for('index') }}">System Home</a> | 
-    <a href="{{ url_for('vocabularies') }}">Vocabularies</a> | 
-    <a href="{{ url_for('about') }}">About the System</a> | 
-    <a href="{{ url_for('sparql') }}">SPARQL Endpoint</a>
-  </div>
+    <a href="{{ url_for('about') }}">About the system</a> | 
+    <a href="{{ url_for('sparql') }}">SPARQL Endpoint</a> | 
+    <a href="{{ url_for('vocabularies_set', set_id='GeoSciML') }}">GeoSciML Vocabs</a> | 
+    <a href="{{ url_for('vocabularies_set', set_id='EarthResourceML') }}">EarthResourceML Vocabs</a>
+  </div>    
   <div id="content" style="grid-column:2;">
-      {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
   </div><!-- #content -->
-  <div id="footer" style="grid-column:2;"></div><!-- #footer -->
+  <div style="grid-column:1; background-color:rgb(151,119,26);"></div>
+  <div id="footer" style="grid-column:2;">
+      CGI &copy; {{ date.year }}. This site is hosted by <a href="http://www.ga.gov.au/">Geoscience Australia</a> but responsibility and copyright for the site content lies with the <a href="http://www.cgi-iugs.org/">IUGS CGI</a>. Questions, suggestions or comments regarding the contents of this site should be directed to the <a href="mailto:CGIsecretariat@mail.cgs.gov.cn">CGI secretariat</a>.
+  </div><!-- #footer -->
+  <div style="grid-column:3; background-color:rgb(151,119,26);"></div>
 </body>
 </html>
