@@ -1,25 +1,30 @@
-![](vocprez/view/style/VocPrez.300.png)  
+# VocPrez
+
+![VocPrez logo](_media/VocPrez.300.png) 
 
 A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+
+# Introduction 
 
 VocPrez is used by:
 
 <a href="https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq">
-    <img src="vocprez/view/style/logo-gsq.jpg" alt="GSQ Logo" style="width:80px;" />
+    <img src="_media/logo-gsq.jpg" alt="GSQ Logo" style="width:80px;" />
 </a>
-<a href="https://www.ga.gov.au">
-    <img src="vocprez/view/style/logo-ga.jpg" alt="GA Logo" style="width:100px;" />
-</a> 
-
 
 * [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq)
     * System link: <https://vocabs.gsq.digital> 
- * [Geoscience Australia](https://www.ga.gov.au)
-     * System link (demo): <http://ga.surroundaustralia.com> 
+
+<a href="https://www.ga.gov.au">
+    <img src="_media/logo-ga.jpg" alt="GA Logo" style="width:100px;" />
+</a> 
+
+* [Geoscience Australia](https://www.ga.gov.au)
+    * System link (demo): <http://ga.surroundaustralia.com> 
 
 ## VocPrez structure
 
-![](vocprez/view/style/system.500.png)  
+![](_media/system.500.png)  
 **Figure 1**: An overview diagram of where VocPrez fits in relation to sources of vocab data.
 
 VocPrez can get vocabularies from one or more *sources* and any instance can be tuned to use any set of *sources*. This allows for use with a wide range of back-end vocabulary management.
@@ -41,8 +46,8 @@ As per other pyLDAPI deployments, this tool uses the [Jinja2 Python templating e
 
 Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are contained within this repository, as is a Model-View-Controller-style deployment of Flask, pre-configures for SKOS.
 
+# Installation
 
-## Installation
 * follow the instructions as per pyLDAPI (see [its documentation](https://pyldapi.readthedocs.io))
 * ensure your config file is correct
     * you need to copy the file `_config/template.py` to `_config/__init__.py` and configure carables within it. See the template.py` file for examples
@@ -67,14 +72,12 @@ This code is licensed using the GPL v3 licence. See the [LICENSE file](LICENSE) 
 We use [pytest](https://docs.pytest.org/en/latest/) as our testing framework. Tests live in the [tests directory](_tests). These tests ensure that the endpoints are functioning as intended. See the [README.md](_tests/README.md) for the tests for more information.
 
 
-## Running in docker 
+## Running in Docker 
 
 To override the endpoint in the template set the ENDPOINT environment variable
-* `docker run -it -v $PWD/vocprez/_config/template.py:/vocprez/_config/__init__.py -p 8002:8001 vocpreztest`
+ `docker run -it -v $PWD/vocprez/_config/template.py:/vocprez/_config/__init__.py -p 8002:8001 vocpreztest`
 
-
-
-## Contacts
+# Contacts
 *Author*:  
 **Nicholas Car**  
 *Data Systems Architect*  
