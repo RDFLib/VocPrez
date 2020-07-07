@@ -21,6 +21,14 @@ VocPrez is used by:
 
 * [Geoscience Australia](https://www.ga.gov.au)
     * System link (demo): <http://ga.surroundaustralia.com> 
+    
+<a href="http://www.cgi-iugs.org/">
+    <img src="_media/logo-cgi.jpg" alt="CGI Logo" style="width:100px;" />
+</a> 
+
+* [Commission for the Management and Application of Geosceicne Information (CGI)](http://www.cgi-iugs.org/)
+    * System link: <http://cgi.vocabs.ga.gov.au/>     
+    
 
 ## VocPrez structure
 
