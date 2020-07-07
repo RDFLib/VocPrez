@@ -32,6 +32,7 @@ VocPrez can get vocabularies from one or more *sources* and any instance can be 
 Technically, the tool is a SKOS-specific implementation of the [pyLDAPI](https://github.com/rdflib/pyLDAPI). pyLDAPI is a generic tool for the deliver of [RDF](https://www.w3.org/RDF/) data online in both human- and machine-readable formats; it turns RDF data into *[Linked Data](https://www.w3.org/standards/semanticweb/data)*. 
 
 ## SKOS
+
 pyLDAPI needs deployment-specific templates for registers & classes that present the data of interest in that deployment. VocPrez is pre-configured with templates for SKOS' core data classes - `ConceptScheme`, `Collection` & `Concept` - and registers of them. It also assumes that a `ConceptScheme` is synonymous with a *Vocabulary*.
 
 This tool is *not* a SKOS data editor! It is expected to be used with a SKOS data source (any sort of datasource can be configured and three come pre-loaded) and its only role is to publish that SKOS data online as Linked Data.
@@ -42,6 +43,7 @@ Since this tool is preconfigured for SKOS data, it is ready for use with SKOS-on
 
 
 ## API & Templates
+
 As per other pyLDAPI deployments, this tool uses the [Jinja2 Python templating engine](http://jinja.pocoo.org/) to generate HTML and other files which are called fro use through Python's [Flask](http://flask.pocoo.org/), a small HTTP framework.
 
 Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are contained within this repository, as is a Model-View-Controller-style deployment of Flask, pre-configures for SKOS.
@@ -53,29 +55,53 @@ Standard templates for `ConceptScheme`, `Collection`, `Concept` & `Register` are
     * you need to copy the file `_config/template.py` to `_config/__init__.py` and configure carables within it. See the template.py` file for examples
 * configure your data source(s)
     * you will need to supply this tool with SKOS data from any sort of data source: a triplestore, a relational database or even a local file
-    * see the [DATA_SOURCES.md](https://github.com/CSIRO-enviro-informatics/VocPrez/blob/master/DATA_SOURCES.md) file for examples
+    * see the [DATA_SOURCES.md](https://github.com/RDFLib/VocPrez/blob/master/DATA_SOURCES.md) file for examples
 
 
 ## Dependencies
-See the [requirements.txt](https://github.com/CSIRO-enviro-informatics/VocPrez/blob/master/requirements.txt) standard Python dependency listing file.
+
+See the [requirements.txt](https://github.com/RDFLib/VocPrez/blob/master/requirements.txt) standard Python dependency listing file.
 
 
 ## Releases
+
 See [RELEASE_NOTES.md](RELEASE_NOTES.md) for notes on major releases and plans for future releases.
 
 
 ## License
+
 This code is licensed using the GPL v3 licence. See the [LICENSE file](LICENSE) for the deed.
 
 
 ## Tests
+
 We use [pytest](https://docs.pytest.org/en/latest/) as our testing framework. Tests live in the [tests directory](_tests). These tests ensure that the endpoints are functioning as intended. See the [README.md](_tests/README.md) for the tests for more information.
 
+# Deployment
 
-## Running in Docker 
+## Ansible
 
-To override the endpoint in the template set the ENDPOINT environment variable
- `docker run -it -v $PWD/vocprez/_config/template.py:/vocprez/_config/__init__.py -p 8002:8001 vocpreztest`
+Coming Soon!
+
+## AWS
+
+Coming soon!
+
+## Docker 
+
+To override the endpoint in the template set the ENDPOINT environment variable. 
+
+### Docker build
+
+First we must build a container from the dockerfile. 
+
+`docker build -t vocprez`
+
+### Docker Run 
+
+To run the container we need to copy the settings from template.py to __init__.py and set the port. 
+
+ `docker run -it -v $PWD/vocprez/_config/template.py:/vocprez/_config/__init__.py -p 5000:5000 vocprez`
 
 # Contacts
 *Author*:  
