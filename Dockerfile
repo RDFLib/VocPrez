@@ -1,12 +1,13 @@
 FROM python:3.7.8-slim-buster
 
-COPY requirements.txt .
+WORKDIR /usr/app
+
+EXPOSE 5000
+
+ADD requirements.txt .
 
 RUN pip install -r requirements.txt
-RUN pip install gunicorn
 
-COPY vocprez/ /vocprez/
-WORKDIR /vocprez
-ENV PYTHONPATH /
+ADD ./vocprez ./vocprez
 
-CMD ["gunicorn", "-w", "5", "-b", "0.0.0.0:8001", "vocprez.app:app"]
+CMD ["gunicorn", "-w", "5", "-b", "0.0.0.0:5000", "vocprez.wsgi:app"]
