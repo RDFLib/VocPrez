@@ -99,7 +99,7 @@ First we must build a container from the dockerfile.
 
 ### Docker Run 
 
-To run the container we need to copy the settings from template.py to __init__.py and set the port. 
+To run the container we need to copy the settings from `_config/template.py` to `_config/__init__.py` and set the port. 
 
  `docker run -it -v $PWD/vocprez/_config/template.py:/vocprez/_config/__init__.py -p 5000:5000 vocprez`
 
