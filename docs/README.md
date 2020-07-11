@@ -149,7 +149,7 @@ To override the endpoint in the template set the ENDPOINT environment variable.
 
 First we must build a container from the dockerfile. 
 
-`docker build -t vocprez`
+`sudo docker build -t vocprez . -f Dockerfile`
 
 ### Docker Run 
 
