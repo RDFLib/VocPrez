@@ -24,6 +24,7 @@ import datetime
 import logging
 import vocprez.source as source
 import markdown
+import re
 
 
 app = Flask(
@@ -122,15 +123,20 @@ def vocabularies():
         if request.values.get("per_page") is not None
         else 20
     )
-    #
-    # # TODO: replace this logic with the following
-    # #   1. read all static vocabs from g.VOCABS
-    # get this instance's list of vocabs
+
     vocabs = []  # local copy (to this request) for sorting
+
+    # get this instance's list of vocabs
     for k, voc in g.VOCABS.items():
-        vocabs.append((url_for("object", uri=k), voc.title))
+        # respond to a filter
+        if request.values.get("filter") is not None:
+            if request.values.get("filter") in voc.title:
+                vocabs.append((url_for("object", uri=k), voc.title))
+        else:
+            # no filter: list all
+            vocabs.append((url_for("object", uri=k), voc.title))
     vocabs.sort(key=lambda tup: tup[1])
-    total = len(g.VOCABS.items())
+    total = len(vocabs)
     #
     # # Search
     # query = request.values.get("search")

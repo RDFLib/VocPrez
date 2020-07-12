@@ -5,6 +5,15 @@
         <div style="grid-column: 1; grid-row: 1;">
             <h1>{{ label }}</h1>
         </div>
+        <div style="grid-column: 2; grid-row: 1;">
+            <div class="altprofiles">
+              <h4>Alternates Profiles</h4>
+              <p>Different views of and formats:</p>
+              <ul>
+                  <li><a href="{{ url_for('vocabularies') }}?_profile=alt">Alternate Profiles</a></li>
+              </ul>
+            </div>
+        </div>
         <div style="grid-column: 1; grid-row: 2;">
             <dl>
               <dt>URI</dt>
@@ -31,14 +40,14 @@
             {%- endfor -%}
             </ul>
         </div>
-        <div style="grid-column: 2; grid-row: 2;">
-            <div class="altprofiles">
-              <h4>Alternates Profiles</h4>
-              <p>Different views of and formats:</p>
-              <ul>
-                <li><a href="{{ url_for('vocabularies') }}?_profile=alt">Alternate Profiles</a></li>
-              </ul>
-            </div>
+        <div style="grid-column: 2; grid-row: 3;">
+          <h4>Filter</h4>
+          <form method="get" action="{{ url_for('vocabularies') }}">
+            <input type="text" name="filter" value="{{ request.values.get('filter') if request.values.get('filter') }}" /> <button>Filter</button>
+          </form>
+          <form method="get" action="{{ url_for('vocabularies') }}">
+            <button>Clear</button>
+          </form>
         </div>
         <div style="grid-column: 1; grid-row: 4;">
           {{ pagination.links }}
