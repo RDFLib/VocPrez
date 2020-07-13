@@ -46,6 +46,6 @@ def add_vocab(url):
 
 
 if __name__ == '__main__':
-#    create_db()
+    create_db()
     for url in VOCABS:
         add_vocab(url)
