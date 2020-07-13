@@ -17,7 +17,7 @@ jobs:
       - name: build and run VocPrez container
         run: |
           docker build -t cgi/vocprez .
-          docker run -d -p 5000:5000 -e SPARQL_ENDPOINT=http://fuseki:3030/db/query cgi/vocprez
+          docker run -d -p 5000:5000 -e SPARQL_ENDPOINT=http://localhost:3030/db/query cgi/vocprez
           
       - name: run the VocPrez tests as-is
         run: |
@@ -32,3 +32,5 @@ jobs:
         image: stain/jena-fuseki
         env:
           ADMIN_PASSWORD: admin
+        ports:
+          - 3030:3030
