@@ -22,9 +22,9 @@ jobs:
 
       - name: run the VocPrez tests as-is
         run: |
+          pip3 install setuptools
           pip3 install -r requirements.txt
           pip3 install pytest
-          cd VocPrez
           python3 -m pytest
 
     # Service containers to run with `container-job`
