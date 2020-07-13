@@ -26,6 +26,7 @@ jobs:
           pip3 install -r requirements.txt
           pip3 install pytest
           # Still needed to import vocprez/_config
+          cp vocprez/_config/template.py vocprez/_config/__init__.py
           export SPARQL_ENDPOINT=http://localhost:3030/db/query
           python3 -m pytest
 
