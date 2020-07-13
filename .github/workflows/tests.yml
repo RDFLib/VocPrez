@@ -6,6 +6,9 @@ jobs:
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
       - name: load data into Fuseki service
         run: |
           python vocprez/_tests/_vocabs_load.py
