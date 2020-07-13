@@ -6,7 +6,7 @@
             <h1>{{ label }}</h1>
         </div>
         <div style="grid-column: 2; grid-row: 1;">
-            <div class="altprofiles">
+            <div id="altprofiles">
               <h4>Alternates Profiles</h4>
               <p>Different views of and formats:</p>
               <ul>
@@ -41,13 +41,15 @@
             </ul>
         </div>
         <div style="grid-column: 2; grid-row: 3;">
-          <h4>Filter</h4>
-          <form method="get" action="{{ url_for('vocabularies') }}">
-            <input type="text" name="filter" value="{{ request.values.get('filter') if request.values.get('filter') }}" /> <button>Filter</button>
-          </form>
-          <form method="get" action="{{ url_for('vocabularies') }}">
-            <button>Clear</button>
-          </form>
+          <div id="filter">
+            <h4>Filter</h4>
+            <form method="get" action="{{ url_for('vocabularies') }}">
+              <input type="text" name="filter" value="{{ request.values.get('filter') if request.values.get('filter') }}" /> <button>Filter</button>
+            </form>
+            <form method="get" action="{{ url_for('vocabularies') }}">
+              <button>Clear</button>
+            </form>
+          </div>
         </div>
         <div style="grid-column: 1; grid-row: 4;">
           {{ pagination.links }}
