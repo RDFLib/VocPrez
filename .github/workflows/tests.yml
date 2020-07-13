@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: load data into Fuseki service
         run: |
-          python vocprez/_tests/_vocab_load.py
+          python vocprez/_tests/_vocabs_load.py
 
     # Service containers to run with `container-job`
     services:
@@ -17,4 +17,4 @@ jobs:
         # Docker Hub image
         image: stain/jena-fuseki
         env:
-          ADMIN_PASSWORD:  admin
+          ADMIN_PASSWORD: admin
