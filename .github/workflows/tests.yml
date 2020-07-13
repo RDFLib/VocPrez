@@ -15,10 +15,11 @@ jobs:
           export FUSEKI_HOST=http://localhost:3030/
           python3 vocprez/_tests/_vocabs_load.py
 
-      #- name: build and run VocPrez container
-          #run: |
-          #docker build -t cgi/vocprez .
-          #docker run -d -p 5000:5000 -e SPARQL_ENDPOINT=http://localhost:3030/db/query cgi/vocprez
+      - name: build and run VocPrez container
+        run: |
+          docker build -t cgi/vocprez .
+          # did not expose port 5000 as expected
+          #docker run -d -p 5000:5000 -e ENDPOINT=http://localhost:3030/db/query cgi/vocprez
 
       - name: run the VocPrez tests as-is
         run: |
@@ -27,8 +28,8 @@ jobs:
           pip3 install pytest
           # Still needed to import vocprez/_config
           cp vocprez/_config/template.py vocprez/_config/__init__.py
-          export SPARQL_ENDPOINT=http://localhost:3030/db/query
-          # Run the test server - better to rewrite the tests
+          export ENDPOINT=http://localhost:3030/db/query
+          # Run the test server - better to rewrite the tests?
           export PYTHONPATH=.:..
           cd vocprez
           python3 app.py &
