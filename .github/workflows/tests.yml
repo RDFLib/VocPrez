@@ -12,6 +12,7 @@ jobs:
       - name: load data into Fuseki service
         run: |
           pip3 install requests
+          export FUSEKI_HOST=http://localhost:3030/
           python3 vocprez/_tests/_vocabs_load.py
           
       - name: build and run VocPrez container
