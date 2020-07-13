@@ -5,12 +5,10 @@ jobs:
   db-test:
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
-    # Docker Hub image that `container-job` executes in
-    container: python:3.7.8-slim-buster
     steps:
-    - name: load data into Fuseki service
-      run: |
-        python vocprez/_tests/_vocab_load.py
+      - name: load data into Fuseki service
+        run: |
+          python vocprez/_tests/_vocab_load.py
 
     # Service containers to run with `container-job`
     services:
@@ -19,4 +17,4 @@ jobs:
         # Docker Hub image
         image: stain/jena-fuseki
         environment:
-      	- ADMIN_PASSWORD=admin
+      	  - ADMIN_PASSWORD=admin
