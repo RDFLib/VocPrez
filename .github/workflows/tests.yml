@@ -28,7 +28,8 @@ jobs:
           # Still needed to import vocprez/_config
           cp vocprez/_config/template.py vocprez/_config/__init__.py
           export SPARQL_ENDPOINT=http://localhost:3030/db/query
-          # Run the test server 
+          # Run the test server - better to rewrite the tests
+          export PYTHONPATH=.:..
           cd vocprez
           python3 app.py &
           cd ../
