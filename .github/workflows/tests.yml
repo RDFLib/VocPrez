@@ -22,9 +22,11 @@ jobs:
 
       - name: run the VocPrez tests as-is
         run: |
-          pip3 install setuptools
+          pip3 install setuptools wheel
           pip3 install -r requirements.txt
           pip3 install pytest
+          # Still needed to import vocprez/_config
+          export SPARQL_ENDPOINT=http://localhost:3030/db/query
           python3 -m pytest
 
     # Service containers to run with `container-job`
