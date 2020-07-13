@@ -12,6 +12,7 @@ jobs:
 
       - name: load data into Fuseki service
         run: |
+          pip install requests
           python vocprez/_tests/_vocabs_load.py
 
     # Service containers to run with `container-job`
