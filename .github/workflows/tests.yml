@@ -20,6 +20,9 @@ jobs:
           docker build -t cgi/vocprez .
           docker run -d -p 5000:5000 -e SPARQL_ENDPOINT=http://localhost:3030/db/query cgi/vocprez
 
+      - name: check we can load VocPrez
+        run: curl http://localhost:5000
+
       - name: run the VocPrez tests as-is
         run: |
           pip3 install setuptools wheel
