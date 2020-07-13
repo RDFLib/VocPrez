@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: load data into Fuseki service
-        run: |3 
+        run: |
           pip3 install requests
           export FUSEKI_HOST=http://localhost:3030/
           python3 vocprez/_tests/_vocabs_load.py
