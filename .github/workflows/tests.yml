@@ -4,7 +4,7 @@ on: push
 jobs:
   db-test:
     # Containers must run in Linux based operating systems
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -14,15 +14,17 @@ jobs:
           pip3 install requests
           export FUSEKI_HOST=http://localhost:3030/
           python3 vocprez/_tests/_vocabs_load.py
-          
+
       - name: build and run VocPrez container
         run: |
           docker build -t cgi/vocprez .
           docker run -d -p 5000:5000 -e SPARQL_ENDPOINT=http://localhost:3030/db/query cgi/vocprez
-          
+
       - name: run the VocPrez tests as-is
         run: |
+          pip3 install requirements.txt
           pip3 install pytest
+          cd VocPrez
           python3 -m pytest
 
     # Service containers to run with `container-job`
