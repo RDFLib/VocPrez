@@ -28,7 +28,8 @@ jobs:
           # Still needed to import vocprez/_config
           cp vocprez/_config/template.py vocprez/_config/__init__.py
           export SPARQL_ENDPOINT=http://localhost:3030/db/query
-          gunicorn --bind 127.0.0.0:5000 --daemon vocprez.wsgi:app
+          whereis gunicorn
+          /usr/local/bin/gunicorn --bind 127.0.0.0:5000 --daemon vocprez.wsgi:app
           # Check we can load VocPrez
           curl http://localhost:5000
           python3 -m pytest
