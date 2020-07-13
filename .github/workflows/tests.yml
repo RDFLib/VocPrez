@@ -16,5 +16,5 @@ jobs:
       fuseki:
         # Docker Hub image
         image: stain/jena-fuseki
-        environment:
-      	  - ADMIN_PASSWORD=admin
+        env:
+          ADMIN_PASSWORD:  admin
