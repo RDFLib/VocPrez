@@ -1,0 +1,18 @@
+name: Run tests against Fuseki
+on: push
+
+jobs:
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+    # Docker Hub image that `container-job` executes in
+    container: python:3.7.8-slim-buster
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      fuseki:
+        # Docker Hub image
+        image: stain/jena-fuseki
+
