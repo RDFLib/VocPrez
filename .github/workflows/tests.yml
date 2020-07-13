@@ -4,16 +4,25 @@ on: push
 jobs:
   db-test:
     # Containers must run in Linux based operating systems
-    runs-on: ubuntu-latest
-    container: python:3.7.8-slim-buster
+    runs-on: ubuntu-latest 
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
 
       - name: load data into Fuseki service
         run: |
-          pip install requests
-          python vocprez/_tests/_vocabs_load.py
+          pip3 install requests
+          python3 vocprez/_tests/_vocabs_load.py
+          
+      - name: build and run VocPrez container
+        run: |
+          docker build -t cgi/vocprez .
+          docker run -d -p 5000:5000 -e SPARQL_ENDPOINT=http://fuseki:3030/db/query cgi/vocprez
+          
+      - name: run the VocPrez tests as-is
+        run: |
+          pip3 install pytest
+          py.test
 
     # Service containers to run with `container-job`
     services:
