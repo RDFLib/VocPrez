@@ -20,9 +20,14 @@ VocPrez is used by:
 * [Commission for the Management and Application of Geoscience Information (CGI)](http://www.cgi-iugs.org/)
     * System link: <http://cgi.vocabs.ga.gov.au/>    
      
+![](docs/_media/logo-bgs-200.png) 
+
+* [British Geological Survey (BGS)](https://bgs.ac.uk/)
+    * System link: <https://devdata.bgs.ac.uk/vocprez/> - *dev only!*
+    
 # Documentation     
      
-See the Documentation at https://RDFLib.github.io/VocPrez/
+See the Documentation at https://rdflib.dev/VocPrez/
 
 # Contacts
 *Author*:  
