@@ -155,9 +155,9 @@ def vocabularies():
 
     return ContainerRenderer(
         request,
-        config.VOCS_URI if config.VOCS_URI is not None else url_for("vocabularies"),
-        config.VOCS_TITLE if config.VOCS_TITLE is not None else 'Vocabularies',
-        config.VOCS_DESC if config.VOCS_DESC is not None else None,
+        config.VOCS_URI if hasattr(config, "VOCS_URI") else url_for("vocabularies"),
+        config.VOCS_TITLE if hasattr(config, "VOCS_TITLE") else 'Vocabularies',
+        config.VOCS_DESC if hasattr(config, "VOCS_DESC") else None,
         None,
         None,
         vocabs,
