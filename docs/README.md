@@ -120,7 +120,7 @@ cp config.py $VP_HOME/vocprez/_config/__init__.py
 # get the GA VP theme
 git clone https://github.com/me/my-vp-theme $VP_THEME_HOME
 # apply the theme
-sh $VP_THEME_HOME/apply.py
+sh $VP_THEME_HOME/apply.sh
 
 
 # Apache
@@ -128,7 +128,7 @@ sudo apt install -y apache2
 # config
 sudo cp apache.conf /etc/apache2/sites-available/000-default.conf
 sudo apt install -y libapache2-mod-wsgi-py3
-sudo chown -R www-data $VP_HOME/vocprez/cache
+sudo chown -R www-data $VP_HOME/vocprez/cache  # Apache needs to own the cache folder to be able to write to it
 sudo service apache2 restart
 ```
 
