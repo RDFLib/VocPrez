@@ -84,7 +84,7 @@ Minimally:
     Additionally:
 
 3. Style it
-    * a number of organisations deploying VocPrez override the )boring) templates with their own and add some additional API endpoints for various functions. 
+    * a number of organisations deploying VocPrez override the (boring) templates with their own and add some additional API endpoints for various functions. 
     * see the instructions for Geoscience Australia's instance:
         * <https://github.com/geoscienceaustralia/VocPrez-theme-ga>
         
