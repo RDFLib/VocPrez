@@ -29,6 +29,12 @@ VocPrez is used by:
      
 See the documentation at <https://rdflib.dev/VocPrez/>.
 
+## License
+
+This code is licensed using the GPL v3 licence. See the [LICENSE file in this repository](LICENSE) for the deed. 
+
+Regarding attribution as per the license: please ensure that the VocPrez logo is visible on all public instance of VocPrez.
+
 ## Contacts
 *Author*:  
 **Nicholas Car**  
