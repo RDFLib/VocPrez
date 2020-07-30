@@ -48,6 +48,10 @@ VOCAB_SOURCES = {
         "sparql_username": SPARQL_USERNAME,
         "sparql_password": SPARQL_PASSWORD,
     },
+    "file_source": {
+        "source": VocabSource.File,
+        "directory": path.join(APP_DIR, 'data', 'vocab_files')
+    }
     # example source of individual vocabs from https://vocabs.ardc.edu.au/ using their JSON API
     #"rva": {
     #    "source": VocabSource.RVA,
