@@ -3,7 +3,7 @@
 {% block content -%}
 <h1>Vocabulary</h1>
 <dl>
-  <dt><a href="http://purl.org/dc/terms/title">Title</a></dt>
+  <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
   <dd><h2>{{ vocab.title }}</h2></dd>
   <dt>URI</dt>
   <dd><a href="{{ uri }}">{{ uri }}</a></dd>
@@ -57,9 +57,9 @@
           <td>
             {% for collection in vocab.collections %}
               {% if LOCAL_URLS -%}
-                <a href="{{ url_for('object') }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br>
+                <a href="{{ url_for('object') }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br />
               {% else -%}
-                <a href="{{ collection[0] }}">{{ collection[1] }}</a><br>
+                <a href="{{ collection[0] }}">{{ collection[1] }}</a><br />
               {% endif -%}
             {% endfor %}
           </td>
