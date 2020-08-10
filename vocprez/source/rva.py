@@ -12,8 +12,8 @@ class RVA(Source):
     """Source for Research Vocabularies Australia
     """
 
-    def __init__(self, vocab_id, request, language=None):
-        super().__init__(vocab_id, request, language)
+    def __init__(self, vocab_uri, request, language=None):
+        super().__init__(vocab_uri, request, language)
 
     @staticmethod
     def collect(details):

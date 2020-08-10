@@ -108,7 +108,7 @@ def cache_write(cache_object, cache_file_name):
         logging.debug("Empty object ignored")
 
 
-def draw_concept_hierarchy(hierarchy, request, vocab_id):
+def draw_concept_hierarchy(hierarchy, request, vocab_uri):
         tab = "\t"
         previous_length = 1
 
@@ -137,8 +137,8 @@ def draw_concept_hierarchy(hierarchy, request, vocab_id):
             if (not hasattr(config, "LOCAL_URLS")) or config.LOCAL_URLS:
                 uri = (
                         request.url_root
-                        + "object?vocab_id="
-                        + vocab_id
+                        + "object?vocab_uri="
+                        + vocab_uri
                         + "&uri="
                         + url_encode(item[1])
                 )

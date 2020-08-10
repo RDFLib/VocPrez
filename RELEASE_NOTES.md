@@ -1,12 +1,14 @@
 # Release Notes
 
-## 2.1 - next, eta July 2020
+## 2.2 (or 3.0) - next, Aug 2020
+* improved profile configurability
+
+See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 2.2.
+
+## 2.1 - current, July 2020
 * consistent absolute URI / local URIs everywhere
 * UI fixes
-* data model tidy-up (profile based)
-* better documentation
-
-See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 2.1.
+* prettier documentation
 
 
 ## 2.0 - current, June 2020

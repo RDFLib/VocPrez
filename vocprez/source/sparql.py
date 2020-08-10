@@ -3,7 +3,6 @@ import dateutil.parser
 from flask import g
 import vocprez.source.utils
 from vocprez import _config as config
-import urllib.parse
 from vocprez.model.vocabulary import Vocabulary
 from ._source import Source
 
@@ -12,8 +11,8 @@ class SPARQL(Source):
     """Source for a generic SPARQL endpoint
     """
 
-    def __init__(self, vocab_id, request, language=None):
-        super().__init__(vocab_id, request, language)
+    def __init__(self, vocab_uri, request, language=None):
+        super().__init__(vocab_uri, request, language)
 
     @staticmethod
     def collect(details):
@@ -68,9 +67,6 @@ class SPARQL(Source):
         sparql_vocabs = {}
         for cs in concept_schemes:
             vocab_id = cs["cs"]["value"]
-
-            # if len(vocab_id) < 2:
-            #     vocab_id = cs["cs"]["value"].split("/")[-2]
 
             sparql_vocabs[vocab_id] = Vocabulary(
                 cs["cs"]["value"],

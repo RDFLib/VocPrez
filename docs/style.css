@@ -1,0 +1,12 @@
+h1 {
+    line-height: 1.2 !important;
+}
+
+:root {
+    --zoomimage-overlay-background: rgba(0, 0, 0, 0.875);
+}
+
+.sidebar li>p {
+    font-weight: 700;
+    margin: 0;
+}

@@ -17,8 +17,8 @@ class VbException(Exception):
 
 
 class VocBench(Source):
-    def __init__(self, vocab_id, request, language=None):
-        super().__init__(vocab_id, request, language)
+    def __init__(self, vocab_uri, request, language=None):
+        super().__init__(vocab_uri, request, language)
 
     @staticmethod
     def init():
@@ -167,7 +167,7 @@ class VocBench(Source):
                       ?c a skos:Collection ;
                          skos:prefLabel ?pl .
                     }""",
-                "ctx_project": self.vocab_id,
+                "ctx_project": self.vocab_uri,
             },
         )
         concepts = json.loads(r.content.decode("utf-8"))["result"]["sparql"]["results"][
@@ -200,7 +200,7 @@ class VocBench(Source):
                       OPTIONAL {?tc skos:topConceptOf ?s }
                       OPTIONAL {?tc skos:prefLabel ?tcpl }
                     }""",
-                "ctx_project": self.vocab_id,
+                "ctx_project": self.vocab_uri,
             },
         )
 
@@ -221,7 +221,7 @@ class VocBench(Source):
             from model.vocabulary import Vocabulary
 
             return Vocabulary(
-                self.vocab_id,
+                self.vocab_uri,
                 metadata[0]["s"]["value"],
                 metadata[0]["t"]["value"],
                 metadata[0]["d"]["value"] if metadata[0].get("d") is not None else None,
@@ -265,7 +265,7 @@ class VocBench(Source):
         self.s = VocBench("x", self.request)._authed_request_object()
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         metadata = json.loads(r.content.decode("utf-8"))["result"]["sparql"]["results"][
             "bindings"
@@ -281,7 +281,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         altLabels = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -297,7 +297,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         hiddenLabels = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -314,7 +314,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         broaders = json.loads(r.content.decode("utf-8"))["result"]["sparql"]["results"][
             "bindings"
@@ -331,7 +331,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         narrowers = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -347,7 +347,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         exactMatches = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -363,7 +363,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         closeMatches = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -379,7 +379,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         broadMatches = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -395,7 +395,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         narrowMatches = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -411,7 +411,7 @@ class VocBench(Source):
         )
         r = self.s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
         relatedMatches = json.loads(r.content.decode("utf-8"))["result"]["sparql"][
             "results"
@@ -420,7 +420,7 @@ class VocBench(Source):
         from model.concept import Concept
 
         return Concept(
-            self.vocab_id,
+            self.vocab_uri,
             uri,
             metadata["pl"]["value"],
             metadata.get("d").get("value") if metadata.get("d") is not None else None,
@@ -454,7 +454,7 @@ class VocBench(Source):
     def get_concept_hierarchy(self):
         # returns an ordered list of tuples, (hierarchy level, Concept URI, Concept prefLabel)
         s = VocBench("x", self.request)._authed_request_object()
-        vocab = g.VOCABS[self.vocab_id]
+        vocab = g.VOCABS[self.vocab_uri]
         r = s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
             data={
@@ -472,9 +472,9 @@ class VocBench(Source):
                     }}
                     GROUP BY ?c ?pl ?parent
                     ORDER BY ?length ?parent ?pl""".format(
-                    self.vocab_id
+                    self.vocab_uri
                 ),  # TODO: this needs to be a URI, not a token
-                "ctx_project": self.vocab_id,
+                "ctx_project": self.vocab_uri,
             },
         )
 
@@ -543,7 +543,7 @@ class VocBench(Source):
 
                         last_index = parent_index + 1
                     previous_parent_uri = this_parent
-            return vocprez.source.utils.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
+            return vocprez.source.utils.draw_concept_hierarchy(hierarchy, self.request, self.vocab_uri)
         else:
             raise VbException("There was an error: " + r.content.decode("utf-8"))
 
@@ -568,7 +568,7 @@ class VocBench(Source):
         s = VocBench("x", self.request)._authed_request_object()
         r = s.post(
             config.VB_ENDPOINT + "/SPARQL/evaluateQuery",
-            data={"query": q, "ctx_project": self.vocab_id},
+            data={"query": q, "ctx_project": self.vocab_uri},
         )
 
         try:
