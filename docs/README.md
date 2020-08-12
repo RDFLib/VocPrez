@@ -13,7 +13,7 @@ VocPrez is a pure Python application that reads vocabularies from one or more so
 * as machine-readable RDF or other formats
     * using mapping code
     
-The different information model views VocPrez supports are defined by *profiles*, that is by formal data specifications. VocPrez supports both different profiles and different formats (Media Types) for each profile. 
+The different information model views VocPrez supports are defined by *profiles*, that is by formal specifications. VocPrez supports both different profiles and different formats (Media Types) for each profile. 
 
 VocPrez is used by:
 
