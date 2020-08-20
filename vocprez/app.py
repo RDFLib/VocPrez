@@ -109,6 +109,7 @@ def index():
     )
 # END ROUTE index
 
+
 # ROUTE vocabs
 @app.route("/vocab/")
 def vocabularies():
