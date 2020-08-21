@@ -45,7 +45,7 @@
         {% endif -%}
         {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  -%}
         <tr>
-          <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Concept Hierarchy</a>:</th>
+          <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Classes</a>:</th>
           <td>
               {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
           </td>
