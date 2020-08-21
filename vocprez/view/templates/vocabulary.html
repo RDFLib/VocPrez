@@ -67,6 +67,15 @@
         {% endif -%}
     </table>
 </div>
+<div class="search">
+  <h3>Search</h3>
+  <form action="{{ url_for("search") }}" method="get" style="">
+    <input type="text" id="search" name="search" style="grid-column: 1;" />
+    <input type="hidden" id="from" name="from" value="{{ uri }}" />
+    <label for="voc" style="grid-column: 2;">Your search term</label><br />
+    <input type="submit" value="Search" style="grid-column: 1;" />
+  </form>
+</div>
 <div class="altprof">
   <h3>Alternate Profiles</h3>
   <p>

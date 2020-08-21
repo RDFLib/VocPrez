@@ -1,7 +1,3 @@
-import sys
-sys.path.insert(0, '../../')
-sys.path.insert(0, '../vocprez/')
-
 import io
 import json
 import requests
@@ -24,7 +20,6 @@ import datetime
 import logging
 import vocprez.source as source
 import markdown
-import re
 
 
 app = Flask(
@@ -106,13 +101,16 @@ def inject_date():
     return {"date": datetime.date.today()}
 
 
+# ROUTE index
 @app.route("/")
 def index():
     return render_template(
         "index.html",
     )
+# END ROUTE index
 
 
+# ROUTE vocabs
 @app.route("/vocab/")
 def vocabularies():
     page = (
@@ -163,6 +161,7 @@ def vocabularies():
         vocabs,
         total
     ).render()
+# END ROUTE vocabs
 
 
 def translate_vocab_id_to_vocab_uri(vocab_id):
@@ -181,6 +180,7 @@ def make_vocab_id_list():
     return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
 
 
+# ROUTE vocab
 @app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
     vocab_uri = translate_vocab_id_to_vocab_uri(vocab_id)
@@ -197,8 +197,10 @@ def vocabulary(vocab_id):
         )
 
     return return_vocab(vocab_uri)
+# ROUTE vocab
 
 
+# ROUTE concepts
 @app.route("/vocab/<vocab_id>/concept/")
 def concepts(vocab_id):
     return "/concept/"
@@ -251,8 +253,10 @@ def concepts(vocab_id):
         members,
         total
     ).render()
+# END ROUTE concepts
 
 
+# ROUTE collections
 @app.route("/collection/")
 def collections():
     return render_template(
@@ -260,6 +264,7 @@ def collections():
         title="Collections",
         register_class="Collections",
     )
+# END ROUTE collections
 
 
 def return_vocab(uri):
@@ -330,7 +335,7 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
     return None
 
 
-# TODO: review the logic in this function regarding use of uri, vocab_uri or uri & vocab_uri
+# ROUTE object
 @app.route("/object")
 def object():
     """
@@ -419,8 +424,10 @@ def object():
             "You supplied a valid 'vocab_uri' but when VocPrez queried the relevant vocab, no information about the "
             "object you identified with 'uri' was found.",
         )
+# END ROUTE object
 
 
+# ROUTE about
 @app.route("/about")
 def about():
     import os
@@ -441,16 +448,19 @@ def about():
         navs={},
         content=content
     )
+# END ROUTE about
 
 
-# the SPARQL UI
+# ROUTE sparql
 @app.route("/sparql", methods=["GET", "POST"])
 def sparql():
     return render_template(
         "sparql.html",
     )
+# END ROUTE sparql
 
 
+# ROUTE search
 @app.route("/search")
 def search():
     if request.values.get("search"):
@@ -578,8 +588,10 @@ def search():
             "search.html",
             vocabs=[(v.uri, v.title) for k, v in g.VOCABS.items()]
         )
+# END ROUTE search
 
 
+# ROUTE endpoint
 # the SPARQL endpoint under-the-hood
 @app.route("/endpoint", methods=["GET", "POST"])
 def endpoint():
@@ -608,8 +620,73 @@ def endpoint():
     """
     logging.debug("request: {}".format(request.__dict__))
 
-    # TODO: Find a slightly less hacky way of getting the format_mimetime value
-    format_mimetype = request.__dict__["environ"]["HTTP_ACCEPT"]
+    def get_sparql_service_description(rdf_format="turtle"):
+        """Return an RDF description of PROMS' read only SPARQL endpoint in a requested format
+
+        :param rdf_format: 'turtle', 'n3', 'xml', 'json-ld'
+        :return: string of RDF in the requested format
+        """
+        sd_ttl = """
+            @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix sd:     <http://www.w3.org/ns/sparql-service-description#> .
+            @prefix sdf:    <http://www.w3.org/ns/formats/> .
+            @prefix void: <http://rdfs.org/ns/void#> .
+            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+            <http://gnafld.net/sparql>
+                a                       sd:Service ;
+                sd:endpoint             <%(BASE_URI)s/function/sparql> ;
+                sd:supportedLanguage    sd:SPARQL11Query ; # yes, read only, sorry!
+                sd:resultFormat         sdf:SPARQL_Results_JSON ;  # yes, we only deliver JSON results, sorry!
+                sd:feature sd:DereferencesURIs ;
+                sd:defaultDataset [
+                    a sd:Dataset ;
+                    sd:defaultGraph [
+                        a sd:Graph ;
+                        void:triples "100"^^xsd:integer
+                    ]
+                ]
+            .
+        """
+        g = Graph().parse(io.StringIO(sd_ttl), format="turtle")
+        rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_TYPES_MAP]))
+        if rdf_format in rdf_formats:
+            return g.serialize(format=rdf_format)
+        else:
+            raise ValueError(
+                "Input parameter rdf_format must be one of: " + ", ".join(rdf_formats)
+            )
+
+    def sparql_query2(query, format_mimetype="application/json"):
+        """ Make a SPARQL query"""
+        logging.debug("sparql_query2: {}".format(query))
+        data = query
+
+        headers = {
+            "Content-Type": "application/sparql-query",
+            "Accept": format_mimetype,
+            "Accept-Encoding": "UTF-8",
+        }
+        if hasattr(config, "SPARQL_USERNAME") and hasattr(config, "SPARQL_PASSWORD"):
+            auth = (config.SPARQL_USERNAME, config.SPARQL_PASSWORD)
+        else:
+            auth = None
+
+        try:
+            logging.debug(
+                "endpoint={}\ndata={}\nheaders={}".format(
+                    config.SPARQL_ENDPOINT, data, headers
+                )
+            )
+            r = requests.post(
+                config.SPARQL_ENDPOINT, auth=auth, data=data, headers=headers, timeout=60
+            )
+            logging.debug("response: {}".format(r.__dict__))
+            return r.content.decode("utf-8")
+        except Exception as e:
+            raise e
+
+    format_mimetype = request.headers["ACCEPT"]
 
     # Query submitted
     if request.method == "POST":
@@ -771,74 +848,7 @@ def endpoint():
                     "Accept header must be one of " + ", ".join(acceptable_mimes) + ".",
                     status=400,
                 )
-
-
-def get_sparql_service_description(rdf_format="turtle"):
-    """Return an RDF description of PROMS' read only SPARQL endpoint in a requested format
-
-    :param rdf_format: 'turtle', 'n3', 'xml', 'json-ld'
-    :return: string of RDF in the requested format
-    """
-    sd_ttl = """
-        @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-        @prefix sd:     <http://www.w3.org/ns/sparql-service-description#> .
-        @prefix sdf:    <http://www.w3.org/ns/formats/> .
-        @prefix void: <http://rdfs.org/ns/void#> .
-        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-        <http://gnafld.net/sparql>
-            a                       sd:Service ;
-            sd:endpoint             <%(BASE_URI)s/function/sparql> ;
-            sd:supportedLanguage    sd:SPARQL11Query ; # yes, read only, sorry!
-            sd:resultFormat         sdf:SPARQL_Results_JSON ;  # yes, we only deliver JSON results, sorry!
-            sd:feature sd:DereferencesURIs ;
-            sd:defaultDataset [
-                a sd:Dataset ;
-                sd:defaultGraph [
-                    a sd:Graph ;
-                    void:triples "100"^^xsd:integer
-                ]
-            ]
-        .
-    """
-    g = Graph().parse(io.StringIO(sd_ttl), format="turtle")
-    rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_TYPES_MAP]))
-    if rdf_format[0][1] in rdf_formats:
-        return g.serialize(format=rdf_format[0][1])
-    else:
-        raise ValueError(
-            "Input parameter rdf_format must be one of: " + ", ".join(rdf_formats)
-        )
-
-
-def sparql_query2(query, format_mimetype="application/json"):
-    """ Make a SPARQL query"""
-    logging.debug("sparql_query2: {}".format(query))
-    data = query
-
-    headers = {
-        "Content-Type": "application/sparql-query",
-        "Accept": format_mimetype,
-        "Accept-Encoding": "UTF-8",
-    }
-    if hasattr(config, "SPARQL_USERNAME") and hasattr(config, "SPARQL_PASSWORD"):
-        auth = (config.SPARQL_USERNAME, config.SPARQL_PASSWORD)
-    else:
-        auth = None
-
-    try:
-        logging.debug(
-            "endpoint={}\ndata={}\nheaders={}".format(
-                config.SPARQL_ENDPOINT, data, headers
-            )
-        )
-        r = requests.post(
-            config.SPARQL_ENDPOINT, auth=auth, data=data, headers=headers, timeout=60
-        )
-        logging.debug("response: {}".format(r.__dict__))
-        return r.content.decode("utf-8")
-    except Exception as e:
-        raise e
+# END ROUTE endpoint
 
 
 # TODO: use for all errors

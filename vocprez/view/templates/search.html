@@ -1,5 +1,4 @@
 {% extends "page.html" %}
-
 {% block content %}
   <h1>Search</h1>
   <p>This page is for searching for Concepts within vocabularies.</p>
@@ -40,7 +39,17 @@
       <p>Results from all vocabularies:</p>
       <dl>
       {% for k, v in results.items() %}
-        <dt><code>&lt;{{ k }}&gt;</code></dt>
+        <dt>Vocab
+          {% for v in vocabs %}
+            {% if v[0] == k %}
+              {% if LOCAL_URLS -%}
+                <a href="{{ url_for('object') }}?vocab_uri={{ v[0] }}">{{ v[1] }}</a>
+              {% else -%}
+                <a href="{{ v[0] }}">{{ v[1] }}</a>
+              {% endif -%}
+            {% endif %}
+          {% endfor %}
+        </dt>
         <dd>
           {% for vv in v %}
             {% if LOCAL_URLS -%}
@@ -54,7 +63,19 @@
       </dl>
     {% else %}
       <dl>
-      <dt>Results from <code>&lt;{{ request.args.get("from") }}&gt;</code>:</dt>
+      <dt>
+        Results from
+        {% for v in vocabs %}
+          {% if v[0] == selected_vocab %}
+            {% if LOCAL_URLS -%}
+              <a href="{{ url_for('object') }}?vocab_uri={{ v[0] }}">{{ v[1] }}</a>
+            {% else -%}
+              <a href="{{ v[0] }}">{{ v[1] }}</a>
+            {% endif -%}
+          {% endif %}
+        {% endfor %}
+        :
+      </dt>
       <dd>
       {% for result in results %}
         {% if LOCAL_URLS -%}
