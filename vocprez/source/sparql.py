@@ -40,6 +40,7 @@ class SPARQL(Source):
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX dcterms: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
             SELECT * WHERE {{
                 ?cs a skos:ConceptScheme .
                 OPTIONAL {{ ?cs skos:prefLabel ?title .
@@ -64,7 +65,7 @@ class SPARQL(Source):
             details.get("sparql_username"),
             details.get("sparql_password"),
         )
-        assert concept_schemes is not None, "Unable to query for ConceptSchemes"
+        assert concept_schemes is not None, "Unable to query for ConceptSchemes : %s " % ( q,)
 
         sparql_vocabs = {}
         for cs in concept_schemes:
