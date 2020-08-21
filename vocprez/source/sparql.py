@@ -47,7 +47,9 @@ class SPARQL(Source):
                 OPTIONAL {{ ?cs dcterms:created ?created }}
                 OPTIONAL {{ ?cs dcterms:issued ?issued }}
                 OPTIONAL {{ ?cs dcterms:modified ?modified }}
-                OPTIONAL {{ ?cs dcterms:creator ?creator }}
+                OPTIONAL {{ ?cs dcterms:creator ?dccreator  
+                    OPTIONAL {{ ?dccreator foaf:name|rdfs:label ?name }} 
+                     BIND( COALESCE(?name,?dccreator) as ?creator ) }}
                 OPTIONAL {{ ?cs dcterms:publisher ?publisher }}
                 OPTIONAL {{ ?cs owl:versionInfo ?version }}
                 OPTIONAL {{ ?cs skos:definition ?description .
