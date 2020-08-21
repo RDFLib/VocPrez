@@ -17,7 +17,7 @@ class Vocabulary:
         created,                # DCAT
         modified,               # DCAT
         versionInfo,
-        data_source,
+        source,
         hasTopConcept=None,
         concepts=None,
         concept_hierarchy=None,
@@ -29,7 +29,6 @@ class Vocabulary:
         sparql_username=None,
         sparql_password=None,
     ):
-        self.source = None
         self.id = id
         self.uri = uri
         self.title = title
@@ -44,7 +43,7 @@ class Vocabulary:
         except:
             self.modified = modified
         self.versionInfo = versionInfo
-        self.data_source = data_source
+        self.source = source
         if hasTopConcept:
             hasTopConcept.sort()
         self.hasTopConcepts = hasTopConcept
@@ -67,7 +66,7 @@ class VocabularyRenderer(Renderer):
         self.uri = self.vocab.uri
         self.language = language
 
-        super().__init__(request, self.vocab.uri, self.profiles, "dcat")
+        super().__init__(request, self.vocab.uri, self.profiles, "skos")
 
     def render(self):
         # try returning alt profile
@@ -82,10 +81,8 @@ class VocabularyRenderer(Renderer):
         elif self.profile == "skos":
             if self.mediatype in Renderer.RDF_SERIALIZER_TYPES_MAP:
                 return self._render_skos_rdf()
-            # ===================================================================
-            # else:
-            #     return self._render_skos_html()
-            # ===================================================================
+            else:
+                return self._render_dcat_html()  # same as DCAT, for now
 
     def _render_dcat_rdf(self):
         # get vocab RDF
@@ -122,10 +119,6 @@ class VocabularyRenderer(Renderer):
             )
         if self.vocab.versionInfo:
             g.add((s, OWL.versionInfo, Literal(self.vocab.versionInfo)))
-        if self.vocab.hasTopConcept:
-            for c in self.vocab.hasTopConcept:
-                g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
-                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
         if self.vocab.accessURL:
             g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
         if self.vocab.downloadURL:
@@ -146,10 +139,10 @@ class VocabularyRenderer(Renderer):
         g.add((s, RDF.type, SKOS.ConceptScheme))
         g.add((s, SKOS.prefLabel, Literal(self.vocab.title)))
         g.add((s, SKOS.definition, Literal(self.vocab.description)))
-        if self.vocab.hasTopConcept:
-            for c in self.vocab.hasTopConcept:
-                g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
-                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
+        # if self.vocab.hasTopConcept:
+        #     for c in self.vocab.hasTopConcept:
+        #         g.add((s, SKOS.hasTopConcept, URIRef(c[0])))
+        #         g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
         if self.vocab.concepts:
             for c in self.vocab.concepts:
                 g.add((s, SKOS.inScheme, URIRef(c[0])))

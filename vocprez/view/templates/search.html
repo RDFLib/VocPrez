@@ -1,0 +1,98 @@
+{% extends "page.html" %}
+{% block content %}
+  <h1>Search</h1>
+  <p>This page is for searching for Concepts within vocabularies.</p>
+  <style>
+    form {
+        display: grid;
+        grid-template-columns: 25% 50% 25%;
+        column-gap: 5px;
+        row-gap: 5px;
+    }
+    form label {
+        font-style: italic;
+        font-size: small;
+    }
+  </style>
+  <form action="{{ url_for("search") }}" method="get" style="">
+    {% if last_search is not none %}
+      <input type="text" id="search" name="search" value="{{ last_search }}" style="grid-column: 1;" />
+    {% else %}
+      <input type="text" id="search" name="search" style="grid-column: 1;" />
+    {% endif %}
+    <label for="voc" style="grid-column: 2;">Your search term</label>
+    <select id="from" name="from" style="grid-column: 1;">
+      <option value="all"><em>all</em></option>
+      {% for v in vocabs %}
+        {% if v[0] == selected_vocab %}
+          <option value="{{ v[0] }}" selected>{{ v[1] }}</option>
+        {% else %}
+          <option value="{{ v[0] }}">{{ v[1] }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+    <label for="voc" style="grid-column: 2;">Select a vocab to limit your search, or choose 'all'</label>
+    <input type="submit" value="Search" style="grid-column: 1;" />
+  </form>
+  {% if results|length > 0 %}
+    {% if selected_vocab == "all" %}
+      <p>Results from all vocabularies:</p>
+      <dl>
+      {% for k, v in results.items() %}
+        <dt>Vocab
+          {% for v in vocabs %}
+            {% if v[0] == k %}
+              {% if LOCAL_URLS -%}
+                <a href="{{ url_for('object') }}?vocab_uri={{ v[0] }}">{{ v[1] }}</a>
+              {% else -%}
+                <a href="{{ v[0] }}">{{ v[1] }}</a>
+              {% endif -%}
+            {% endif %}
+          {% endfor %}
+        </dt>
+        <dd>
+          {% for vv in v %}
+            {% if LOCAL_URLS -%}
+              <a href="{{ url_for('object') }}?uri={{ vv[0] }}">{{ vv[1] }}</a><br>
+            {% else -%}
+            <a href="{{ vv[0] }}">{{ vv[1] }}</a><br />
+            {% endif -%}
+          {% endfor %}
+        </dd>
+      {% endfor %}
+      </dl>
+    {% else %}
+      <dl>
+      <dt>
+        Results from
+        {% for v in vocabs %}
+          {% if v[0] == selected_vocab %}
+            {% if LOCAL_URLS -%}
+              <a href="{{ url_for('object') }}?vocab_uri={{ v[0] }}">{{ v[1] }}</a>
+            {% else -%}
+              <a href="{{ v[0] }}">{{ v[1] }}</a>
+            {% endif -%}
+          {% endif %}
+        {% endfor %}
+        :
+      </dt>
+      <dd>
+      {% for result in results %}
+        {% if LOCAL_URLS -%}
+          <a href="{{ url_for('object') }}?uri={{ result[0] }}">{{ result[1] }}</a><br>
+        {% else -%}
+        <a href="{{ result[0] }}">{{ result[1] }}</a><br />
+        {% endif -%}
+      {% endfor %}
+      </dd>
+      </dl>
+    {% endif %}
+  {% elif request.args.get("search") is not none %}
+    <p>No results</p>
+  {% endif %}
+  <h3>How search is performed</h3>
+  <p>
+    The search function here looks for matches within SKOS Concepts' various labels - preferred, alternate, hidden -
+    and their definitions. It weights results based on the field it is found in, as per the order just given.
+  </p>
+{% endblock %}
