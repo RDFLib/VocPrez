@@ -521,46 +521,42 @@ def search():
 
                 SELECT DISTINCT ?g ?uri ?pl (SUM(?weight) AS ?weight)
                 WHERE {{
-                    GRAPH ?g {{
+                    ?uri a skos:Concept .
+                    ?uri skos:inScheme ?g .
                         {{  # exact match on a prefLabel always wins
-                            ?uri a skos:Concept ;
+                            ?uri
                                  skos:prefLabel ?pl .
                             BIND (50 AS ?weight)
                             FILTER REGEX(?pl, "^{input}$", "i")
                         }}
                         UNION    
                         {{
-                            ?uri a skos:Concept ;
-                                 skos:prefLabel ?pl .
+                            ?uri  skos:prefLabel ?pl .
                             BIND (10 AS ?weight)
                             FILTER REGEX(?pl, "{input}", "i")
                         }}
                         UNION
                         {{
-                            ?uri a skos:Concept ;
-                                 skos:altLabel ?al ;
+                            ?uri  skos:altLabel ?al ;
                                  skos:prefLabel ?pl .
                             BIND (5 AS ?weight)
                             FILTER REGEX(?al, "{input}", "i")
                         }}
                         UNION
                         {{
-                            ?uri a skos:Concept ;
-                                 skos:hiddenLabel ?hl ;
+                            ?uri  skos:hiddenLabel ?hl ;
                                  skos:prefLabel ?pl .
                             BIND (5 AS ?weight)
                             FILTER REGEX(?hl, "{input}", "i")
                         }}        
                         UNION
                         {{
-                            ?uri a skos:Concept ;
-                                 skos:definition ?d ;
+                            ?uri skos:definition ?d ;
                                  skos:prefLabel ?pl .
                             BIND (1 AS ?weight)
                             FILTER REGEX(?d, "{input}", "i")
                         }}        
                     }}
-                }}
                 GROUP BY ?g ?uri ?pl
                 ORDER BY DESC(?weight) 
                 """.format(**{"input": request.values.get("search")})
