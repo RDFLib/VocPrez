@@ -903,21 +903,4 @@ if __name__ == "__main__":
         format="%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s",
     )
 
-    import os
-    sources_folder = os.path.join(config.APP_DIR, "source")
-    main_module = "__init__"
-    import importlib
-
-    def ge_sources():
-        plugins = []
-        possible_sources = os.listdir(sources_folder)
-        for i in possible_sources:
-            location = os.path.join(sources_folder, i)
-            info = importlib.find_module(main_module, [location])
-            plugins.append({"name": i, "info": info})
-        return plugins
-
-    def load_plugin(plugin):
-        return importlib.load_module(main_module, *plugin["info"])
-
     app.run(debug=config.DEBUG, threaded=True, port=5000)
