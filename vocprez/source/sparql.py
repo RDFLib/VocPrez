@@ -45,6 +45,9 @@ class SPARQL(Source):
                 ?cs a skos:ConceptScheme .
                 OPTIONAL {{ ?cs skos:prefLabel ?title .
                     FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
+                OPTIONAL {{ ?cs dcterms:description ?desclang
+                    BIND ( COALESCE (lang(?desclang),"{language}") AS ?lang ) 
+                    FILTER( STRSTARTS(?lang,"{language}") ) }}    
                 OPTIONAL {{ ?cs dcterms:created ?created }}
                 OPTIONAL {{ ?cs dcterms:issued ?issued }}
                 OPTIONAL {{ ?cs dcterms:modified ?modified }}
@@ -53,8 +56,9 @@ class SPARQL(Source):
                      BIND( COALESCE(?name,?dccreator) as ?creator ) }}
                 OPTIONAL {{ ?cs dcterms:publisher ?publisher }}
                 OPTIONAL {{ ?cs owl:versionInfo ?version }}
-                OPTIONAL {{ ?cs skos:definition ?description .
-                    FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
+                OPTIONAL {{ ?cs skos:definition ?definition . 
+                    FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
+                BIND ( COALESCE( ?definition, ?desclang) as ?description )
             }} 
             ORDER BY ?title
             """.format(language=config.DEFAULT_LANGUAGE)
