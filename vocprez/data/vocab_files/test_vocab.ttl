@@ -1,0 +1,2369 @@
+@prefix cs: <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdo: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/A102_Proton_Precession_Magnetome> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "A102 Proton Precession Magnetome Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "A102 Proton Precession Magnetome"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN-ASQ_1> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "AN-ASQ 1 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "AN-ASQ 1"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN_ASQ-1> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "AN/ASQ-1 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "AN/ASQ-1"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN_ASQ-8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "AN/ASQ-8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "AN/ASQ-8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN_ASQ1> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "AN/ASQ1 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "AN/ASQ1"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/ASQ-10_Fluxgate_megnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "ASQ-10 Fluxgate megnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "ASQ-10 Fluxgate megnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/ASQ_8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "ASQ/8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "ASQ/8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MFS-7_Flux-gate_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "BMR MFS-7 Flux-gate magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "BMR MFS-7 Flux-gate magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MNS-1_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "BMR MNS-1 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "BMR MNS-1 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MNS1_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "BMR MNS1 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "BMR MNS1 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MNS1_proton_precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "BMR MNS1 proton precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "BMR MNS1 proton precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_Proton_Precession,_MNS-1> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "BMR Proton Precession, MNS-1 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "BMR Proton Precession, MNS-1"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS-2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-03-26" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "CS-2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "CS-2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS-2_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2012-04-03" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "CS-2 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "CS-2 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS2,_G822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "CS2, G822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "CS2, G822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CSF_Caesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "CSF Caesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "CSF Caesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Mag> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-05-28" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Caesium Mag Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Caesium Mag"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Caesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Caesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Vapour_G822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Caesium Vapour G822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Caesium Vapour G822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Vapour_G823A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Caesium Vapour G823A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Caesium Vapour G823A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Ceasium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Ceasium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Ceasium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Scintrex_V201_-split_beam> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-06-02" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Cesium Scintrex V201 -split beam Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Cesium Scintrex V201 -split beam"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour_Magnetometer_Senso> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Cesium Vapour Magnetometer Senso Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Cesium Vapour Magnetometer Senso"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour_Scintrex_V-201> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Cesium Vapour Scintrex V-201 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Cesium Vapour Scintrex V-201"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour_optical_absorption> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Cesium Vapour optical absorption Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Cesium Vapour optical absorption"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:definition "Cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cs_vapour_in_stinger> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Cs vapour in stinger Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Cs vapour in stinger"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Flux-gate_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Flux-gate magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Flux-gate magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-06-21" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Fluxgate_MFS-7> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Fluxgate MFS-7 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Fluxgate MFS-7"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Fluxgate_magnetometer_MFS-7> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Fluxgate magnetometer MFS-7 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Fluxgate magnetometer MFS-7"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G-813_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "G-813 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "G-813 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G-822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-08-26" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "G-822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "G-822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G-822A_CV> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-02-19" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "G-822A CV Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "G-822A CV"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822-A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-02-23" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "G822-A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "G822-A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "G822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "G822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822A_CS-2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-08-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "G822A CS-2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "G822A CS-2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822a> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-01-09" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "G822a Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "G822a"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/GR800B> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "GR800B Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "GR800B"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-02-14" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G-822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G-822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_CV> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-10-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G-822A CV Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G-822A CV"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_Caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G-822A Caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G-822A Caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-09-13" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G-822A Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G-822A Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A___Scintrex_CS3> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-06-18" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G-822A & Scintrex CS3 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G-822A & Scintrex CS3"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G-822A caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G-822A caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G-822A cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G-822A cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_G813> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G803/G813 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G803/G813"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_MFS-7_Flux-gate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G803/MFS-7 Flux-gate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G803/MFS-7 Flux-gate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_Proton> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G803 Proton Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G803 Proton"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_Proton_Prec> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G803 Proton Prec Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G803 Proton Prec"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_Proton_Prec_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G803 Proton Prec. Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G803 Proton Prec."@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803__MFS-7_Flux-gate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G803/ MFS-7 Flux-gate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G803/ MFS-7 Flux-gate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_stinger_mounted> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-10-16" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G803 stinger mounted Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G803 stinger mounted"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_G803> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G813/G803 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G813/G803"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_Proton_Prec> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G813 Proton Prec Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G813 Proton Prec"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_Proton_Prec_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G813 Proton Prec. Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G813 Proton Prec."@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_Proton_Processio> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G813 Proton Processio Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G813 Proton Processio"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_proton_precess_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-05-09" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G813 proton precess. Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G813 proton precess."@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_proton_precessio> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G813 proton precessio Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G813 proton precessio"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A,_Scintrex_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-10-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A, Scintrex CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A, Scintrex CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_Magnet> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A Caesium Magnet Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A Caesium Magnet"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_Magnete> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A Caesium Magnete Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A Caesium Magnete"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A Caesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A Caesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_magneto> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A Caesium magneto Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A Caesium magneto"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-01-25" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822A cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_or_Scintrex_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:definition "Geometrics G822A or Scintrex CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822A or Scintrex CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2009-09-14" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822 Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822 Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822_Cesium__Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-09-13" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822 Cesium  Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822 Cesium  Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2009-01-28" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822a,_Scintrex_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-08-26" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G822a, Scintrex CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G822a, Scintrex CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G823_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2008-04-10" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G823 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G823 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Heium_Magnetomet> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Heium Magnetomet Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Heium Magnetomet"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Mag> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium Mag Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium Mag"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Magnetome> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium Magnetome Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium Magnetome"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Vapour_Ma> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium Vapour Ma Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium Vapour Ma"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Vapour_ma> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium Vapour ma Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium Vapour ma"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_mag> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium mag Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium mag"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_magnet> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium magnet Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium magnet"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_magnetome> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium magnetome Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium magnetome"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 Helium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 Helium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_helium_magnetome> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 helium magnetome Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 helium magnetome"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_helium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G833 helium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G833 helium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G_813> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics G.813 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics G.813"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_Proton_Precession_Mag> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics Proton Precession Mag Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics Proton Precession Mag"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_proton_mag__M_G-803> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-02-16" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Geometrics proton mag. M G-803 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Geometrics proton mag. M G-803"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Golf_Mark_3> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Golf Mark 3 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Golf Mark 3"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Gulf_III_Total_Force> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Gulf III Total Force Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Gulf III Total Force"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Gulf_Mark_III_Fluxgate_T_F_magne> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Gulf Mark III Fluxgate T/F magne Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Gulf Mark III Fluxgate T/F magne"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Hor_grad_system__3_Geom__G813_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Hor grad system (3*Geom. G813) Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Hor grad system (3*Geom. G813)"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-4_fluxgate_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-4 fluxgate magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-4 fluxgate magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-5 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-5"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_Fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-5 Fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-5 Fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_Saturable_core_Fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-5 Saturable core Fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-5 Saturable core Fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_Saturable_core_fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-5 Saturable core fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-5 Saturable core fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_saturable-core_fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-5 saturable-core fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-5 saturable-core fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_saturable_core_fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-5 saturable core fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-5 saturable core fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_saturable_cure_fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-5 saturable cure fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-5 saturable cure fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-6_saturable_core_fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-6 saturable core fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-6 saturable core fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Flux-gate_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-7 Flux-gate magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-7 Flux-gate magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-7 Fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-7 Fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Fluxgate_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-7 Fluxgate magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-7 Fluxgate magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-7 Magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-7 Magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-7 fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-7 fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS-7 magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS-7 magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS4> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS4 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS4"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS4_Magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS4 Magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS4 Magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS6_or_MFS5> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS6 or MFS5 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS6 or MFS5"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS7_Fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS7 Fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS7 Fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS_7_fluxgate_mag> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MFS 7 fluxgate mag Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MFS 7 fluxgate mag"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-1 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-1"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1,_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-1, Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-1, Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Prcession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-1 Proton Prcession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-1 Proton Prcession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-1 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-1 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Precession-Prototyp> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-1 Proton Precession-Prototyp Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-1 Proton Precession-Prototyp"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Presession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-1 Proton Presession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-1 Proton Presession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-2_Proton_Procession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS-2 Proton Procession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS-2 Proton Procession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS1 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS1 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_Proton_Precession__BMR_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS1 Proton Precession (BMR) Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS1 Proton Precession (BMR)"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_Proton_Procession__BMR_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS1 Proton Procession (BMR) Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS1 Proton Procession (BMR)"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_nuclear_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS1 nuclear magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS1 nuclear magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS2_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS2 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS2 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS_1_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNS 1 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNS 1 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNZ1> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNZ1 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNZ1"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNZ1_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MNZ1 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MNZ1 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MSF4_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "MSF4 magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "MSF4 magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Modified_ASQ_-_10_Fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Modified ASQ - 10 Fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Modified ASQ - 10 Fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/NFS-7_Fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "NFS-7 Fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "NFS-7 Fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Optically_Pumped_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-07-25" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Optically Pumped Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Optically Pumped Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Proton_Magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Proton Magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Proton Magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Reduced_scale_Magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Reduced scale Magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Reduced scale Magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/SCINTREX_Caesium_Vapour_CS-2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "SCINTREX Caesium Vapour CS-2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "SCINTREX Caesium Vapour CS-2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/SCINTREX_VIW_2321_H8_Cesium_Vapo> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "SCINTREX VIW 2321 H8 Cesium Vapo Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "SCINTREX VIW 2321 H8 Cesium Vapo"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Saturable-core_fluxgate> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Saturable-core fluxgate Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Saturable-core fluxgate"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2008-07-10" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex,_VIW_2321-H8_Caesium_va> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex, VIW 2321-H8 Caesium va Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex, VIW 2321-H8 Caesium va"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2,_Geometrics__G822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-08-26" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2, Geometrics  G822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2, Geometrics  G822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2Caesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2011-06-22" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2Caesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2Caesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_CV> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-01-31" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 CV Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 CV"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_CV_Magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2009-09-03" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 CV Magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 CV Magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_CV_magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-06-19" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 CV magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 CV magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Caesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-08-13" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 Caesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 Caesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-09-13" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 Caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 Caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Cesium_Vapour_Mag> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 Cesium Vapour Mag Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 Cesium Vapour Mag"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Geometrics_G-822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-09-13" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2/Geometrics G-822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2/Geometrics G-822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2__Geometrics_G-822A> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-09-29" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 &Geometrics G-822A Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 &Geometrics G-822A"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2___CS-3_cesium_vap_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2010-02-09" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 & CS-3 cesium vap. Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 & CS-3 cesium vap."@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2___CS-3_cesium_vapo> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2011-09-07" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 & CS-3 cesium vapo Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 & CS-3 cesium vapo"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-08-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-11-28" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_or_Geometrics_G822> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-2 or Geometrics G822 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-2 or Geometrics G822"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-3_Caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2008-07-10" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-3 Caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-3 Caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-3_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2009-02-17" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-3 Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-3 Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-3_caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2011-02-03" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-3 caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-3 caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-II> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2009-01-28" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS-II Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS-II"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS2 Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS2 Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2_Split_Beam_Cesium_V> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS2 Split Beam Cesium V Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS2 Split Beam Cesium V"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-01-23" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CS2 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CS2 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CV_Model_V-201> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex CV Model V-201 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex CV Model V-201"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Caesium_Vapour_H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Caesium Vapour H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Caesium Vapour H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Ces__Vap__VIW_2321-H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-07-22" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Ces. Vap. VIW 2321-H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Ces. Vap. VIW 2321-H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_CS-2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Cesium Vapour CS-2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cesium Vapour CS-2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Cesium Vapour CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cesium Vapour CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_Cs2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-03-27" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Cesium Vapour Cs2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cesium Vapour Cs2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_Model_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-03-14" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Cesium Vapour Model CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cesium Vapour Model CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_V201> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:definition "Scintrex Cesium Vapour V201 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cesium Vapour V201"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_V2321-H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-12-17" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Cesium Vapour V2321-H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cesium Vapour V2321-H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cs2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Cs2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Cs2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_H8_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-06-02" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex H8 Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex H8 Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Split_beam_C82> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Split beam C82 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Split beam C82"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Split_beam_Cesium_VIW_H> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex Split beam Cesium VIW/H Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex Split beam Cesium VIW/H"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V-201_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-10-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V-201 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V-201 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Alkali_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201 Alkali Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201 Alkali Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Cesium_Vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201 Cesium Vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201 Cesium Vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Split_Beam_Caesium> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201 Split Beam Caesium Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201 Split Beam Caesium"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Split_Beam_Ceasium> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201 Split Beam Ceasium Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201 Split Beam Ceasium"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_split_beam_Cesium> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201 split beam Cesium Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201 split beam Cesium"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201split_beam__cesium> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-10-23" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V201split beam  cesium Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V201split beam  cesium"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V2321> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-10-29" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex V2321 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex V2321"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321-CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-11-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW2321-CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW2321-CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321-CS2_cesium_vap_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-05-20" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW2321-CS2 cesium vap. Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW2321-CS2 cesium vap."@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321-H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW2321-H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW2321-H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW2321/CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW2321/CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321_CS2_split_beam> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-08-20" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW2321/CS2 split beam Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW2321/CS2 split beam"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H6_Alkali_Vapo> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW 2321-H6 Alkali Vapo Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321-H6 Alkali Vapo"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-01-09" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW 2321-H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321-H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_Ceaium_Vapo> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW 2321-H8 Ceaium Vapo Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321-H8 Ceaium Vapo"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_Cesium_Vap_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-07-30" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW 2321-H8 Cesium Vap. Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321-H8 Cesium Vap."@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_Cesium_Vapo> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW 2321-H8 Cesium Vapo Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321-H8 Cesium Vapo"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_cesium_vap_> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-08-17" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW 2321-H8 cesium vap. Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321-H8 cesium vap."@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_cesium_vapo> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:definition "Scintrex VIW 2321-H8 cesium vapo Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321-H8 cesium vapo"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321_H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW 2321 H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW 2321 H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_H8_Split_Beam_Caesi> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW/H8 Split Beam Caesi Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW/H8 Split Beam Caesi"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_H8_split_beam_Caesi> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW/H8 split beam Caesi Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW/H8 split beam Caesi"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW__2321-H8_cesium_vap> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex VIW  2321-H8 cesium vap Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex VIW  2321-H8 cesium vap"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_ViW_2321-H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-01-09" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex ViW 2321-H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex ViW 2321-H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex__CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex  CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex  CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex__cesium_vapour_CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-01-09" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex  cesium vapour CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex  cesium vapour CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_caesium_vapour_CS-2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex caesium vapour CS-2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex caesium vapour CS-2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_caesium_vapour_V2321> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex caesium vapour V2321 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex caesium vapour V2321"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_split_beam_caesium_V201> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex split beam caesium V201 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex split beam caesium V201"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_v201_alkai_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-10-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrex v201 alkai vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrex v201 alkai vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrrex_CS-2_cesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2005-11-28" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Scintrrex CS-2 cesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Scintrrex CS-2 cesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Sonotek_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Sonotek Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Sonotek Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_Beam_Cesium_Scintrex_V201> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Split Beam Cesium Scintrex V201 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Split Beam Cesium Scintrex V201"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_Beam_Cesium_Scintrex_V2321> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Split Beam Cesium Scintrex V2321 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Split Beam Cesium Scintrex V2321"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_Beam_Helium_Vapour_V201> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Split Beam Helium Vapour V201 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Split Beam Helium Vapour V201"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_beam_Cesium_Scintrex_V2321> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Split beam Cesium Scintrex V2321 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Split beam Cesium Scintrex V2321"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/TBA> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2007-09-13" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "TBA Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "TBA"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/VIW2321-CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-08-13" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "VIW2321-CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "VIW2321-CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/VIW_2321-H8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-03-26" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "VIW 2321-H8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "VIW 2321-H8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/VIW_2321-h8> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2004-03-26" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "VIW 2321-h8 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "VIW 2321-h8"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Varian_V-85_Proton_Precession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Varian V-85 Proton Precession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Varian V-85 Proton Precession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Varian_V85_Proton_Procession> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Varian V85 Proton Procession Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Varian V85 Proton Procession"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Varian_caesium_vapour> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2003-11-24" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "Varian caesium vapour Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "Varian caesium vapour"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/cesium_Scintrex_VIW2321-CS2> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2006-10-16" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "cesium Scintrex VIW2321-CS2 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "cesium Scintrex VIW2321-CS2"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/fluxgate_magnetometer_MFS-7> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "fluxgate magnetometer MFS-7 Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "fluxgate magnetometer MFS-7"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/geometrics_G-803_proton_magnetom> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "geometrics G-803 proton magnetom Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "geometrics G-803 proton magnetom"@en ;
+    skos:topConceptOf cs: .
+
+<http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/magnetometer> a skos:Concept ;
+    rdfs:isDefinedBy cs: ;
+    skos:changeNote [ dcterms:date "2002-07-08" ;
+            rdf:value "Start date for the use of this Airborn_Magnetic" ] ;
+    skos:definition "magnetometer Instrument"@en ;
+    skos:inScheme cs: ;
+    skos:prefLabel "magnetometer"@en ;
+    skos:topConceptOf cs: .
+
+<https://linked.data.gov.au/org/ga/voc-wg> a sdo:Organization ;
+    sdo:affiliation <https://linked.data.gov.au/org/ga> ;
+    sdo:name "Geoscience Australia Vocabulary Working Group" ;
+    sdo:url <https://www.ga.gov.au/data-pubs/datastandards> .
+
+<https://linked.data.gov.au/org/ga> a sdo:Organization ;
+    sdo:name "Geoscience Australia" ;
+    sdo:url <https://www.ga.gov.au> .
+
+cs: a skos:ConceptScheme ;
+    dcterms:created "2016-11-15T11:29:15"^^xsd:dateTime ;
+    dcterms:creator <https://linked.data.gov.au/org/ga/voc-wg> ;
+    dcterms:modified "2016-11-15T11:29:15"^^xsd:dateTime ;
+    dcterms:provenance "GA's ORAPROD database tables"@en ;
+    dcterms:publisher <https://linked.data.gov.au/org/ga> ;
+    skos:changeNote "This vocabulary created directly from the database"@en ;
+    skos:definition "Geoscience Australia's 15-Nov-2016 version of the Airborn Magnetic vocabulary"@en ;
+    skos:hasTopConcept <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/A102_Proton_Precession_Magnetome>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN-ASQ_1>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN_ASQ-1>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN_ASQ-8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/AN_ASQ1>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/ASQ-10_Fluxgate_megnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/ASQ_8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MFS-7_Flux-gate_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MNS-1_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MNS1_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_MNS1_proton_precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/BMR_Proton_Precession,_MNS-1>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS-2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS-2_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CS2,_G822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/CSF_Caesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Mag>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Vapour_G822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_Vapour_G823A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Ceasium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Scintrex_V201_-split_beam>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour_Magnetometer_Senso>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour_Scintrex_V-201>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_Vapour_optical_absorption>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Cs_vapour_in_stinger>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Flux-gate_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Fluxgate_MFS-7>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Fluxgate_magnetometer_MFS-7>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G-813_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G-822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G-822A_CV>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822-A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822A_CS-2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/G822a>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/GR800B>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_CV>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_Caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A___Scintrex_CS3>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G-822A_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_G813>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_MFS-7_Flux-gate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_Proton>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_Proton_Prec>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_Proton_Prec_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803__MFS-7_Flux-gate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G803_stinger_mounted>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_G803>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_Proton_Prec>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_Proton_Prec_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_Proton_Processio>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_proton_precess_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G813_proton_precessio>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A,_Scintrex_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_Magnet>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_Magnete>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Caesium_magneto>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822A_or_Scintrex_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822_Cesium__Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G822a,_Scintrex_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G823_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Heium_Magnetomet>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Mag>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Magnetome>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Vapour_Ma>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_Vapour_ma>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_mag>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_magnet>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_magnetome>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_Helium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_helium_magnetome>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G833_helium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_G_813>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_Proton_Precession_Mag>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Geometrics_proton_mag__M_G-803>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Golf_Mark_3>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Gulf_III_Total_Force>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Gulf_Mark_III_Fluxgate_T_F_magne>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Hor_grad_system__3_Geom__G813_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-4_fluxgate_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_Fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_Saturable_core_Fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_Saturable_core_fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_saturable-core_fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_saturable_core_fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-5_saturable_cure_fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-6_saturable_core_fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Flux-gate_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Fluxgate_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_Magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS-7_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS4>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS4_Magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS6_or_MFS5>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS7_Fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MFS_7_fluxgate_mag>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1,_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Prcession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Precession-Prototyp>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-1_Proton_Presession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS-2_Proton_Procession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_Proton_Precession__BMR_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_Proton_Procession__BMR_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS1_nuclear_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS2_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNS_1_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNZ1>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MNZ1_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/MSF4_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Modified_ASQ_-_10_Fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/NFS-7_Fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Optically_Pumped_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Proton_Magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Reduced_scale_Magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/SCINTREX_Caesium_Vapour_CS-2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/SCINTREX_VIW_2321_H8_Cesium_Vapo>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Saturable-core_fluxgate>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex,_VIW_2321-H8_Caesium_va>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2,_Geometrics__G822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2Caesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_CV>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_CV_Magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_CV_magnetometer>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Caesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Cesium_Vapour_Mag>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_Geometrics_G-822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2__Geometrics_G-822A>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2___CS-3_cesium_vap_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2___CS-3_cesium_vapo>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-2_or_Geometrics_G822>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-3_Caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-3_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-3_caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS-II>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2_Split_Beam_Cesium_V>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CS2_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_CV_Model_V-201>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Caesium_Vapour_H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Ces__Vap__VIW_2321-H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_CS-2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_Cs2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_Model_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_V201>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cesium_Vapour_V2321-H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Cs2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_H8_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Split_beam_C82>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_Split_beam_Cesium_VIW_H>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V-201_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Alkali_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Cesium_Vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Split_Beam_Caesium>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_Split_Beam_Ceasium>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201_split_beam_Cesium>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V201split_beam__cesium>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_V2321>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321-CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321-CS2_cesium_vap_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321-H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW2321_CS2_split_beam>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H6_Alkali_Vapo>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_Ceaium_Vapo>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_Cesium_Vap_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_Cesium_Vapo>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_cesium_vap_>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321-H8_cesium_vapo>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_2321_H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_H8_Split_Beam_Caesi>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW_H8_split_beam_Caesi>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_VIW__2321-H8_cesium_vap>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_ViW_2321-H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex__CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex__cesium_vapour_CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_caesium_vapour_CS-2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_caesium_vapour_V2321>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_split_beam_caesium_V201>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrex_v201_alkai_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Scintrrex_CS-2_cesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Sonotek_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_Beam_Cesium_Scintrex_V201>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_Beam_Cesium_Scintrex_V2321>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_Beam_Helium_Vapour_V201>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Split_beam_Cesium_Scintrex_V2321>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/TBA>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/VIW2321-CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/VIW_2321-H8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/VIW_2321-h8>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Varian_V-85_Proton_Precession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Varian_V85_Proton_Procession>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/Varian_caesium_vapour>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/cesium_Scintrex_VIW2321-CS2>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/fluxgate_magnetometer_MFS-7>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/geometrics_G-803_proton_magnetom>,
+        <http://pid.geoscience.gov.au/def/voc/Airborn_Magnetic/magnetometer> ;
+    skos:prefLabel "Airborn Magnetic"@en .
+
