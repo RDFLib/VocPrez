@@ -91,6 +91,7 @@ def context_processor():
     return dict(
         utils=u,
         LOCAL_URLS=config.LOCAL_URLS,
+        LOCAL_ALTS=config.LOCAL_ALTS,
         MEDIATYPE_NAMES=MEDIATYPE_NAMES,
         STATUSES=STATUSES
     )
