@@ -129,7 +129,7 @@ def vocabularies():
     for k, voc in g.VOCABS.items():
         # respond to a filter
         if request.values.get("filter") is not None:
-            if request.values.get("filter") in voc.title:
+            if request.values.get("filter").lower() in voc.title.lower():
                 vocabs.append((url_for("object", uri=k), voc.title))
         else:
             # no filter: list all
