@@ -894,6 +894,17 @@ Instead, found **{}**.""".format(
     )
 
 
+@app.route("/purge-cache")
+def purge_cache():
+    source.utils._purge_cache("VOCABS.p")
+
+    return Response(
+        "Cache reloaded",
+        status=200,
+        mimetype="text/plain"
+    )
+
+
 # run the Flask app
 if __name__ == "__main__":
     logging.basicConfig(
