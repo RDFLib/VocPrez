@@ -450,3 +450,15 @@ def match(vocabs, query):
 
 def parse_markdown(s):
     return markdown.markdown(s)
+
+
+def _purge_cache(cache_file_name):
+    """Cache purging function used in multiple places"""
+    # remove the pickle cache
+    cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
+    if os.path.isfile(cache_file_path):
+        os.unlink(cache_file_path)
+
+    # clear the Flask cache
+    if hasattr(g, "DATA"):
+        g.DATA = None
