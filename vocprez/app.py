@@ -847,6 +847,17 @@ Instead, found **{}**.""".format(
     )
 
 
+@app.route("/purge-cache")
+def purge_cache():
+    source.utils._purge_cache("VOCABS.p")
+
+    return Response(
+        "Cache reloaded",
+        status=200,
+        mimetype="text/plain"
+    )
+
+
 # run the Flask app
 if __name__ == "__main__":
     logging.basicConfig(
@@ -855,22 +866,5 @@ if __name__ == "__main__":
         datefmt="%Y-%m-%d %H:%M:%S",
         format="%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s",
     )
-
-    import os
-    sources_folder = os.path.join(config.APP_DIR, "source")
-    main_module = "__init__"
-    import importlib
-
-    def ge_sources():
-        plugins = []
-        possible_sources = os.listdir(sources_folder)
-        for i in possible_sources:
-            location = os.path.join(sources_folder, i)
-            info = importlib.find_module(main_module, [location])
-            plugins.append({"name": i, "info": info})
-        return plugins
-
-    def load_plugin(plugin):
-        return importlib.load_module(main_module, *plugin["info"])
 
     app.run(debug=config.DEBUG, threaded=True, port=5000)
