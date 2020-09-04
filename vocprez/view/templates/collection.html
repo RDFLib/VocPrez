@@ -36,7 +36,7 @@
 <div class="altprof">
   <h3>Alternate Profiles</h3>
   <p>
-  {% if LOCAL_URLS -%}
+  {% if LOCAL_ALTS -%}
     Different views and formats of this collection are here: <a href="{{ url_for("object") }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.
   {% else -%}
     Different views and formats of this collection are here: <a href="{{ uri }}?_profile=alt">Alternate Profiles</a>.
