@@ -68,7 +68,7 @@
 </table>
 <div class="altprof">
   <h3>Alternate Profiles</h3>
-  {% if LOCAL_URLS -%}
+  {% if LOCAL_ALTS -%}
     {% if vocab_uri is not none %}
       <p>Different views and formats of this concept are here: <a href="{{ url_for('object') }}?vocab_uri={{ vocab_uri }}&uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
     {% else %}
