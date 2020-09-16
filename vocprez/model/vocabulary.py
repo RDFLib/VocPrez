@@ -49,7 +49,7 @@ class Vocabulary:
         self.hasTopConcepts = hasTopConcept
         self.concepts = concepts
         self.conceptHierarchy = concept_hierarchy
-        self.collection = collections
+        self.collections = collections
         self.accessURL = accessURL
         self.downloadURL = downloadURL
         self.sparql_endpoint = sparql_endpoint
