@@ -1,4 +1,5 @@
 {% extends "page.html" %}
+{% from "_format.html" import format with context -%}
 {% block content %}
 
 <h1>Concept</h1>
@@ -35,7 +36,7 @@
   {% endif %}
   <tr>
     <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
-    <td>{{ concept.definition }}</td>
+      <td>{{ format(concept.definition)|safe }}</td>
   </tr>
   {% if concept.related_instances|length > 0 %}
     {% for k, v in concept.related_instances.items() %}
