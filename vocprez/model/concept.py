@@ -46,7 +46,6 @@ class ConceptRenderer(Renderer):
                 return self._render_skos_html()
 
     def _render_skos_rdf(self):
-        print("_render_skos_rdf")
         g = Graph()
         g.bind("dct", DCTERMS)
         g.bind("skos", SKOS)
@@ -131,7 +130,6 @@ class ConceptRenderer(Renderer):
         #     return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
 
     def _render_skos_html(self):
-        print("_render_skos_html")
         _template_context = {
             "version": __version__,
             "vocab_uri": self.concept.vocab_uri if self.concept.vocab_uri is not None else self.request.values.get("vocab_uri"),

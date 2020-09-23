@@ -33,8 +33,6 @@ class VocBench(Source):
                     )
 
                     utils.cache_write(k, g)
-                else:
-                    print("File {}.p exists, skipping pickling step.".format(k))
                 g.VOCABS[k]["source"] = config.VocabSource.FILE
 
                 # # Creators
