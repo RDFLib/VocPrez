@@ -68,7 +68,7 @@ def context_processor():
         "text/html": "HTML",
         "application/json": "JSON",
         "text/turtle": "Turtle",
-        "application/rdf+xml": "RDX/XML",
+        "application/rdf+xml": "RDF/XML",
         "application/ld+json": "JSON-LD",
         "text/n3": "Notation-3",
         "application/n-triples": "N-Triples",
