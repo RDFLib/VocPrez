@@ -4,30 +4,39 @@ from flask import Response, render_template
 from rdflib import Graph, URIRef, Literal, XSD, RDF
 from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
 from vocprez.model.profiles import profile_skos, profile_dcat
+from typing import List
+
+
+class Property(object):
+    def __init__(self, uri: str, label: str, value: URIRef or Literal):
+        self.uri = uri
+        self.label = label
+        self.value = value
 
 
 class Vocabulary:
     def __init__(
         self,
         id,
-        uri,                    # DCAT
-        title,                  # DCAT
-        description,            # DCAT
-        creator,                # DCAT
-        created,                # DCAT
-        modified,               # DCAT
+        uri,
+        title,
+        description,
+        creator,
+        created,
+        modified,
         versionInfo,
         source,
         hasTopConcept=None,
         concepts=None,
         concept_hierarchy=None,
         collections=None,
-        accessURL=None,         # DCAT
-        downloadURL=None,       # DCAT
-        sparql_endpoint=None,   # DCAT
+        accessURL=None,
+        downloadURL=None,
+        sparql_endpoint=None,
         collection_uris=None,
         sparql_username=None,
         sparql_password=None,
+        other_properties: List[Property] = None
     ):
         self.id = id
         self.uri = uri
@@ -56,6 +65,8 @@ class Vocabulary:
         self.collection_uris = collection_uris
         self.sparql_username = sparql_username
         self.sparql_password = sparql_password
+
+        self.other_properties = other_properties
 
 
 class VocabularyRenderer(Renderer):
@@ -126,6 +137,10 @@ class VocabularyRenderer(Renderer):
         if self.vocab.sparql_endpoint:
             g.add((s, VOID.sparqlEndpoint, URIRef(self.vocab.sparql_endpoint)))
 
+        if self.vocab.other_properties is not None:
+            for prop in self.vocab.other_properties:
+                g.add((s, URIRef(prop.uri), prop.value))
+
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
             return Response(g.serialize(format="json-ld"), mimetype=self.mediatype)
@@ -159,8 +174,7 @@ class VocabularyRenderer(Renderer):
             "version": __version__,
             "uri": self.uri,
             "vocab": self.vocab,
-            # "navs": self.navs,
-            "title": "Voc: " + self.vocab.title,
+            "title": self.vocab.title,
         }
 
         return Response(
