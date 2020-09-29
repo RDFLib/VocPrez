@@ -32,7 +32,7 @@ class VocBench(Source):
                         data=VocBench.voc.export_project(k), format="turtle"
                     )
 
-                    utils.cache_write(k, g)
+                    utils.cache_write(g)
                 g.VOCABS[k]["source"] = config.VocabSource.FILE
 
                 # # Creators

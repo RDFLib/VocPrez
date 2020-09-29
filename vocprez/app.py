@@ -14,7 +14,7 @@ from flask import (
 )
 from vocprez.model import *
 from vocprez import _config as config
-from vocprez.source.utils import cache_read, cache_write, sparql_query
+from vocprez.source.utils import sparql_query
 from pyldapi import Renderer, ContainerRenderer
 import datetime
 import logging
@@ -34,26 +34,16 @@ def before_request():
     calling collect() for each of the vocab sources defined in config/__init__.py -> VOCAB_SOURCES
     :return: nothing
     """
-    # check to see if g.VOCABS exists, if so, do nothing
-    if hasattr(g, "VOCABS"):
-        return
+    logging.debug("before_request()")
 
-    # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
-    g.VOCABS = cache_read("VOCABS.p")
-
-    if not g.VOCABS:
-        # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
-
-        # check each vocab source and,
-        # using the appropriate class (from details['source']),
-        # load all the vocabs from it into this session's (g) VOCABS variable
-        g.VOCABS = {}
-        for source_details in config.VOCAB_SOURCES.values():
-            # run the appropriate collect() for the given source(es)
-            getattr(source, source_details["source"]).collect(source_details)
-
-        # also load all vocabs into VOCABS.p on disk for future use
-        cache_write(g.VOCABS, "VOCABS.p")
+    # always rebuild if DEBUG True
+    if config.DEBUG:
+        source.utils.cache_reload()
+    elif hasattr(g, "VOCABS"):
+        # if g.VOCABS exists, if so, do nothing
+        pass
+    else:
+        source.utils.cache_load()
 
 
 @app.context_processor
@@ -894,9 +884,9 @@ Instead, found **{}**.""".format(
     )
 
 
-@app.route("/purge-cache")
-def purge_cache():
-    source.utils._purge_cache("VOCABS.p")
+@app.route("/cache-reload")
+def cache_reload():
+    source.utils.cache_reload()
 
     return Response(
         "Cache reloaded",

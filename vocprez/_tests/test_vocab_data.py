@@ -22,7 +22,7 @@ def client():
         with app.app_context():
             g.VOCABS = {}
             File.collect(TEST_SOURCE)
-            cache_write(g.VOCABS, "VOCABS.p")
+            cache_write(g.VOCABS)
         yield client
 
 
