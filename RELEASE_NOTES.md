@@ -1,11 +1,22 @@
 # Release Notes
 
-## 2.3 (or 3.0) - next, late 2020
+## 3.0 - next, late 2020
 * improved profile configurability
 
-See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 2.2.
+See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 3.0.
 
-## 2.2 - current, August 2020
+
+## 2.4 - current, late September 2020
+* improved caching
+* vocabulary class extension for other_properties
+* config file not backwards compatible due to need for CACHE_FILE, not CACHE_DIR property
+
+
+## 2.3
+* cache purge function added
+
+
+## 2.2
 * search page added
 * minor improvements
 
