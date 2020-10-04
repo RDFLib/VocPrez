@@ -116,17 +116,20 @@ def vocabularies():
         else 20
     )
 
-    vocabs = []  # local copy (to this request) for sorting
-
     # get this instance's list of vocabs
-    for k, voc in g.VOCABS.items():
-        # respond to a filter
-        if request.values.get("filter") is not None:
-            if request.values.get("filter").lower() in voc.title.lower():
-                vocabs.append((url_for("object", uri=k), voc.title))
-        else:
-            # no filter: list all
-            vocabs.append((url_for("object", uri=k), voc.title))
+    vocabs = list(g.VOCABS.keys())
+
+    # respond to a filter
+    if request.values.get("filter") is not None:
+        vocabs = [
+            v for v in vocabs
+            if request.values.get("filter").lower() in g.VOCABS[v].id.lower()
+               or request.values.get("filter").lower() in g.VOCABS[v].title.lower()
+               or request.values.get("filter").lower() in g.VOCABS[v].description.lower()
+        ]
+
+    vocabs = [(url_for("object", uri=v), g.VOCABS[v]) for v in vocabs]
+
     vocabs.sort(key=lambda tup: tup[1])
     total = len(vocabs)
     #
