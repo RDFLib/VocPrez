@@ -16,7 +16,7 @@ from vocprez.model import *
 from vocprez import _config as config
 from vocprez.source.utils import sparql_query
 from pyldapi import Renderer, ContainerRenderer
-import datetime
+from vocprez.model import CatalogRenderer
 import logging
 import vocprez.source as source
 import markdown
@@ -86,11 +86,6 @@ def context_processor():
     )
 
 
-@app.context_processor
-def inject_date():
-    return {"date": datetime.date.today()}
-
-
 # ROUTE index
 @app.route("/")
 def index():
@@ -98,6 +93,15 @@ def index():
         "index.html",
     )
 # END ROUTE index
+
+
+# ROUTE dataset
+@app.route("/catalog")
+def catalog():
+    # vocabs as Datasets
+    datasets = [(k, v.title) for k, v in g.VOCABS.items()]
+    return CatalogRenderer(request, datasets).render()
+# END ROUTE dataset
 
 
 # ROUTE vocabs
@@ -151,19 +155,6 @@ def vocabularies():
         vocabs,
         total
     ).render()
-# END ROUTE vocabs
-
-
-def translate_vocab_id_to_vocab_uri(vocab_id):
-    vocab_ids = {}
-
-    for x in g.VOCABS.keys():
-        vocab_ids[x.split("#")[-1].split("/")[-1].lower()] = x
-
-    if vocab_id in vocab_ids.keys():
-        return vocab_ids[vocab_id]
-    else:
-        return None
 
 
 def make_vocab_id_list():
@@ -274,32 +265,35 @@ def return_collection_or_concept_from_main_cache(uri):
 
         SELECT DISTINCT *
         WHERE {{ 
-            GRAPH ?g {{
-                <{uri}> a ?c .
-                OPTIONAL {{
-                    <{uri}> skos:inScheme ?cs .
-                }}
-
-                BIND (COALESCE(?cs, ?g) AS ?x)
-            }}                
+            <{uri}> a ?c .
+            OPTIONAL {{
+                {{ <{uri}> skos:inScheme ?cs . }}
+                UNION
+                {{ <{uri}> skos:topConcpetOf ?cs . }}
+                UNION
+                {{ ?cs skos:member <{uri}> . }}
+            }}           
         }}
         """.format(uri=uri)
+    print(q)
     for r in sparql_query(q):
+        print(r["c"]["value"])
         if r["c"]["value"] in source.Source.VOC_TYPES:
             # if we find it and it's of a known class, return it
             # since, for a Concept or a Collection, we know the relevant vocab as vocab ==  CS ==  graph
             # in VocPrez's models of a vocabs
-            vocab_uri = r["x"]["value"]
+            vocab_uri = r["cs"]["value"]
             if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
                 try:
                     c = source.Source(vocab_uri, request).get_collection(uri)
-                    return CollectionRenderer(request, c).render()
+                    return CollectionRenderer(request, c)
                 except:
                     pass
             elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
+                print("Concept")
                 try:
                     c = source.Source(vocab_uri, request).get_concept(uri)
-                    return ConceptRenderer(request, c).render()
+                    return ConceptRenderer(request, c)
                 except:
                     pass
     return None
@@ -310,7 +304,7 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
 
-        return CollectionRenderer(request, c).render()
+        return CollectionRenderer(request, c)
     except:
         pass
 
@@ -318,7 +312,7 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
 
-        return ConceptRenderer(request, c).render()
+        return ConceptRenderer(request, c)
     except:
         pass
 
@@ -375,9 +369,10 @@ def object():
         if v is not None:
             return v
         # if we get here, it's not a vocab so try to return a Collection or Concept from the main cache
+        print("before return_collection_or_concept_from_main_cache()")
         c = return_collection_or_concept_from_main_cache(uri)
         if c is not None:
-            return c
+            return c.render()
         # if we get here, it's neither a vocab nor a Concept of Collection so return error
         return return_vocrez_error(
             "Input Error",
@@ -405,7 +400,7 @@ def object():
         # the uri is either a Concept or Collection.
         c = return_collection_or_concept_from_vocab_source(vocab_uri, uri)
         if c is not None:
-            return c
+            return c.render()
 
         # if we get here, neither a Collection nor a Concept could be found at that vocab's source so error
         return return_vocrez_error(
