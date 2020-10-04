@@ -1,5 +1,5 @@
 from flask import g
-from vocprez.source.utils import url_decode, sparql_query, draw_concept_hierarchy, get_graph
+from vocprez.source.utils import *
 import vocprez._config as config
 
 

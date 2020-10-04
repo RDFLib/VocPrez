@@ -1,6 +1,6 @@
 import vocprez.source.utils
 from vocprez import _config as config
-from vocprez.source import Source
+from vocprez.source import *
 from os.path import join
 from rdflib import Graph, URIRef, RDF
 from rdflib.namespace import SKOS

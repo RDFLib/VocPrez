@@ -4,7 +4,7 @@ from flask import g
 import vocprez.source.utils
 from vocprez import _config as config
 from vocprez.model.vocabulary import Vocabulary
-from vocprez.source._source import Source
+from vocprez.source._source import *
 
 
 class SPARQL(Source):
