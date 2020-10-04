@@ -66,6 +66,16 @@
   </tr>
   {% endfor %}
 {% endif %}
+{% if concept.other_properties is not none %}
+  {% for prop in concept.other_properties %}
+    <tr>
+      <th><a href="{{ prop.url }}">{{ prop.label }}</a>:</th>
+      <td>
+        {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+{% endif %}
 </table>
 <div class="altprof">
   <h3>Alternate Profiles</h3>
