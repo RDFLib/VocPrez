@@ -51,7 +51,26 @@
           </td>
         </tr>
         {% endif -%}
-        {%  if vocab.collections is not none and vocab.collections|length > 0  -%}
+        {% if vocab.other_properties is not none %}
+          {% for prop in vocab.other_properties %}
+            <tr>
+              <th><a href="{{ prop.url }}">{{ prop.label }}</a>:</th>
+              <td>
+                {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+        {% if vocab.collections == "Collection" %}
+          <tr>
+            <th><a href=http://www.w3.org/2004/02/skos/core#member">Members</a></th>
+            <td>
+              {% for concept in vocab.concepts %}
+                <a href="{% if LOCAL_URLS %}{{ url_for('object') }}?vocab_uri={{ uri }}&uri={% endif %}{{ concept[0] }}">{{ concept[1] }}</a><br />
+              {% endfor -%}
+            </td>
+          </tr>
+        {% elif vocab.collections is not none and vocab.collections|length > 0  -%}
         <tr>
           <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a>:</th>
           <td>
