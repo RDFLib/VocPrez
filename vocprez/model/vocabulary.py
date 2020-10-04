@@ -5,13 +5,7 @@ from rdflib import Graph, URIRef, Literal, XSD, RDF
 from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
 from vocprez.model.profiles import profile_skos, profile_dcat
 from typing import List
-
-
-class Property(object):
-    def __init__(self, uri: str, label: str, value: URIRef or Literal):
-        self.uri = uri
-        self.label = label
-        self.value = value
+from vocprez.model.property import Property
 
 
 class Vocabulary:
