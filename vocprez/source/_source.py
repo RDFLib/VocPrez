@@ -1,7 +1,5 @@
-from collections import OrderedDict
-import dateutil
 from flask import g
-from .utils import url_decode, sparql_query, draw_concept_hierarchy, make_title, get_graph
+from vocprez.source.utils import url_decode, sparql_query, draw_concept_hierarchy, get_graph
 import vocprez._config as config
 
 
@@ -252,11 +250,11 @@ class Source:
             "http://www.opengis.net/def/metamodel/ogc-na/status": "Status"
         }
         annotations = {}
-        agent_types = [
-            'http://purl.org/dc/terms/contributor',
-            'http://purl.org/dc/terms/creator',
-            'http://purl.org/dc/terms/publisher',
-        ]
+        agent_types = {
+            'http://purl.org/dc/terms/contributor': "Contributor",
+            'http://purl.org/dc/terms/creator': "Creator",
+            'http://purl.org/dc/terms/publisher': "Publisher",
+        }
         agent = {}
         related_instance_types = {
             'http://www.w3.org/2004/02/skos/core#exactMatch': "Exact Match",

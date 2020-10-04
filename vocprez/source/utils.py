@@ -1,5 +1,4 @@
 import base64
-import errno
 import logging
 import os
 import pickle
@@ -21,8 +20,8 @@ __all__ = [
     "url_encode",
     "sparql_query",
     "draw_concept_hierarchy",
-    "make_title",
-    "get_graph"
+    "get_graph",
+    "url_decode"
 ]
 
 
