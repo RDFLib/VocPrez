@@ -155,6 +155,7 @@ def vocabularies():
         vocabs,
         total
     ).render()
+# END ROUTE vocabs
 
 
 def make_vocab_id_list():
