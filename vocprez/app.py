@@ -130,7 +130,7 @@ def vocabularies():
 
     vocabs = [(url_for("object", uri=v), g.VOCABS[v]) for v in vocabs]
 
-    vocabs.sort(key=lambda tup: tup[1])
+    vocabs.sort(key=lambda tup: tup[1].title)
     total = len(vocabs)
     #
     # # Search
