@@ -19,8 +19,19 @@ profile_dcat = Profile(
     comment="Dataset Catalogue Vocabulary (DCAT) is a W3C-authored RDF vocabulary designed to "
     "facilitate interoperability between data catalogs "
     "published on the Web.",
-    mediatypes=["text/html", "application/json"] + Renderer.RDF_MEDIA_TYPES,
+    mediatypes=["text/html"] + Renderer.RDF_MEDIA_TYPES,
     default_mediatype="text/html",
+    languages=["en"],  # default 'en' only for now
+    default_language="en",
+)
+
+profile_void = Profile(
+    "https://www.w3.org/TR/vocab-dcat/",
+    label="VoID",
+    comment="The Vocabulary of Interlinked Datasets (VoID) is an RDF Schema vocabulary for expressing metadata about "
+            "RDF datasets.",
+    mediatypes=Renderer.RDF_MEDIA_TYPES,
+    default_mediatype="text/turtle",
     languages=["en"],  # default 'en' only for now
     default_language="en",
 )
