@@ -13,7 +13,7 @@ import urllib
 import re
 from bs4 import BeautifulSoup
 import vocprez._config as config
-import vocprez.source as source
+import source
 
 
 __all__ = [
