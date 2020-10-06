@@ -1,4 +1,4 @@
-import vocprez.source.utils
+import vocprez.utils
 from vocprez import _config as config
 from vocprez.source import *
 from os.path import join

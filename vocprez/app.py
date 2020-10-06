@@ -14,7 +14,7 @@ from flask import (
 )
 from vocprez.model import *
 from vocprez import _config as config
-from vocprez.source.utils import sparql_query
+import vocprez.utils as u
 from pyldapi import Renderer, ContainerRenderer
 from vocprez.model import CatalogRenderer
 import logging
@@ -38,12 +38,12 @@ def before_request():
 
     # always rebuild if DEBUG True
     if config.DEBUG:
-        source.utils.cache_reload()
+        u.cache_reload()
     elif hasattr(g, "VOCABS"):
         # if g.VOCABS exists, if so, do nothing
         pass
     else:
-        source.utils.cache_load()
+        u.cache_load()
 
 
 @app.context_processor
@@ -77,7 +77,6 @@ def context_processor():
         "http://www.opengis.net/def/status/superseded": "superseded",
         "http://www.opengis.net/def/status/valid": "valid",
     }
-    import vocprez.source.utils as u
     return dict(
         utils=u,
         LOCAL_URLS=config.LOCAL_URLS,
@@ -128,22 +127,9 @@ def vocabularies():
                or request.values.get("filter").lower() in g.VOCABS[v].description.lower()
         ]
 
-    vocabs = [(url_for("object", uri=v), g.VOCABS[v]) for v in vocabs]
-
-    vocabs.sort(key=lambda tup: tup[1].title)
+    vocabs = [(url_for("object", uri=v), g.VOCABS[v].title) for v in vocabs]
+    vocabs.sort(key=lambda tup: tup[1])
     total = len(vocabs)
-    #
-    # # Search
-    # query = request.values.get("search")
-    # results = []
-    # if query:
-    #     for m in match(vocabs, query):
-    #         results.append(m)
-    #     vocabs[:] = results
-    #     vocabs.sort(key=lambda v: v.title)
-    #     total = len(vocabs)
-    #
-    # # generate vocabs list for requested page and per_page
     start = (page - 1) * per_page
     end = start + per_page
     vocabs = vocabs[start:end]
@@ -241,17 +227,6 @@ def concepts(vocab_id):
 # END ROUTE concepts
 
 
-# ROUTE collections
-@app.route("/collection/")
-def collections():
-    return render_template(
-        "members.html",
-        title="Collections",
-        register_class="Collections",
-    )
-# END ROUTE collections
-
-
 def return_vocab(uri):
     if uri in g.VOCABS.keys():
         # get vocab details using appropriate source handler
@@ -279,9 +254,7 @@ def return_collection_or_concept_from_main_cache(uri):
             }}           
         }}
         """.format(uri=uri)
-    print(q)
-    for r in sparql_query(q):
-        print(r["c"]["value"])
+    for r in u.sparql_query(q):
         if r["c"]["value"] in source.Source.VOC_TYPES:
             # if we find it and it's of a known class, return it
             # since, for a Concept or a Collection, we know the relevant vocab as vocab ==  CS ==  graph
@@ -457,7 +430,7 @@ def search():
         if request.values.get("from") and request.values.get("from") != "all":
             q = """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    
+
                 SELECT DISTINCT ?uri ?pl (SUM(?weight) AS ?weight)
                 WHERE {{
                     GRAPH <{grf}> {{
@@ -507,7 +480,6 @@ def search():
         else:
             q = """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
                 SELECT DISTINCT ?g ?uri ?pl (SUM(?weight) AS ?weight)
                 WHERE {{
                     GRAPH ?g {{
@@ -555,7 +527,7 @@ def search():
                 """.format(**{"input": request.values.get("search")})
             results = {}
 
-        for r in sparql_query(q):
+        for r in u.sparql_query(q):
             if r.get("uri") is None:
                 break  # must do this check as r["weight"] will appear at least once with value 0 for no results
             if request.values.get("from") and request.values.get("from") != "all":

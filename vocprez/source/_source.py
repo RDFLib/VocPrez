@@ -1,5 +1,5 @@
 from flask import g
-from vocprez.source.utils import *
+from vocprez.utils import *
 import vocprez._config as config
 
 
