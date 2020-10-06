@@ -3,9 +3,10 @@ from pyldapi import Renderer
 from flask import Response, render_template
 from rdflib import Graph, URIRef, Literal, XSD, RDF
 from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
-from vocprez.model.profiles import profile_skos, profile_dcat
+from vocprez.model.profiles import profile_skos, profile_dcat, profile_dd
 from typing import List
 from vocprez.model.property import Property
+import json as j
 
 
 class Vocabulary:
@@ -67,6 +68,7 @@ class VocabularyRenderer(Renderer):
     def __init__(self, request, vocab, language="en"):
         self.profiles = {"dcat": profile_dcat}
         self.profiles.update({"skos": profile_skos})
+        self.profiles.update({"dd": profile_dd})
         self.vocab = vocab
         self.uri = self.vocab.uri
         self.language = language
@@ -88,6 +90,8 @@ class VocabularyRenderer(Renderer):
                 return self._render_skos_rdf()
             else:
                 return self._render_dcat_html()  # same as DCAT, for now
+        elif self.profile == "dd":
+            return self._render_dd_json()
 
     def _render_dcat_rdf(self):
         # get vocab RDF
@@ -137,9 +141,9 @@ class VocabularyRenderer(Renderer):
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
-            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype)
+            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype, headers=self.headers)
         else:
-            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
+            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype, headers=self.headers)
 
     def _render_skos_rdf(self):
         g = Graph()
@@ -159,9 +163,9 @@ class VocabularyRenderer(Renderer):
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
-            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype)
+            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype, headers=self.headers)
         else:
-            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
+            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype, headers=self.headers)
 
     def _render_dcat_html(self):
         _template_context = {
@@ -175,3 +179,14 @@ class VocabularyRenderer(Renderer):
             render_template("vocabulary.html", **_template_context),
             headers=self.headers,
         )
+
+    def _render_dd_json(self):
+        concepts = []
+        if self.vocab.concepts:
+            for c in self.vocab.concepts:
+                concepts.append({
+                    "uri": c[0],
+                    "prefLabel": c[1],
+                    "broader": c[2],
+                })
+        return Response(j.dumps(concepts), mimetype="application/json", headers=self.headers)

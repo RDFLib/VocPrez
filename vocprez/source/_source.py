@@ -119,23 +119,30 @@ class Source:
         vocab = g.VOCABS[self.vocab_uri]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-            SELECT DISTINCT ?c ?pl
+            SELECT DISTINCT ?c ?pl ?broader
             WHERE {{
-                    {{ ?c skos:inScheme <{uri}> . }}
-                    UNION
-                    {{ ?c skos:topConceptOf <{uri}> . }}
-                    UNION
-                    {{ <{uri}> skos:hasTopConcept ?c . }}
-            
-                    ?c skos:prefLabel ?pl .
+                GRAPH <{vocab_uri}> {{
+                    ?c a skos:Concept ;
+                         skos:prefLabel ?pl .
+
+                    OPTIONAL {{
+                        {{?c skos:broader ?broader}}
+                        UNION 
+                        {{?broader skos:narrower ?c}}
+                    }}
+
                     FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+                }}
             }}
             ORDER BY ?pl
-            """.format(uri=vocab.uri, language=self.language)
+            """.format(vocab_uri=vocab.uri, language=self.language)
 
         return [
-            (concept["c"]["value"], concept["pl"]["value"])
+            (
+                concept["c"]["value"],
+                concept["pl"]["value"],
+                concept["broader"]["value"] if concept.get("broader") else None
+            )
             for concept in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
         ]
 

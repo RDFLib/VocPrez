@@ -46,3 +46,15 @@ profile_ckan = Profile(
     languages=["en"],
     default_language="en",
 )
+
+profile_dd = Profile(
+    "https://w3id.org/profile/dd",
+    "Drop-Down List",
+    comment="A simple data model to provide items for form drop-down lists. The basic information is an ID & name tuple "
+            "and the optional extra value is an item's parent. For vocabularies, this is then URI, prefLabel or URI, "
+            "prefLabel & broader Concept",
+    mediatypes=["application/json"],
+    default_mediatype="application/json",
+    languages=["en"],
+    default_language="en",
+)
