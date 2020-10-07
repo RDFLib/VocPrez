@@ -4,7 +4,7 @@ from flask import g
 import pytest
 from vocprez.source.file import File
 from vocprez import _config as config
-from vocprez.source.utils import cache_write
+from vocprez.utils import cache_write
 
 #TODO: delete cached pickle files/vocab_files before running tests?
 #TODO: loop through a set of supplied vocabs. At present only 'Airborn_Magnetic' is being used

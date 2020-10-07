@@ -1,4 +1,4 @@
 __version__ = "2.4"
 
-import source
-import utils
+from . import source
+from . import utils

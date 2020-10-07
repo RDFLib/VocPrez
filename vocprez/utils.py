@@ -13,10 +13,11 @@ import urllib
 import re
 from bs4 import BeautifulSoup
 import vocprez._config as config
-import source
+from . import source
 
 
 __all__ = [
+    "cache_write",
     "url_encode",
     "sparql_query",
     "draw_concept_hierarchy",
