@@ -147,14 +147,16 @@ def vocabularies():
 # END ROUTE vocabs
 
 
-def make_vocab_id_list():
-    return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
-
-
-# ROUTE vocab
+# ROUTE one vocab
 @app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
-    vocab_uri = translate_vocab_id_to_vocab_uri(vocab_id)
+    def make_vocab_id_list():
+        return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
+
+    vocab_uri = None
+    for v in g.VOCABS.keys():
+        if v.endswith(vocab_id):
+            vocab_uri = v
 
     if vocab_uri is None:
         return return_vocrez_error(
@@ -168,7 +170,7 @@ def vocabulary(vocab_id):
         )
 
     return return_vocab(vocab_uri)
-# ROUTE vocab
+# ROUTE one vocab
 
 
 # ROUTE concepts
