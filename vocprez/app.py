@@ -170,7 +170,7 @@ def vocabulary(vocab_id):
         )
 
     return return_vocab(vocab_uri)
-# ROUTE one vocab
+# END ROUTE one vocab
 
 
 # ROUTE concepts
