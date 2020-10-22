@@ -859,7 +859,7 @@ Instead, found **{}**.""".format(
 
 @app.route("/cache-reload")
 def cache_reload():
-    source.utils.cache_reload()
+    u.cache_reload()
 
     return Response(
         "Cache reloaded",
