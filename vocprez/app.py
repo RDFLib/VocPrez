@@ -264,14 +264,16 @@ def return_collection_or_concept_from_main_cache(uri):
             vocab_uri = r["cs"]["value"]
             if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
                 try:
-                    c = source.Source(vocab_uri, request).get_collection(uri)
+                    c = getattr(source, g.VOCABS[vocab_uri].source) \
+                        (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
                     return CollectionRenderer(request, c)
                 except:
                     pass
             elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
                 print("Concept")
                 try:
-                    c = source.Source(vocab_uri, request).get_concept(uri)
+                    c = getattr(source, g.VOCABS[vocab_uri].source) \
+                        (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
                     return ConceptRenderer(request, c)
                 except:
                     pass
@@ -282,7 +284,6 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
     try:
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
-
         return CollectionRenderer(request, c)
     except:
         pass
@@ -290,7 +291,6 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
     try:
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
-
         return ConceptRenderer(request, c)
     except:
         pass
