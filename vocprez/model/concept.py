@@ -92,7 +92,10 @@ class ConceptRenderer(Renderer):
 
         if self.concept.other_properties is not None:
             for prop in self.concept.other_properties:
-                g.add((c, URIRef(prop.uri), prop.value))
+                if str(prop.value).startswith("http"):
+                    g.add((c, URIRef(prop.uri), URIRef(prop.value)))
+                else:
+                    g.add((c, URIRef(prop.uri), Literal(prop.value)))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
