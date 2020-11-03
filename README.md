@@ -23,7 +23,7 @@ VocPrez is used by:
 ![](vocprez/view/style/logo-bgs-200.png) 
 
 * [British Geological Survey (BGS)](https://bgs.ac.uk/)
-    * System link: <https://devdata.bgs.ac.uk/vocprez/> - *dev only!*
+    * System link: <https://data.bgs.ac.uk/vocprez/> 
     
 ## Documentation     
      
