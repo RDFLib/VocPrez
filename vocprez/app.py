@@ -147,14 +147,16 @@ def vocabularies():
 # END ROUTE vocabs
 
 
-def make_vocab_id_list():
-    return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
-
-
-# ROUTE vocab
+# ROUTE one vocab
 @app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
-    vocab_uri = translate_vocab_id_to_vocab_uri(vocab_id)
+    def make_vocab_id_list():
+        return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
+
+    vocab_uri = None
+    for v in g.VOCABS.keys():
+        if v.endswith(vocab_id):
+            vocab_uri = v
 
     if vocab_uri is None:
         return return_vocrez_error(
@@ -168,7 +170,7 @@ def vocabulary(vocab_id):
         )
 
     return return_vocab(vocab_uri)
-# ROUTE vocab
+# END ROUTE one vocab
 
 
 # ROUTE concepts
@@ -262,14 +264,16 @@ def return_collection_or_concept_from_main_cache(uri):
             vocab_uri = r["cs"]["value"]
             if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
                 try:
-                    c = source.Source(vocab_uri, request).get_collection(uri)
+                    c = getattr(source, g.VOCABS[vocab_uri].source) \
+                        (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
                     return CollectionRenderer(request, c)
                 except:
                     pass
             elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
                 print("Concept")
                 try:
-                    c = source.Source(vocab_uri, request).get_concept(uri)
+                    c = getattr(source, g.VOCABS[vocab_uri].source) \
+                        (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
                     return ConceptRenderer(request, c)
                 except:
                     pass
@@ -280,7 +284,6 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
     try:
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
-
         return CollectionRenderer(request, c)
     except:
         pass
@@ -288,7 +291,6 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
     try:
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
-
         return ConceptRenderer(request, c)
     except:
         pass
@@ -857,7 +859,7 @@ Instead, found **{}**.""".format(
 
 @app.route("/cache-reload")
 def cache_reload():
-    source.utils.cache_reload()
+    u.cache_reload()
 
     return Response(
         "Cache reloaded",

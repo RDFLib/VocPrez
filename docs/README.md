@@ -108,6 +108,8 @@ sudo apt install -y python3-venv
 python3 -m venv $VP_HOME/venv
 source $VP_HOME/venv/bin/activate
 pip install -r $VP_HOME/requirements.txt
+# optional, if deploying with GUnicorn, not Apache as per below
+pip install -r $VP_HOME/requirements.depploy.txt  
 
 
 # configure VocPrez
