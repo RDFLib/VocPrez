@@ -1,5 +1,4 @@
 import base64
-import errno
 import logging
 import os
 import pickle
@@ -14,98 +13,84 @@ import urllib
 import re
 from bs4 import BeautifulSoup
 import vocprez._config as config
+from . import source
 
 
 __all__ = [
-    "cache_read",
     "cache_write",
     "url_encode",
     "sparql_query",
     "draw_concept_hierarchy",
-    "make_title",
-    "get_graph"
+    "get_graph",
+    "url_decode"
 ]
 
 
-def cache_read(cache_file_name):
-    """
-    Function to read object from cache if cache file is younger than cache_hours. Returns None on failure
-    """
-    cache_seconds = config.VOCAB_CACHE_HOURS * 3600
-    cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
-
-    if os.path.isfile(cache_file_path):
-        # if the cache file is younger than cache_hours days, then try to read it
-        cache_file_age = time.time() - os.stat(cache_file_path).st_mtime
-        logging.debug("Cache file age: {0:.2f} hours".format(cache_file_age / 3600))
-        # if the cache file is older than VOCAB_CACHE_HOURS, ignore it
-        if cache_file_age <= cache_seconds:
-            try:
-                with open(cache_file_path, "rb") as f:
-                    cache_object = pickle.load(f)
-                    f.close()
-                if cache_object:  # Ignore empty file
-                    logging.debug(
-                        "Read cache file {}".format(os.path.abspath(cache_file_path))
-                    )
-                    return cache_object
-            except Exception as e:
-                logging.debug(
-                    "Unable to read cache file {}: {}".format(
-                        os.path.abspath(cache_file_path), e
-                    )
-                )
-                pass
-        else:
-            logging.debug(
-                "Ignoring old cache file {}".format(os.path.abspath(cache_file_path))
-            )
-
-    return
-
-
-def cache_write(cache_object, cache_file_name):
+def cache_write(cache_object):
     """
     Function to write object to cache if cache file is older than cache_hours.
     """
-    cache_seconds = config.VOCAB_CACHE_HOURS * 3600
-    cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
+    logging.debug("cache_write({})".format(cache_object))
 
-    if os.path.isfile(cache_file_path):
-        # if the cache file is older than VOCAB_CACHE_HOURS days, delete it
-        cache_file_age = time.time() - os.stat(cache_file_path).st_mtime
-        # if the cache file is older than VOCAB_CACHE_HOURS days, delete it
-        if cache_seconds and cache_file_age > cache_seconds:
-            logging.debug(
-                "Removing old cache file {}".format(os.path.abspath(cache_file_path))
-            )
-            os.remove(cache_file_path)
-        else:
-            logging.debug(
-                "Retaining recent cache file {}".format(
-                    os.path.abspath(cache_file_path)
-                )
-            )
-            return  # Don't do anything - cache file is too young to die
+    # create dir if not there
+    if not os.path.isdir(os.path.dirname(config.CACHE_FILE)):
+        os.makedirs(os.path.dirname(config.CACHE_FILE))
 
-    try:
-        os.makedirs(config.VOCAB_CACHE_DIR)
-        logging.debug(
-            "Cache directory {} created".format(os.path.abspath(config.VOCAB_CACHE_DIR))
-        )
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(config.VOCAB_CACHE_DIR):
-            pass
-        else:
-            raise
+    with open(config.CACHE_FILE, "wb") as cache_file:
+        pickle.dump(cache_object, cache_file)
 
-    if cache_object:  # Don't write empty file
-        with open(cache_file_path, "wb") as cache_file:
-            pickle.dump(cache_object, cache_file)
-            cache_file.close()
-        logging.debug("Cache file {} written".format(cache_file_path))
+
+def cache_clear():
+    logging.debug("cache_clear()")
+
+    # clear the Flask cache
+    if hasattr(g, "VOCABS"):
+        g.VOCABS = None
+
+    # remove the pickle cache
+    if os.path.isfile(config.CACHE_FILE):
+        os.unlink(config.CACHE_FILE)
+
+
+def cache_load():
+    logging.debug("cache_load()")
+
+    if config.DEBUG:
+        logging.debug("DEBUG so purge cache")
+        cache_clear()
+
+    if hasattr(g, "VOCABS"):
+        logging.debug("have g, doing nothing")
+        pass
+    elif os.path.isfile(config.CACHE_FILE):
+        logging.debug("rebuild g from CACHE_FILE")
+        g.VOCABS = {}
+        cache_file_age = time.time() - os.stat(config.CACHE_FILE).st_mtime
+        if cache_file_age < config.CACHE_HOURS * 3600:
+            with open(config.CACHE_FILE, "rb") as f:
+                g.VOCABS = pickle.load(f)
+        else:  # old cache file
+            logging.debug("rebuild g & CACHE_FILE from collect() methods")
+            cache_clear()
+
+            for source_details in config.DATA_SOURCES.values():
+                getattr(source, source_details["source"]).collect(source_details)
+            cache_write(g.VOCABS)
     else:
-        logging.debug("Empty object ignored")
+        logging.debug("build g & CACHE_FILE from collect() methods")
+        g.VOCABS = {}
+        for source_details in config.DATA_SOURCES.values():
+            getattr(source, source_details["source"]).collect(source_details)
+        cache_write(g.VOCABS)
+
+
+def cache_reload():
+    """Cache purging function used in multiple places"""
+    logging.debug("cache_reload()")
+
+    cache_clear()
+
+    cache_load()
 
 
 def draw_concept_hierarchy(hierarchy, request, vocab_uri):
@@ -450,15 +435,3 @@ def match(vocabs, query):
 
 def parse_markdown(s):
     return markdown.markdown(s)
-
-
-def _purge_cache(cache_file_name):
-    """Cache purging function used in multiple places"""
-    # remove the pickle cache
-    cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
-    if os.path.isfile(cache_file_path):
-        os.unlink(cache_file_path)
-
-    # clear the Flask cache
-    if hasattr(g, "DATA"):
-        g.DATA = None

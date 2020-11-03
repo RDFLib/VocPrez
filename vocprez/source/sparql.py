@@ -1,10 +1,10 @@
 import logging
 import dateutil.parser
 from flask import g
-import vocprez.source.utils
+import vocprez.utils as u
 from vocprez import _config as config
 from vocprez.model.vocabulary import Vocabulary
-from ._source import Source
+from vocprez.source._source import *
 
 
 class SPARQL(Source):
@@ -63,7 +63,7 @@ class SPARQL(Source):
             ORDER BY ?title
             """.format(language=config.DEFAULT_LANGUAGE)
         # record just the IDs & title for the VocPrez in-memory vocabs list
-        concept_schemes = vocprez.source.utils.sparql_query(
+        concept_schemes = u.sparql_query(
             q,
             details["sparql_endpoint"],  # must specify a SPARQL endpoint if this source is to be a SPARQL source
             details.get("sparql_username"),

@@ -14,9 +14,9 @@ from flask import (
 )
 from vocprez.model import *
 from vocprez import _config as config
-from vocprez.source.utils import cache_read, cache_write, sparql_query
+import vocprez.utils as u
 from pyldapi import Renderer, ContainerRenderer
-import datetime
+from vocprez.model import CatalogRenderer
 import logging
 import vocprez.source as source
 import markdown
@@ -34,26 +34,16 @@ def before_request():
     calling collect() for each of the vocab sources defined in config/__init__.py -> VOCAB_SOURCES
     :return: nothing
     """
-    # check to see if g.VOCABS exists, if so, do nothing
-    if hasattr(g, "VOCABS"):
-        return
+    logging.debug("before_request()")
 
-    # we have no g.VOCABS so try and load it from a pickled VOCABS.p file
-    g.VOCABS = cache_read("VOCABS.p")
-
-    if not g.VOCABS:
-        # we haven't been able to load from VOCABS.p so run collect() on each vocab source to recreate it
-
-        # check each vocab source and,
-        # using the appropriate class (from details['source']),
-        # load all the vocabs from it into this session's (g) VOCABS variable
-        g.VOCABS = {}
-        for source_details in config.VOCAB_SOURCES.values():
-            # run the appropriate collect() for the given source(es)
-            getattr(source, source_details["source"]).collect(source_details)
-
-        # also load all vocabs into VOCABS.p on disk for future use
-        cache_write(g.VOCABS, "VOCABS.p")
+    # always rebuild if DEBUG True
+    if config.DEBUG:
+        u.cache_reload()
+    elif hasattr(g, "VOCABS"):
+        # if g.VOCABS exists, if so, do nothing
+        pass
+    else:
+        u.cache_load()
 
 
 @app.context_processor
@@ -68,7 +58,7 @@ def context_processor():
         "text/html": "HTML",
         "application/json": "JSON",
         "text/turtle": "Turtle",
-        "application/rdf+xml": "RDX/XML",
+        "application/rdf+xml": "RDF/XML",
         "application/ld+json": "JSON-LD",
         "text/n3": "Notation-3",
         "application/n-triples": "N-Triples",
@@ -87,18 +77,12 @@ def context_processor():
         "http://www.opengis.net/def/status/superseded": "superseded",
         "http://www.opengis.net/def/status/valid": "valid",
     }
-    import vocprez.source.utils as u
     return dict(
         utils=u,
         LOCAL_URLS=config.LOCAL_URLS,
         MEDIATYPE_NAMES=MEDIATYPE_NAMES,
         STATUSES=STATUSES
     )
-
-
-@app.context_processor
-def inject_date():
-    return {"date": datetime.date.today()}
 
 
 # ROUTE index
@@ -108,6 +92,15 @@ def index():
         "index.html",
     )
 # END ROUTE index
+
+
+# ROUTE dataset
+@app.route("/catalog")
+def catalog():
+    # vocabs as Datasets
+    datasets = [(k, v.title) for k, v in g.VOCABS.items()]
+    return CatalogRenderer(request, datasets).render()
+# END ROUTE dataset
 
 
 # ROUTE vocabs
@@ -122,31 +115,21 @@ def vocabularies():
         else 20
     )
 
-    vocabs = []  # local copy (to this request) for sorting
-
     # get this instance's list of vocabs
-    for k, voc in g.VOCABS.items():
-        # respond to a filter
-        if request.values.get("filter") is not None:
-            if request.values.get("filter").lower() in voc.title.lower():
-                vocabs.append((url_for("object", uri=k), voc.title))
-        else:
-            # no filter: list all
-            vocabs.append((url_for("object", uri=k), voc.title))
+    vocabs = list(g.VOCABS.keys())
+
+    # respond to a filter
+    if request.values.get("filter") is not None:
+        vocabs = [
+            v for v in vocabs
+            if request.values.get("filter").lower() in g.VOCABS[v].id.lower()
+               or request.values.get("filter").lower() in g.VOCABS[v].title.lower()
+               or request.values.get("filter").lower() in g.VOCABS[v].description.lower()
+        ]
+
+    vocabs = [(url_for("object", uri=v), g.VOCABS[v].title) for v in vocabs]
     vocabs.sort(key=lambda tup: tup[1])
     total = len(vocabs)
-    #
-    # # Search
-    # query = request.values.get("search")
-    # results = []
-    # if query:
-    #     for m in match(vocabs, query):
-    #         results.append(m)
-    #     vocabs[:] = results
-    #     vocabs.sort(key=lambda v: v.title)
-    #     total = len(vocabs)
-    #
-    # # generate vocabs list for requested page and per_page
     start = (page - 1) * per_page
     end = start + per_page
     vocabs = vocabs[start:end]
@@ -162,18 +145,6 @@ def vocabularies():
         total
     ).render()
 # END ROUTE vocabs
-
-
-def translate_vocab_id_to_vocab_uri(vocab_id):
-    vocab_ids = {}
-
-    for x in g.VOCABS.keys():
-        vocab_ids[x.split("#")[-1].split("/")[-1].lower()] = x
-
-    if vocab_id in vocab_ids.keys():
-        return vocab_ids[vocab_id]
-    else:
-        return None
 
 
 def make_vocab_id_list():
@@ -256,17 +227,6 @@ def concepts(vocab_id):
 # END ROUTE concepts
 
 
-# ROUTE collections
-@app.route("/collection/")
-def collections():
-    return render_template(
-        "members.html",
-        title="Collections",
-        register_class="Collections",
-    )
-# END ROUTE collections
-
-
 def return_vocab(uri):
     if uri in g.VOCABS.keys():
         # get vocab details using appropriate source handler
@@ -284,32 +244,33 @@ def return_collection_or_concept_from_main_cache(uri):
 
         SELECT DISTINCT *
         WHERE {{ 
-            GRAPH ?g {{
-                <{uri}> a ?c .
-                OPTIONAL {{
-                    <{uri}> skos:inScheme ?cs .
-                }}
-
-                BIND (COALESCE(?cs, ?g) AS ?x)
-            }}                
+            <{uri}> a ?c .
+            OPTIONAL {{
+                {{ <{uri}> skos:inScheme ?cs . }}
+                UNION
+                {{ <{uri}> skos:topConcpetOf ?cs . }}
+                UNION
+                {{ ?cs skos:member <{uri}> . }}
+            }}           
         }}
         """.format(uri=uri)
-    for r in sparql_query(q):
+    for r in u.sparql_query(q):
         if r["c"]["value"] in source.Source.VOC_TYPES:
             # if we find it and it's of a known class, return it
             # since, for a Concept or a Collection, we know the relevant vocab as vocab ==  CS ==  graph
             # in VocPrez's models of a vocabs
-            vocab_uri = r["x"]["value"]
+            vocab_uri = r["cs"]["value"]
             if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
                 try:
                     c = source.Source(vocab_uri, request).get_collection(uri)
-                    return CollectionRenderer(request, c).render()
+                    return CollectionRenderer(request, c)
                 except:
                     pass
             elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
+                print("Concept")
                 try:
                     c = source.Source(vocab_uri, request).get_concept(uri)
-                    return ConceptRenderer(request, c).render()
+                    return ConceptRenderer(request, c)
                 except:
                     pass
     return None
@@ -320,7 +281,7 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
 
-        return CollectionRenderer(request, c).render()
+        return CollectionRenderer(request, c)
     except:
         pass
 
@@ -328,7 +289,7 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
         c = getattr(source, g.VOCABS[vocab_uri].source) \
             (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
 
-        return ConceptRenderer(request, c).render()
+        return ConceptRenderer(request, c)
     except:
         pass
 
@@ -385,9 +346,10 @@ def object():
         if v is not None:
             return v
         # if we get here, it's not a vocab so try to return a Collection or Concept from the main cache
+        print("before return_collection_or_concept_from_main_cache()")
         c = return_collection_or_concept_from_main_cache(uri)
         if c is not None:
-            return c
+            return c.render()
         # if we get here, it's neither a vocab nor a Concept of Collection so return error
         return return_vocrez_error(
             "Input Error",
@@ -415,7 +377,7 @@ def object():
         # the uri is either a Concept or Collection.
         c = return_collection_or_concept_from_vocab_source(vocab_uri, uri)
         if c is not None:
-            return c
+            return c.render()
 
         # if we get here, neither a Collection nor a Concept could be found at that vocab's source so error
         return return_vocrez_error(
@@ -465,61 +427,107 @@ def sparql():
 def search():
     if request.values.get("search"):
         last_search = request.values.get("search")
-        q = """
-                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-                        SELECT DISTINCT ?g ?uri ?pl (SUM(?weight) AS ?weight)
-                        WHERE {{
-                            {schemebind}
-                            ?uri a skos:Concept .
-                            ?uri skos:inScheme ?g .
-                                {{  # exact match on a prefLabel always wins
-                                    ?uri
-                                         skos:prefLabel ?pl .
-                                    BIND (50 AS ?weight)
-                                    FILTER REGEX(?pl, "^{input}$", "i")
-                                }}
-                                UNION    
-                                {{
-                                    ?uri  skos:prefLabel ?pl .
-                                    BIND (10 AS ?weight)
-                                    FILTER REGEX(?pl, "{input}", "i")
-                                }}
-                                UNION
-                                {{
-                                    ?uri  skos:altLabel ?al ;
-                                         skos:prefLabel ?pl .
-                                    BIND (5 AS ?weight)
-                                    FILTER REGEX(?al, "{input}", "i")
-                                }}
-                                UNION
-                                {{
-                                    ?uri  skos:hiddenLabel ?hl ;
-                                         skos:prefLabel ?pl .
-                                    BIND (5 AS ?weight)
-                                    FILTER REGEX(?hl, "{input}", "i")
-                                }}        
-                                UNION
-                                {{
-                                    ?uri skos:definition ?d ;
-                                         skos:prefLabel ?pl .
-                                    BIND (1 AS ?weight)
-                                    FILTER REGEX(?d, "{input}", "i")
-                                }}        
-                            }}
-                        GROUP BY ?g ?uri ?pl
-                        ORDER BY DESC(?weight) 
-                        """
         if request.values.get("from") and request.values.get("from") != "all":
-            q = q.format(**{
-                        "schemebind": "BIND ( <{scheme}> AS ?g )".format(**{"scheme":request.values.get("from")}),
-                         "input": request.values.get("search")})
+            q = """
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+                SELECT DISTINCT ?uri ?pl (SUM(?weight) AS ?weight)
+                WHERE {{
+                    GRAPH <{grf}> {{
+                        {{  # exact match on a prefLabel always wins
+                            ?uri a skos:Concept ;
+                                 skos:prefLabel ?pl .
+                            BIND (50 AS ?weight)
+                            FILTER REGEX(?pl, "^{input}$", "i")
+                        }}
+                        UNION    
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:prefLabel ?pl .
+                            BIND (10 AS ?weight)
+                            FILTER REGEX(?pl, "{input}", "i")
+                        }}
+                        UNION
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:altLabel ?al ;
+                                 skos:prefLabel ?pl .
+                            BIND (5 AS ?weight)
+                            FILTER REGEX(?al, "{input}", "i")
+                        }}
+                        UNION
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:hiddenLabel ?hl ;
+                                 skos:prefLabel ?pl .
+                            BIND (5 AS ?weight)
+                            FILTER REGEX(?hl, "{input}", "i")
+                        }}        
+                        UNION
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:definition ?d ;
+                                 skos:prefLabel ?pl .
+                            BIND (1 AS ?weight)
+                            FILTER REGEX(?d, "{input}", "i")
+                        }}        
+                    }}
+                }}
+                GROUP BY ?uri ?pl
+                ORDER BY DESC(?weight) 
+                """.format(**{"grf": request.values.get("from"), "input": request.values.get("search")})
             results = []
         else:
-            q = q.format(**{"schemebind":"" ,"input": request.values.get("search")})
+            q = """
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                SELECT DISTINCT ?g ?uri ?pl (SUM(?weight) AS ?weight)
+                WHERE {{
+                    GRAPH ?g {{
+                        {{  # exact match on a prefLabel always wins
+                            ?uri a skos:Concept ;
+                                 skos:prefLabel ?pl .
+                            BIND (50 AS ?weight)
+                            FILTER REGEX(?pl, "^{input}$", "i")
+                        }}
+                        UNION    
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:prefLabel ?pl .
+                            BIND (10 AS ?weight)
+                            FILTER REGEX(?pl, "{input}", "i")
+                        }}
+                        UNION
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:altLabel ?al ;
+                                 skos:prefLabel ?pl .
+                            BIND (5 AS ?weight)
+                            FILTER REGEX(?al, "{input}", "i")
+                        }}
+                        UNION
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:hiddenLabel ?hl ;
+                                 skos:prefLabel ?pl .
+                            BIND (5 AS ?weight)
+                            FILTER REGEX(?hl, "{input}", "i")
+                        }}        
+                        UNION
+                        {{
+                            ?uri a skos:Concept ;
+                                 skos:definition ?d ;
+                                 skos:prefLabel ?pl .
+                            BIND (1 AS ?weight)
+                            FILTER REGEX(?d, "{input}", "i")
+                        }}        
+                    }}
+                }}
+                GROUP BY ?g ?uri ?pl
+                ORDER BY DESC(?weight) 
+                """.format(**{"input": request.values.get("search")})
             results = {}
 
-        for r in sparql_query(q):
+        for r in u.sparql_query(q):
             if r.get("uri") is None:
                 break  # must do this check as r["weight"] will appear at least once with value 0 for no results
             if request.values.get("from") and request.values.get("from") != "all":
@@ -847,9 +855,9 @@ Instead, found **{}**.""".format(
     )
 
 
-@app.route("/purge-cache")
-def purge_cache():
-    source.utils._purge_cache("VOCABS.p")
+@app.route("/cache-reload")
+def cache_reload():
+    source.utils.cache_reload()
 
     return Response(
         "Cache reloaded",

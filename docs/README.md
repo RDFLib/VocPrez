@@ -111,9 +111,7 @@ pip install -r $VP_HOME/requirements.txt
 
 
 # configure VocPrez
-# app.wsgi
-printf "import sys\nimport logging\nsys.path.insert(0, '$VP_HOME')\nsys.path.insert(0, '$VP_HOME/vocprez')\nlogging.basicConfig(stream=sys.stderr)\n\nfrom app import app as application\n" > $VP_HOME/app.wsgi
-# _conf
+# _config
 cp config.py $VP_HOME/vocprez/_config/__init__.py
 
 

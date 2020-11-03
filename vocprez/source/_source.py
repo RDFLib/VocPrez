@@ -1,7 +1,5 @@
-from collections import OrderedDict
-import dateutil
 from flask import g
-from .utils import cache_read, cache_write, url_decode, sparql_query, draw_concept_hierarchy, make_title, get_graph
+from ..utils import *
 import vocprez._config as config
 
 
@@ -26,80 +24,69 @@ class Source:
 
     @property
     def graph(self):
-        # if we have a graph in memory, return that
-        if self._graph is not None:
-            return self._graph
-        else:
-            cache_file_name = self.vocab_uri + ".p"
-            self._graph = cache_read(cache_file_name)
+        # no graph cache file so extract graph from source and cache
+        vocab = g.VOCABS[self.vocab_uri]
 
-            # if we got one from the cache file, return that
-            if self._graph is not None:
-                return self._graph
-            else:
-                # no graph cache file so extract graph from source and cache
-                vocab = g.VOCABS[self.vocab_uri]
+        q = """
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                PREFIX dct: <http://purl.org/dc/terms/>
+                PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-                q = """
-                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                        PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                        PREFIX dct: <http://purl.org/dc/terms/>
-                        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+                CONSTRUCT {{ ?subject ?predicate ?object }}
+                WHERE  {{ 
+                    {{ GRAPH ?graph {{
+                        {{    # conceptScheme
+                            ?subject ?predicate ?object .
+                            ?subject a skos:ConceptScheme .
+                            <{uri}> a skos:ConceptScheme .
+                        }}
+                        union
+                        {{    # conceptScheme members as subjects
+                            ?subject ?predicate ?object .
+                            ?subject skos:inScheme <{uri}> .
+                        }}
+                        union
+                        {{    # conceptScheme members as objects
+                            ?subject ?predicate ?object .
+                            ?object skos:inScheme <{uri}> .
+                        }}
+                    }} }}
+                    UNION
+                    {{
+                        {{    # conceptScheme
+                            ?subject ?predicate ?object .
+                            ?subject a skos:ConceptScheme .
+                            <{uri}> a skos:ConceptScheme .
+                        }}
+                        union
+                        {{    # conceptScheme members as subjects
+                            ?subject ?predicate ?object .
+                            ?subject skos:inScheme <{uri}> .
+                        }}
+                        union
+                        {{    # conceptScheme members as objects
+                            ?subject ?predicate ?object .
+                            ?object skos:inScheme <{uri}> .
+                        }}
+                    }}
+                    FILTER(STRSTARTS(STR(?predicate), STR(rdfs:))
+                        || STRSTARTS(STR(?predicate), STR(skos:))
+                        || STRSTARTS(STR(?predicate), STR(dct:))
+                        || STRSTARTS(STR(?predicate), STR(owl:))
+                        )
+                }}""".format(
+            uri=vocab.uri
+        )
 
-                        CONSTRUCT {{ ?subject ?predicate ?object }}
-                        WHERE  {{ 
-                            {{ GRAPH ?graph {{
-                                {{    # conceptScheme
-                                    ?subject ?predicate ?object .
-                                    ?subject a skos:ConceptScheme .
-                                    <{uri}> a skos:ConceptScheme .
-                                }}
-                                union
-                                {{    # conceptScheme members as subjects
-                                    ?subject ?predicate ?object .
-                                    ?subject skos:inScheme <{uri}> .
-                                }}
-                                union
-                                {{    # conceptScheme members as objects
-                                    ?subject ?predicate ?object .
-                                    ?object skos:inScheme <{uri}> .
-                                }}
-                            }} }}
-                            UNION
-                            {{
-                                {{    # conceptScheme
-                                    ?subject ?predicate ?object .
-                                    ?subject a skos:ConceptScheme .
-                                    <{uri}> a skos:ConceptScheme .
-                                }}
-                                union
-                                {{    # conceptScheme members as subjects
-                                    ?subject ?predicate ?object .
-                                    ?subject skos:inScheme <{uri}> .
-                                }}
-                                union
-                                {{    # conceptScheme members as objects
-                                    ?subject ?predicate ?object .
-                                    ?object skos:inScheme <{uri}> .
-                                }}
-                            }}
-                            FILTER(STRSTARTS(STR(?predicate), STR(rdfs:))
-                                || STRSTARTS(STR(?predicate), STR(skos:))
-                                || STRSTARTS(STR(?predicate), STR(dct:))
-                                || STRSTARTS(STR(?predicate), STR(owl:))
-                                )
-                        }}""".format(
-                    uri=vocab.uri
-                )
-
-                self._graph = get_graph(
-                    vocab.sparql_endpoint,
-                    q,
-                    sparql_username=vocab.sparql_username,
-                    sparql_password=vocab.sparql_password,
-                )
-                cache_write(self._graph, cache_file_name)
-                return self._graph
+        self._graph = get_graph(
+            vocab.sparql_endpoint,
+            q,
+            sparql_username=vocab.sparql_username,
+            sparql_password=vocab.sparql_password,
+        )
+        cache_write(self._graph)
+        return self._graph
 
     @staticmethod
     def collect(details):
@@ -132,23 +119,30 @@ class Source:
         vocab = g.VOCABS[self.vocab_uri]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-            SELECT DISTINCT ?c ?pl
+            SELECT DISTINCT ?c ?pl ?broader
             WHERE {{
-                    {{ ?c skos:inScheme <{uri}> . }}
-                    UNION
-                    {{ ?c skos:topConceptOf <{uri}> . }}
-                    UNION
-                    {{ <{uri}> skos:hasTopConcept ?c . }}
-            
-                    ?c skos:prefLabel ?pl .
+                GRAPH <{vocab_uri}> {{
+                    ?c a skos:Concept ;
+                         skos:prefLabel ?pl .
+
+                    OPTIONAL {{
+                        {{?c skos:broader ?broader}}
+                        UNION 
+                        {{?broader skos:narrower ?c}}
+                    }}
+
                     FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+                }}
             }}
             ORDER BY ?pl
-            """.format(uri=vocab.uri, language=self.language)
+            """.format(vocab_uri=vocab.uri, language=self.language)
 
         return [
-            (concept["c"]["value"], concept["pl"]["value"])
+            (
+                concept["c"]["value"],
+                concept["pl"]["value"],
+                concept["broader"]["value"] if concept.get("broader") else None
+            )
             for concept in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
         ]
 
@@ -268,11 +262,11 @@ class Source:
             "http://www.opengis.net/def/metamodel/ogc-na/status": "Status"
         }
         annotations = {}
-        agent_types = [
-            'http://purl.org/dc/terms/contributor',
-            'http://purl.org/dc/terms/creator',
-            'http://purl.org/dc/terms/publisher',
-        ]
+        agent_types = {
+            'http://purl.org/dc/terms/contributor': "Contributor",
+            'http://purl.org/dc/terms/creator': "Creator",
+            'http://purl.org/dc/terms/publisher': "Publisher",
+        }
         agent = {}
         related_instance_types = {
             'http://www.w3.org/2004/02/skos/core#exactMatch': "Exact Match",
