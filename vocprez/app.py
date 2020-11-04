@@ -270,7 +270,6 @@ def return_collection_or_concept_from_main_cache(uri):
                 except:
                     pass
             elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
-                print("Concept")
                 try:
                     c = getattr(source, g.VOCABS[vocab_uri].source) \
                         (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
@@ -348,7 +347,6 @@ def object():
         if v is not None:
             return v
         # if we get here, it's not a vocab so try to return a Collection or Concept from the main cache
-        print("before return_collection_or_concept_from_main_cache()")
         c = return_collection_or_concept_from_main_cache(uri)
         if c is not None:
             return c.render()
