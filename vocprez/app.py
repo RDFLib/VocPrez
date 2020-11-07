@@ -20,11 +20,21 @@ from vocprez.model import CatalogRenderer
 import logging
 import vocprez.source as source
 import markdown
+from flask_compress import Compress
 
 
 app = Flask(
     __name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR
 )
+app.config["COMPRESS_MIMETYPES"] = [
+    'text/html',
+    'text/css',
+    'text/xml',
+    'application/json',
+    'application/geo+json',
+    'application/javascript',
+] + Renderer.RDF_MEDIA_TYPES
+Compress(app)
 
 
 @app.before_request

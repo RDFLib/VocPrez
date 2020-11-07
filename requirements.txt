@@ -1,5 +1,6 @@
 bs4>=0.0.1
 flask>=1.1.1
+flask_compress>=1.8.0
 markdown==3.2.1
 rdflib>=5.0.0
 rdflib-jsonld>=0.5.0
