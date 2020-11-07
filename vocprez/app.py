@@ -37,6 +37,7 @@ app.config["COMPRESS_MIMETYPES"] = [
 Compress(app)
 
 
+# FUNCTION before_request
 @app.before_request
 def before_request():
     """
@@ -54,8 +55,10 @@ def before_request():
         pass
     else:
         u.cache_load()
+# END FUNCTION before_request
 
 
+# FUNCTION context_processor
 @app.context_processor
 def context_processor():
     """
@@ -93,6 +96,7 @@ def context_processor():
         MEDIATYPE_NAMES=MEDIATYPE_NAMES,
         STATUSES=STATUSES
     )
+# END FUNCTION context_processor
 
 
 # ROUTE index
@@ -239,6 +243,7 @@ def concepts(vocab_id):
 # END ROUTE concepts
 
 
+# FUNCTION return_vocab
 def return_vocab(uri):
     if uri in g.VOCABS.keys():
         # get vocab details using appropriate source handler
@@ -247,8 +252,10 @@ def return_vocab(uri):
         return VocabularyRenderer(request, vocab).render()
     else:
         return None
+# END FUNCTION return_vocab
 
 
+# FUNCTION return_collection_or_concept_from_main_cache
 # TODO: make this use the main cache directly, not via Vocab's source
 def return_collection_or_concept_from_main_cache(uri):
     q = """
@@ -287,8 +294,10 @@ def return_collection_or_concept_from_main_cache(uri):
                 except:
                     pass
     return None
+# END FUNCTION return_collection_or_concept_from_main_cache
 
 
+# FUNCTION return_collection_or_concept_from_vocab_source
 def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
     try:
         c = getattr(source, g.VOCABS[vocab_uri].source) \
@@ -305,6 +314,7 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
         pass
 
     return None
+# END FUNCTION return_collection_or_concept_from_vocab_source
 
 
 # ROUTE object
@@ -822,6 +832,7 @@ def endpoint():
 # END ROUTE endpoint
 
 
+# FUNCTION return_vocrez_error
 # TODO: use for all errors
 # TODO: allow conneg - at least text v. HTML
 def return_vocrez_error(title, status, message):
@@ -831,8 +842,10 @@ def return_vocrez_error(title, status, message):
         status=status,
         msg=message
     ), status
+# END FUNCTION return_vocrez_error
 
 
+# FUNCTION render_vb_exception_response
 def render_vb_exception_response(e):
     e = json.loads(str(e))
     msg = e["stresponse"]["msg"]
@@ -848,8 +861,10 @@ def render_vb_exception_response(e):
         heading="VocBench Error",
         msg=msg
     )
+# END FUNCTION render_vb_exception_response
 
 
+# FUNCTION render_invalid_object_class_response
 def render_invalid_object_class_response(vocab_id, uri, c_type):
     msg = """No valid *Object Class URI* found for vocab_id **{}** and uri **{}** 
     
@@ -863,8 +878,10 @@ Instead, found **{}**.""".format(
         heading="Concept Class Type Error",
         msg=msg,
     )
+# END FUNCTION render_invalid_object_class_response
 
 
+# ROUTE cache_reload
 @app.route("/cache-reload")
 def cache_reload():
     u.cache_reload()
@@ -874,6 +891,7 @@ def cache_reload():
         status=200,
         mimetype="text/plain"
     )
+# END ROUTE cache_reload
 
 
 # run the Flask app
