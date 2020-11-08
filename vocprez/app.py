@@ -436,9 +436,28 @@ def about():
 # ROUTE sparql
 @app.route("/sparql", methods=["GET", "POST"])
 def sparql():
-    return render_template(
-        "sparql.html",
-    )
+    # queries to /sparql with an accept header set to a SPARQL return type or an RDF type
+    # are forwarded to /endpoint for a response
+    # all others (i.e. with no Accept header, an Accept header HTML or for an unsupported Accept header
+    # result in the SPARQL page HTML respose where the query is placed into the YasGUI UI for interactive querying
+    SPARQL_RESPONSE_MEDIA_TYPES = [
+        "application/sparql-results+json",
+        "text/csv",
+        "text/tab-separated-values",
+    ]
+    QUERY_RESPONSE_MEDIA_TYPES = ["text/html"] + SPARQL_RESPONSE_MEDIA_TYPES + Renderer.RDF_MEDIA_TYPES
+    accept_type = request.accept_mimetypes.best_match(QUERY_RESPONSE_MEDIA_TYPES, "text/html")
+    logging.debug("accept_type: " + accept_type)
+    if accept_type in SPARQL_RESPONSE_MEDIA_TYPES or accept_type in Renderer.RDF_MEDIA_TYPES:
+        # return data
+        logging.debug("returning endpoint()")
+        return endpoint()
+    else:
+        # return HTML UI
+        logging.debug("returning sparql()")
+        return render_template(
+            "sparql.html",
+        )
 # END ROUTE sparql
 
 
