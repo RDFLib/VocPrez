@@ -1,19 +1,21 @@
 {% extends "page.html" %}
+{%
+    set extra_styling = '
+      form {
+          display: grid;
+          grid-template-columns: 25% 50% 25%;
+          column-gap: 5px;
+          row-gap: 5px;
+      }
+      form label {
+          font-style: italic;
+          font-size: small;
+      }
+    '
+%}
 {% block content %}
   <h1>Search</h1>
   <p>This page is for searching for Concepts within vocabularies.</p>
-  <style>
-    form {
-        display: grid;
-        grid-template-columns: 25% 50% 25%;
-        column-gap: 5px;
-        row-gap: 5px;
-    }
-    form label {
-        font-style: italic;
-        font-size: small;
-    }
-  </style>
   <form action="{{ url_for("search") }}" method="get" style="">
     {% if last_search is not none %}
       <input type="text" id="search" name="search" value="{{ last_search }}" style="grid-column: 1;" />

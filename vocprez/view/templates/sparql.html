@@ -1,5 +1,16 @@
 {% extends "page.html" %}
+{%
+    set extra_styling = '
+        .yasgui .autocompleteWrapper {
+          display: none !important;
+        }
 
+        pre {
+            background-color: #eee;
+            padding:5px;
+        }
+    '
+%}
 {% block content %}
     <h1>SPARQL</h1>
     <p>
@@ -113,16 +124,6 @@ curl {{ url_for('sparql', _external=True) }}?query={YOUR_QUERY_URL_ENCODED}<br /
     </div>
     <p>&nbsp;</p>
     <link href='https://unpkg.com/@triply/yasgui/build/yasgui.min.css' rel='stylesheet' type='text/css'/>
-    <style>
-        .yasgui .autocompleteWrapper {
-          display: none !important;
-        }
-
-        pre {
-            background-color: #eee;
-            padding:5px;
-        }
-    </style>
     <script src='https://unpkg.com/@triply/yasgui/build/yasgui.min.js'></script>
     <script type="text/javascript">
         /*
