@@ -22,6 +22,12 @@ import vocprez.source as source
 import markdown
 from flask_compress import Compress
 
+logging.basicConfig(
+    filename=config.LOGFILE,
+    level=logging.DEBUG,
+    datefmt="%Y-%m-%d %H:%M:%S",
+    format="%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s",
+)
 
 app = Flask(
     __name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR
@@ -915,11 +921,4 @@ def cache_reload():
 
 # run the Flask app
 if __name__ == "__main__":
-    logging.basicConfig(
-        filename=config.LOGFILE,
-        level=logging.DEBUG,
-        datefmt="%Y-%m-%d %H:%M:%S",
-        format="%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s",
-    )
-
     app.run(debug=config.DEBUG, threaded=True, port=5000)
