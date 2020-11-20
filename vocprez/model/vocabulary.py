@@ -7,6 +7,7 @@ from vocprez.model.profiles import profile_skos, profile_dcat, profile_dd
 from typing import List
 from vocprez.model.property import Property
 import json as j
+from vocprez._config import *
 
 
 class Vocabulary:
@@ -103,8 +104,6 @@ class VocabularyRenderer(Renderer):
         g.namespace_manager.bind("dct", DCTERMS)
         g.namespace_manager.bind("owl", OWL)
         g.namespace_manager.bind("skos", SKOS)
-        VOID = Namespace("http://rdfs.org/ns/void")
-        g.namespace_manager.bind("void", VOID)
         s = URIRef(self.vocab.uri)
 
         g.add((s, RDF.type, DCAT.Dataset))
@@ -132,12 +131,19 @@ class VocabularyRenderer(Renderer):
             g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
         if self.vocab.downloadURL:
             g.add((s, DCAT.downloadURL, URIRef(self.vocab.downloadURL)))
-        if self.vocab.sparql_endpoint:
-            g.add((s, VOID.sparqlEndpoint, URIRef(self.vocab.sparql_endpoint)))
+
+        sp = URIRef(SYSTEM_URI_BASE + "/sparql")
+        g.add((sp, DCAT.servesDataset, s))
+        g.add((sp, DCTERMS.title, Literal("VocPrez SPARQL Service")))
+        api = URIRef(SYSTEM_URI_BASE)
+        g.add((api, DCAT.servesDataset, s))
+        g.add((api, DCTERMS.title, Literal("VocPrez Linked Data API")))
 
         if self.vocab.other_properties is not None:
             for prop in self.vocab.other_properties:
-                g.add((s, URIRef(prop.uri), prop.value))
+                # other properties from DCAT, DCTERMS only
+                if str(prop.uri).startswith(("https://www.w3.org/ns/dcat#", "http://purl.org/dc/terms/")):
+                    g.add((s, URIRef(prop.uri), prop.value))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
