@@ -1,29 +1,25 @@
 {% extends "page.html" %}
 
 {% block content %}
-    <h1>System Home</h1>
+  <h1>System Home</h1>
+  <p>
+  Welcome to an instance of <a href="https://github.com/RDFlib/VocPrez">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+  </p>
+  <p>VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbencutils.uniroma2.it/">VocBench</a>. </p>
+  <p>See the <a href="{{ url_for("about") }}">About page</a> for more information about VocPrez itself.</p>
+  <h2>Vocabularies</h2>
+  <p>See the <a href="{{ url_for("vocabularies") }}">Vocabularies Register</a> for a list of vocabularies this instance of VocPrez knows about.</p>
+  <h2>Collections</h2>
+  <p>Usually for the vocabularies VocPrez displays, <code>skos:Collection</code> instances are contained within a <code>skos:ConceptScheme</code> so, to find a <code>skos:Collection</code>, visit the relevant <code>skos:ConceptScheme</code> instance's page and you will see it listed.</p>
+  <p>This behaviour of nesting <code>skos:Collection</code> instances within <code>skos:ConceptScheme</code> instances may be overridden and has been by some VocPrez implementers so that some VocPrez instances have Collections appear as top-level items.</p>
+  <h2>Concepts</h2>
+  <p>SKOS concepts are listed within a vocabulary's home page. Each vocabulary presents both a concept heirarchy (tree) view and a link to a flat list of its concepts.</p>
+  <h2>Search &amp; Querying</h2>
+  <p>You can search for Concepts within one vocab or across all vocabs using the <a href="{{ url_for("search") }}">Search page</a> or perform SPARQL queries using the <a href="{{ url_for("sparql") }}">SPARQL page</a>.</p>
+  <div class="altprof">
+    <h3>Alternate Profiles</h3>
     <p>
-        Welcome to an instance of <a href="https://github.com/RDFlib/VocPrez">VocPrez</a>, a read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
-    </p>
-
-    <p>VocPrez presents different views of vocabularies from a list of RDF sources. This system currently implements sources from local files, <a href="https://vocabs.ands.org.au/">Research Vocabularies Australia</a> and <a href="http://vocbencutils.uniroma2.it/">VocBench</a>. </p>
-
-    <p>See the <a href="{{ url_for("about") }}">About page</a> for more information about VocPrez itself.</p>
-
-    <h2>Vocabularies</h2>
-    <p>See the <a href="{{ url_for("vocabularies") }}">Vocabularies Register</a> for a list of vocabularies this instance of VocPrez knows about.</p>
-
-    <h2>Collections</h2>
-    <p>Usually for the vocabularies VocPrez displays, <code>skos:Collection</code> instances are contained within a <code>skos:ConceptScheme</code> so, to find a <code>skos:Collection</code>, visit the relevant <code>skos:ConceptScheme</code> instance's page and you will see it listed.</p>
-    <p>This behaviour of nesting <code>skos:Collection</code> instances within <code>skos:ConceptScheme</code> instances may be overridden and has been by some VocPrez implementers so that some VocPrez instances have Collections appear as top-level items.</p>
-
-    <h2>Concepts</h2>
-    <p>SKOS concepts are listed within a vocabulary's home page. Each vocabulary presents both a concept heirarchy (tree) view and a link to a flat list of its concepts.</p>
-
-    <h2>Search &amp; Querying</h2>
-    <p>You can search for Concepts within one vocab or across all vocabs using the <a href="{{ url_for("search") }}">Search page</a> or perform SPARQL queries using the <a href="{{ url_for("sparql") }}">SPARQL page</a>.</p>
-    <div style="border-top:solid 2px grey;">
-        <h3>Alternate Profiles</h3>
-        <p>Different views and formats of list of Concepts: <a href="{{ request.base_url }}?_profile=alt">Alternate Profiles</a>.</p>
-    </div>
+      Different views and formats: <a href="{{ utils.get_content_uri(uri, config.SYSTEM_URI_BASE) }}?_profile=alt">Alternate Profiles</a>.
+      <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span></p>
+  </div>
 {% endblock %}

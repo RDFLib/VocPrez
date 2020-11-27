@@ -69,3 +69,14 @@ profile_dd = Profile(
     languages=["en"],
     default_language="en",
 )
+
+profile_sdo = Profile(
+    "https://schema.org",
+    label="schema.org",
+    comment="Schema.org is a collaborative, community activity with a mission to create, maintain, and promote schemas "
+            "for structured data on the Internet, on web pages, in email messages, and beyond.",
+    mediatypes=["text/html"] + Renderer.RDF_MEDIA_TYPES,
+    default_mediatype="text/html",
+    languages=["en"],  # default 'en' only for now
+    default_language="en",
+)

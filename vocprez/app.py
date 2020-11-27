@@ -16,7 +16,7 @@ from vocprez.model import *
 from vocprez import _config as config
 import vocprez.utils as u
 from pyldapi import Renderer, ContainerRenderer
-from vocprez.model import VocabulariesRenderer
+from vocprez.model import VocPrezRenderer, VocabulariesRenderer
 import logging
 import vocprez.source as source
 import markdown
@@ -81,19 +81,15 @@ def context_processor():
 # ROUTE index
 @app.route("/")
 def index():
-    return render_template(
-        "index.html",
-    )
+    return VocPrezRenderer(
+        request,
+        config.SYSTEM_URI_BASE,
+        config.VOCS_URI,
+        config.VOCS_TITLE,
+        config.VOCS_DESC,
+        g.VOCABS
+    ).render()
 # END ROUTE index
-
-
-# ROUTE dataset
-@app.route("/catalog")
-def catalog():
-    # vocabs as Datasets
-    datasets = [(k, v.title) for k, v in g.VOCABS.items()]
-    return CatalogRenderer(request, datasets).render()
-# END ROUTE dataset
 
 
 # ROUTE vocabs
@@ -114,7 +110,7 @@ def vocabularies():
 @app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
     if vocab_id not in [x.id for x in g.VOCABS.values()]:
-        return return_vocrez_error(
+        return return_vocprez_error(
             "vocab_id not valid",
             400,
             markdown.markdown(
@@ -126,11 +122,9 @@ def vocabulary(vocab_id):
         )
 
     vocab_uri = None
-    for v in g.VOCABS.keys():
-        if v.endswith(vocab_id):
-            vocab_uri = v
-
-    return return_vocab(vocab_uri)
+    for v in g.VOCABS.values():
+        if v.id == vocab_id:
+            return return_vocab(vocab_uri)
 # END ROUTE one vocab
 
 
@@ -287,7 +281,7 @@ def object():
 
     # must have a URI or Vocab URI supplied, for any scenario
     if uri_is_empty and vocab_uri_is_empty:
-        return return_vocrez_error(
+        return return_vocprez_error(
             "Input Error",
             400,
             "A Query String Argument of 'uri' and/or 'vocab_uri' must be supplied for this endpoint"
@@ -298,7 +292,7 @@ def object():
         if v is not None:
             return v
         # if we haven't returned already, the vocab_uri was unknown but that's all we have so error
-        return return_vocrez_error(
+        return return_vocprez_error(
             "vocab_uri error",
             400,
             markdown.markdown(
@@ -318,7 +312,7 @@ def object():
         if c is not None:
             return c.render()
         # if we get here, it's neither a vocab nor a Concept of Collection so return error
-        return return_vocrez_error(
+        return return_vocprez_error(
             "Input Error",
             400,
             "The 'uri' you supplied is not known to this instance of VocPrez. You may consider supplying a 'vocab_uri' "
@@ -330,7 +324,7 @@ def object():
 
         # we have a vocab_uri, so it must be a real one
         if vocab_uri not in g.VOCABS.keys():
-            return return_vocrez_error(
+            return return_vocprez_error(
                 "Input Error",
                 400,
                 markdown.markdown(
@@ -347,7 +341,7 @@ def object():
             return c.render()
 
         # if we get here, neither a Collection nor a Concept could be found at that vocab's source so error
-        return return_vocrez_error(
+        return return_vocprez_error(
             "Input Error",
             400,
             "You supplied a valid 'vocab_uri' but when VocPrez queried the relevant vocab, no information about the "
@@ -801,7 +795,7 @@ def endpoint():
 # FUNCTION return_vocrez_error
 # TODO: use for all errors
 # TODO: allow conneg - at least text v. HTML
-def return_vocrez_error(title, status, message):
+def return_vocprez_error(title, status, message):
     return render_template(
         "error.html",
         title=title,
