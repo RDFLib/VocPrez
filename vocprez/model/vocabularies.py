@@ -127,6 +127,7 @@ class VocabulariesRenderer(ContainerRenderer):
                     g = self._make_dcat_graph()
                     return super()._make_rdf_response(g)
                 else:
+                    # TODO: make a better DCAT HTML view
                     return super()._render_mem_profile_html()
         else:  # there is a paging error (e.g. page > last_page)
             return Response(self.paging_error, status=400, mimetype="text/plain")

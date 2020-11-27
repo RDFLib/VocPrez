@@ -6,7 +6,7 @@
   <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
   <dd><h2>{{ vocab.title }}</h2></dd>
   <dt>URI</dt>
-  <dd><a href="{{ uri }}">{{ uri }}</a></dd>
+  <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
 </dl>
 <div class="overflow">
     <table class="metadata concept_scheme">
@@ -98,11 +98,7 @@
 <div class="altprof">
   <h3>Alternate Profiles</h3>
   <p>
-  {% if LOCAL_URLS -%}
-    Different views and formats of this vocabulary are here: <a href="{{ url_for("object") }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.
-  {% else -%}
-    Different views and formats of this vocabulary are here: <a href="{{ uri }}&_profile=alt">Alternate Profiles</a>.
-  {% endif -%}
+    Different views and formats: <a href="{{ utils.get_content_uri(uri) }}&_profile=alt">Alternate Profiles</a>.
     <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
 </div>
 {% endblock -%}
