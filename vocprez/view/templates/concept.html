@@ -6,7 +6,7 @@
 
 {# status #}
 {% if "http://www.opengis.net/def/metamodel/ogc-na/status" in concept.annotations.keys() %} {# we have a status marker #}
-  <div class="status {{ concept.annotations["http://www.opengis.net/def/metamodel/ogc-na/status"][1].split("/")[-1] }}"></div>
+  <div class="status {{ utils.get_status_label(concept.annotations["http://www.opengis.net/def/metamodel/ogc-na/status"][1]) }}"></div>
 {% endif %}
 
 <dl>

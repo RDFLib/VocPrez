@@ -72,23 +72,8 @@ def context_processor():
     :return: A dictionary of variables
     :rtype: dict
     """
-
-    STATUSES = {
-        "http://www.opengis.net/def/status/accepted": "accepted",
-        "http://www.opengis.net/def/status/deprecated": "deprecated",
-        "http://www.opengis.net/def/status/experimental": "experimental",
-        "http://www.opengis.net/def/status/invalid": "invalid",
-        "http://www.opengis.net/def/status/notAccepted": "notAccepted",
-        "http://www.opengis.net/def/status/reserved": "reserved",
-        "http://www.opengis.net/def/status/retired": "retired",
-        "http://www.opengis.net/def/status/stable": "stable",
-        "http://www.opengis.net/def/status/submitted": "submitted",
-        "http://www.opengis.net/def/status/superseded": "superseded",
-        "http://www.opengis.net/def/status/valid": "valid",
-    }
     return dict(
-        utils=u,
-        STATUSES=STATUSES
+        utils=u,  # gives access to all functions defined in utils.py
     )
 # END FUNCTION context_processor
 
