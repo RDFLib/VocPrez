@@ -131,20 +131,16 @@ def vocabulary(vocab_id):
 # ROUTE concepts
 @app.route("/vocab/<vocab_id>/concept/")
 def concepts(vocab_id):
-    return "/concept/"
-
-    # check the vocab id is valid
-    vocab_ids = {}
-    for x in g.VOCABS.keys():
-        vocab_ids[x.split("#")[-1].split("/")[-1]] = x
-
-    if vocab_id not in vocab_ids.keys():
-        msg = "The vocabulary ID that was supplied was not known. " \
-              "It must be one of these: {}".format(", ".join(vocab_ids.keys()))
-        return Response(
-            msg,
-            status=400,
-            mimetype="text/plain"
+    if vocab_id not in [x.id for x in g.VOCABS.values()]:
+        return return_vocprez_error(
+            "vocab_id not valid",
+            400,
+            markdown.markdown(
+                "The 'vocab_id' you supplied, {}, is not known. Valid vocab_ids are:\n\n{}".format(
+                    vocab_id,
+                    "\n".join(["* [{}]({}): {}".format(x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
+                )
+            )
         )
 
     try:
@@ -359,7 +355,7 @@ def about():
     with open(os.path.join(config.APP_DIR, "..", "README.md")) as f:
         content = f.read()
 
-    # make images come from wed dir
+    # make images come from web dir
     content = content.replace(
         "vocprez/view/style/", request.url_root + "style/"
     )
