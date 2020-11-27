@@ -73,16 +73,6 @@ def context_processor():
     :rtype: dict
     """
 
-    MEDIATYPE_NAMES = {
-        "text/html": "HTML",
-        "application/json": "JSON",
-        "text/turtle": "Turtle",
-        "application/rdf+xml": "RDF/XML",
-        "application/ld+json": "JSON-LD",
-        "text/n3": "Notation-3",
-        "application/n-triples": "N-Triples",
-    }
-
     STATUSES = {
         "http://www.opengis.net/def/status/accepted": "accepted",
         "http://www.opengis.net/def/status/deprecated": "deprecated",
@@ -98,8 +88,6 @@ def context_processor():
     }
     return dict(
         utils=u,
-        LOCAL_URLS=config.LOCAL_URLS,
-        MEDIATYPE_NAMES=MEDIATYPE_NAMES,
         STATUSES=STATUSES
     )
 # END FUNCTION context_processor
@@ -857,23 +845,6 @@ def render_vb_exception_response(e):
 # END FUNCTION render_vb_exception_response
 
 
-# FUNCTION render_invalid_object_class_response
-def render_invalid_object_class_response(vocab_id, uri, c_type):
-    msg = """No valid *Object Class URI* found for vocab_id **{}** and uri **{}** 
-    
-Instead, found **{}**.""".format(
-        vocab_id, uri, c_type
-    )
-    msg = Markup(markdown.markdown(msg))
-    return render_template(
-        "error.html",
-        title="Error - Object Class URI",
-        heading="Concept Class Type Error",
-        msg=msg,
-    )
-# END FUNCTION render_invalid_object_class_response
-
-
 # ROUTE cache_reload
 @app.route("/cache-reload")
 def cache_reload():
@@ -889,4 +860,4 @@ def cache_reload():
 
 # run the Flask app
 if __name__ == "__main__":
-    app.run(debug=config.DEBUG, threaded=True, port=5000)
+    app.run(debug=config.DEBUG, threaded=True, port=config.PORT)

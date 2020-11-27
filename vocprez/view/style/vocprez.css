@@ -124,6 +124,7 @@ ul {
 .metadata td,
 .metadata th {
     padding: 5px;
+    vertical-align: top;
 }
 
 .content {

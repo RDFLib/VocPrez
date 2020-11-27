@@ -119,7 +119,7 @@ def draw_concept_hierarchy(hierarchy, request, vocab_uri):
                 mult = item[0] - 1
 
             # Default to showing local URLs unless told otherwise
-            if (not hasattr(config, "LOCAL_URLS")) or config.LOCAL_URLS:
+            if (not hasattr(config, "LOCAL_URLS")) or config.USE_SYSTEM_URIS:
                 uri = (
                         request.url_root
                         + "object?vocab_uri="
@@ -451,7 +451,20 @@ def get_absolute_uri(uri):
 
 
 def get_content_uri(uri, system_uri_override=None):
-    if config.LOCAL_URLS:
+    if config.USE_SYSTEM_URIS:
         return get_system_uri(uri, system_uri_override)
     else:
         return get_absolute_uri(uri)
+
+
+def get_pretty_mediatype(mediatype):
+    MEDIATYPE_NAMES = {
+        "text/html": "HTML",
+        "application/json": "JSON",
+        "text/turtle": "Turtle",
+        "application/rdf+xml": "RDF/XML",
+        "application/ld+json": "JSON-LD",
+        "text/n3": "Notation-3",
+        "application/n-triples": "N-Triples",
+    }
+    return MEDIATYPE_NAMES.get(mediatype, mediatype)

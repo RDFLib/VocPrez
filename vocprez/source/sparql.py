@@ -5,6 +5,7 @@ import vocprez.utils as u
 from vocprez import _config as config
 from vocprez.model.vocabulary import Vocabulary
 from vocprez.source._source import *
+from markdown import markdown
 
 
 class SPARQL(Source):
@@ -84,7 +85,7 @@ class SPARQL(Source):
                 id,
                 cs["cs"]["value"],
                 cs["title"].get("value") or vocab_id if cs.get("title") else vocab_id,  # Need str for sorting, not None
-                cs["description"].get("value") if cs.get("description") is not None else None,
+                markdown(cs["description"].get("value")) if cs.get("description") is not None else None,
                 cs["creator"].get("value") if cs.get("creator") is not None else None,
                 dateutil.parser.parse(cs.get("created").get("value")) if cs.get("created") is not None else None,
                 # dct:issued not in Vocabulary

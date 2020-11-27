@@ -15,7 +15,7 @@
 <table class="metadata collection">
     {%  if collection.comment is not none  %}
     <tr>
-        <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th><td>{{ collection.definition }}</td>
+        <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th><td>{{ collection.definition|safe }}</td>
     </tr>
     {% endif %}
     {% if collection.members|length > 0 %}
