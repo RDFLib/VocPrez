@@ -435,3 +435,23 @@ def match(vocabs, query):
 
 def parse_markdown(s):
     return markdown.markdown(s)
+
+
+def get_system_uri(absolute_uri, system_uri_override):
+    if system_uri_override is not None:
+        return system_uri_override
+    else:
+        return "{}/object?uri={}".format(config.SYSTEM_URI_BASE, url_encode(absolute_uri))
+
+
+def get_absolute_uri(uri):
+    if "uri=" in uri:
+        uri = uri.split("uri=")[1]
+    return url_decode(uri)
+
+
+def get_content_uri(uri, system_uri_override=None):
+    if config.LOCAL_URLS:
+        return get_system_uri(uri, system_uri_override)
+    else:
+        return get_absolute_uri(uri)

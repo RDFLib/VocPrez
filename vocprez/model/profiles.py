@@ -13,6 +13,17 @@ profile_skos = Profile(
     default_language="en",
 )
 
+profile_vocpub = Profile(
+    "https://w3id.org/profile/vocpub",
+    label="VocPub",
+    comment="A profile of SKOS for the publication of Vocabularies. This profile mandates the use of one Concept "
+            "Scheme per vocabulary",
+    mediatypes=["text/html", "application/json"] + Renderer.RDF_MEDIA_TYPES,
+    default_mediatype="text/html",
+    languages=["en"],  # default 'en' only for now
+    default_language="en",
+)
+
 profile_dcat = Profile(
     "https://www.w3.org/TR/vocab-dcat/",
     label="DCAT",

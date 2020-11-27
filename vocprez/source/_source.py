@@ -184,7 +184,9 @@ class Source:
             "wasDerivedFrom": None,
         }
         m = []
+        found = False
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+            found = True
             if r["o"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
                 return None
 
@@ -200,6 +202,9 @@ class Source:
                 s["wasDerivedFrom"] = r["o"]["value"]
             elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#member":
                 m.append((r["o"]["value"], r["mpl"]["value"]))
+
+        if not found:
+            return None
 
         from vocprez.model.collection import Collection
 
@@ -272,7 +277,9 @@ class Source:
             'http://www.w3.org/2004/02/skos/core#narrower': "Narrower"
         }
         related_instances = {}
+        found = False
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+            found = True
             if r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#prefLabel":
                 pl = r["o"]["value"]
             elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
@@ -302,6 +309,9 @@ class Source:
                 related_instances[r["p"]["value"]]["instances"].append(
                     (r["o"]["value"], r["ropl"]["value"] if r["ropl"] is not None else None)
                 )
+
+        if not found:
+            return None
 
             # TODO: Agents
 

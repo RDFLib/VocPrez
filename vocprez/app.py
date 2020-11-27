@@ -16,7 +16,7 @@ from vocprez.model import *
 from vocprez import _config as config
 import vocprez.utils as u
 from pyldapi import Renderer, ContainerRenderer
-from vocprez.model import CatalogRenderer
+from vocprez.model import VocabulariesRenderer
 import logging
 import vocprez.source as source
 import markdown
@@ -126,43 +126,13 @@ def catalog():
 # ROUTE vocabs
 @app.route("/vocab/")
 def vocabularies():
-    page = (
-        int(request.values.get("page")) if request.values.get("page") is not None else 1
-    )
-    per_page = (
-        int(request.values.get("per_page"))
-        if request.values.get("per_page") is not None
-        else 20
-    )
-
-    # get this instance's list of vocabs
-    vocabs = list(g.VOCABS.keys())
-
-    # respond to a filter
-    if request.values.get("filter") is not None:
-        vocabs = [
-            v for v in vocabs
-            if request.values.get("filter").lower() in g.VOCABS[v].id.lower()
-               or request.values.get("filter").lower() in g.VOCABS[v].title.lower()
-               or request.values.get("filter").lower() in g.VOCABS[v].description.lower()
-        ]
-
-    vocabs = [(url_for("object", uri=v), g.VOCABS[v].title) for v in vocabs]
-    vocabs.sort(key=lambda tup: tup[1])
-    total = len(vocabs)
-    start = (page - 1) * per_page
-    end = start + per_page
-    vocabs = vocabs[start:end]
-
-    return ContainerRenderer(
+    return VocabulariesRenderer(
         request,
-        config.VOCS_URI if hasattr(config, "VOCS_URI") else url_for("vocabularies"),
-        config.VOCS_TITLE if hasattr(config, "VOCS_TITLE") else 'Vocabularies',
-        config.VOCS_DESC if hasattr(config, "VOCS_DESC") else None,
-        None,
-        None,
-        vocabs,
-        total
+        g.VOCABS,
+        config.SYSTEM_URI_BASE,
+        config.VOCS_URI,
+        config.VOCS_TITLE,
+        config.VOCS_DESC
     ).render()
 # END ROUTE vocabs
 
@@ -402,6 +372,7 @@ def object():
         # the vocab_uri is valid so query that vocab's source for the object
         # the uri is either a Concept or Collection.
         c = return_collection_or_concept_from_vocab_source(vocab_uri, uri)
+        print(c)
         if c is not None:
             return c.render()
 
