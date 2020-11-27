@@ -140,24 +140,22 @@ def vocabularies():
 # ROUTE one vocab
 @app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
-    def make_vocab_id_list():
-        return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
+    if vocab_id not in [x.id for x in g.VOCABS.values()]:
+        return return_vocrez_error(
+            "vocab_id not valid",
+            400,
+            markdown.markdown(
+                "The 'vocab_id' you supplied, {}, is not known. Valid vocab_ids are:\n\n{}".format(
+                    vocab_id,
+                    "\n".join(["* [{}]({}): {}".format(x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
+                )
+            )
+        )
 
     vocab_uri = None
     for v in g.VOCABS.keys():
         if v.endswith(vocab_id):
             vocab_uri = v
-
-    if vocab_uri is None:
-        return return_vocrez_error(
-            "vocab_id not valid",
-            400,
-            markdown.markdown(
-                "The 'vocab_id' you supplied could not be translated to a valid vocab's URI. Valid vocab_ids are:\n\n"                
-                "{}".format("".join(["* [{id}]({uri})   \n".format(**{"uri": url_for("vocabulary", vocab_id=x), "id": x}) for x in make_vocab_id_list()]))
-                # "{}".format(",".join(make_vocab_id_list()))
-            ),
-        )
 
     return return_vocab(vocab_uri)
 # END ROUTE one vocab
@@ -372,7 +370,6 @@ def object():
         # the vocab_uri is valid so query that vocab's source for the object
         # the uri is either a Concept or Collection.
         c = return_collection_or_concept_from_vocab_source(vocab_uri, uri)
-        print(c)
         if c is not None:
             return c.render()
 

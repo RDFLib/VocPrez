@@ -40,7 +40,8 @@ class SPARQL(Source):
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX dcterms: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            SELECT * WHERE {{
+            SELECT * 
+            WHERE {{
                 ?cs a skos:ConceptScheme .
                 OPTIONAL {{ ?cs skos:prefLabel ?title .
                     FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
@@ -65,11 +66,22 @@ class SPARQL(Source):
         assert concept_schemes is not None, "Unable to query for ConceptSchemes"
 
         sparql_vocabs = {}
+        vocab_ids = []
         for cs in concept_schemes:
             vocab_id = cs["cs"]["value"]
+            part = cs["cs"]["value"].split("#")[-1].split("/")[-1]
+            if len(part) < 1:
+                part = cs["cs"]["value"].split("#")[-1].split("/")[-2]
+            id = part.lower()
+            if id in vocab_ids:
+                raise Exception("More than one vocab has the ID {}. Please ensure all vocabs have unique IDs. "
+                                "IDs are extracted from the last part of vocabs' URIs (i.e. after the final hash ('#') "
+                                "or slash ('/').".format(id))
+            else:
+                vocab_ids.append(id)
 
             sparql_vocabs[vocab_id] = Vocabulary(
-                cs["cs"]["value"],
+                id,
                 cs["cs"]["value"],
                 cs["title"].get("value") or vocab_id if cs.get("title") else vocab_id,  # Need str for sorting, not None
                 cs["description"].get("value") if cs.get("description") is not None else None,
