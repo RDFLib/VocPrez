@@ -604,7 +604,7 @@ def endpoint():
             "Accept": format_mimetype,
             "Accept-Encoding": "UTF-8",
         }
-        if hasattr(config, "SPARQL_USERNAME") and hasattr(config, "SPARQL_PASSWORD"):
+        if config.SPARQL_USERNAME is not None and config.SPARQL_PASSWORD is not None:
             auth = (config.SPARQL_USERNAME, config.SPARQL_PASSWORD)
         else:
             auth = None
@@ -615,9 +615,14 @@ def endpoint():
                     config.SPARQL_ENDPOINT, data, headers
                 )
             )
-            r = requests.post(
-                config.SPARQL_ENDPOINT, auth=auth, data=data, headers=headers, timeout=60
-            )
+            if auth is not None:
+                r = requests.post(
+                    config.SPARQL_ENDPOINT, auth=auth, data=data, headers=headers, timeout=60
+                )
+            else:
+                r = requests.post(
+                    config.SPARQL_ENDPOINT, data=data, headers=headers, timeout=60
+                )
             logging.debug("response: {}".format(r.__dict__))
             return r.content.decode("utf-8")
         except Exception as e:
