@@ -75,11 +75,12 @@ class SPARQL(Source):
                 part = cs["cs"]["value"].split("#")[-1].split("/")[-2]
             id = part.lower()
             if id in vocab_ids:
-                raise Exception("More than one vocab has the ID {}. Please ensure all vocabs have unique IDs. "
-                                "IDs are extracted from the last part of vocabs' URIs (i.e. after the final hash ('#') "
-                                "or slash ('/').".format(id))
-            else:
-                vocab_ids.append(id)
+                if id[-1].isnumeric():
+                    id = id[:-1] + str(int(id[-1]) + 1)
+                else:
+                    id = id + "1"
+
+            vocab_ids.append(id)
 
             sparql_vocabs[vocab_id] = Vocabulary(
                 id,
