@@ -801,25 +801,6 @@ def return_vocprez_error(title, status, message):
 # END FUNCTION return_vocrez_error
 
 
-# FUNCTION render_vb_exception_response
-def render_vb_exception_response(e):
-    e = json.loads(str(e))
-    msg = e["stresponse"]["msg"]
-    if "not an open project" in msg:
-        invalid_vocab_id = msg.split("not an open project:")[-1]
-        msg = "The VocBench instance returned with an error: **{}** is not an open project.".format(
-            invalid_vocab_id
-        )
-        msg = Markup(markdown.markdown(msg))
-    return render_template(
-        "error.html",
-        title="Error",
-        heading="VocBench Error",
-        msg=msg
-    )
-# END FUNCTION render_vb_exception_response
-
-
 # ROUTE cache_reload
 @app.route("/cache-reload")
 def cache_reload():
