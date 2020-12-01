@@ -121,10 +121,9 @@ def vocabulary(vocab_id):
             )
         )
 
-    vocab_uri = None
     for v in g.VOCABS.values():
         if v.id == vocab_id:
-            return return_vocab(vocab_uri)
+            return return_vocab(v.uri)
 # END ROUTE one vocab
 
 
