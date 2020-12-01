@@ -3,7 +3,6 @@ from vocprez.model.profiles import profile_dcat, profile_sdo
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import DCAT, DCTERMS, SDO, RDF
 from flask import Response, render_template
-import markdown
 
 
 class VocPrez:
@@ -19,6 +18,7 @@ class VocPrez:
         g = Graph()
         g.bind("sdo", SDO)
         vs = URIRef(self.vocs_uri)
+        g.add((vs, RDF.type, SDO.Dataset))
         g.add((vs, SDO.name, Literal(self.vocs_title)))
         g.add((vs, SDO.description, Literal(self.vocs_desc)))
         # for v in self.vocabs.values():
