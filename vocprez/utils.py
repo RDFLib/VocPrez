@@ -119,7 +119,7 @@ def draw_concept_hierarchy(hierarchy, request, vocab_uri):
                 mult = item[0] - 1
 
             # Default to showing local URLs unless told otherwise
-            if (not hasattr(config, "LOCAL_URLS")) or config.LOCAL_URLS:
+            if (not hasattr(config, "LOCAL_URLS")) or config.USE_SYSTEM_URIS:
                 uri = (
                         request.url_root
                         + "object?vocab_uri="
@@ -435,3 +435,53 @@ def match(vocabs, query):
 
 def parse_markdown(s):
     return markdown.markdown(s)
+
+
+def get_system_uri(absolute_uri, system_uri_override):
+    if system_uri_override is not None:
+        return system_uri_override
+    else:
+        return "{}/object?uri={}".format(config.SYSTEM_URI_BASE, url_encode(absolute_uri))
+
+
+def get_absolute_uri(uri):
+    if "uri=" in uri:
+        uri = uri.split("uri=")[1]
+    return url_decode(uri)
+
+
+def get_content_uri(uri, system_uri_override=None):
+    if config.USE_SYSTEM_URIS:
+        return get_system_uri(uri, system_uri_override)
+    else:
+        return get_absolute_uri(uri)
+
+
+def get_pretty_mediatype(mediatype):
+    MEDIATYPE_NAMES = {
+        "text/html": "HTML",
+        "application/json": "JSON",
+        "text/turtle": "Turtle",
+        "application/rdf+xml": "RDF/XML",
+        "application/ld+json": "JSON-LD",
+        "text/n3": "Notation-3",
+        "application/n-triples": "N-Triples",
+    }
+    return MEDIATYPE_NAMES.get(mediatype, mediatype)
+
+
+def get_status_label(mediatype):
+    STATUSES = {
+        "http://www.opengis.net/def/status/accepted": "accepted",
+        "http://www.opengis.net/def/status/deprecated": "deprecated",
+        "http://www.opengis.net/def/status/experimental": "experimental",
+        "http://www.opengis.net/def/status/invalid": "invalid",
+        "http://www.opengis.net/def/status/notAccepted": "notAccepted",
+        "http://www.opengis.net/def/status/reserved": "reserved",
+        "http://www.opengis.net/def/status/retired": "retired",
+        "http://www.opengis.net/def/status/stable": "stable",
+        "http://www.opengis.net/def/status/submitted": "submitted",
+        "http://www.opengis.net/def/status/superseded": "superseded",
+        "http://www.opengis.net/def/status/valid": "valid",
+    }
+    return STATUSES.get(mediatype, mediatype)

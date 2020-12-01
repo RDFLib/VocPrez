@@ -4,35 +4,35 @@
 <h1>Vocabulary</h1>
 <dl>
   <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
-  <dd><h2>{{ vocab.title }}</h2></dd>
+  <dd><h3>{{ vocab.title }}</h3></dd>
   <dt>URI</dt>
-  <dd><a href="{{ uri }}">{{ uri }}</a></dd>
+  <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
 </dl>
 <div class="overflow">
     <table class="metadata concept_scheme">
         {%  if vocab.description is not none  -%}
         <tr>
-          <th><a href="http://purl.org/dc/terms/description">Description</a>:</th><td>{{ vocab.description }}</td>
+          <th><a href="http://purl.org/dc/terms/description">Description</a></th><td>{{ vocab.description|safe }}</td>
         </tr>
         {% endif -%}
         {%  if vocab.creator is not none  -%}
         <tr>
-          <th><a href="http://purl.org/dc/terms/creator">Creator</a>:</th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
+          <th><a href="http://purl.org/dc/terms/creator">Creator</a></th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
         </tr>
         {% endif -%}
         {%  if vocab.created is not none  -%}
         <tr>
-          <th><a href="http://purl.org/dc/terms/created">Created</a>:</th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
+          <th><a href="http://purl.org/dc/terms/created">Created</a></th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
         </tr>
         {% endif -%}
         {%  if vocab.modified is not none  -%}
         <tr>
-          <th><a href="http://purl.org/dc/terms/modified">Modified</a>:</th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
+          <th><a href="http://purl.org/dc/terms/modified">Modified</a></th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
         </tr>
         {% endif -%}
         {%  if vocab.versionInfo is not none  -%}
         <tr>
-          <th><a href="http://www.w3.org/2002/07/owl#versionInfo">Version Info</a>:</th><td>{{ vocab.versionInfo }}</td>
+          <th><a href="http://www.w3.org/2002/07/owl#versionInfo">Version Info</a></th><td>{{ vocab.versionInfo }}</td>
         </tr>
         {% endif -%}
         {% if vocab.downloadURL -%}
@@ -45,7 +45,7 @@
         {% endif -%}
         {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  -%}
         <tr>
-          <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Top Concepts</a>:</th>
+          <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Concept Hierarchy</a></th>
           <td>
               {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
           </td>
@@ -54,7 +54,7 @@
         {% if vocab.other_properties is not none %}
           {% for prop in vocab.other_properties %}
             <tr>
-              <th><a href="{{ prop.url }}">{{ prop.label }}</a>:</th>
+              <th><a href="{{ prop.url }}">{{ prop.label }}</a></th>
               <td>
                 {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
               </td>
@@ -72,7 +72,7 @@
           </tr>
         {% elif vocab.collections is not none and vocab.collections|length > 0  -%}
         <tr>
-          <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a>:</th>
+          <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a></th>
           <td>
             {% for collection in vocab.collections %}
               {% if LOCAL_URLS -%}
@@ -98,11 +98,7 @@
 <div class="altprof">
   <h3>Alternate Profiles</h3>
   <p>
-  {% if LOCAL_ALTS -%}
-    Different views and formats of this vocabulary are here: <a href="{{ url_for("object") }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.
-  {% else -%}
-    Different views and formats of this vocabulary are here: <a href="{{ uri }}?_profile=alt">Alternate Profiles</a>.
-  {% endif -%}
+    Different views and formats: <a href="{{ utils.get_content_uri(uri) }}&_profile=alt">Alternate Profiles</a>.
     <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
 </div>
 {% endblock -%}

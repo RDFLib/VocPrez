@@ -6,7 +6,17 @@
 See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 3.0.
 
 
-## 2.4 - current, late September 2020
+## 2.5 - current, late November 2020
+* implemented a new Vocabularies model, instead of default pyLDAPI Container for list of vocabs
+* updated SPARQL GUI
+    * folded /endpoint into /sparql
+* tidied app.py by moving some functions to utils.py
+* implemented get_content_uri() in all templates
+* tidied template HTML & CSS
+* whole-system DCAT & SDO view
+
+
+## 2.4
 * improved caching
 * vocabulary class extension for other_properties
 * config file not backwards compatible due to need for CACHE_FILE, not CACHE_DIR property

@@ -1,0 +1,27 @@
+{% extends "page.html" %}
+{% block content %}
+  <div>
+    <h1>{{ title}}</h1>
+  </div>
+  <div id="maincontent">
+    <div>
+      {{ description|safe }}
+    </div>
+    <dl>
+      <dt>URI</dt>
+      <dd><a href="{% if LOCAL_URLS %}{{ url_for('object') }}?uri={% endif %}{{ uri }}">{{ uri }}</a></dd>
+      <dt>Publisher</dt>
+      <dd>
+        <a href="{% if LOCAL_URLS %}{{ url_for('object') }}?uri={% endif %}{{ publisher[0] }}">{{ publisher[1] }}</a>
+      </dd>
+    </dl>
+  </div>
+  <div id="altprofiles">
+    <h4>Alternates Profiles</h4>
+    <p>Different views of and formats:</p>
+    <p>
+      <a href="{{ url_for('object') }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>
+      <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
+    </p>
+  </div>
+{% endblock %}

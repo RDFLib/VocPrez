@@ -5,6 +5,7 @@ import vocprez.utils as u
 from vocprez import _config as config
 from vocprez.model.vocabulary import Vocabulary
 from vocprez.source._source import *
+from markdown import markdown
 
 
 class SPARQL(Source):
@@ -40,25 +41,19 @@ class SPARQL(Source):
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX dcterms: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-            SELECT * WHERE {{
+            SELECT * 
+            WHERE {{
                 ?cs a skos:ConceptScheme .
                 OPTIONAL {{ ?cs skos:prefLabel ?title .
                     FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
-                OPTIONAL {{ ?cs dcterms:description ?desclang
-                    BIND ( COALESCE (lang(?desclang),"{language}") AS ?lang ) 
-                    FILTER( STRSTARTS(?lang,"{language}") ) }}    
                 OPTIONAL {{ ?cs dcterms:created ?created }}
                 OPTIONAL {{ ?cs dcterms:issued ?issued }}
                 OPTIONAL {{ ?cs dcterms:modified ?modified }}
-                OPTIONAL {{ ?cs dcterms:creator ?dccreator  
-                    OPTIONAL {{ ?dccreator foaf:name|rdfs:label ?name }} 
-                     BIND( COALESCE(?name,?dccreator) as ?creator ) }}
+                OPTIONAL {{ ?cs dcterms:creator ?creator }}
                 OPTIONAL {{ ?cs dcterms:publisher ?publisher }}
                 OPTIONAL {{ ?cs owl:versionInfo ?version }}
-                OPTIONAL {{ ?cs skos:definition ?definition . 
-                    FILTER(lang(?definition) = "{language}" || lang(?definition) = "") }}
-                BIND ( COALESCE( ?definition, ?desclang) as ?description )
+                OPTIONAL {{ ?cs skos:definition ?description .
+                    FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
             }} 
             ORDER BY ?title
             """.format(language=config.DEFAULT_LANGUAGE)
@@ -69,17 +64,29 @@ class SPARQL(Source):
             details.get("sparql_username"),
             details.get("sparql_password"),
         )
-        assert concept_schemes is not None, "Unable to query for ConceptSchemes : %s " % ( q,)
+        assert concept_schemes is not None, "Unable to query for ConceptSchemes"
 
         sparql_vocabs = {}
+        vocab_ids = []
         for cs in concept_schemes:
             vocab_id = cs["cs"]["value"]
+            part = cs["cs"]["value"].split("#")[-1].split("/")[-1]
+            if len(part) < 1:
+                part = cs["cs"]["value"].split("#")[-1].split("/")[-2]
+            id = part.lower()
+            if id in vocab_ids:
+                if id[-1].isnumeric():
+                    id = id[:-1] + str(int(id[-1]) + 1)
+                else:
+                    id = id + "1"
+
+            vocab_ids.append(id)
 
             sparql_vocabs[vocab_id] = Vocabulary(
-                cs["cs"]["value"],
+                id,
                 cs["cs"]["value"],
                 cs["title"].get("value") or vocab_id if cs.get("title") else vocab_id,  # Need str for sorting, not None
-                cs["description"].get("value") if cs.get("description") is not None else None,
+                markdown(cs["description"].get("value")) if cs.get("description") is not None else None,
                 cs["creator"].get("value") if cs.get("creator") is not None else None,
                 dateutil.parser.parse(cs.get("created").get("value")) if cs.get("created") is not None else None,
                 # dct:issued not in Vocabulary

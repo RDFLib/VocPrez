@@ -1,0 +1,312 @@
+body {
+    display:grid;
+    grid-template-columns: 1fr 3fr 1fr ;
+    grid-template-rows: 140px 50px auto 50px;
+
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.2em;
+}
+
+#vocprez {
+    position: fixed;
+    top: 240px;
+    left: -50px;
+    font-size: small;
+    transform: rotate(-90deg);
+    color: grey;
+}
+
+#vocprez a {
+    font-size: 2em;
+    font-weight: bold;
+    text-decoration: none;
+    color: #005A9C;
+}
+#vocprez a:hover {
+    color: #333;
+}
+
+#vocprez a#versionlink {
+    font-size: 1em;
+}
+
+#header {
+    background-color: lightgrey;
+    padding: 20px;
+    color: white;
+    font-size: 100px;
+    font-weight: bold;
+}
+
+#mainmenu {
+      margin-top: 10px;
+    text-align: center;
+}
+
+#footer {
+    background-color: #eee;
+}
+
+.disabled a {
+    color: gray;
+}
+
+table, th, td {
+    border: 1px solid #e4e4e4;
+    text-align: left;
+}
+
+h1 {
+    color: darkgrey;
+    font-size: 2em;
+    font-weight: bold;
+    line-height: 1em;
+}
+
+h2 {
+    color: darkgrey;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+h3 {
+    color: darkgrey;
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+h4 {
+    color: darkgrey;
+    font-size: 1.15em;
+    font-weight: bold;
+}
+
+dt {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+p, a, li, td, th {
+    font-size: 100%;
+}
+
+a {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: darkblue;
+}
+
+code {
+  font-size: 1.2em ;
+}
+
+table.alternates td {
+    vertical-align: top;
+    padding: 5px;
+}
+
+table.content td {
+    padding: 5px;
+}
+
+ul {
+    line-height: 1.5em;
+}
+
+.metadata {
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+.metadata td,
+.metadata th {
+    padding: 5px;
+    vertical-align: top;
+}
+
+.content {
+    margin-bottom: 40px;
+    padding: 40px;
+    width: 75%;
+    box-shadow: 0 0 10px rgba(53, 52, 53, 0.1);
+    border: 1px solid rgba(53, 52, 53, 0.1);
+    border-radius: 2px;
+    background: white;
+    margin-left: 200px;
+}
+
+.content > h1 {
+    margin-bottom: 26px;
+    padding-bottom: 5px;
+    font-size: 40px;
+    line-height: 42px;
+    font-weight: 700;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.collapsible {
+    font-weight: normal;
+    color: #4294B0;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.collapsible-content {
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+.overflow {
+    overflow: auto;
+    min-height: 28px;
+}
+
+#altprof {
+
+}
+
+#filter {
+
+}
+
+/*
+* Pagination
+*/
+/* Borrowed from Bootstrap3 compiled CSS */
+.pagination {
+  display: inline-block;
+  padding-left: 0;
+  margin: 0 0;
+  border-radius: 4px;
+}
+.pagination li {
+  display: inline;
+}
+.pagination li > a,
+.pagination li > span {
+  position: relative;
+  float: left;
+  padding: 6px 12px;
+  margin-left: -1px;
+  line-height: 1.42857143;
+  color: #337ab7;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+.pagination li:first-child > a,
+.pagination li:first-child > span {
+  margin-left: 0;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.pagination li:last-child > a,
+.pagination li:last-child > span {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+.pagination li > a:hover,
+.pagination li > span:hover,
+.pagination li > a:focus,
+.pagination li > span:focus {
+  z-index: 2;
+  color: #23527c;
+  background-color: #eee;
+  border-color: #ddd;
+}
+.pagination .active > a,
+.pagination .active > span,
+.pagination .active > a:hover,
+.pagination .active > span:hover,
+.pagination .active > a:focus,
+.pagination .active > span:focus {
+  z-index: 3;
+  color: #fff;
+  cursor: default;
+  background-color: #337ab7;
+  border-color: #337ab7;
+}
+.pagination .disabled > span,
+.pagination .disabled > span:hover,
+.pagination .disabled > span:focus,
+.pagination .disabled > a,
+.pagination .disabled > a:hover,
+.pagination .disabled > a:focus {
+  color: #777;
+  cursor: not-allowed;
+  background-color: #fff;
+  border-color: #ddd;
+}
+.pagination-lg li > a,
+.pagination-lg li > span {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+}
+.pagination-lg li:first-child > a,
+.pagination-lg li:first-child > span {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+.pagination-lg li:last-child > a,
+.pagination-lg li:last-child > span {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+.pagination-sm li > a,
+.pagination-sm li > span {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.pagination-sm li:first-child > a,
+.pagination-sm li:first-child > span {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.pagination-sm li:last-child > a,
+.pagination-sm li:last-child > span {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+/*
+*   Automated pagination info
+*/
+.collapsible-content {
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 250px;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  border:solid 1px black;
+  background-color: lightgrey;
+  font-weight: normal;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

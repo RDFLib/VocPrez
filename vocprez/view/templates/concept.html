@@ -6,17 +6,17 @@
 
 {# status #}
 {% if "http://www.opengis.net/def/metamodel/ogc-na/status" in concept.annotations.keys() %} {# we have a status marker #}
-  <div class="status {{ concept.annotations["http://www.opengis.net/def/metamodel/ogc-na/status"][1].split("/")[-1] }}"></div>
+  <div class="status {{ utils.get_status_label(concept.annotations["http://www.opengis.net/def/metamodel/ogc-na/status"][1]) }}"></div>
 {% endif %}
 
 <dl>
   <dt>Preferred Label</dt>
   <dd><h2>{{ concept.prefLabel }}</h2></dd>
   <dt>URI</dt>
-  <dd><a href="{{ uri }}">{{ uri }}</a></dd>
+  <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
   {%  if vocab_uri is not none %}
   <dt>Within Vocab</dt>
-  <dd><a href="{{ url_for('object', uri=vocab_uri) }}">{{ vocab_title }}</a></dd>
+  <dd><a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a></dd>
   {% endif %}
 </dl>
 <table class="metadata concept">
@@ -36,7 +36,7 @@
   {% endif %}
   <tr>
     <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
-      <td>{{ format(concept.definition)|safe }}</td>
+      <td>{{ concept.definition|safe }}</td>
   </tr>
   {% if concept.related_instances|length > 0 %}
     {% for k, v in concept.related_instances.items() %}
@@ -44,11 +44,7 @@
       <th><a href="{{ k }}">{{ v["label"] }}</a></th>
       <td>
         {%  for inst in v["instances"] %}
-          {% if LOCAL_URLS -%}
-            <a href="{{ url_for('object') }}?uri={{ inst[0] }}">{{ inst[1] }}</a><br />
-          {% else %}
-            <a href="{{ inst[0] }}">{{ inst[1] }}</a><br />
-          {% endif -%}
+            <a href="{{ utils.get_content_uri(inst[0]) }}">{{ inst[1] }}</a><br />
         {% endfor %}
       </td>
     </tr>
@@ -69,7 +65,7 @@
 {% if concept.other_properties is not none %}
   {% for prop in concept.other_properties %}
     <tr>
-      <th><a href="{{ prop.url }}">{{ prop.label }}</a>:</th>
+      <th><a href="{{ prop.url }}">{{ prop.label }}</a></th>
       <td>
         {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
       </td>
@@ -79,17 +75,8 @@
 </table>
 <div class="altprof">
   <h3>Alternate Profiles</h3>
-  {% if LOCAL_ALTS -%}
-    {% if vocab_uri is not none %}
-      <p>Different views and formats of this concept are here: <a href="{{ url_for('object') }}?vocab_uri={{ vocab_uri }}&uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
-    {% else %}
-      <p>
-        Different views and formats of this concept are here: <a href="{{ url_for('object') }}?uri={{ uri }}?_profile=alt">Alternate Profiles</a>.
-        <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
-      </p>
-    {% endif %}
-  {% else -%}
-    <p>Different views and formats of this concept are here: <a href="{{ uri }}?_profile=alt">Alternate Profiles</a>.</p>
-  {% endif -%}
+  <p>
+    Different views and formats: <a href="{{ utils.get_content_uri(uri) }}&_profile=alt">Alternate Profiles</a>.
+    <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
 </div>
 {% endblock %}

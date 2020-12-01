@@ -16,17 +16,34 @@ from vocprez.model import *
 from vocprez import _config as config
 import vocprez.utils as u
 from pyldapi import Renderer, ContainerRenderer
-from vocprez.model import CatalogRenderer
+from vocprez.model import VocPrezRenderer, VocabulariesRenderer
 import logging
 import vocprez.source as source
 import markdown
+from flask_compress import Compress
 
+logging.basicConfig(
+    filename=config.LOGFILE,
+    level=logging.DEBUG,
+    datefmt="%Y-%m-%d %H:%M:%S",
+    format="%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s",
+)
 
 app = Flask(
     __name__, template_folder=config.TEMPLATES_DIR, static_folder=config.STATIC_DIR
 )
+app.config["COMPRESS_MIMETYPES"] = [
+    'text/html',
+    'text/css',
+    'text/xml',
+    'application/json',
+    'application/geo+json',
+    'application/javascript',
+] + Renderer.RDF_MEDIA_TYPES
+Compress(app)
 
 
+# FUNCTION before_request
 @app.before_request
 def before_request():
     """
@@ -44,8 +61,10 @@ def before_request():
         pass
     else:
         u.cache_load()
+# END FUNCTION before_request
 
 
+# FUNCTION context_processor
 @app.context_processor
 def context_processor():
     """
@@ -53,96 +72,36 @@ def context_processor():
     :return: A dictionary of variables
     :rtype: dict
     """
-
-    MEDIATYPE_NAMES = {
-        "text/html": "HTML",
-        "application/json": "JSON",
-        "text/turtle": "Turtle",
-        "application/rdf+xml": "RDF/XML",
-        "application/ld+json": "JSON-LD",
-        "text/n3": "Notation-3",
-        "application/n-triples": "N-Triples",
-    }
-
-    STATUSES = {
-        "http://www.opengis.net/def/status/accepted": "accepted",
-        "http://www.opengis.net/def/status/deprecated": "deprecated",
-        "http://www.opengis.net/def/status/experimental": "experimental",
-        "http://www.opengis.net/def/status/invalid": "invalid",
-        "http://www.opengis.net/def/status/notAccepted": "notAccepted",
-        "http://www.opengis.net/def/status/reserved": "reserved",
-        "http://www.opengis.net/def/status/retired": "retired",
-        "http://www.opengis.net/def/status/stable": "stable",
-        "http://www.opengis.net/def/status/submitted": "submitted",
-        "http://www.opengis.net/def/status/superseded": "superseded",
-        "http://www.opengis.net/def/status/valid": "valid",
-    }
     return dict(
-        utils=u,
-        LOCAL_URLS=config.LOCAL_URLS,
-        MEDIATYPE_NAMES=MEDIATYPE_NAMES,
-        STATUSES=STATUSES
+        utils=u,  # gives access to all functions defined in utils.py
     )
+# END FUNCTION context_processor
 
 
 # ROUTE index
 @app.route("/")
 def index():
-    return render_template(
-        "index.html",
-    )
+    return VocPrezRenderer(
+        request,
+        config.SYSTEM_URI_BASE,
+        config.VOCS_URI,
+        config.VOCS_TITLE,
+        config.VOCS_DESC,
+        g.VOCABS
+    ).render()
 # END ROUTE index
-
-
-# ROUTE dataset
-@app.route("/catalog")
-def catalog():
-    # vocabs as Datasets
-    datasets = [(k, v.title) for k, v in g.VOCABS.items()]
-    return CatalogRenderer(request, datasets).render()
-# END ROUTE dataset
 
 
 # ROUTE vocabs
 @app.route("/vocab/")
 def vocabularies():
-    page = (
-        int(request.values.get("page")) if request.values.get("page") is not None else 1
-    )
-    per_page = (
-        int(request.values.get("per_page"))
-        if request.values.get("per_page") is not None
-        else 20
-    )
-
-    # get this instance's list of vocabs
-    vocabs = list(g.VOCABS.keys())
-
-    # respond to a filter
-    if request.values.get("filter") is not None:
-        vocabs = [
-            v for v in vocabs
-            if request.values.get("filter").lower() in g.VOCABS[v].id.lower()
-               or request.values.get("filter").lower() in g.VOCABS[v].title.lower()
-               or request.values.get("filter").lower() in g.VOCABS[v].description.lower()
-        ]
-
-    vocabs = [(url_for("object", uri=v), g.VOCABS[v].title) for v in vocabs]
-    vocabs.sort(key=lambda tup: tup[1])
-    total = len(vocabs)
-    start = (page - 1) * per_page
-    end = start + per_page
-    vocabs = vocabs[start:end]
-
-    return ContainerRenderer(
+    return VocabulariesRenderer(
         request,
-        config.VOCS_URI if hasattr(config, "VOCS_URI") else url_for("vocabularies"),
-        config.VOCS_TITLE if hasattr(config, "VOCS_TITLE") else 'Vocabularies',
-        config.VOCS_DESC if hasattr(config, "VOCS_DESC") else None,
-        None,
-        None,
-        vocabs,
-        total
+        g.VOCABS,
+        config.SYSTEM_URI_BASE,
+        config.VOCS_URI,
+        config.VOCS_TITLE,
+        config.VOCS_DESC
     ).render()
 # END ROUTE vocabs
 
@@ -150,46 +109,38 @@ def vocabularies():
 # ROUTE one vocab
 @app.route("/vocab/<string:vocab_id>/")
 def vocabulary(vocab_id):
-    def make_vocab_id_list():
-        return [x.split("#")[-1].split("/")[-1].lower() for x in g.VOCABS.keys()]
-
-    vocab_uri = None
-    for v in g.VOCABS.keys():
-        if v.endswith(vocab_id):
-            vocab_uri = v
-
-    if vocab_uri is None:
-        return return_vocrez_error(
+    if vocab_id not in [x.id for x in g.VOCABS.values()]:
+        return return_vocprez_error(
             "vocab_id not valid",
             400,
             markdown.markdown(
-                "The 'vocab_id' you supplied could not be translated to a valid vocab's URI. Valid vocab_ids are:\n\n"                
-                "{}".format("".join(["* [{id}]({uri})   \n".format(**{"uri": url_for("vocabulary", vocab_id=x), "id": x}) for x in make_vocab_id_list()]))
-                # "{}".format(",".join(make_vocab_id_list()))
-            ),
+                "The 'vocab_id' you supplied, {}, is not known. Valid vocab_ids are:\n\n{}".format(
+                    vocab_id,
+                    "\n".join(["* [{}]({}): {}".format(x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
+                )
+            )
         )
 
-    return return_vocab(vocab_uri)
+    vocab_uri = None
+    for v in g.VOCABS.values():
+        if v.id == vocab_id:
+            return return_vocab(vocab_uri)
 # END ROUTE one vocab
 
 
 # ROUTE concepts
 @app.route("/vocab/<vocab_id>/concept/")
 def concepts(vocab_id):
-    return "/concept/"
-
-    # check the vocab id is valid
-    vocab_ids = {}
-    for x in g.VOCABS.keys():
-        vocab_ids[x.split("#")[-1].split("/")[-1]] = x
-
-    if vocab_id not in vocab_ids.keys():
-        msg = "The vocabulary ID that was supplied was not known. " \
-              "It must be one of these: {}".format(", ".join(vocab_ids.keys()))
-        return Response(
-            msg,
-            status=400,
-            mimetype="text/plain"
+    if vocab_id not in [x.id for x in g.VOCABS.values()]:
+        return return_vocprez_error(
+            "vocab_id not valid",
+            400,
+            markdown.markdown(
+                "The 'vocab_id' you supplied, {}, is not known. Valid vocab_ids are:\n\n{}".format(
+                    vocab_id,
+                    "\n".join(["* [{}]({}): {}".format(x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
+                )
+            )
         )
 
     try:
@@ -229,6 +180,7 @@ def concepts(vocab_id):
 # END ROUTE concepts
 
 
+# FUNCTION return_vocab
 def return_vocab(uri):
     if uri in g.VOCABS.keys():
         # get vocab details using appropriate source handler
@@ -237,8 +189,10 @@ def return_vocab(uri):
         return VocabularyRenderer(request, vocab).render()
     else:
         return None
+# END FUNCTION return_vocab
 
 
+# FUNCTION return_collection_or_concept_from_main_cache
 # TODO: make this use the main cache directly, not via Vocab's source
 def return_collection_or_concept_from_main_cache(uri):
     q = """
@@ -270,7 +224,6 @@ def return_collection_or_concept_from_main_cache(uri):
                 except:
                     pass
             elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
-                print("Concept")
                 try:
                     c = getattr(source, g.VOCABS[vocab_uri].source) \
                         (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
@@ -278,8 +231,10 @@ def return_collection_or_concept_from_main_cache(uri):
                 except:
                     pass
     return None
+# END FUNCTION return_collection_or_concept_from_main_cache
 
 
+# FUNCTION return_collection_or_concept_from_vocab_source
 def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
     try:
         c = getattr(source, g.VOCABS[vocab_uri].source) \
@@ -296,6 +251,7 @@ def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
         pass
 
     return None
+# END FUNCTION return_collection_or_concept_from_vocab_source
 
 
 # ROUTE object
@@ -321,7 +277,7 @@ def object():
 
     # must have a URI or Vocab URI supplied, for any scenario
     if uri_is_empty and vocab_uri_is_empty:
-        return return_vocrez_error(
+        return return_vocprez_error(
             "Input Error",
             400,
             "A Query String Argument of 'uri' and/or 'vocab_uri' must be supplied for this endpoint"
@@ -332,7 +288,7 @@ def object():
         if v is not None:
             return v
         # if we haven't returned already, the vocab_uri was unknown but that's all we have so error
-        return return_vocrez_error(
+        return return_vocprez_error(
             "vocab_uri error",
             400,
             markdown.markdown(
@@ -348,12 +304,11 @@ def object():
         if v is not None:
             return v
         # if we get here, it's not a vocab so try to return a Collection or Concept from the main cache
-        print("before return_collection_or_concept_from_main_cache()")
         c = return_collection_or_concept_from_main_cache(uri)
         if c is not None:
             return c.render()
         # if we get here, it's neither a vocab nor a Concept of Collection so return error
-        return return_vocrez_error(
+        return return_vocprez_error(
             "Input Error",
             400,
             "The 'uri' you supplied is not known to this instance of VocPrez. You may consider supplying a 'vocab_uri' "
@@ -365,7 +320,7 @@ def object():
 
         # we have a vocab_uri, so it must be a real one
         if vocab_uri not in g.VOCABS.keys():
-            return return_vocrez_error(
+            return return_vocprez_error(
                 "Input Error",
                 400,
                 markdown.markdown(
@@ -382,7 +337,7 @@ def object():
             return c.render()
 
         # if we get here, neither a Collection nor a Concept could be found at that vocab's source so error
-        return return_vocrez_error(
+        return return_vocprez_error(
             "Input Error",
             400,
             "You supplied a valid 'vocab_uri' but when VocPrez queried the relevant vocab, no information about the "
@@ -400,7 +355,7 @@ def about():
     with open(os.path.join(config.APP_DIR, "..", "README.md")) as f:
         content = f.read()
 
-    # make images come from wed dir
+    # make images come from web dir
     content = content.replace(
         "vocprez/view/style/", request.url_root + "style/"
     )
@@ -418,9 +373,28 @@ def about():
 # ROUTE sparql
 @app.route("/sparql", methods=["GET", "POST"])
 def sparql():
-    return render_template(
-        "sparql.html",
-    )
+    # queries to /sparql with an accept header set to a SPARQL return type or an RDF type
+    # are forwarded to /endpoint for a response
+    # all others (i.e. with no Accept header, an Accept header HTML or for an unsupported Accept header
+    # result in the SPARQL page HTML respose where the query is placed into the YasGUI UI for interactive querying
+    SPARQL_RESPONSE_MEDIA_TYPES = [
+        "application/sparql-results+json",
+        "text/csv",
+        "text/tab-separated-values",
+    ]
+    QUERY_RESPONSE_MEDIA_TYPES = ["text/html"] + SPARQL_RESPONSE_MEDIA_TYPES + Renderer.RDF_MEDIA_TYPES
+    accept_type = request.accept_mimetypes.best_match(QUERY_RESPONSE_MEDIA_TYPES, "text/html")
+    logging.debug("accept_type: " + accept_type)
+    if accept_type in SPARQL_RESPONSE_MEDIA_TYPES or accept_type in Renderer.RDF_MEDIA_TYPES:
+        # return data
+        logging.debug("returning endpoint()")
+        return endpoint()
+    else:
+        # return HTML UI
+        logging.debug("returning sparql()")
+        return render_template(
+            "sparql.html",
+        )
 # END ROUTE sparql
 
 
@@ -630,7 +604,7 @@ def endpoint():
             "Accept": format_mimetype,
             "Accept-Encoding": "UTF-8",
         }
-        if hasattr(config, "SPARQL_USERNAME") and hasattr(config, "SPARQL_PASSWORD"):
+        if config.SPARQL_USERNAME is not None and config.SPARQL_PASSWORD is not None:
             auth = (config.SPARQL_USERNAME, config.SPARQL_PASSWORD)
         else:
             auth = None
@@ -641,9 +615,14 @@ def endpoint():
                     config.SPARQL_ENDPOINT, data, headers
                 )
             )
-            r = requests.post(
-                config.SPARQL_ENDPOINT, auth=auth, data=data, headers=headers, timeout=60
-            )
+            if auth is not None:
+                r = requests.post(
+                    config.SPARQL_ENDPOINT, auth=auth, data=data, headers=headers, timeout=60
+                )
+            else:
+                r = requests.post(
+                    config.SPARQL_ENDPOINT, data=data, headers=headers, timeout=60
+                )
             logging.debug("response: {}".format(r.__dict__))
             return r.content.decode("utf-8")
         except Exception as e:
@@ -814,49 +793,20 @@ def endpoint():
 # END ROUTE endpoint
 
 
+# FUNCTION return_vocrez_error
 # TODO: use for all errors
 # TODO: allow conneg - at least text v. HTML
-def return_vocrez_error(title, status, message):
+def return_vocprez_error(title, status, message):
     return render_template(
         "error.html",
         title=title,
         status=status,
         msg=message
     ), status
+# END FUNCTION return_vocrez_error
 
 
-def render_vb_exception_response(e):
-    e = json.loads(str(e))
-    msg = e["stresponse"]["msg"]
-    if "not an open project" in msg:
-        invalid_vocab_id = msg.split("not an open project:")[-1]
-        msg = "The VocBench instance returned with an error: **{}** is not an open project.".format(
-            invalid_vocab_id
-        )
-        msg = Markup(markdown.markdown(msg))
-    return render_template(
-        "error.html",
-        title="Error",
-        heading="VocBench Error",
-        msg=msg
-    )
-
-
-def render_invalid_object_class_response(vocab_id, uri, c_type):
-    msg = """No valid *Object Class URI* found for vocab_id **{}** and uri **{}** 
-    
-Instead, found **{}**.""".format(
-        vocab_id, uri, c_type
-    )
-    msg = Markup(markdown.markdown(msg))
-    return render_template(
-        "error.html",
-        title="Error - Object Class URI",
-        heading="Concept Class Type Error",
-        msg=msg,
-    )
-
-
+# ROUTE cache_reload
 @app.route("/cache-reload")
 def cache_reload():
     u.cache_reload()
@@ -866,15 +816,9 @@ def cache_reload():
         status=200,
         mimetype="text/plain"
     )
+# END ROUTE cache_reload
 
 
 # run the Flask app
 if __name__ == "__main__":
-    logging.basicConfig(
-        filename=config.LOGFILE,
-        level=logging.DEBUG,
-        datefmt="%Y-%m-%d %H:%M:%S",
-        format="%(asctime)s %(levelname)s %(filename)s:%(lineno)s %(message)s",
-    )
-
-    app.run(debug=config.DEBUG, threaded=True, port=5000)
+    app.run(debug=config.DEBUG, threaded=True, port=config.PORT)
