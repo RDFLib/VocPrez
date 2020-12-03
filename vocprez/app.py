@@ -569,9 +569,9 @@ def endpoint():
             @prefix void: <http://rdfs.org/ns/void#> .
             @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-            <http://gnafld.net/sparql>
+            <{0}>
                 a                       sd:Service ;
-                sd:endpoint             <%(BASE_URI)s/function/sparql> ;
+                sd:endpoint             <{0}> ;
                 sd:supportedLanguage    sd:SPARQL11Query ; # yes, read only, sorry!
                 sd:resultFormat         sdf:SPARQL_Results_JSON ;  # yes, we only deliver JSON results, sorry!
                 sd:feature sd:DereferencesURIs ;
@@ -583,7 +583,7 @@ def endpoint():
                     ]
                 ]
             .
-        """
+        """.format(config.SYSTEM_URI_BASE + url_for("sparql"))
         g = Graph().parse(io.StringIO(sd_ttl), format="turtle")
         rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_TYPES_MAP]))
         if rdf_format in rdf_formats:
