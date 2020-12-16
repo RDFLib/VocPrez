@@ -15,9 +15,28 @@
           <th><a href="http://purl.org/dc/terms/description">Description</a></th><td>{{ vocab.description|safe }}</td>
         </tr>
         {% endif -%}
+        {%  if vocab.publisher is not none  -%}
+        <tr>
+          <th><a href="http://purl.org/dc/terms/publisher">Publisher</a></th>
+          <td>
+            {% if vocab.publisher.startswith("http") %}
+            <a href="{{ vocab.publisher }}">{{ vocab.publisher.split('/')[-1].split('#')[-1] }}</a>
+            {% else %}
+            {{ vocab.publisher }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endif -%}
         {%  if vocab.creator is not none  -%}
         <tr>
-          <th><a href="http://purl.org/dc/terms/creator">Creator</a></th><td><a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a></td>
+          <th><a href="http://purl.org/dc/terms/creator">Creator</a></th>
+          <td>
+            {% if vocab.creator.startswith("http") %}
+            <a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a>
+            {% else %}
+            {{ vocab.creator }}
+            {% endif %}
+          </td>
         </tr>
         {% endif -%}
         {%  if vocab.created is not none  -%}
@@ -66,7 +85,7 @@
             <th><a href=http://www.w3.org/2004/02/skos/core#member">Members</a></th>
             <td>
               {% for concept in vocab.concepts %}
-                <a href="{% if LOCAL_URLS %}{{ url_for('object') }}?vocab_uri={{ uri }}&uri={% endif %}{{ concept[0] }}">{{ concept[1] }}</a><br />
+                <a href="{% if USE_SYSTEM_URIS %}{{ url_for('object') }}?vocab_uri={{ uri }}&uri={% endif %}{{ concept[0] }}">{{ concept[1] }}</a><br />
               {% endfor -%}
             </td>
           </tr>
@@ -75,12 +94,7 @@
           <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a></th>
           <td>
             {% for collection in vocab.collections %}
-              {% if LOCAL_URLS -%}
-                <a href="{{ url_for('object') }}?vocab_uri={{ uri }}&uri={{ collection[0] }}">{{ collection[1] }}</a><br />
-              {% else -%}
-                <a href="{{ collection[0] }}">{{ collection[1] }}</a><br />
-              {% endif -%}
-            {% endfor %}
+              <a href="{{ utils.get_content_uri(collection[0]) }}">{{ collection[1] }}</a><br />
           </td>
         </tr>
         {% endif -%}
