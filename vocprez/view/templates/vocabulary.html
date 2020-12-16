@@ -15,18 +15,6 @@
           <th><a href="http://purl.org/dc/terms/description">Description</a></th><td>{{ vocab.description|safe }}</td>
         </tr>
         {% endif -%}
-        {%  if vocab.publisher is not none  -%}
-        <tr>
-          <th><a href="http://purl.org/dc/terms/publisher">Publisher</a></th>
-          <td>
-            {% if vocab.publisher.startswith("http") %}
-            <a href="{{ vocab.publisher }}">{{ vocab.publisher.split('/')[-1].split('#')[-1] }}</a>
-            {% else %}
-            {{ vocab.publisher }}
-            {% endif %}
-          </td>
-        </tr>
-        {% endif -%}
         {%  if vocab.creator is not none  -%}
         <tr>
           <th><a href="http://purl.org/dc/terms/creator">Creator</a></th>
@@ -95,6 +83,7 @@
           <td>
             {% for collection in vocab.collections %}
               <a href="{{ utils.get_content_uri(collection[0]) }}">{{ collection[1] }}</a><br />
+            {% endfor %}
           </td>
         </tr>
         {% endif -%}
