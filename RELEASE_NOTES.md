@@ -6,7 +6,13 @@
 See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 3.0.
 
 
-## 2.5 - current, late November 2020
+## 2.6 - current, mid January, 2021
+* updated pyLDAPI requirement - 3.11 which includes correct hasToken use in Alt Profile RDF
+* better handing of Agents indicated by text (not URIs)
+* Alt Profiles sub-template in `alt_link.html`
+
+
+## 2.5
 * implemented a new Vocabularies model, instead of default pyLDAPI Container for list of vocabs
 * updated SPARQL GUI
     * folded /endpoint into /sparql

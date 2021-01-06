@@ -6,14 +6,7 @@
             <h1>{{ label }}</h1>
         </div>
         <div style="grid-column: 2; grid-row: 1;">
-            <div id="altprofiles">
-              <h4>Alternates Profiles</h4>
-              <p>Different views of and formats:</p>
-              <p>
-                <a href="{{ url_for('vocabularies') }}?_profile=alt">Alternate Profiles</a>
-                <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
-              </p>
-            </div>
+          {% include 'alt_link.html' %}
         </div>
         <div style="grid-column: 1; grid-row: 2;">
             <dl>

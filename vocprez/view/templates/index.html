@@ -16,10 +16,5 @@
   <p>SKOS concepts are listed within a vocabulary's home page. Each vocabulary presents both a concept heirarchy (tree) view and a link to a flat list of its concepts.</p>
   <h2>Search &amp; Querying</h2>
   <p>You can search for Concepts within one vocab or across all vocabs using the <a href="{{ url_for("search") }}">Search page</a> or perform SPARQL queries using the <a href="{{ url_for("sparql") }}">SPARQL page</a>.</p>
-  <div class="altprof">
-    <h3>Alternate Profiles</h3>
-    <p>
-      Different views and formats: <a href="{{ utils.get_content_uri(uri, config.SYSTEM_URI_BASE) }}?_profile=alt">Alternate Profiles</a>.
-      <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span></p>
-  </div>
+  {% include 'alt_link.html' %}
 {% endblock %}

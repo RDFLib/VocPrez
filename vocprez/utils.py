@@ -437,24 +437,64 @@ def parse_markdown(s):
     return markdown.markdown(s)
 
 
-def get_system_uri(absolute_uri, system_uri_override):
+def make_query_string(qsas: dict):
+    if not qsas:
+        return ""
+
+    pairs = []
+    for k, v in qsas.items():
+        pairs.append("{}={}".format(k, url_encode(v)))
+
+    return "&".join(sorted(pairs))
+
+
+def get_system_uri(uri, qsas:dict = {}, system_uri_override=None):
+    if "?" in uri:
+        for qsa in uri.split("?")[1].split("&"):
+            kv = qsa.split("=")
+            # ensure that any given qsas vars override same vars in uri
+            if qsas.get(kv[0]) is None:
+                qsas[kv[0]] = kv[1]
+
+    if qsas.get("uri"):
+        uri_qsa = "?uri=" + qsas["uri"]
+        del qsas["uri"]
+    else:
+        uri_qsa = "?uri=" + url_encode(url_decode(uri.split("?")[0]))
+    s = make_query_string(qsas)
+    all_qsas = uri_qsa if s == "" else uri_qsa + "&" + s
     if system_uri_override is not None:
-        return system_uri_override
+        return system_uri_override + all_qsas
     else:
-        return "{}/object?uri={}".format(config.SYSTEM_URI_BASE, url_encode(absolute_uri))
+        return "{}/object".format(config.SYSTEM_URI_BASE) + all_qsas
 
 
-def get_absolute_uri(uri):
-    if "uri=" in uri:
-        uri = uri.split("uri=")[1]
-    return url_decode(uri)
+def get_absolute_uri(uri, qsas:dict = {}):
+    if "?" not in uri:
+        s = make_query_string(qsas)
+        return url_decode(uri) if s == "" else url_decode(uri) + "?" + make_query_string(qsas)
+    else:
+        # system_uri = uri.split("?")[0]
+        for qsa in sorted(uri.split("?")[1].split("&")):
+            kv = qsa.split("=")
+            # ensure that any given qsas vars override same vars in uri
+            if qsas.get(kv[0]) is None:
+                qsas[kv[0]] = kv[1]
+        if qsas.get("uri") is not None:
+            uri = url_decode(qsas["uri"])
+            del qsas["uri"]
+        else:
+            uri = uri.split("?")[0]
+
+        s = make_query_string(qsas)
+        return uri if s == "" else uri + "?" + make_query_string(qsas)
 
 
-def get_content_uri(uri, system_uri_override=None):
+def get_content_uri(uri, qsas:dict = {}, system_uri_override=None):
     if config.USE_SYSTEM_URIS:
-        return get_system_uri(uri, system_uri_override)
+        return get_system_uri(uri, qsas=qsas, system_uri_override=system_uri_override)
     else:
-        return get_absolute_uri(uri)
+        return get_absolute_uri(uri, qsas=qsas)
 
 
 def get_pretty_mediatype(mediatype):
