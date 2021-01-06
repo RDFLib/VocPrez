@@ -1,3 +1,7 @@
+{% if uri is not defined %}
+    {%  set uri = request.base_url  %}
+{% endif %}
+
 <div class="altprof">
   <h3>Alternate Profiles</h3>
   <p>

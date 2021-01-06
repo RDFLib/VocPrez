@@ -299,6 +299,8 @@ def object():
     elif not uri_is_empty and vocab_uri_is_empty:
         if uri == config.VOCS_URI:
             return vocabularies()
+        if uri == config.SYSTEM_URI_BASE or uri == config.SYSTEM_URI_BASE + "/":
+            return index()
         # we have no vocab_uri so we must be able to return a result from the main cache or error
         # if it's a vocab, return that
         v = return_vocab(uri)
