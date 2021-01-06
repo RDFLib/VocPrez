@@ -12,7 +12,7 @@ class VocabulariesRenderer(ContainerRenderer):
         self.page = int(request.values.get("page")) if request.values.get("page") is not None else 1
         self.per_page = int(request.values.get("per_page")) \
                    if request.values.get("per_page") is not None \
-                   else 10
+                   else 100
 
         # get this instance's list of vocabs
         vocabs = list(flask_vocs.keys())
