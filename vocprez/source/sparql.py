@@ -94,7 +94,7 @@ class SPARQL(Source):
                 # dateutil.parser.parse(cs.get('issued').get('value')) if cs.get('issued') is not None else None,
                 dateutil.parser.parse(cs.get("modified").get("value")) if cs.get("modified") is not None else None,
                 cs["version"].get("value") if cs.get("version") is not None else None,  # versionInfo
-                cs["source"].get("value") if cs.get("source") is not None else None,  # versionInfo,
+                config.VocabSource.SPARQL,
                 sparql_endpoint=details["sparql_endpoint"],
                 sparql_username=details.get("sparql_username"),
                 sparql_password=details.get("sparql_password"),
