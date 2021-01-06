@@ -178,6 +178,7 @@ class Source:
 
         pl = None
         d = None
+        c = None
         s = {
             "provenance": None,
             "source": None,
@@ -194,6 +195,8 @@ class Source:
                 pl = r["o"]["value"]
             elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
                 d = r["o"]["value"]
+            elif r["p"]["value"] == "http://www.w3.org/2000/01/rdf-schema#comment":
+                c = r["o"]["value"]
             elif r["p"]["value"] == "http://purl.org/dc/terms/provenance":
                 s["provenance"] = r["o"]["value"]
             elif r["p"]["value"] == "http://purl.org/dc/terms/source":
@@ -207,7 +210,8 @@ class Source:
             return None
 
         from vocprez.model.collection import Collection
-
+        if not d :
+            d = c
         return Collection(self.vocab_uri, uri, pl, d, s, m)
 
     def get_concept(self, uri):
@@ -245,7 +249,7 @@ class Source:
                 
                 OPTIONAL {{
                     ?o skos:prefLabel ?ropl .
-                }}                
+                }}        
             }}
             """.format(
             concept_uri=uri, language=self.language
@@ -253,6 +257,7 @@ class Source:
 
         pl = None
         d = None
+        c = None
         s = {
             "provenance": None,
             "source": None,
@@ -284,6 +289,8 @@ class Source:
                 pl = r["o"]["value"]
             elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
                 d = r["o"]["value"]
+            elif r["p"]["value"] == "http://www.w3.org/2000/01/rdf-schema#comment":
+                c = r["o"]["value"]
             elif r["p"]["value"] == "http://purl.org/dc/terms/provenance":
                 s["provenance"] = r["o"]["value"]
             elif r["p"]["value"] == "http://purl.org/dc/terms/source":
@@ -319,6 +326,8 @@ class Source:
 
         from vocprez.model.concept import Concept
 
+        if not d:
+            d = c
         return Concept(
             self.vocab_uri,
             uri,
