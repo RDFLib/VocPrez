@@ -9,8 +9,8 @@ class VocabulariesRenderer(ContainerRenderer):
     def __init__(self, request, flask_vocs, system_uri_base, vocs_uri, vocs_title, vocs_desc):
         self.system_uri_base = system_uri_base
         # work out stuff from request
-        self.page = int(request.values.get("page")) if request.values.get("page") is not None else 1
-        self.per_page = int(request.values.get("per_page")) \
+        page = int(request.values.get("page")) if request.values.get("page") is not None else 1
+        per_page = int(request.values.get("per_page")) \
                    if request.values.get("per_page") is not None \
                    else 100
 
@@ -31,8 +31,8 @@ class VocabulariesRenderer(ContainerRenderer):
         vocabs = [(v, flask_vocs[v].title) for v in vocabs]
         vocabs.sort(key=lambda tup: tup[1])
         total = len(vocabs)
-        start = (self.page - 1) * self.per_page
-        end = start + self.per_page
+        start = (page - 1) * per_page
+        end = start + per_page
         self.vocabs = vocabs[start:end]
 
         super().__init__(
@@ -50,6 +50,9 @@ class VocabulariesRenderer(ContainerRenderer):
             page_size_max=1000,
             register_template="vocabularies.html"
         )
+
+        self.page = page
+        self.per_page = per_page
 
     def _make_dcat_graph(self):
         g = super()._generate_mem_profile_rdf()

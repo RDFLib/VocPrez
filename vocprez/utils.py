@@ -448,14 +448,13 @@ def make_query_string(qsas: dict):
     return "&".join(sorted(pairs))
 
 
-def get_system_uri(uri, qsas:dict = {}, system_uri_override=None):
+def get_system_uri(uri, qsas: dict = {}, system_uri_override=None):
     if "?" in uri:
         for qsa in uri.split("?")[1].split("&"):
             kv = qsa.split("=")
             # ensure that any given qsas vars override same vars in uri
             if qsas.get(kv[0]) is None:
                 qsas[kv[0]] = kv[1]
-
     if qsas.get("uri"):
         uri_qsa = "?uri=" + qsas["uri"]
         del qsas["uri"]
@@ -490,7 +489,7 @@ def get_absolute_uri(uri, qsas:dict = {}):
         return uri if s == "" else uri + "?" + make_query_string(qsas)
 
 
-def get_content_uri(uri, qsas:dict = {}, system_uri_override=None):
+def get_content_uri(uri, qsas: dict = {}, system_uri_override=None):
     if config.USE_SYSTEM_URIS:
         return get_system_uri(uri, qsas=qsas, system_uri_override=system_uri_override)
     else:
