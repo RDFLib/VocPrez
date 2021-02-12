@@ -9,10 +9,10 @@
     </div>
     <dl>
       <dt>URI</dt>
-      <dd><a href="{% if LOCAL_URLS %}{{ url_for('object') }}?uri={% endif %}{{ uri }}">{{ uri }}</a></dd>
+      <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
       <dt>Publisher</dt>
       <dd>
-        <a href="{% if LOCAL_URLS %}{{ url_for('object') }}?uri={% endif %}{{ publisher[0] }}">{{ publisher[1] }}</a>
+        <a href="{{ utils.get_content_uri(publisher[0]) }}">{{ publisher[1] }}</a>
       </dd>
     </dl>
   </div>
