@@ -1,5 +1,7 @@
 from flask import g
 from ..utils import *
+from ..utils import suppressed_properties
+from ..model.property import Property
 import vocprez._config as config
 
 
@@ -187,24 +189,26 @@ class Source:
         m = []
         found = False
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+            prop = r["p"]["value"]
+            val = r["o"]["value"]
             found = True
-            if r["o"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
+            if val == "http://www.w3.org/2004/02/skos/core#Concept":
                 return None
 
-            if r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#prefLabel":
-                pl = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
-                d = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2000/01/rdf-schema#comment":
-                c = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/provenance":
-                s["provenance"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/source":
-                s["source"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/ns/prov#wasDerivedFrom":
-                s["wasDerivedFrom"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#member":
-                m.append((r["o"]["value"], r["mpl"]["value"]))
+            if prop == "http://www.w3.org/2004/02/skos/core#prefLabel":
+                pl = val
+            elif prop == "http://www.w3.org/2004/02/skos/core#definition":
+                d = val
+            elif prop == "http://www.w3.org/2000/01/rdf-schema#comment":
+                c = val
+            elif prop == "http://purl.org/dc/terms/provenance":
+                s["provenance"] = val
+            elif prop == "http://purl.org/dc/terms/source":
+                s["source"] = val
+            elif prop == "http://www.w3.org/ns/prov#wasDerivedFrom":
+                s["wasDerivedFrom"] = val
+            elif prop == "http://www.w3.org/2004/02/skos/core#member":
+                m.append((val, r["mpl"]["value"]))
 
         if not found:
             return None
@@ -239,6 +243,7 @@ class Source:
         #     concept_uri=uri, language=self.language
         # )
         q = """
+            PREFIX dcterms: <http://purl.org/dc/terms/>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
@@ -248,7 +253,8 @@ class Source:
                                 ?p ?o .
                 
                 OPTIONAL {{
-                    ?o skos:prefLabel ?ropl .
+                    VALUES ?label {{ rdfs:label dcterms:title }}
+                    ?o ?label ?ropl .
                 }}        
             }}
             """.format(
@@ -264,7 +270,49 @@ class Source:
             "wasDerivedFrom": None,
         }
         annotation_types = {
-            "http://www.opengis.net/def/metamodel/ogc-na/status": "Status"
+            "http://www.opengis.net/def/metamodel/ogc-na/status": "Status",
+            "http://www.w3.org/2004/02/skos/core#note": "Note",
+            "http://www.w3.org/2004/02/skos/core#changeNote": "Change Note",
+            "http://www.w3.org/2004/02/skos/core#historyNote": "History Note",
+            "http://www.w3.org/2004/02/skos/core#editorialNote": "Editorial Note",
+            "http://www.w3.org/2004/02/skos/core#scopeNote": "Scope Note",
+            "http://www.w3.org/2004/02/skos/core#example": "Example",
+            "http://www.w3.org/2004/02/skos/core#altLabel": "Alternative Label",
+            "http://www.w3.org/2004/02/skos/core#hiddenLabel": "Hidden Label",
+            "http://www.w3.org/2004/02/skos/core#notation": "Notation",
+            # DCTERMS
+            "http://purl.org/dc/terms/conformsTo": "Conforms To",
+            "http://purl.org/dc/terms/abstract": "Abstract",
+            "http://purl.org/dc/terms/identifier": "Identifier",
+            "http://purl.org/dc/terms/audience": "Audience",
+            "http://purl.org/dc/terms/publisher": "Publisher",
+            "http://purl.org/dc/terms/isRequiredBy": "Is Required By",
+            "http://purl.org/dc/terms/replaces": "Replaces",
+            "http://purl.org/dc/terms/provenance": "Provenance",
+            "http://purl.org/dc/terms/requires": "Requires",
+            "http://purl.org/dc/terms/language": "Language",
+            "http://purl.org/dc/terms/description": "Description",
+            "http://purl.org/dc/terms/title": "Title",
+            # DC
+            "http://purl.org/dc/elements/1.1/contributor": "Contributor",
+            "http://purl.org/dc/elements/1.1/coverage": "Coverage",
+            "http://purl.org/dc/elements/1.1/creator": "Creator",
+            "http://purl.org/dc/elements/1.1/date": "Date",
+            "http://purl.org/dc/elements/1.1/description": "Description",
+            "http://purl.org/dc/elements/1.1/format": "Format",
+            "http://purl.org/dc/elements/1.1/identifier": "Identifier",
+            "http://purl.org/dc/elements/1.1/language": "Language",
+            "http://purl.org/dc/elements/1.1/publisher": "Publisher",
+            "http://purl.org/dc/elements/1.1/relation": "Relation",
+            "http://purl.org/dc/elements/1.1/rights": "Rights",
+            "http://purl.org/dc/elements/1.1/source": "Source",
+            "http://purl.org/dc/elements/1.1/subject": "Subject",
+            "http://purl.org/dc/elements/1.1/title": "Title",
+            "http://purl.org/dc/elements/1.1/type": "Type",
+            # RDFS
+            "http://www.w3.org/2000/01/rdf-schema#label": "Label",
+            "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
+            "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also",
         }
         annotations = {}
         agent_types = {
@@ -279,50 +327,89 @@ class Source:
             'http://www.w3.org/2004/02/skos/core#broadMatch': "Broad Match",
             'http://www.w3.org/2004/02/skos/core#narrowMatch': "Narrow Match",
             'http://www.w3.org/2004/02/skos/core#broader': "Broader",
-            'http://www.w3.org/2004/02/skos/core#narrower': "Narrower"
+            'http://www.w3.org/2004/02/skos/core#narrower': "Narrower",
+            "http://www.w3.org/2004/02/skos/core#related": "Related",
+            "http://purl.org/dc/terms/relation": "Relation",
         }
         related_instances = {}
+        other_property_types = {
+            "http://purl.org/dc/terms/date": "Date",
+            "http://purl.org/dc/terms/source": "Source",
+            "http://purl.org/dc/terms/references": "References",
+            "http://purl.org/dc/terms/isVersionOf": "Is Version Of",
+            "http://purl.org/dc/terms/isReplacedBy": "Is Replaced By",
+            "http://purl.org/dc/terms/modified": "Date Modified",
+            "http://purl.org/dc/terms/issued": "Date Issued",
+            "http://purl.org/dc/terms/format": "Format",
+            "http://purl.org/dc/terms/isReferencedBy": "Is Referenced By",
+            "http://purl.org/dc/terms/license": "License",
+            "http://purl.org/dc/terms/rights": "Rights",
+            "http://purl.org/dc/terms/isPartOf": "Is Part Of",
+            "http://purl.org/dc/terms/coverage": "Coverage",
+            "http://purl.org/dc/terms/medium": "Medium",
+            "http://purl.org/dc/terms/available": "Date Available",
+            "http://purl.org/dc/terms/spatial": "Spatial Coverage",
+            "http://purl.org/dc/terms/valid": "Date Valid",
+            "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Sub Class Of",
+            "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": "Is Defined By",
+        }
+        other_properties = []
         found = False
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+            prop = r["p"]["value"]
+            val = r["o"]["value"]
             found = True
-            if r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#prefLabel":
-                pl = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
-                d = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2000/01/rdf-schema#comment":
-                c = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/provenance":
-                s["provenance"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/source":
-                s["source"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/ns/prov#wasDerivedFrom":
-                s["wasDerivedFrom"] = r["o"]["value"]
+            if val == "http://www.w3.org/2004/02/skos/core#Concept":
+                pass
+            elif prop == "http://www.w3.org/2004/02/skos/core#prefLabel":
+                pl = val
+            elif prop == "http://www.w3.org/2004/02/skos/core#definition":
+                d = val
+            elif prop == "http://www.w3.org/2000/01/rdf-schema#comment":
+                c = val
+            elif prop == "http://purl.org/dc/terms/provenance":
+                s["provenance"] = val
+            elif prop == "http://purl.org/dc/terms/source":
+                s["source"] = val
+            elif prop == "http://www.w3.org/ns/prov#wasDerivedFrom":
+                s["wasDerivedFrom"] = val
 
-            elif r["p"]["value"] in annotation_types.keys():
+            elif prop in annotation_types.keys():
                 if r.get("ropl") is not None:
                     # annotation value has a labe too
-                    annotations[r["p"]["value"]] = (annotation_types[r["p"]["value"]], r["o"]["value"], r["ropl"]["value"])
+                    annotations[prop] = (annotation_types[prop], val, r["ropl"]["value"])
                 else:
                     # no label
-                    annotations[r["p"]["value"]] = (annotation_types[r["p"]["value"]], r["o"]["value"])
+                    annotations[prop] = (annotation_types[prop], val)
 
-            elif r["p"]["value"] in related_instance_types.keys():
-                if related_instances.get(r["p"]["value"]) is None:
-                    related_instances[r["p"]["value"]] = {}
-                    related_instances[r["p"]["value"]] = {
+            elif prop in related_instance_types.keys():
+                if related_instances.get(prop) is None:
+                    related_instances[prop] = {}
+                    related_instances[prop] = {
                         "instances": [],
-                        "label": related_instance_types[r["p"]["value"]]
+                        "label": related_instance_types[prop]
                     }
-                related_instances[r["p"]["value"]]["instances"].append(
-                    (r["o"]["value"], r["ropl"]["value"] if r["ropl"] is not None else None)
+                related_instances[prop]["instances"].append(
+                    (val, r["ropl"]["value"] if r["ropl"] is not None else None)
                 )
+
+            else:
+                if val == "http://www.w3.org/2004/02/skos/core#Concept":
+                    pass
+                if prop in suppressed_properties():
+                    pass
+                else:
+                    property_label = None
+                    if r.get("ropl") is not None:
+                        property_label = r["ropl"]["value"]
+                    if property_label is None:
+                        property_label = other_property_types.get(prop)
+
+                    if property_label is not None:
+                        other_properties.append(Property(prop, property_label, val))
 
         if not found:
             return None
-
-            # TODO: Agents
-
-            # TODO: more Annotations
 
         from vocprez.model.concept import Concept
 
@@ -334,7 +421,8 @@ class Source:
             pl,
             d,
             related_instances,
-            annotations
+            annotations,
+            other_properties=other_properties
         )
 
     def get_concept_hierarchy(self):
@@ -434,3 +522,4 @@ class Source:
                 return cls["c"]["value"]
 
         return None
+

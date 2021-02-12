@@ -34,7 +34,7 @@
     </td>
   </tr>
   {% endif %}
-  <tr>
+  <tr id="row-definition">
     <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
       <td>{{ concept.definition|safe }}</td>
   </tr>
@@ -65,7 +65,7 @@
 {% if concept.other_properties is not none %}
   {% for prop in concept.other_properties %}
     <tr>
-      <th><a href="{{ prop.url }}">{{ prop.label }}</a></th>
+      <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
       <td>
         {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
       </td>

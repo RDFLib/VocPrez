@@ -524,3 +524,10 @@ def get_status_label(mediatype):
         "http://www.opengis.net/def/status/valid": "valid",
     }
     return STATUSES.get(mediatype, mediatype)
+
+
+def suppressed_properties():
+    return [
+        "http://www.w3.org/2000/01/rdf-schema#label",
+        "http://www.w3.org/2004/02/skos/core#inScheme",
+    ]
