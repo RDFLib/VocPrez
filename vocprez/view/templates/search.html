@@ -16,14 +16,17 @@
 {% block content %}
   <h1>Search</h1>
   <p>This page is for searching for Concepts within vocabularies.</p>
-  <form action="{{ url_for("search") }}" method="get" style="">
-    {% if last_search is not none %}
-      <input type="text" id="search" name="search" value="{{ last_search }}" style="grid-column: 1;" />
-    {% else %}
-      <input type="text" id="search" name="search" style="grid-column: 1;" />
-    {% endif %}
-    <label for="voc" style="grid-column: 2;">Your search term</label>
-    <select id="from" name="from" style="grid-column: 1;">
+  <form action="{{ url_for("search") }}" method="get" style="display:grid; column-gap:10px; row-gap:5px;">
+    <div style="grid-column: 1;">
+      {% if last_search is not none %}
+        <input type="text" id="search" name="search" value="{{ last_search }}" style="width:300px" />
+      {% else %}
+        <input type="text" id="search" name="search" style="width:300px" />
+      {% endif %}
+    </div>
+    <label for="voc" style="grid-column: 2; font-style:italic;">Your search term</label>
+    <div style="grid-column: 1;">
+      <select id="from" name="from">
       <option value="all"><em>all</em></option>
       {% for v in vocabs %}
         {% if v[0] == selected_vocab %}
@@ -33,8 +36,11 @@
         {% endif %}
       {% endfor %}
     </select>
-    <label for="voc" style="grid-column: 2;">Select a vocab to limit your search, or choose 'all'</label>
-    <input type="submit" value="Search" style="grid-column: 1;" />
+    </div>
+    <label for="voc" style="grid-column: 2; font-style:italic;">Select a single vocab, or choose 'all'</label>
+    <div style="grid-column: 1;">
+      <input type="submit" value="Search" />
+    </div>
   </form>
   {% if results|length > 0 %}
     {% if selected_vocab == "all" %}
@@ -92,7 +98,7 @@
   {% elif request.args.get("search") is not none %}
     <p>No results</p>
   {% endif %}
-  <h3>How search is performed</h3>
+  <h3 style="margin-top:20px;">How search is performed</h3>
   <p>
     The search function here looks for matches within SKOS Concepts' various labels - preferred, alternate, hidden -
     and their definitions. It weights results based on the field it is found in, as per the order just given.
