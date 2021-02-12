@@ -23,7 +23,8 @@ class VocabulariesRenderer(ContainerRenderer):
                 v for v in vocabs
                 if request.values.get("filter").lower() in flask_vocs[v].id.lower()
                    or request.values.get("filter").lower() in flask_vocs[v].title.lower()
-                   or request.values.get("filter").lower() in flask_vocs[v].description.lower()
+                   or request.values.get("filter").lower() in
+                   (flask_vocs[v].description.lower() if flask_vocs[v].description is not None else "")
             ]
 
         # make local or absolute URIs
