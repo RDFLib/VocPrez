@@ -50,21 +50,13 @@
         <dt>Vocab
           {% for v in vocabs %}
             {% if v[0] == k %}
-              {% if LOCAL_URLS -%}
-                <a href="{{ url_for('object') }}?vocab_uri={{ v[0] }}">{{ v[1] }}</a>
-              {% else -%}
-                <a href="{{ v[0] }}">{{ v[1] }}</a>
-              {% endif -%}
+              <a href="{{ utils.get_content_uri(v[0]) }}">{{ v[1] }}</a>
             {% endif %}
           {% endfor %}
         </dt>
         <dd>
           {% for vv in v %}
-            {% if LOCAL_URLS -%}
-              <a href="{{ url_for('object') }}?uri={{ vv[0] }}">{{ vv[1] }}</a><br>
-            {% else -%}
-            <a href="{{ vv[0] }}">{{ vv[1] }}</a><br />
-            {% endif -%}
+            <a href="{{ utils.get_content_uri(vv[0]) }}">{{ vv[1] }}</a><br />
           {% endfor %}
         </dd>
       {% endfor %}
@@ -75,22 +67,14 @@
         Results from
         {% for v in vocabs %}
           {% if v[0] == selected_vocab %}
-            {% if LOCAL_URLS -%}
-              <a href="{{ url_for('object') }}?vocab_uri={{ v[0] }}">{{ v[1] }}</a>
-            {% else -%}
-              <a href="{{ v[0] }}">{{ v[1] }}</a>
-            {% endif -%}
+            <a href="{{ utils.get_content_uri(v[0]) }}">{{ v[1] }}</a>
           {% endif %}
         {% endfor %}
         :
       </dt>
       <dd>
       {% for result in results %}
-        {% if LOCAL_URLS -%}
-          <a href="{{ url_for('object') }}?uri={{ result[0] }}">{{ result[1] }}</a><br>
-        {% else -%}
-        <a href="{{ result[0] }}">{{ result[1] }}</a><br />
-        {% endif -%}
+        <a href="{{ utils.get_content_uri(result[0]) }}">{{ result[1] }}</a><br />
       {% endfor %}
       </dd>
       </dl>
