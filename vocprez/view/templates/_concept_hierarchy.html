@@ -42,32 +42,31 @@
   {% endif %}
 
   <script>
-      var toggler1 = document.getElementsByClassName("caret");
-      var i;
+      var togglerOne = document.getElementsByClassName("caret");
 
-      for (i = 0; i < toggler1.length; i++) {
-        toggler1[i].addEventListener("click", function() {
+      for (let i = 0; i < togglerOne.length; i++) {
+        togglerOne[i].addEventListener("click", function() {
           this.parentElement.querySelector(".nested").classList.toggle("active");
           this.classList.toggle("caret-down");
         });
       }
 
-      var toggler2 = document.getElementById("tree-toggler");
+      var togglerAll = document.getElementById("tree-toggler");
 
-      toggler2.addEventListener("click", function() {
+      togglerAll.addEventListener("click", function() {
           var caret = document.getElementsByClassName("caret");
 
-          if(toggler2.innerHTML === "expand all") {
-              toggler2.innerHTML = "collapse all";
-              for(var i = 0; i < caret.length; i++) {
+          if(togglerAll.innerHTML === "expand all") {
+              togglerAll.innerHTML = "collapse all";
+              for(let i = 0; i < caret.length; i++) {
                   caret[i].classList.add('caret-down');
-                  caret[i].nextSibling.classList.add('active');
+                  caret[i].nextElementSibling.classList.add('active');
               }
           } else {
-              toggler.innerHTML = "expand all";
-              for(var i = 0; i < caret.length; i++) {
+              togglerAll.innerHTML = "expand all";
+              for(let i = 0; i < caret.length; i++) {
                   caret[i].classList.remove('caret-down');
-                  caret[i].nextSibling.classList.remove('active');
+                  caret[i].nextElementSibling.classList.remove('active');
               }
           }
       })
