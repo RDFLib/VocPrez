@@ -3,6 +3,15 @@
 {% block content -%}
 <h1>Vocabulary</h1>
 {% include 'alt_link.html' %}
+<div class="search" style="float:right;">
+  <h3>Search</h3>
+  <form action="{{ url_for("search") }}" method="get" style="">
+    <input type="text" id="search" name="search" style="grid-column: 1;" />
+    <input type="hidden" id="from" name="from" value="{{ uri }}" />
+    <label for="voc" style="grid-column: 2;">Your search term</label><br />
+    <input type="submit" value="Search" style="grid-column: 1;" />
+  </form>
+</div>
 <dl>
   <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
   <dd><h2>{{ vocab.title }}</h2></dd>
@@ -92,14 +101,5 @@
         </tr>
         {% endif -%}
     </table>
-</div>
-<div class="search">
-  <h3>Search</h3>
-  <form action="{{ url_for("search") }}" method="get" style="">
-    <input type="text" id="search" name="search" style="grid-column: 1;" />
-    <input type="hidden" id="from" name="from" value="{{ uri }}" />
-    <label for="voc" style="grid-column: 2;">Your search term</label><br />
-    <input type="submit" value="Search" style="grid-column: 1;" />
-  </form>
 </div>
 {% endblock -%}
