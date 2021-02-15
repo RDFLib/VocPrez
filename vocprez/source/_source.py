@@ -214,7 +214,7 @@ class Source:
             return None
 
         from vocprez.model.collection import Collection
-        if not d :
+        if not d:
             d = c
         return Collection(self.vocab_uri, uri, pl, d, s, m)
 
@@ -243,23 +243,27 @@ class Source:
         #     concept_uri=uri, language=self.language
         # )
         q = """
-            PREFIX dcterms: <http://purl.org/dc/terms/>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
             SELECT DISTINCT *            
-            WHERE {{
-                <{concept_uri}> a skos:Concept ;
-                                ?p ?o .
+            WHERE {
+                <xxxx> a skos:Concept ;
+                       ?p ?o .
+
+                FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+
+                OPTIONAL {
+                    ?p skos:prefLabel|rdfs:label ?ppl .
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                }
                 
-                OPTIONAL {{
-                    VALUES ?label {{ rdfs:label dcterms:title }}
-                    ?o ?label ?ropl .
-                }}        
-            }}
-            """.format(
-            concept_uri=uri, language=self.language
-        )
+                OPTIONAL {
+                    ?o skos:prefLabel|rdfs:label ?opl .
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                }
+            }
+            """.replace("xxxx", uri)
 
         pl = None
         d = None
@@ -314,7 +318,7 @@ class Source:
             "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
             "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also",
         }
-        annotations = {}
+        annotations = []
         agent_types = {
             'http://purl.org/dc/terms/contributor': "Contributor",
             'http://purl.org/dc/terms/creator': "Creator",
@@ -331,7 +335,7 @@ class Source:
             "http://www.w3.org/2004/02/skos/core#related": "Related",
             "http://purl.org/dc/terms/relation": "Relation",
         }
-        related_instances = {}
+        related_instances = []
         other_property_types = {
             "http://purl.org/dc/terms/date": "Date",
             "http://purl.org/dc/terms/source": "Source",
@@ -358,6 +362,13 @@ class Source:
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
             prop = r["p"]["value"]
             val = r["o"]["value"]
+            property_label = None
+            if r.get("ppl") is not None:
+                property_label = r["ppl"]["value"]
+            object_label = None
+            if r.get("opl") is not None:
+                object_label = r["opl"]["value"]
+
             found = True
             if val == "http://www.w3.org/2004/02/skos/core#Concept":
                 pass
@@ -375,38 +386,26 @@ class Source:
                 s["wasDerivedFrom"] = val
 
             elif prop in annotation_types.keys():
-                if r.get("ropl") is not None:
-                    # annotation value has a labe too
-                    annotations[prop] = (annotation_types[prop], val, r["ropl"]["value"])
-                else:
-                    # no label
-                    annotations[prop] = (annotation_types[prop], val)
+                if property_label is None:
+                    property_label = annotation_types.get(prop)
+
+                if property_label is not None:
+                    annotations.append(Property(prop, property_label, val, object_label))
 
             elif prop in related_instance_types.keys():
-                if related_instances.get(prop) is None:
-                    related_instances[prop] = {}
-                    related_instances[prop] = {
-                        "instances": [],
-                        "label": related_instance_types[prop]
-                    }
-                related_instances[prop]["instances"].append(
-                    (val, r["ropl"]["value"] if r["ropl"] is not None else None)
-                )
+                if property_label is None:
+                    property_label = related_instance_types.get(prop)
 
-            else:
-                if val == "http://www.w3.org/2004/02/skos/core#Concept":
-                    pass
-                if prop in suppressed_properties():
-                    pass
-                else:
-                    property_label = None
-                    if r.get("ropl") is not None:
-                        property_label = r["ropl"]["value"]
+                if property_label is not None:
+                    related_instances.append(Property(prop, property_label, val, object_label))
+
+            else:  # other properties
+                if val != "http://www.w3.org/2004/02/skos/core#Concept" and prop not in suppressed_properties():
                     if property_label is None:
                         property_label = other_property_types.get(prop)
 
                     if property_label is not None:
-                        other_properties.append(Property(prop, property_label, val))
+                        other_properties.append(Property(prop, property_label, val, object_label))
 
         if not found:
             return None

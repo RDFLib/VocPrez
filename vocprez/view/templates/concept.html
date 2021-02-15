@@ -5,9 +5,11 @@
 <h1>Concept</h1>
 
 {# status #}
-{% if "http://www.opengis.net/def/metamodel/ogc-na/status" in concept.annotations.keys() %} {# we have a status marker #}
-  <div class="status {{ utils.get_status_label(concept.annotations["http://www.opengis.net/def/metamodel/ogc-na/status"][1]) }}"></div>
-{% endif %}
+{% for prop in concept.annotations  %}
+  {% if prop.uri == "http://www.opengis.net/def/metamodel/ogc-na/status"  %}
+    <div class="status {{ utils.get_status_label(prop.value) }}"></div>
+  {% endif %}
+{% endfor %}
 
 <dl>
   <dt>Preferred Label</dt>
@@ -38,40 +40,42 @@
     <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
       <td>{{ concept.definition|safe }}</td>
   </tr>
-  {% if concept.related_instances|length > 0 %}
-    {% for k, v in concept.related_instances.items() %}
-    <tr>
-      <th><a href="{{ k }}">{{ v["label"] }}</a></th>
-      <td>
-        {%  for inst in v["instances"] %}
-            <a href="{{ utils.get_content_uri(inst[0]) }}">{{ inst[1] }}</a><br />
-        {% endfor %}
-      </td>
-    </tr>
+  {% if concept.related_instances is not none %}
+    {% for prop in concept.related_instances %}
+      <tr>
+        <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+        <td>
+          {% if prop.value[:4] == 'http' %}
+            <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
+          {% else %}{{ prop.value }}{% endif %}
+        </td>
+      </tr>
     {% endfor %}
-{% endif %}
-{% if concept.annotations|length > 0 %}
-  {% for k, v in concept.annotations.items() %}
-  <tr>
-    <th><a href="{{ k }}">{{ v[0] }}</a></th>
-    {%  if v|length == 3 %}
-    <td><a href="{{ v[1] }}">{{ v[2] }}</a></td>
-    {% else %}
-      <td>{{ v[1] }}</td>
-    {% endif %}
-  </tr>
-  {% endfor %}
-{% endif %}
-{% if concept.other_properties is not none %}
-  {% for prop in concept.other_properties %}
-    <tr>
-      <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
-      <td>
-        {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
-      </td>
-    </tr>
-  {% endfor %}
-{% endif %}
+  {% endif %}
+  {% if concept.annotations is not none %}
+    {% for prop in concept.annotations %}
+      <tr>
+        <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+        <td>
+          {% if prop.value[:4] == 'http' %}
+            <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
+          {% else %}{{ prop.value }}{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  {% endif %}
+  {% if concept.other_properties is not none %}
+    {% for prop in concept.other_properties %}
+      <tr>
+        <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+        <td>
+          {% if prop.value[:4] == 'http' %}
+            <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
+          {% else %}{{ prop.value }}{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  {% endif %}
 </table>
 {% include 'alt_link.html' %}
 {% endblock %}
