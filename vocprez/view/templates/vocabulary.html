@@ -7,7 +7,10 @@
   <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
   <dd><h2>{{ vocab.title }}</h2></dd>
   <dt>URI</dt>
-  <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
+  <dd>
+    <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
+    <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
+  </dd>
 </dl>
 <div class="overflow">
     <table class="metadata concept_scheme">

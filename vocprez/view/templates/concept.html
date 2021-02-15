@@ -15,7 +15,10 @@
   <dt>Preferred Label</dt>
   <dd><h2>{{ concept.prefLabel }}</h2></dd>
   <dt>URI</dt>
-  <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
+  <dd>
+    <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
+    <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
+  </dd>
   {%  if vocab_uri is not none %}
   <dt>Within Vocab</dt>
   <dd><a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a></dd>
