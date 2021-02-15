@@ -23,7 +23,7 @@
       <th><a href="http://www.w3.org/2004/02/skos/core#member">Members</a></th>
         <td class="list">
           {% for member in collection.members -%}
-            <li><a href="{{ utils.get_content_uri(member[0]) }}">{{ member[1] }}</a></li>
+            <li><a href="{{ utils.get_content_uri(member.value) }}">{{ member.value_label }}</a></li>
           {% endfor %}
         </td>
     </tr>

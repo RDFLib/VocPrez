@@ -110,7 +110,7 @@ class CollectionRenderer(Renderer):
             g.add((
                 c,
                 SKOS.member,
-                URIRef(m[0]),
+                URIRef(m.value),
             ))
 
         if self.collection.other_properties is not None:

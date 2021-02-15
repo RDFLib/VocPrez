@@ -164,19 +164,27 @@ class Source:
         vocab = g.VOCABS[self.vocab_uri]
         # get the collection's metadata and members
         q = """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            
-            SELECT *
-            WHERE {{
-                <{collection_uri}> ?p ?o .            
-                
-                OPTIONAL {{
-                    ?o skos:prefLabel ?mpl .
-                }}
-                
-                FILTER(lang(?o) = "{language}" || lang(?o) = "" || ISURI(?o))
-            }}
-            """.format(collection_uri=uri, language=self.language)
+
+            SELECT DISTINCT *            
+            WHERE {
+                <xxxx> a skos:Collection ;
+                       ?p ?o .
+
+                FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+
+                OPTIONAL {
+                    ?p skos:prefLabel|rdfs:label ?ppl .
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                }
+
+                OPTIONAL {
+                    ?o skos:prefLabel|rdfs:label ?opl .
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                }
+            }
+            """.replace("xxxx", uri)
 
         pl = None
         d = None
@@ -208,7 +216,7 @@ class Source:
             elif prop == "http://www.w3.org/ns/prov#wasDerivedFrom":
                 s["wasDerivedFrom"] = val
             elif prop == "http://www.w3.org/2004/02/skos/core#member":
-                m.append((val, r["mpl"]["value"]))
+                m.append(Property(prop, "Member", val, r["opl"]["value"]))
 
         if not found:
             return None
@@ -216,7 +224,7 @@ class Source:
         from vocprez.model.collection import Collection
         if not d:
             d = c
-        return Collection(self.vocab_uri, uri, pl, d, s, m)
+        return Collection(self.vocab_uri, uri, pl, d, s, sorted(m, key=lambda x: x.value_label.lower()))
 
     def get_concept(self, uri):
         vocab = g.VOCABS[self.vocab_uri]
