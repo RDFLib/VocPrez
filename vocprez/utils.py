@@ -496,6 +496,13 @@ def get_content_uri(uri, qsas: dict = {}, system_uri_override=None):
         return get_absolute_uri(uri, qsas=qsas)
 
 
+def get_alt_prof_uri(uri):
+    if config.USE_ABS_ALT_URI:
+        return get_absolute_uri(uri, qsas={"_profile": "alt"})
+    else:
+        get_content_uri(uri, qsas={"_profile": "alt"})
+
+
 def get_pretty_mediatype(mediatype):
     MEDIATYPE_NAMES = {
         "text/html": "HTML",
