@@ -2,6 +2,7 @@
 
 {% block content %}
 <h1>Collection</h1>
+{% include 'alt_link.html' %}
 <dl>
   <dt>Preferred Label</dt>
   <dd><h2>{{ collection.prefLabel }}</h2></dd>
@@ -29,5 +30,4 @@
     </tr>
     {% endif %}
 </table>
-{% include 'alt_link.html' %}
 {% endblock %}

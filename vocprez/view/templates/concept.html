@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>Concept</h1>
-
+{% include 'alt_link.html' %}
 {# status #}
 {% for prop in concept.annotations  %}
   {% if prop.uri == "http://www.opengis.net/def/metamodel/ogc-na/status"  %}
@@ -77,5 +77,4 @@
     {% endfor %}
   {% endif %}
 </table>
-{% include 'alt_link.html' %}
 {% endblock %}

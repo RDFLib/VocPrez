@@ -2,9 +2,15 @@
     {%  set uri = request.base_url  %}
 {% endif %}
 
-<div class="altprof">
+<div class="altprof" style="width:220px; float:right;">
   <h3>Alternate Profiles</h3>
   <p>
-    Different views and formats: <a href="{{ utils.get_content_uri(uri, qsas={'_profile':'alt'}) }}">Alternate Profiles</a>.
-    <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Profiles (alternative information views) encoded in various Media Types (HTML, text, RDF, JSON etc.) are available for this resource.</span></span>
+    Different views and formats:
+  </p>
+  <ul style="padding:0">
+    <li>
+      <a href="{{ utils.get_content_uri(uri, qsas={'_profile':'alt'}) }}">Alternate Profiles</a>&nbsp;<span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Profiles (alternative information views) encoded in various Media Types (HTML, text, RDF, JSON etc.) are available for this resource.</span>
+    </span>
+    </li>
+  </ul>
 </div>

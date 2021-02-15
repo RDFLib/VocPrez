@@ -2,6 +2,7 @@
 {% from "_concept_hierarchy.html" import render_concept_hierarchy with context -%}
 {% block content -%}
 <h1>Vocabulary</h1>
+{% include 'alt_link.html' %}
 <dl>
   <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
   <dd><h2>{{ vocab.title }}</h2></dd>
@@ -98,5 +99,4 @@
     <input type="submit" value="Search" style="grid-column: 1;" />
   </form>
 </div>
-{% include 'alt_link.html' %}
 {% endblock -%}
