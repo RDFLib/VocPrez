@@ -8,7 +8,7 @@
       {% include 'alt_link.html' %}
     </div>
     <div style="grid-column: 2; grid-row: 3;">
-      <div id="filter">
+      <div class="filter">
         <h3>Filter</h3>
         <form method="get" action="{{ url_for('vocabularies') }}">
           <input type="text" name="filter" value="{{ request.values.get('filter') if request.values.get('filter') }}" />
