@@ -1,105 +1,114 @@
 {% extends "page.html" -%}
+
 {% from "_concept_hierarchy.html" import render_concept_hierarchy with context -%}
 {% block content -%}
-<h1>Vocabulary</h1>
-{% include 'alt_link.html' %}
-<div class="search" style="float:right;">
-  <h3>Search</h3>
-  <form action="{{ url_for("search") }}" method="get" style="">
-    <input type="text" id="search" name="search" style="grid-column: 1;" />
-    <input type="hidden" id="from" name="from" value="{{ uri }}" />
-    <label for="voc" style="grid-column: 2;">Your search term</label><br />
-    <input type="submit" value="Search" style="grid-column: 1;" />
-  </form>
-</div>
-<dl>
-  <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
-  <dd><h2>{{ vocab.title }}</h2></dd>
-  <dt>URI</dt>
-  <dd>
-    <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
-    <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
-  </dd>
-</dl>
-<div class="overflow">
+  <div style="grid-column: 1; grid-row: 1;">
+    <h1>Vocabulary</h1>
+  </div>
+  <div style="grid-column: 2; grid-row: 2;">
+    {% include 'alt_link.html' %}
+  </div>
+  <div style="grid-column: 2; grid-row: 3;">
+    <div class="search">
+    <h3>Search</h3>
+    <form action="{{ url_for("search") }}" method="get" style="">
+      <input type="text" id="search" name="search" style="grid-column: 1;" />
+      <input type="hidden" id="from" name="from" value="{{ uri }}" />
+      <label for="voc" style="grid-column: 2;">Your search term</label><br />
+      <input type="submit" value="Search" style="grid-column: 1;" />
+    </form>
+  </div>
+  </div>
+  <div style="grid-column: 1; grid-row: 2;">
+    <dl>
+    <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
+    <dd><h2>{{ vocab.title }}</h2></dd>
+    <dt>URI</dt>
+    <dd>
+      <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
+      <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
+    </dd>
+  </dl>
+  </div>
+  <div style="grid-column: 1; grid-row: 3;">
     <table class="metadata concept_scheme">
-        {%  if vocab.description is not none  -%}
-        <tr>
-          <th><a href="http://purl.org/dc/terms/description">Description</a></th><td>{{ vocab.description|safe }}</td>
-        </tr>
-        {% endif -%}
-        {%  if vocab.creator is not none  -%}
-        <tr>
-          <th><a href="http://purl.org/dc/terms/creator">Creator</a></th>
-          <td>
-            {% if vocab.creator.startswith("http") %}
-            <a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a>
-            {% else %}
-            {{ vocab.creator }}
-            {% endif %}
-          </td>
-        </tr>
-        {% endif -%}
-        {%  if vocab.created is not none  -%}
-        <tr>
-          <th><a href="http://purl.org/dc/terms/created">Created</a></th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
-        </tr>
-        {% endif -%}
-        {%  if vocab.modified is not none  -%}
-        <tr>
-          <th><a href="http://purl.org/dc/terms/modified">Modified</a></th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
-        </tr>
-        {% endif -%}
-        {%  if vocab.versionInfo is not none  -%}
-        <tr>
-          <th><a href="http://www.w3.org/2002/07/owl#versionInfo">Version Info</a></th><td>{{ vocab.versionInfo }}</td>
-        </tr>
-        {% endif -%}
-        {% if vocab.downloadURL -%}
-        <tr>
-          <th>Download:</th>
-          <td>
-            <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
-          </td>
-        </tr>
-        {% endif -%}
-        {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  -%}
-        <tr>
-          <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Concept Hierarchy</a></th>
-          <td>
-              {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
-          </td>
-        </tr>
-        {% endif -%}
-        {% if vocab.other_properties is not none %}
-          {% for prop in vocab.other_properties %}
-            <tr>
-              <th><a href="{{ prop.url }}">{{ prop.label }}</a></th>
-              <td>
-                {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        {% endif %}
-        {% if vocab.collections == "Collection" %}
+          {%  if vocab.description is not none  -%}
           <tr>
-            <th><a href=http://www.w3.org/2004/02/skos/core#member">Members</a></th>
+            <th><a href="http://purl.org/dc/terms/description">Description</a></th><td>{{ vocab.description|safe }}</td>
+          </tr>
+          {% endif -%}
+          {%  if vocab.creator is not none  -%}
+          <tr>
+            <th><a href="http://purl.org/dc/terms/creator">Creator</a></th>
             <td>
-              {% for concept in vocab.concepts %}
-                <a href="{% if USE_SYSTEM_URIS %}{{ url_for('object') }}?vocab_uri={{ uri }}&uri={% endif %}{{ concept[0] }}">{{ concept[1] }}</a><br />
-              {% endfor -%}
+              {% if vocab.creator.startswith("http") %}
+              <a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a>
+              {% else %}
+              {{ vocab.creator }}
+              {% endif %}
             </td>
           </tr>
-        {% elif vocab.collections is not none and vocab.collections|length > 0  -%}
-        <tr>
-          <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a></th>
-          <td>
-            {% for collection in vocab.collections %}
-              <a href="{{ utils.get_content_uri(collection[0]) }}">{{ collection[1] }}</a><br />
+          {% endif -%}
+          {%  if vocab.created is not none  -%}
+          <tr>
+            <th><a href="http://purl.org/dc/terms/created">Created</a></th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
+          </tr>
+          {% endif -%}
+          {%  if vocab.modified is not none  -%}
+          <tr>
+            <th><a href="http://purl.org/dc/terms/modified">Modified</a></th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
+          </tr>
+          {% endif -%}
+          {%  if vocab.versionInfo is not none  -%}
+          <tr>
+            <th><a href="http://www.w3.org/2002/07/owl#versionInfo">Version Info</a></th><td>{{ vocab.versionInfo }}</td>
+          </tr>
+          {% endif -%}
+          {% if vocab.downloadURL -%}
+          <tr>
+            <th>Download:</th>
+            <td>
+              <a href="{{ vocab.downloadURL }}">RDF (turtle)</a>
+            </td>
+          </tr>
+          {% endif -%}
+          {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  -%}
+          <tr>
+            <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Concept Hierarchy</a></th>
+            <td>
+                {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
+            </td>
+          </tr>
+          {% endif -%}
+          {% if vocab.other_properties is not none %}
+            {% for prop in vocab.other_properties %}
+              <tr>
+                <th><a href="{{ prop.url }}">{{ prop.label }}</a></th>
+                <td>
+                  {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
+                </td>
+              </tr>
             {% endfor %}
-          </td>
-        </tr>
-        {% endif -%}
-    </table>
-</div>
+          {% endif %}
+          {% if vocab.collections == "Collection" %}
+            <tr>
+              <th><a href=http://www.w3.org/2004/02/skos/core#member">Members</a></th>
+              <td>
+                {% for concept in vocab.concepts %}
+                  <a href="{% if USE_SYSTEM_URIS %}{{ url_for('object') }}?vocab_uri={{ uri }}&uri={% endif %}{{ concept[0] }}">{{ concept[1] }}</a><br />
+                {% endfor -%}
+              </td>
+            </tr>
+          {% elif vocab.collections is not none and vocab.collections|length > 0  -%}
+          <tr>
+            <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a></th>
+            <td>
+              {% for collection in vocab.collections %}
+                <a href="{{ utils.get_content_uri(collection[0]) }}">{{ collection[1] }}</a><br />
+              {% endfor %}
+            </td>
+          </tr>
+          {% endif -%}
+      </table>
+  </div>
 {% endblock -%}

@@ -1,83 +1,90 @@
 {% extends "page.html" %}
+
 {% from "_format.html" import format with context -%}
 {% block content %}
-
-<h1>Concept</h1>
-{% include 'alt_link.html' %}
-{# status #}
-{% for prop in concept.annotations  %}
-  {% if prop.uri == "http://www.opengis.net/def/metamodel/ogc-na/status"  %}
-    <div class="status {{ utils.get_status_label(prop.value) }}"></div>
-  {% endif %}
-{% endfor %}
-
-<dl>
-  <dt>Preferred Label</dt>
-  <dd><h2>{{ concept.prefLabel }}</h2></dd>
-  <dt>URI</dt>
-  <dd>
-    <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
-    <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
-  </dd>
-  {%  if vocab_uri is not none %}
-  <dt>Within Vocab</dt>
-  <dd><a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a></dd>
-  {% endif %}
-</dl>
-<table class="metadata concept">
-  <tr>
-    <th><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></th>
-    <td>{{ concept.prefLabel }}</td>
-  </tr>
-  {% if concept.altLabels|length > 0 %}
-  <tr>
-    <th><a href="http://www.w3.org/2004/02/skos/core#altLabel">Alternative Labels</a></th>
-    <td>
-      {% for a in concept.altLabels %}
-        {{ a }}
+  <div style="grid-column: 1; grid-row: 1;">
+    <h1>Concept</h1>
+  </div>
+  <div style="grid-column: 2; grid-row: 2;">
+    {% include 'alt_link.html' %}
+  </div>
+  <div style="grid-column: 1; grid-row: 2;">
+    {# status #}
+    {% for prop in concept.annotations  %}
+      {% if prop.uri == "http://www.opengis.net/def/metamodel/ogc-na/status"  %}
+        <div class="status {{ utils.get_status_label(prop.value) }}"></div>
+      {% endif %}
+    {% endfor %}
+    <dl>
+      <dt>Preferred Label</dt>
+      <dd><h2>{{ concept.prefLabel }}</h2></dd>
+      <dt>URI</dt>
+      <dd>
+        <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
+        <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
+      </dd>
+      {%  if vocab_uri is not none %}
+      <dt>Within Vocab</dt>
+      <dd><a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a></dd>
+      {% endif %}
+    </dl>
+  </div>
+  <div style="grid-column: 1; grid-row: 3;">
+    <table class="metadata concept">
+    <tr>
+      <th><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></th>
+      <td>{{ concept.prefLabel }}</td>
+    </tr>
+    {% if concept.altLabels|length > 0 %}
+    <tr>
+      <th><a href="http://www.w3.org/2004/02/skos/core#altLabel">Alternative Labels</a></th>
+      <td>
+        {% for a in concept.altLabels %}
+          {{ a }}
+        {% endfor %}
+      </td>
+    </tr>
+    {% endif %}
+    <tr id="row-definition">
+      <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
+        <td>{{ concept.definition|safe }}</td>
+    </tr>
+    {% if concept.related_instances is not none %}
+      {% for prop in concept.related_instances %}
+        <tr>
+          <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+          <td>
+            {% if prop.value[:4] == 'http' %}
+              <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
+            {% else %}{{ prop.value }}{% endif %}
+          </td>
+        </tr>
       {% endfor %}
-    </td>
-  </tr>
-  {% endif %}
-  <tr id="row-definition">
-    <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
-      <td>{{ concept.definition|safe }}</td>
-  </tr>
-  {% if concept.related_instances is not none %}
-    {% for prop in concept.related_instances %}
-      <tr>
-        <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
-        <td>
-          {% if prop.value[:4] == 'http' %}
-            <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
-          {% else %}{{ prop.value }}{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  {% endif %}
-  {% if concept.annotations is not none %}
-    {% for prop in concept.annotations %}
-      <tr>
-        <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
-        <td>
-          {% if prop.value[:4] == 'http' %}
-            <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
-          {% else %}{{ prop.value }}{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  {% endif %}
-  {% if concept.other_properties is not none %}
-    {% for prop in concept.other_properties %}
-      <tr>
-        <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
-        <td>
-          {% if prop.value[:4] == 'http' %}
-            <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
-          {% else %}{{ prop.value }}{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-  {% endif %}
-</table>
+    {% endif %}
+    {% if concept.annotations is not none %}
+      {% for prop in concept.annotations %}
+        <tr>
+          <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+          <td>
+            {% if prop.value[:4] == 'http' %}
+              <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
+            {% else %}{{ prop.value }}{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+    {% if concept.other_properties is not none %}
+      {% for prop in concept.other_properties %}
+        <tr>
+          <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+          <td>
+            {% if prop.value[:4] == 'http' %}
+              <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
+            {% else %}{{ prop.value }}{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+  </table>
+  </div>
 {% endblock %}
