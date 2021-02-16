@@ -1,8 +1,9 @@
 {% extends "page.html" %}
+{% set label = "Collection" %}
 
 {% block content %}
   <div style="grid-column: 1; grid-row: 1;">
-    <h1>Collection</h1>
+    <h1>{{ label }}</h1>
   </div>
   <div style="grid-column: 2; grid-row: 2;">
     {% include 'alt_link.html' %}

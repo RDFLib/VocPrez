@@ -1,9 +1,10 @@
 {% extends "page.html" %}
-
 {% from "_format.html" import format with context -%}
+{% set label = "Concept" %}
+
 {% block content %}
   <div style="grid-column: 1; grid-row: 1;">
-    <h1>Concept</h1>
+    <h1>{{ label }}</h1>
   </div>
   <div style="grid-column: 2; grid-row: 2;">
     {% include 'alt_link.html' %}
