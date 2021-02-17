@@ -55,9 +55,15 @@
         <tr>
           <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
           <td>
-            {% if prop.value[:4] == 'http' %}
-              <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
-            {% else %}{{ prop.value }}{% endif %}
+            {% if prop.value.startswith('http') %}
+              {% if prop.value_label is not none %}
+              <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+              {% else %}
+              <a href="{{ prop.value }}">{{ prop.value }}</a>
+              {% endif %}
+            {% else %}
+              {{ prop.value }}
+            {% endif %}
           </td>
         </tr>
       {% endfor %}
@@ -67,9 +73,15 @@
         <tr>
           <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
           <td>
-            {% if prop.value[:4] == 'http' %}
-              <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
-            {% else %}{{ prop.value }}{% endif %}
+            {% if prop.value.startswith('http') %}
+              {% if prop.value_label is not none %}
+              <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+              {% else %}
+              <a href="{{ prop.value }}">{{ prop.value }}</a>
+              {% endif %}
+            {% else %}
+              {{ prop.value }}
+            {% endif %}
           </td>
         </tr>
       {% endfor %}
@@ -79,9 +91,15 @@
         <tr>
           <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
           <td>
-            {% if prop.value[:4] == 'http' %}
-              <a href="{{ prop.value }}">{% if prop.value_label is not none %}{{ prop.value_label }}{% else %}{{ prop.value }}{% endif %}</a>
-            {% else %}{{ prop.value }}{% endif %}
+            {% if prop.value.startswith('http') %}
+              {% if prop.value_label is not none %}
+              <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+              {% else %}
+              <a href="{{ prop.value }}">{{ prop.value }}</a>
+              {% endif %}
+            {% else %}
+              {{ prop.value }}
+            {% endif %}
           </td>
         </tr>
       {% endfor %}
