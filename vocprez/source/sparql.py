@@ -12,8 +12,8 @@ class SPARQL(Source):
     """Source for a generic SPARQL endpoint
     """
 
-    def __init__(self, vocab_uri, request, language=None):
-        super().__init__(vocab_uri, request, language)
+    def __init__(self, request, language=None):
+        super().__init__(request, language)
 
     @staticmethod
     def collect(details):
@@ -25,11 +25,6 @@ class SPARQL(Source):
             'sparql_endpoint': 'http://dev2.nextgen.vocabs.ga.gov.au/fuseki/vocabs',
             'sparql_username': '<sparql_user>', # Optional username for SPARQL endpoint
             'sparql_password': '<sparql_password>', # Optional password for SPARQL endpoint
-            #'uri_filter_regex': '.*', # Regular expression to filter vocabulary URIs - Everything
-            #'uri_filter_regex': '^http(s?)://pid.geoscience.gov.au/def/voc/ga/', # Regular expression to filter vocabulary URIs - GA
-            #'uri_filter_regex': '^https://gcmdservices.gsfc.nasa.gov', # Regular expression to filter vocabulary URIs - GCMD
-            'uri_filter_regex': '^http(s?)://resource.geosciml.org/', # Regular expression to filter vocabulary URIs - CGI
-
         },
         """
         logging.debug("SPARQL collect()...")
@@ -101,4 +96,3 @@ class SPARQL(Source):
             )
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
         logging.debug("SPARQL collect() complete.")
-

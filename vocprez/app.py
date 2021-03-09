@@ -183,8 +183,7 @@ def concepts(vocab_id):
 def return_vocab(uri):
     if uri in g.VOCABS.keys():
         # get vocab details using appropriate source handler
-        vocab = getattr(source, g.VOCABS[uri].source) \
-            (uri, request, language=request.values.get("lang")).get_vocabulary()
+        vocab = source.SPARQL(request).get_vocabulary(uri)
         return VocabularyRenderer(request, vocab).render()
     else:
         return None
@@ -193,7 +192,16 @@ def return_vocab(uri):
 
 # FUNCTION return_collection_or_concept_from_main_cache
 # TODO: make this use the main cache directly, not via Vocab's source
-def return_collection_or_concept_from_main_cache(uri):
+def return_collection_or_concept(uri, vocab_uri=None):
+    # if vocab_uri is set, this must be a Concept
+    try:
+        c = source.SPARQL(request).get_concept(vocab_uri, uri)
+        return ConceptRenderer(request, c)
+    except:
+        pass
+
+    # if vocab_uri is not set, this could either be a Concept or a Collection
+    # first find out which
     q = """
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
@@ -203,9 +211,7 @@ def return_collection_or_concept_from_main_cache(uri):
             OPTIONAL {{
                 {{ <{uri}> skos:inScheme ?cs . }}
                 UNION
-                {{ <{uri}> skos:topConcpetOf ?cs . }}
-                UNION
-                {{ ?cs skos:member <{uri}> . }}
+                {{ <{uri}> skos:topConceptOf ?cs . }}
             }}           
         }}
         """.format(uri=uri)
@@ -214,18 +220,15 @@ def return_collection_or_concept_from_main_cache(uri):
             # if we find it and it's of a known class, return it
             # since, for a Concept or a Collection, we know the relevant vocab as vocab ==  CS ==  graph
             # in VocPrez's models of a vocabs
-            vocab_uri = r["cs"]["value"]
             if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
                 try:
-                    c = getattr(source, g.VOCABS[vocab_uri].source) \
-                        (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
+                    c = source.SPARQL(request).get_collection(uri)
                     return CollectionRenderer(request, c)
                 except:
                     pass
             elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
                 try:
-                    c = getattr(source, g.VOCABS[vocab_uri].source) \
-                        (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
+                    c = source.SPARQL(request).get_concept(r["cs"]["value"], uri)
                     return ConceptRenderer(request, c)
                 except:
                     pass
@@ -234,22 +237,7 @@ def return_collection_or_concept_from_main_cache(uri):
 
 
 # FUNCTION return_collection_or_concept_from_vocab_source
-def return_collection_or_concept_from_vocab_source(vocab_uri, uri):
-    try:
-        c = getattr(source, g.VOCABS[vocab_uri].source) \
-            (vocab_uri, request, language=request.values.get("lang")).get_collection(uri)
-        return CollectionRenderer(request, c)
-    except:
-        pass
 
-    try:
-        c = getattr(source, g.VOCABS[vocab_uri].source) \
-            (vocab_uri, request, language=request.values.get("lang")).get_concept(uri)
-        return ConceptRenderer(request, c)
-    except:
-        pass
-
-    return None
 # END FUNCTION return_collection_or_concept_from_vocab_source
 
 
@@ -306,11 +294,11 @@ def object():
         v = return_vocab(uri)
         if v is not None:
             return v
-        # if we get here, it's not a vocab so try to return a Collection or Concept from the main cache
-        c = return_collection_or_concept_from_main_cache(uri)
+        # if we get here, it's not a vocab so try to return a Collection or Concept
+        c = return_collection_or_concept(uri)
         if c is not None:
             return c.render()
-        # if we get here, it's neither a vocab nor a Concept of Collection so return error
+        # if we get here, it's neither a vocab nor a Concept or a Collection so return error
         return return_vocprez_error(
             "Input Error",
             400,
@@ -335,7 +323,7 @@ def object():
 
         # the vocab_uri is valid so query that vocab's source for the object
         # the uri is either a Concept or Collection.
-        c = return_collection_or_concept_from_vocab_source(vocab_uri, uri)
+        c = return_collection_or_concept(uri, vocab_uri=vocab_uri)
         if c is not None:
             return c.render()
 

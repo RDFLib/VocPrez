@@ -17,12 +17,9 @@ class Source:
         "http://www.w3.org/2004/02/skos/core#Concept",
     ]
 
-    def __init__(self, vocab_uri, request, language=None):
-        self.vocab_uri = vocab_uri
+    def __init__(self, request, language=None):
         self.request = request
         self.language = language or config.DEFAULT_LANGUAGE
-
-        self._graph = None  # Property for rdflib Graph object to be populated on demand
 
     @property
     def graph(self):
@@ -98,8 +95,8 @@ class Source:
         """
         pass
 
-    def list_collections(self):
-        vocab = g.VOCABS[self.vocab_uri]
+    def list_collections(self, vocab_uri):
+        vocab = g.VOCABS[vocab_uri]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -117,8 +114,8 @@ class Source:
 
         return [(x.get("c").get("value"), x.get("pl").get("value")) for x in collections]
 
-    def list_concepts(self):
-        vocab = g.VOCABS[self.vocab_uri]
+    def list_concepts(self, vocab_uri):
+        vocab = g.VOCABS[vocab_uri]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT DISTINCT ?c ?pl ?broader
@@ -148,20 +145,19 @@ class Source:
             for concept in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
         ]
 
-    def get_vocabulary(self):
+    def get_vocabulary(self, vocab_uri):
         """
         Get a vocab from the cache
         :return:
         :rtype:
         """
-        vocab = g.VOCABS[self.vocab_uri]
-        vocab.concept_hierarchy = self.get_concept_hierarchy()
-        vocab.concepts = self.list_concepts()
-        vocab.collections = self.list_collections()
+        vocab = g.VOCABS[vocab_uri]
+        vocab.concept_hierarchy = self.get_concept_hierarchy(vocab_uri)
+        vocab.concepts = self.list_concepts(vocab_uri)
+        vocab.collections = self.list_collections(vocab_uri)
         return vocab
 
-    def get_collection(self, uri):
-        vocab = g.VOCABS[self.vocab_uri]
+    def get_collection(self, collection_uri):
         # get the collection's metadata and members
         q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -169,23 +165,26 @@ class Source:
 
             SELECT DISTINCT *            
             WHERE {
-                <xxxx> a skos:Collection ;
-                       ?p ?o .
-
-                FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
-
-                OPTIONAL {
-                    ?p skos:prefLabel|rdfs:label ?ppl .
+                GRAPH ?g {
+                    <xxxx> a skos:Collection ;
+                           ?p ?o .
+    
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
-                }
-
-                OPTIONAL {
-                    ?o skos:prefLabel|rdfs:label ?opl .
-                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+    
+                    OPTIONAL {
+                        ?p skos:prefLabel|rdfs:label ?ppl .
+                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                    }
+    
+                    OPTIONAL {
+                        ?o skos:prefLabel|rdfs:label ?opl .
+                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                    }
                 }
             }
-            """.replace("xxxx", uri)
+            """.replace("xxxx", collection_uri)
 
+        vocab_uri = None
         pl = None
         d = None
         c = None
@@ -196,7 +195,8 @@ class Source:
         }
         m = []
         found = False
-        for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+        for r in sparql_query(q, config.SPARQL_ENDPOINT, config.SPARQL_USERNAME, config.SPARQL_PASSWORD):
+            vocab_uri = r["g"]["value"]
             prop = r["p"]["value"]
             val = r["o"]["value"]
             found = True
@@ -224,32 +224,10 @@ class Source:
         from vocprez.model.collection import Collection
         if not d:
             d = c
-        return Collection(self.vocab_uri, uri, pl, d, s, sorted(m, key=lambda x: x.value_label.lower()))
+        return Collection(vocab_uri, collection_uri, pl, d, s, sorted(m, key=lambda x: x.value_label.lower()))
 
-    def get_concept(self, uri):
-        vocab = g.VOCABS[self.vocab_uri]
-        # q = """
-        #     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        #     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        #
-        #     SELECT *
-        #     WHERE {{
-        #         <{concept_uri}> a skos:Concept ;
-        #                         ?p ?o .
-        #
-        #         OPTIONAL {{
-        #             GRAPH ?predicateGraph {{?p rdfs:label ?predicateLabel .}}
-        #             FILTER(lang(?predicateLabel) = "{language}" || lang(?predicateLabel) = "")
-        #         }}
-        #         OPTIONAL {{
-        #             ?o skos:prefLabel ?objectLabel .
-        #             FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "")
-        #             # Don't filter prefLabel language
-        #         }}
-        #     }}
-        #     """.format(
-        #     concept_uri=uri, language=self.language
-        # )
+    def get_concept(self, vocab_uri, uri):
+        vocab = g.VOCABS[vocab_uri]
         q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -423,7 +401,7 @@ class Source:
         if not d:
             d = c
         return Concept(
-            self.vocab_uri,
+            vocab_uri,
             uri,
             pl,
             d,
@@ -432,7 +410,7 @@ class Source:
             other_properties=other_properties
         )
 
-    def get_concept_hierarchy(self):
+    def get_concept_hierarchy(self, vocab_uri):
         """
         Function to draw concept hierarchy for vocabulary
         """
@@ -477,7 +455,7 @@ class Source:
                              ] + build_hierarchy(bindings_list, concept, level)
             return hier
 
-        vocab = g.VOCABS[self.vocab_uri]
+        vocab = g.VOCABS[vocab_uri]
 
         query = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -509,7 +487,7 @@ class Source:
 
         hierarchy = build_hierarchy(bindings_list)
 
-        return draw_concept_hierarchy(hierarchy, self.request, self.vocab_uri)
+        return draw_concept_hierarchy(hierarchy, self.request, vocab_uri)
 
     def get_object_class(self):
         vocab = g.VOCABS[self.vocab_uri]
