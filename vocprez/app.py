@@ -350,7 +350,7 @@ def about():
     content = content.replace(
         "vocprez/view/style/", request.url_root + "style/"
     )
-    content = Markup(markdown.markdown(content))
+    content = Markup(markdown.markdown(content, extensions=['tables']))
 
     return render_template(
         "about.html",
