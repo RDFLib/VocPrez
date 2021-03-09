@@ -363,6 +363,7 @@ def about():
 
 # ROUTE sparql
 @app.route("/sparql", methods=["GET", "POST"])
+@app.route("/sparql/", methods=["GET", "POST"])
 def sparql():
     # queries to /sparql with an accept header set to a SPARQL return type or an RDF type
     # are forwarded to /endpoint for a response
