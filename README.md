@@ -1,10 +1,15 @@
 ![](vocprez/view/style/VocPrez.300.png)  
 
-A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+VocPrez is a read-only web delivery system - web pages and API - for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies. It complies with [Content Negotiation by Profile](https://w3c.github.io/dx-connegp/connegp/).
 
 ## Introduction
 VocPrez is used by:
 
+![](vocprez/view/style/logo-bodc-bw.png)
+
+* The [British Oceanographic Data Centre](https://www.bodc.ac.uk/) 's NERC Vocabulary Server
+    * System link: <http://vocab.nerc.ac.uk> 
+  
 ![](vocprez/view/style/logo-gsq-200.jpg)
 
 * [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq)
@@ -36,7 +41,7 @@ This code is licensed using the GPL v3 licence. See the [LICENSE file in this re
 Regarding attribution as per the license: please ensure that the VocPrez logo is visible on all public instance of VocPrez.
 
 ## Contacts
-*Author*:  
+*Lead Developer*:  
 **Nicholas Car**  
 *Data Systems Architect*  
 [SURROUND Australia Pty Ltd](http://surroundaustralia.com)  
