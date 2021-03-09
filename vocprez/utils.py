@@ -500,7 +500,7 @@ def get_alt_prof_uri(uri):
     if hasattr(config, "USE_ABS_ALT_URI:"):
         return get_absolute_uri(uri, qsas={"_profile": "alt"})
     else:
-        get_content_uri(uri, qsas={"_profile": "alt"})
+        return get_content_uri(uri, qsas={"_profile": "alt"})
 
 
 def get_pretty_mediatype(mediatype):
