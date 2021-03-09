@@ -34,9 +34,11 @@
       <tr>
         <th><a href="http://www.w3.org/2004/02/skos/core#member">Members</a></th>
           <td class="list">
+            <ul>
             {% for member in collection.members -%}
               <li><a href="{{ utils.get_content_uri(member.value) }}">{{ member.value_label }}</a></li>
             {% endfor %}
+            </ul>
           </td>
       </tr>
       {% endif %}
