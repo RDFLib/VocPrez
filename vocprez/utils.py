@@ -510,7 +510,7 @@ def get_pretty_mediatype(mediatype):
         "text/turtle": "Turtle",
         "application/rdf+xml": "RDF/XML",
         "application/ld+json": "JSON-LD",
-        "text/n3": "Notation-3",
+        "text/n3": "N3",
         "application/n-triples": "N-Triples",
     }
     return MEDIATYPE_NAMES.get(mediatype, mediatype)
