@@ -133,7 +133,7 @@ class CollectionRenderer(Renderer):
         _template_context = {
             "version": __version__,
             "vocab_uri": self.collection.vocab_uri if self.collection.vocab_uri is not None else self.request.values.get("vocab_uri"),
-            "vocab_title": g.VOCABS[self.collection.vocab_uri].title,
+            "vocab_title": g.VOCABS[self.collection.vocab_uri].title if self.collection.vocab_uri is not None else None,
             "uri": self.instance_uri,
             "collection": self.collection,
         }
