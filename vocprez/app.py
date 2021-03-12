@@ -215,23 +215,28 @@ def return_collection_or_concept(uri, vocab_uri=None):
             }}           
         }}
         """.format(uri=uri)
+    this_types = []
+    cs = None
     for r in u.sparql_query(q):
-        if r["c"]["value"] in source.Source.VOC_TYPES:
-            # if we find it and it's of a known class, return it
-            # since, for a Concept or a Collection, we know the relevant vocab as vocab ==  CS ==  graph
-            # in VocPrez's models of a vocabs
-            if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
-                try:
-                    c = source.SPARQL(request).get_collection(uri)
-                    return CollectionRenderer(request, c)
-                except:
-                    pass
-            elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
-                try:
-                    c = source.SPARQL(request).get_concept(r["cs"]["value"], uri)
-                    return ConceptRenderer(request, c)
-                except:
-                    pass
+        this_types.append(r["c"]["value"])
+        if r.get("cs"):
+            cs = r["cs"]["value"]
+    for this_type in this_types:
+        # if we find it and it's of a known class, return it
+        # since, for a Concept or a Collection, we know the relevant vocab as vocab ==  CS ==  graph
+        # in VocPrez's models of a vocabs
+        if this_type == "http://www.w3.org/2004/02/skos/core#Collection":
+            try:
+                c = source.OGCSPARQL(request).get_collection(uri)
+                return CollectionRenderer(request, c)
+            except Exception as e:
+                pass
+        elif this_type == "http://www.w3.org/2004/02/skos/core#Concept":
+            try:
+                c = source.SPARQL(request).get_concept(cs, uri)
+                return ConceptRenderer(request, c)
+            except:
+                pass
     return None
 # END FUNCTION return_collection_or_concept_from_main_cache
 
