@@ -14,16 +14,17 @@
     }
 
     .caret::before {
-      content: "\25B6";
-      color: black;
+      content: "\002B" /*"\25B6"*/;
+      color: #337ab7;
       display: inline-block;
       margin-right: 6px;
     }
 
     .caret-down::before {
-      -ms-transform: rotate(90deg); /* IE 9 */
-      -webkit-transform: rotate(90deg); /* Safari */'
-      transform: rotate(90deg);
+      content: "\2212" ;
+      /* -ms-transform: rotate(90deg); /* IE 9 */
+      /* -webkit-transform: rotate(90deg); /* Safari */
+      /* transform: rotate(90deg); */
     }
 
     .nested {
@@ -33,11 +34,20 @@
     .active {
       display: block;
       list-style-type: none;
+      margin-left: -20px;
+    }
+
+    .active li::before {
+      /*content: "\2212" ;*/
+      margin-right: 6px;
+    }
+    .tree-action {
+        font-size: small;
     }
   </style>
 
   {% if hierarchy %}
-    <span class="tree-action" id="tree-toggler">expand all</span>
+    <a class="tree-action" id="tree-toggler">expand all</a><span style="font-size:small;">, click '+' to expand individually</span>
     {{ utils.render_concept_tree(hierarchy)|safe }}
   {% endif %}
 

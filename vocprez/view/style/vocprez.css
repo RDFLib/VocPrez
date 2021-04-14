@@ -45,6 +45,7 @@ body {
 
 #footer {
     background-color: #eee;
+    margin-top: 20px;
 }
 
 .disabled a {
@@ -165,12 +166,24 @@ ul {
     min-height: 28px;
 }
 
-#altprof {
-
+.altprof {
+    float: right;
+    width: 350px;
+}
+.altprof ul li {
+  list-style-type: None;
 }
 
-#filter {
+.filter {
+    float: right;
+    width: 350px;
+    clear: right;
+}
 
+.search {
+    float: right;
+    width: 350px;
+    clear: right;
 }
 
 /*
