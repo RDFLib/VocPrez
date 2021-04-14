@@ -14,6 +14,7 @@ RETRY_SLEEP_SECONDS = 10
 SPARQL_TIMEOUT = 60
 PORT = 5000
 
+
 #
 #   Vocabulary data sources
 #
@@ -31,6 +32,7 @@ class VocabSource:
 # BEGIN Instance Vars
 SYSTEM_URI_BASE = "http://localhost:{}".format(PORT)
 USE_SYSTEM_URIS = True
+USE_ABS_ALT_URI = False
 DEBUG = True
 SPARQL_ENDPOINT = "http://localhost:7200/repositories/ga-vocs"
 SPARQL_USERNAME = None
