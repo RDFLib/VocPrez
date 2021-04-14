@@ -144,3 +144,90 @@ def test_vocab_rdf_alt():
 
     assert "text/turtle" in r.headers["Content-Type"]
     assert "<{}> altr:hasDefaultRepresentation".format(vocab_eg_uri) in content
+
+
+def test_vocab_dd_json():
+    # get the list of vocabs to get the URI of one vocab
+    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
+    vocab_eg_uri = m[0][0]
+
+    # get one vocab
+    r = requests.get(
+        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+    )
+    content = r.json()
+
+    assert "application/json" in r.headers["Content-Type"]
+    assert len(content) > 0
+    assert content[0].get("uri")
+
+
+#
+# -- Test Vocabulary Instance ------------------------------------------------------------------------------------------
+#
+def test_concept_skos_html():
+    # get the list of vocabs to get the URI of one vocab
+    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
+    vocab_eg_uri = m[0][0]
+
+    # get one vocab
+    r = requests.get(
+        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+    )
+    content = r.json()
+
+    # get one Concept
+    concept_eg_uri = content[0].get("uri")
+
+    r = requests.get(
+        BASE_URL + "/object?uri=" + concept_eg_uri
+    )
+
+    assert "<h1>Concept</h1>" in r.content.decode()
+
+
+def test_concept_skos_rdf():
+    # get the list of vocabs to get the URI of one vocab
+    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
+    vocab_eg_uri = m[0][0]
+
+    # get one vocab
+    r = requests.get(
+        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+    )
+    content = r.json()
+
+    # get one Concept
+    concept_eg_uri = content[0].get("uri")
+
+    r = requests.get(
+        BASE_URL + "/object?uri=" + concept_eg_uri + "&_mediatype=text/turtle"
+    )
+
+    assert "text/turtle" in r.headers["Content-Type"]
+    assert "<{}> a skos:Concept ;".format(concept_eg_uri) in r.content.decode()
+
+
+def test_concept_rdf_alt():
+    # get the list of vocabs to get the URI of one vocab
+    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
+    vocab_eg_uri = m[0][0]
+
+    # get one vocab
+    r = requests.get(
+        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+    )
+    content = r.json()
+
+    # get one Concept
+    concept_eg_uri = content[0].get("uri")
+
+    r = requests.get(
+        BASE_URL + "/object?uri=" + concept_eg_uri + "&_profile=alt&_mediatype=text/turtle"
+    )
+
+    assert "<{}> altr:hasDefaultRepresentation".format(concept_eg_uri) in r.content.decode()
