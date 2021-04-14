@@ -1,11 +1,38 @@
 # Release Notes
 
-## 2.3 (or 3.0) - next, late 2020
+## 3.0 - next, late 2020
 * improved profile configurability
 
-See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 2.2.
+See the [Issues list](https://github.com/RDFLib/VocPrez/issues) for issues tagged 3.0.
 
-## 2.2 - current, August 2020
+
+## 2.6 - current, mid January, 2021
+* updated pyLDAPI requirement - 3.11 which includes correct hasToken use in Alt Profile RDF
+* better handing of Agents indicated by text (not URIs)
+* Alt Profiles sub-template in `alt_link.html`
+
+
+## 2.5
+* implemented a new Vocabularies model, instead of default pyLDAPI Container for list of vocabs
+* updated SPARQL GUI
+    * folded /endpoint into /sparql
+* tidied app.py by moving some functions to utils.py
+* implemented get_content_uri() in all templates
+* tidied template HTML & CSS
+* whole-system DCAT & SDO view
+
+
+## 2.4
+* improved caching
+* vocabulary class extension for other_properties
+* config file not backwards compatible due to need for CACHE_FILE, not CACHE_DIR property
+
+
+## 2.3
+* cache purge function added
+
+
+## 2.2
 * search page added
 * minor improvements
 

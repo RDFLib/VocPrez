@@ -1,84 +1,110 @@
 {% extends "page.html" %}
+{% from "_format.html" import format with context -%}
+{% set label = "Concept" %}
+
 {% block content %}
-
-<h1>Concept</h1>
-
-{# status #}
-{% if "http://www.opengis.net/def/metamodel/ogc-na/status" in concept.annotations.keys() %} {# we have a status marker #}
-  <div class="status {{ concept.annotations["http://www.opengis.net/def/metamodel/ogc-na/status"][1].split("/")[-1] }}"></div>
-{% endif %}
-
-<dl>
-  <dt>Preferred Label</dt>
-  <dd><h2>{{ concept.prefLabel }}</h2></dd>
-  <dt>URI</dt>
-  <dd><a href="{{ uri }}">{{ uri }}</a></dd>
-  {%  if vocab_uri is not none %}
-  <dt>Within Vocab</dt>
-  <dd><a href="{{ url_for('object', uri=vocab_uri) }}">{{ vocab_title }}</a></dd>
-  {% endif %}
-</dl>
-<table class="metadata concept">
-  <tr>
-    <th><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></th>
-    <td>{{ concept.prefLabel }}</td>
-  </tr>
-  {% if concept.altLabels|length > 0 %}
-  <tr>
-    <th><a href="http://www.w3.org/2004/02/skos/core#altLabel">Alternative Labels</a></th>
-    <td>
-      {% for a in concept.altLabels %}
-        {{ a }}
-      {% endfor %}
-    </td>
-  </tr>
-  {% endif %}
-  <tr>
-    <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
-    <td>{{ concept.definition }}</td>
-  </tr>
-  {% if concept.related_instances|length > 0 %}
-    {% for k, v in concept.related_instances.items() %}
+  <p style="font-size:small;"><a href="{{ url_for('index') }}">System Home</a> / <a href="{{ url_for('vocabularies') }}">Vocabularies</a> / <a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a> / <a href="{{ utils.get_content_uri(uri) }}">{{ concept.prefLabel }}</a></p>
+  <div style="grid-column: 1; grid-row: 1;">
+    <h1>{{ label }}</h1>
+  </div>
+  <div style="grid-column: 2; grid-row: 2;">
+    {% include 'alt_link.html' %}
+  </div>
+  <div style="grid-column: 1; grid-row: 2;">
+    {# status #}
+    {% for prop in concept.annotations  %}
+      {% if prop.uri == "http://www.opengis.net/def/metamodel/ogc-na/status"  %}
+        <div class="status {{ utils.get_status_label(prop.value) }}"></div>
+      {% endif %}
+    {% endfor %}
+    <dl>
+      <dt><span class="tooltip">Preferred Label<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a></span></span></dt>
+      <dd><h2>{{ concept.prefLabel }}</h2></dd>
+      <dt>URI</dt>
+      <dd>
+        <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
+        <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
+      </dd>
+      {%  if vocab_uri is not none %}
+      <dt>Within Vocab</dt>
+      <dd><a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a></dd>
+      {% endif %}
+    </dl>
+  </div>
+  <div style="grid-column: 1; grid-row: 3;">
+    <table class="metadata concept">
     <tr>
-      <th><a href="{{ k }}">{{ v["label"] }}</a></th>
+      <th><span class="tooltip">Preferred Label<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a></span></span></th>
+      <td>{{ concept.prefLabel }}</td>
+    </tr>
+    {% if concept.altLabels|length > 0 %}
+    <tr>
+      <th><a href="http://www.w3.org/2004/02/skos/core#altLabel">Alternative Labels</a></th>
       <td>
-        {%  for inst in v["instances"] %}
-          {% if LOCAL_URLS -%}
-            <a href="{{ url_for('object') }}?uri={{ inst[0] }}">{{ inst[1] }}</a><br />
-          {% else %}
-            <a href="{{ inst[0] }}">{{ inst[1] }}</a><br />
-          {% endif -%}
+        {% for a in concept.altLabels %}
+          {{ a }}
         {% endfor %}
       </td>
     </tr>
-    {% endfor %}
-{% endif %}
-{% if concept.annotations|length > 0 %}
-  {% for k, v in concept.annotations.items() %}
-  <tr>
-    <th><a href="{{ k }}">{{ v[0] }}</a></th>
-    {%  if v|length == 3 %}
-    <td><a href="{{ v[1] }}">{{ v[2] }}</a></td>
-    {% else %}
-      <td>{{ v[1] }}</td>
     {% endif %}
-  </tr>
-  {% endfor %}
-{% endif %}
-</table>
-<div class="altprof">
-  <h3>Alternate Profiles</h3>
-  {% if LOCAL_URLS -%}
-    {% if vocab_uri is not none %}
-      <p>Different views and formats of this concept are here: <a href="{{ url_for('object') }}?vocab_uri={{ vocab_uri }}&uri={{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
-    {% else %}
-      <p>
-        Different views and formats of this concept are here: <a href="{{ url_for('object') }}?uri={{ uri }}&_profile=alt">Alternate Profiles</a>.
-        <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
-      </p>
+    <tr id="row-definition">
+      <th><span class="tooltip">Definition<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#definition">skos:definition</a></span></span></th>
+      <td>{{ concept.definition|safe }}</td>
+    </tr>
+    {% if concept.related_instances is not none %}
+      {% for prop in concept.related_instances %}
+        <tr>
+          <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
+          <td>
+            {% if prop.value.startswith('http') %}
+              {% if prop.value_label is not none %}
+              <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+              {% else %}
+              <a href="{{ prop.value }}">{{ prop.value }}</a>
+              {% endif %}
+            {% else %}
+              {{ prop.value }}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
     {% endif %}
-  {% else -%}
-    <p>Different views and formats of this concept are here: <a href="{{ uri }}&_profile=alt">Alternate Profiles</a>.</p>
-  {% endif -%}
-</div>
+    {% if concept.annotations is not none %}
+      {% for prop in concept.annotations %}
+        <tr>
+          <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
+          <td>
+            {% if prop.value.startswith('http') %}
+              {% if prop.value_label is not none %}
+              <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+              {% else %}
+              <a href="{{ prop.value }}">{{ prop.value }}</a>
+              {% endif %}
+            {% else %}
+              {{ prop.value }}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+    {% if concept.other_properties is not none %}
+      {% for prop in concept.other_properties %}
+        <tr>
+          <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
+          <td>
+            {% if prop.value.startswith('http') %}
+              {% if prop.value_label is not none %}
+              <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+              {% else %}
+              <a href="{{ prop.value }}">{{ prop.value }}</a>
+              {% endif %}
+            {% else %}
+              {{ prop.value }}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+  </table>
+  </div>
 {% endblock %}

@@ -1,5 +1,4 @@
 import base64
-import errno
 import logging
 import os
 import pickle
@@ -14,98 +13,84 @@ import urllib
 import re
 from bs4 import BeautifulSoup
 import vocprez._config as config
+from . import source
 
 
 __all__ = [
-    "cache_read",
     "cache_write",
     "url_encode",
     "sparql_query",
     "draw_concept_hierarchy",
-    "make_title",
-    "get_graph"
+    "get_graph",
+    "url_decode"
 ]
 
 
-def cache_read(cache_file_name):
-    """
-    Function to read object from cache if cache file is younger than cache_hours. Returns None on failure
-    """
-    cache_seconds = config.VOCAB_CACHE_HOURS * 3600
-    cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
-
-    if os.path.isfile(cache_file_path):
-        # if the cache file is younger than cache_hours days, then try to read it
-        cache_file_age = time.time() - os.stat(cache_file_path).st_mtime
-        logging.debug("Cache file age: {0:.2f} hours".format(cache_file_age / 3600))
-        # if the cache file is older than VOCAB_CACHE_HOURS, ignore it
-        if cache_file_age <= cache_seconds:
-            try:
-                with open(cache_file_path, "rb") as f:
-                    cache_object = pickle.load(f)
-                    f.close()
-                if cache_object:  # Ignore empty file
-                    logging.debug(
-                        "Read cache file {}".format(os.path.abspath(cache_file_path))
-                    )
-                    return cache_object
-            except Exception as e:
-                logging.debug(
-                    "Unable to read cache file {}: {}".format(
-                        os.path.abspath(cache_file_path), e
-                    )
-                )
-                pass
-        else:
-            logging.debug(
-                "Ignoring old cache file {}".format(os.path.abspath(cache_file_path))
-            )
-
-    return
-
-
-def cache_write(cache_object, cache_file_name):
+def cache_write(cache_object):
     """
     Function to write object to cache if cache file is older than cache_hours.
     """
-    cache_seconds = config.VOCAB_CACHE_HOURS * 3600
-    cache_file_path = os.path.join(config.VOCAB_CACHE_DIR, cache_file_name)
+    logging.debug("cache_write({})".format(cache_object))
 
-    if os.path.isfile(cache_file_path):
-        # if the cache file is older than VOCAB_CACHE_HOURS days, delete it
-        cache_file_age = time.time() - os.stat(cache_file_path).st_mtime
-        # if the cache file is older than VOCAB_CACHE_HOURS days, delete it
-        if cache_seconds and cache_file_age > cache_seconds:
-            logging.debug(
-                "Removing old cache file {}".format(os.path.abspath(cache_file_path))
-            )
-            os.remove(cache_file_path)
-        else:
-            logging.debug(
-                "Retaining recent cache file {}".format(
-                    os.path.abspath(cache_file_path)
-                )
-            )
-            return  # Don't do anything - cache file is too young to die
+    # create dir if not there
+    if not os.path.isdir(os.path.dirname(config.CACHE_FILE)):
+        os.makedirs(os.path.dirname(config.CACHE_FILE))
 
-    try:
-        os.makedirs(config.VOCAB_CACHE_DIR)
-        logging.debug(
-            "Cache directory {} created".format(os.path.abspath(config.VOCAB_CACHE_DIR))
-        )
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(config.VOCAB_CACHE_DIR):
-            pass
-        else:
-            raise
+    with open(config.CACHE_FILE, "wb") as cache_file:
+        pickle.dump(cache_object, cache_file)
 
-    if cache_object:  # Don't write empty file
-        with open(cache_file_path, "wb") as cache_file:
-            pickle.dump(cache_object, cache_file)
-            cache_file.close()
-        logging.debug("Cache file {} written".format(cache_file_path))
+
+def cache_clear():
+    logging.debug("cache_clear()")
+
+    # clear the Flask cache
+    if hasattr(g, "VOCABS"):
+        g.VOCABS = None
+
+    # remove the pickle cache
+    if os.path.isfile(config.CACHE_FILE):
+        os.unlink(config.CACHE_FILE)
+
+
+def cache_load():
+    logging.debug("cache_load()")
+
+    if config.DEBUG:
+        logging.debug("DEBUG so purge cache")
+        cache_clear()
+
+    if hasattr(g, "VOCABS"):
+        logging.debug("have g, doing nothing")
+        pass
+    elif os.path.isfile(config.CACHE_FILE):
+        logging.debug("rebuild g from CACHE_FILE")
+        g.VOCABS = {}
+        cache_file_age = time.time() - os.stat(config.CACHE_FILE).st_mtime
+        if cache_file_age < config.CACHE_HOURS * 3600:
+            with open(config.CACHE_FILE, "rb") as f:
+                g.VOCABS = pickle.load(f)
+        else:  # old cache file
+            logging.debug("rebuild g & CACHE_FILE from collect() methods")
+            cache_clear()
+
+            for source_details in config.DATA_SOURCES.values():
+                getattr(source, source_details["source"]).collect(source_details)
+            cache_write(g.VOCABS)
     else:
-        logging.debug("Empty object ignored")
+        logging.debug("build g & CACHE_FILE from collect() methods")
+        g.VOCABS = {}
+        for source_details in config.DATA_SOURCES.values():
+            getattr(source, source_details["source"]).collect(source_details)
+        cache_write(g.VOCABS)
+
+
+def cache_reload():
+    """Cache purging function used in multiple places"""
+    logging.debug("cache_reload()")
+
+    cache_clear()
+
+    cache_load()
 
 
 def draw_concept_hierarchy(hierarchy, request, vocab_uri):
@@ -134,7 +119,7 @@ def draw_concept_hierarchy(hierarchy, request, vocab_uri):
                 mult = item[0] - 1
 
             # Default to showing local URLs unless told otherwise
-            if (not hasattr(config, "LOCAL_URLS")) or config.LOCAL_URLS:
+            if (not hasattr(config, "LOCAL_URLS")) or config.USE_SYSTEM_URIS:
                 uri = (
                         request.url_root
                         + "object?vocab_uri="
@@ -450,3 +435,107 @@ def match(vocabs, query):
 
 def parse_markdown(s):
     return markdown.markdown(s)
+
+
+def make_query_string(qsas: dict):
+    if not qsas:
+        return ""
+
+    pairs = []
+    for k, v in qsas.items():
+        pairs.append("{}={}".format(k, url_encode(v)))
+
+    return "&".join(sorted(pairs))
+
+
+def get_system_uri(uri, qsas: dict = {}, system_uri_override=None):
+    if "?" in uri:
+        for qsa in uri.split("?")[1].split("&"):
+            kv = qsa.split("=")
+            # ensure that any given qsas vars override same vars in uri
+            if qsas.get(kv[0]) is None:
+                qsas[kv[0]] = kv[1]
+    if qsas.get("uri"):
+        uri_qsa = "?uri=" + qsas["uri"]
+        del qsas["uri"]
+    else:
+        uri_qsa = "?uri=" + url_encode(url_decode(uri.split("?")[0]))
+    s = make_query_string(qsas)
+    all_qsas = uri_qsa if s == "" else uri_qsa + "&" + s
+    if system_uri_override is not None:
+        return system_uri_override + all_qsas
+    else:
+        return "{}/object".format(config.SYSTEM_URI_BASE) + all_qsas
+
+
+def get_absolute_uri(uri, qsas:dict = {}):
+    if "?" not in uri:
+        s = make_query_string(qsas)
+        return url_decode(uri) if s == "" else url_decode(uri) + "?" + make_query_string(qsas)
+    else:
+        # system_uri = uri.split("?")[0]
+        for qsa in sorted(uri.split("?")[1].split("&")):
+            kv = qsa.split("=")
+            # ensure that any given qsas vars override same vars in uri
+            if qsas.get(kv[0]) is None:
+                qsas[kv[0]] = kv[1]
+        if qsas.get("uri") is not None:
+            uri = url_decode(qsas["uri"])
+            del qsas["uri"]
+        else:
+            uri = uri.split("?")[0]
+
+        s = make_query_string(qsas)
+        return uri if s == "" else uri + "?" + make_query_string(qsas)
+
+
+def get_content_uri(uri, qsas: dict = {}, system_uri_override=None):
+    if config.USE_SYSTEM_URIS:
+        return get_system_uri(uri, qsas=qsas, system_uri_override=system_uri_override)
+    else:
+        return get_absolute_uri(uri, qsas=qsas)
+
+
+def get_alt_prof_uri(uri):
+    if hasattr(config, "USE_ABS_ALT_URI") and config.USE_ABS_ALT_URI:
+        return get_absolute_uri(uri, qsas={"_profile": "alt"})
+    else:
+        return get_content_uri(uri, qsas={"_profile": "alt"})
+
+
+def get_pretty_mediatype(mediatype):
+    MEDIATYPE_NAMES = {
+        "text/html": "HTML",
+        "application/json": "JSON",
+        "text/turtle": "Turtle",
+        "application/rdf+xml": "RDF/XML",
+        "application/ld+json": "JSON-LD",
+        "text/n3": "N3",
+        "application/n-triples": "N-Triples",
+    }
+    return MEDIATYPE_NAMES.get(mediatype, mediatype)
+
+
+def get_status_label(mediatype):
+    STATUSES = {
+        "http://www.opengis.net/def/status/accepted": "accepted",
+        "http://www.opengis.net/def/status/deprecated": "deprecated",
+        "http://www.opengis.net/def/status/experimental": "experimental",
+        "http://www.opengis.net/def/status/invalid": "invalid",
+        "http://www.opengis.net/def/status/notAccepted": "notAccepted",
+        "http://www.opengis.net/def/status/reserved": "reserved",
+        "http://www.opengis.net/def/status/retired": "retired",
+        "http://www.opengis.net/def/status/stable": "stable",
+        "http://www.opengis.net/def/status/submitted": "submitted",
+        "http://www.opengis.net/def/status/superseded": "superseded",
+        "http://www.opengis.net/def/status/valid": "valid",
+    }
+    return STATUSES.get(mediatype, mediatype)
+
+
+def suppressed_properties():
+    return [
+        "http://www.w3.org/2000/01/rdf-schema#label",
+        "http://www.w3.org/2004/02/skos/core#inScheme",
+        "http://www.w3.org/2004/02/skos/core#topConceptOf",
+    ]

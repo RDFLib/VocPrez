@@ -1,0 +1,16 @@
+{% if uri is not defined %}
+    {%  set uri = request.base_url  %}
+{% endif %}
+
+<div class="altprof">
+  <h3>Alternate Profiles</h3>
+  <p>
+    Different views and formats:
+  </p>
+  <ul style="padding:0">
+    <li>
+      <a href="{{ utils.get_alt_prof_uri(uri) }}">Alternate Profiles</a>&nbsp;<span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Profiles (alternative information views) encoded in various Media Types (HTML, text, RDF, JSON etc.) are available for this resource.</span>
+    </span>
+    </li>
+  </ul>
+</div>

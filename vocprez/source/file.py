@@ -1,7 +1,6 @@
-import vocprez.app
-import vocprez.source.utils
+import vocprez.utils
 from vocprez import _config as config
-from .SOURCE import Source
+from vocprez.source import *
 from os.path import join
 from rdflib import Graph, URIRef, RDF
 from rdflib.namespace import SKOS
@@ -39,14 +38,14 @@ class File(Source):
     def __init__(self, vocab_id, request, language=None):
         super().__init__(vocab_id, request, language)
         self.gr = File.load_pickle_graph(vocab_id)
+        self.vocab_id = vocab_id
 
     @staticmethod
     def collect(details):
         file_vocabs = {}
+        vocab_path = details["directory"]
         # find all files in project_directory/data/source/vocab_files
-        for path, subdirs, files in os.walk(
-            join(config.APP_DIR, "data", "vocab_files")
-        ):
+        for path, subdirs, files in os.walk(vocab_path):
             for name in files:
                 if name.split(".")[-1] in File.MAPPER:
                     # load file
@@ -111,7 +110,7 @@ class File(Source):
                             if cs[4] is not None
                             else None,
                             str(cs[5]) if cs[5] is not None else None,  # versionInfo
-                            config.VocabSource.FILE,
+                            config.VocabSource.File,
                         )
         g.VOCABS = {**g.VOCABS, **file_vocabs}
 
@@ -240,13 +239,36 @@ class File(Source):
 
         vocab.hasTopConcept = self.get_top_concepts()
         vocab.concept_hierarchy = self.get_concept_hierarchy()
-        vocab.concepts = self.get_concepts()
+        vocab.concepts = self.list_concepts()
         vocab.collections = self.list_collections()
         return vocab
 
     # stub
     def get_collection(self, uri):
         pass
+
+    def list_concepts(self):
+        vocab = g.VOCABS[self.vocab_uri]
+        q = """
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT DISTINCT ?c ?pl
+            WHERE {{
+                    {{ ?c skos:inScheme <{uri}> . }}
+                    UNION
+                    {{ ?c skos:topConceptOf <{uri}> . }}
+                    UNION
+                    {{ <{uri}> skos:hasTopConcept ?c . }}
+
+                    ?c skos:prefLabel ?pl .
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+            }}
+            ORDER BY ?pl
+            """.format(uri=vocab.uri, language=self.language)
+
+        gr = self.load_pickle_graph(self.vocab_id)
+
+        return [(r["c"],r["pl"]) for r in gr.query(q)]
 
     def get_concept(self):
         concept_uri = self.request.values.get("uri")

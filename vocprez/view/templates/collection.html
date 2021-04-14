@@ -1,43 +1,48 @@
 {% extends "page.html" %}
+{% set label = "Collection" %}
 
 {% block content %}
-<h1>Collection</h1>
-<dl>
-  <dt>Preferred Label</dt>
-  <dd><h2>{{ collection.prefLabel }}</h2></dd>
-  <dt>URI</dt>
-  <dd><a href="{{ uri }}">{{ uri }}</a></dd>
-  {%  if vocab_uri is not none %}
-  <dt>Within Vocab</dt>
-  <dd><a href="{{ url_for('object', uri=vocab_uri) }}">{{ vocab_title }}</a></dd>
-  {% endif %}
-</dl>
-<table class="metadata collection">
-    {%  if collection.comment is not none  %}
-    <tr>
-        <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th><td>{{ collection.definition }}</td>
-    </tr>
+  <div style="grid-column: 1; grid-row: 1;">
+    <h1>{{ label }}</h1>
+  </div>
+  <div style="grid-column: 2; grid-row: 2;">
+    {% include 'alt_link.html' %}
+  </div>
+  <div style="grid-column: 1; grid-row: 2;">
+    <dl>
+      <dt><span class="tooltip">Preferred Label<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a></span></span></dt>
+    <dd><h2>{{ collection.prefLabel }}</h2></dd>
+    <dt>URI</dt>
+    <dd>
+      <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
+      <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
+    </dd>
+    {%  if vocab_uri is not none %}
+    <dt>Within Vocab</dt>
+    <dd><a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a></dd>
     {% endif %}
-    {% if collection.members|length > 0 %}
-    <tr>
-      <th><a href="http://www.w3.org/2004/02/skos/core#member">Members</a></th>
+  </dl>
+  </div>
+  <div style="grid-column: 1; grid-row: 3;">
+    <table class="metadata collection">
+      {%  if collection.comment is not none  %}
+      <tr>
+        <th><span class="tooltip">Definition<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#definition">skos:definition</a></span></span></th>
+        <td>{{ collection.definition|safe }}</td>
+      </tr>
+      {% endif %}
+      {% if collection.members|length > 0 %}
+      <tr>
+        <th><span class="tooltip">Members<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#member">skos:member</a> instances</span></span></th>
         <td class="list">
-          {% for member in collection.members -%}
-            {% if LOCAL_URLS -%}
-              <a href="{{ url_for('object') }}?vocab_uri={{ vocab_uri }}&uri={{ member[0] }}">{{ member[1] }}</a><br>
-            {% else -%}
-              <a href="{{ member[0] }}">{{ member[1] }}</a><br>
-            {% endif -%}
-          {% endfor %}
-        </td>
-    </tr>
-    {% endif %}
-</table>
-<div class="altprof">
-  <h3>Alternate Profiles</h3>
-  <p>
-    Different views and formats of this concept are here: <a href="{{ url_for("object") }}?vocab_uri={{ vocab_uri }}&uri={{ uri }}&_profile=alt">Alternate Profiles</a>.
-    <span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Different Media Types (HTML, text, RDF, JSON etc.) and different information model views, <em>profiles</em>, are available for this resource.</span></span>
-  </p>
-</div>
+            <ul>
+            {% for member in collection.members -%}
+              <li><a href="{{ utils.get_content_uri(member.value) }}">{{ member.value_label }}</a></li>
+            {% endfor %}
+            </ul>
+          </td>
+      </tr>
+      {% endif %}
+  </table>
+  </div>
 {% endblock %}

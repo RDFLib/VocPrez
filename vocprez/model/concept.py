@@ -5,11 +5,20 @@ from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import DCTERMS, RDF, RDFS, SKOS
 from vocprez.model.profiles import profile_skos
 import vocprez._config as config
+from typing import List
+from vocprez.model.property import Property
 
 
 class Concept:
     def __init__(
-        self, vocab_uri, uri, prefLabel, definition, related_instances, annotations=None
+        self,
+        vocab_uri,
+        uri,
+        prefLabel,
+        definition,
+        related_instances,
+        annotations=None,
+        other_properties: List[Property] = None
     ):
         self.vocab_uri = vocab_uri
         self.uri = uri
@@ -18,6 +27,8 @@ class Concept:
         self.related_instances = related_instances
         self.annotations = annotations
         self.agents = None
+
+        self.other_properties = other_properties
 
 
 class ConceptRenderer(Renderer):
@@ -46,7 +57,6 @@ class ConceptRenderer(Renderer):
                 return self._render_skos_html()
 
     def _render_skos_rdf(self):
-        print("_render_skos_rdf")
         g = Graph()
         g.bind("dct", DCTERMS)
         g.bind("skos", SKOS)
@@ -70,15 +80,19 @@ class ConceptRenderer(Renderer):
             Literal(self.concept.definition, lang=config.DEFAULT_LANGUAGE)
         ))
 
-        for k, v in self.concept.related_instances.items():
-            for k2, v2 in v.items():
-                if k2 == "instances":
-                    for inst in v2:
-                        g.add((
-                            c,
-                            URIRef(k),
-                            URIRef(inst[0])  # only URIs for RDF, not prefLabels too
-                        ))
+        if self.concept.related_instances is not None:
+            for prop in self.concept.related_instances:
+                if str(prop.value).startswith("http"):
+                    g.add((c, URIRef(prop.uri), URIRef(prop.value)))
+                else:
+                    g.add((c, URIRef(prop.uri), Literal(prop.value)))
+
+        if self.concept.other_properties is not None:
+            for prop in self.concept.other_properties:
+                if str(prop.value).startswith("http"):
+                    g.add((c, URIRef(prop.uri), URIRef(prop.value)))
+                else:
+                    g.add((c, URIRef(prop.uri), Literal(prop.value)))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
@@ -131,7 +145,6 @@ class ConceptRenderer(Renderer):
         #     return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
 
     def _render_skos_html(self):
-        print("_render_skos_html")
         _template_context = {
             "version": __version__,
             "vocab_uri": self.concept.vocab_uri if self.concept.vocab_uri is not None else self.request.values.get("vocab_uri"),

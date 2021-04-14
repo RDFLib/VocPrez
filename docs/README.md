@@ -108,12 +108,12 @@ sudo apt install -y python3-venv
 python3 -m venv $VP_HOME/venv
 source $VP_HOME/venv/bin/activate
 pip install -r $VP_HOME/requirements.txt
+# optional, if deploying with GUnicorn, not Apache as per below
+pip install -r $VP_HOME/requirements.depploy.txt  
 
 
 # configure VocPrez
-# app.wsgi
-printf "import sys\nimport logging\nsys.path.insert(0, '$VP_HOME')\nsys.path.insert(0, '$VP_HOME/vocprez')\nlogging.basicConfig(stream=sys.stderr)\n\nfrom app import app as application\n" > $VP_HOME/app.wsgi
-# _conf
+# _config
 cp config.py $VP_HOME/vocprez/_config/__init__.py
 
 

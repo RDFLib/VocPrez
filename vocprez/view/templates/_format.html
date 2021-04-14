@@ -19,6 +19,8 @@ Output:
         <a href="{{ s }}">{{ s }}</a>
     {% elif markdown %}
         {{ utils.parse_markdown(s)|safe }}
+    {% elif s.startswith("{") %}
+        <pre>{{ s|safe }}</pre>
     {% elif safe %}
         {{ s|safe }}
     {% else %}

@@ -4,7 +4,7 @@
         <h1>Alternate Profiles</h1>
         <dl>
           <dt>Instance</dt>
-          <dd><a href="{{ uri }}">{{ uri }}</a></dd>
+          <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
           <dt>Default Profile</dt>
           <dd><a href="{{ request.base_url }}?{% if request.args.get('vocab_uri') is not none %}vocab_uri={{ request.args.get('vocab_uri') }}&{% endif %}uri={{ uri }}&_profile={{ default_profile_token }}">{{ default_profile_token }}</a></dd>
         </dl>
@@ -20,16 +20,16 @@
                 </tr>
             {% for token, profile in profiles.items() %}
                 <tr>
-                    <td style="padding-right: 30px;"><a href="{{ request.base_url }}?{% if request.args.get('vocab_uri') is not none %}vocab_uri={{ request.args.get('vocab_uri') }}&{% endif %}uri={{ uri }}&_profile={{ token }}&_mediatype={{ profile['default_mediatype'] }}">{{ token }}</a></td>
+                    <td style="padding-right: 30px;"><a href="{{ request.base_url }}?{% if request.args.get('vocab_uri') is not none %}vocab_uri={{ utils.url_encode(request.args.get('vocab_uri')) }}&{% endif %}uri={{ utils.url_encode(uri) }}&_profile={{ token }}&_mediatype={{ profile['default_mediatype'] }}">{{ token }}</a></td>
                     <td>{{ profile['label'] }}</td>
                     <td>
                     {% for f in profile['mediatypes']|sort() %}
-                        <a href="{{ request.base_url }}?{% if request.args.get('vocab_uri') is not none %}vocab_uri={{ request.args.get('vocab_uri') }}&{% endif %}uri={{ uri }}&_profile={{ token }}&_mediatype={{ f }}">{{ MEDIATYPE_NAMES[f] if MEDIATYPE_NAMES.get(f) is not none else f }}</a><br />
+                        <a href="{{ request.base_url }}?{% if request.args.get('vocab_uri') is not none %}vocab_uri={{ utils.url_encode(request.args.get('vocab_uri')) }}&{% endif %}uri={{ utils.url_encode(uri) }}&_profile={{ token }}&_mediatype={{ f }}">{{ utils.get_pretty_mediatype(f) }}</a><br />
                     {% endfor %}
                     </td>
                     <td style="text-align: center;">
                     {% for l in profile['languages'] %}
-                        <a href="{{ request.base_url }}?{% if request.args.get('vocab_uri') is not none %}vocab_uri={{ request.args.get('vocab_uri') }}&{% endif %}uri={{ uri }}&_profile={{ token }}&_lang={{ l }}">{{ l }}</a><br />
+                        <a href="{{ request.base_url }}?{% if request.args.get('vocab_uri') is not none %}vocab_uri={{ utils.url_encode(request.args.get('vocab_uri')) }}&{% endif %}uri={{ utils.url_encode(uri) }}&_profile={{ token }}&_lang={{ l }}">{{ l }}</a><br />
                     {% endfor %}
                     </td>
                     <td>{{ profile['comment'] }}</td>

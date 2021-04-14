@@ -1,7 +1,7 @@
-from collections import OrderedDict
-import dateutil
 from flask import g
-from .utils import cache_read, cache_write, url_decode, sparql_query, draw_concept_hierarchy, make_title, get_graph
+from ..utils import *
+from ..utils import suppressed_properties
+from ..model.property import Property
 import vocprez._config as config
 
 
@@ -17,89 +17,75 @@ class Source:
         "http://www.w3.org/2004/02/skos/core#Concept",
     ]
 
-    def __init__(self, vocab_uri, request, language=None):
-        self.vocab_uri = vocab_uri
+    def __init__(self, request, language=None):
         self.request = request
         self.language = language or config.DEFAULT_LANGUAGE
 
-        self._graph = None  # Property for rdflib Graph object to be populated on demand
-
     @property
     def graph(self):
-        # if we have a graph in memory, return that
-        if self._graph is not None:
-            return self._graph
-        else:
-            cache_file_name = self.vocab_uri + ".p"
-            self._graph = cache_read(cache_file_name)
+        # no graph cache file so extract graph from source and cache
+        vocab = g.VOCABS[self.vocab_uri]
 
-            # if we got one from the cache file, return that
-            if self._graph is not None:
-                return self._graph
-            else:
-                # no graph cache file so extract graph from source and cache
-                vocab = g.VOCABS[self.vocab_uri]
+        q = """
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                PREFIX dct: <http://purl.org/dc/terms/>
+                PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-                q = """
-                        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                        PREFIX rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                        PREFIX dct: <http://purl.org/dc/terms/>
-                        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+                CONSTRUCT {{ ?subject ?predicate ?object }}
+                WHERE  {{ 
+                    {{ GRAPH ?graph {{
+                        {{    # conceptScheme
+                            ?subject ?predicate ?object .
+                            ?subject a skos:ConceptScheme .
+                            <{uri}> a skos:ConceptScheme .
+                        }}
+                        union
+                        {{    # conceptScheme members as subjects
+                            ?subject ?predicate ?object .
+                            ?subject skos:inScheme <{uri}> .
+                        }}
+                        union
+                        {{    # conceptScheme members as objects
+                            ?subject ?predicate ?object .
+                            ?object skos:inScheme <{uri}> .
+                        }}
+                    }} }}
+                    UNION
+                    {{
+                        {{    # conceptScheme
+                            ?subject ?predicate ?object .
+                            ?subject a skos:ConceptScheme .
+                            <{uri}> a skos:ConceptScheme .
+                        }}
+                        union
+                        {{    # conceptScheme members as subjects
+                            ?subject ?predicate ?object .
+                            ?subject skos:inScheme <{uri}> .
+                        }}
+                        union
+                        {{    # conceptScheme members as objects
+                            ?subject ?predicate ?object .
+                            ?object skos:inScheme <{uri}> .
+                        }}
+                    }}
+                    FILTER(STRSTARTS(STR(?predicate), STR(rdfs:))
+                        || STRSTARTS(STR(?predicate), STR(skos:))
+                        || STRSTARTS(STR(?predicate), STR(dct:))
+                        || STRSTARTS(STR(?predicate), STR(owl:))
+                        )
+                }}""".format(
+            uri=vocab.uri
+        )
 
-                        CONSTRUCT {{ ?subject ?predicate ?object }}
-                        WHERE  {{ 
-                            {{ GRAPH ?graph {{
-                                {{    # conceptScheme
-                                    ?subject ?predicate ?object .
-                                    ?subject a skos:ConceptScheme .
-                                    <{uri}> a skos:ConceptScheme .
-                                }}
-                                union
-                                {{    # conceptScheme members as subjects
-                                    ?subject ?predicate ?object .
-                                    ?subject skos:inScheme <{uri}> .
-                                }}
-                                union
-                                {{    # conceptScheme members as objects
-                                    ?subject ?predicate ?object .
-                                    ?object skos:inScheme <{uri}> .
-                                }}
-                            }} }}
-                            UNION
-                            {{
-                                {{    # conceptScheme
-                                    ?subject ?predicate ?object .
-                                    ?subject a skos:ConceptScheme .
-                                    <{uri}> a skos:ConceptScheme .
-                                }}
-                                union
-                                {{    # conceptScheme members as subjects
-                                    ?subject ?predicate ?object .
-                                    ?subject skos:inScheme <{uri}> .
-                                }}
-                                union
-                                {{    # conceptScheme members as objects
-                                    ?subject ?predicate ?object .
-                                    ?object skos:inScheme <{uri}> .
-                                }}
-                            }}
-                            FILTER(STRSTARTS(STR(?predicate), STR(rdfs:))
-                                || STRSTARTS(STR(?predicate), STR(skos:))
-                                || STRSTARTS(STR(?predicate), STR(dct:))
-                                || STRSTARTS(STR(?predicate), STR(owl:))
-                                )
-                        }}""".format(
-                    uri=vocab.uri
-                )
-
-                self._graph = get_graph(
-                    vocab.sparql_endpoint,
-                    q,
-                    sparql_username=vocab.sparql_username,
-                    sparql_password=vocab.sparql_password,
-                )
-                cache_write(self._graph, cache_file_name)
-                return self._graph
+        self._graph = get_graph(
+            vocab.sparql_endpoint,
+            q,
+            sparql_username=vocab.sparql_username,
+            sparql_password=vocab.sparql_password,
+        )
+        cache_write(self._graph)
+        return self._graph
 
     @staticmethod
     def collect(details):
@@ -109,8 +95,8 @@ class Source:
         """
         pass
 
-    def list_collections(self):
-        vocab = g.VOCABS[self.vocab_uri]
+    def list_collections(self, vocab_uri):
+        vocab = g.VOCABS[vocab_uri]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -128,146 +114,202 @@ class Source:
 
         return [(x.get("c").get("value"), x.get("pl").get("value")) for x in collections]
 
-    def list_concepts(self):
-        vocab = g.VOCABS[self.vocab_uri]
+    def list_concepts(self, vocab_uri):
+        vocab = g.VOCABS[vocab_uri]
         q = """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-            SELECT DISTINCT ?c ?pl
+            SELECT DISTINCT ?c ?pl ?broader
             WHERE {{
-                    {{ ?c skos:inScheme <{uri}> . }}
-                    UNION
-                    {{ ?c skos:topConceptOf <{uri}> . }}
-                    UNION
-                    {{ <{uri}> skos:hasTopConcept ?c . }}
-            
-                    ?c skos:prefLabel ?pl .
+                GRAPH <{vocab_uri}> {{
+                    ?c a skos:Concept ;
+                         skos:prefLabel ?pl .
+
+                    OPTIONAL {{
+                        {{?c skos:broader ?broader}}
+                        UNION 
+                        {{?broader skos:narrower ?c}}
+                    }}
+
                     FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+                }}
             }}
             ORDER BY ?pl
-            """.format(uri=vocab.uri, language=self.language)
+            """.format(vocab_uri=vocab.uri, language=self.language)
 
         return [
-            (concept["c"]["value"], concept["pl"]["value"])
+            (
+                concept["c"]["value"],
+                concept["pl"]["value"],
+                concept["broader"]["value"] if concept.get("broader") else None
+            )
             for concept in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password)
         ]
 
-    def get_vocabulary(self):
+    def get_vocabulary(self, vocab_uri):
         """
         Get a vocab from the cache
         :return:
         :rtype:
         """
-        vocab = g.VOCABS[self.vocab_uri]
-        vocab.concept_hierarchy = self.get_concept_hierarchy()
-        vocab.concepts = self.list_concepts()
-        vocab.collections = self.list_collections()
+        vocab = g.VOCABS[vocab_uri]
+        vocab.concept_hierarchy = self.get_concept_hierarchy(vocab_uri)
+        vocab.concepts = self.list_concepts(vocab_uri)
+        vocab.collections = self.list_collections(vocab_uri)
         return vocab
 
-    def get_collection(self, uri):
-        vocab = g.VOCABS[self.vocab_uri]
+    def get_collection(self, collection_uri):
         # get the collection's metadata and members
         q = """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            
-            SELECT *
-            WHERE {{
-                <{collection_uri}> ?p ?o .            
-                
-                OPTIONAL {{
-                    ?o skos:prefLabel ?mpl .
-                }}
-                
-                FILTER(lang(?o) = "{language}" || lang(?o) = "" || ISURI(?o))
-            }}
-            """.format(collection_uri=uri, language=self.language)
 
+            SELECT DISTINCT *            
+            WHERE {
+                GRAPH ?g {
+                    <xxxx> a skos:Collection ;
+                           ?p ?o .
+    
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+    
+                    OPTIONAL {
+                        ?p skos:prefLabel|rdfs:label ?ppl .
+                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                    }
+    
+                    OPTIONAL {
+                        ?o skos:prefLabel|rdfs:label ?opl .
+                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                    }
+                }
+            }
+            """.replace("xxxx", collection_uri)
+
+        vocab_uri = None
         pl = None
         d = None
+        c = None
         s = {
             "provenance": None,
             "source": None,
             "wasDerivedFrom": None,
         }
         m = []
-        for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
-            if r["o"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
+        found = False
+        for r in sparql_query(q, config.SPARQL_ENDPOINT, config.SPARQL_USERNAME, config.SPARQL_PASSWORD):
+            vocab_uri = r["g"]["value"]
+            prop = r["p"]["value"]
+            val = r["o"]["value"]
+            found = True
+            if val == "http://www.w3.org/2004/02/skos/core#Concept":
                 return None
 
-            if r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#prefLabel":
-                pl = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
-                d = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/provenance":
-                s["provenance"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/source":
-                s["source"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/ns/prov#wasDerivedFrom":
-                s["wasDerivedFrom"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#member":
-                m.append((r["o"]["value"], r["mpl"]["value"]))
+            if prop == "http://www.w3.org/2004/02/skos/core#prefLabel":
+                pl = val
+            elif prop == "http://www.w3.org/2004/02/skos/core#definition":
+                d = val
+            elif prop == "http://www.w3.org/2000/01/rdf-schema#comment":
+                c = val
+            elif prop == "http://purl.org/dc/terms/provenance":
+                s["provenance"] = val
+            elif prop == "http://purl.org/dc/terms/source":
+                s["source"] = val
+            elif prop == "http://www.w3.org/ns/prov#wasDerivedFrom":
+                s["wasDerivedFrom"] = val
+            elif prop == "http://www.w3.org/2004/02/skos/core#member":
+                m.append(Property(prop, "Member", val, r["opl"]["value"]))
+
+        if not found:
+            return None
 
         from vocprez.model.collection import Collection
+        if not d:
+            d = c
+        return Collection(vocab_uri, collection_uri, pl, d, s, sorted(m, key=lambda x: x.value_label.lower()))
 
-        return Collection(self.vocab_uri, uri, pl, d, s, m)
-
-    def get_concept(self, uri):
-        vocab = g.VOCABS[self.vocab_uri]
-        # q = """
-        #     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        #     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        #
-        #     SELECT *
-        #     WHERE {{
-        #         <{concept_uri}> a skos:Concept ;
-        #                         ?p ?o .
-        #
-        #         OPTIONAL {{
-        #             GRAPH ?predicateGraph {{?p rdfs:label ?predicateLabel .}}
-        #             FILTER(lang(?predicateLabel) = "{language}" || lang(?predicateLabel) = "")
-        #         }}
-        #         OPTIONAL {{
-        #             ?o skos:prefLabel ?objectLabel .
-        #             FILTER(?prefLabel = skos:prefLabel || lang(?objectLabel) = "{language}" || lang(?objectLabel) = "")
-        #             # Don't filter prefLabel language
-        #         }}
-        #     }}
-        #     """.format(
-        #     concept_uri=uri, language=self.language
-        # )
+    def get_concept(self, vocab_uri, uri):
+        vocab = g.VOCABS[vocab_uri]
         q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
             SELECT DISTINCT *            
-            WHERE {{
-                <{concept_uri}> a skos:Concept ;
-                                ?p ?o .
+            WHERE {
+                <xxxx> a skos:Concept ;
+                       ?p ?o .
+
+                FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+
+                OPTIONAL {
+                    ?p skos:prefLabel|rdfs:label ?ppl .
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                }
                 
-                OPTIONAL {{
-                    ?o skos:prefLabel ?ropl .
-                }}                
-            }}
-            """.format(
-            concept_uri=uri, language=self.language
-        )
+                OPTIONAL {
+                    ?o skos:prefLabel|rdfs:label ?opl .
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                }
+            }
+            """.replace("xxxx", uri)
 
         pl = None
         d = None
+        c = None
         s = {
             "provenance": None,
             "source": None,
             "wasDerivedFrom": None,
         }
         annotation_types = {
-            "http://www.opengis.net/def/metamodel/ogc-na/status": "Status"
+            "http://www.opengis.net/def/metamodel/ogc-na/status": "Status",
+            "http://www.w3.org/2004/02/skos/core#note": "Note",
+            "http://www.w3.org/2004/02/skos/core#changeNote": "Change Note",
+            "http://www.w3.org/2004/02/skos/core#historyNote": "History Note",
+            "http://www.w3.org/2004/02/skos/core#editorialNote": "Editorial Note",
+            "http://www.w3.org/2004/02/skos/core#scopeNote": "Scope Note",
+            "http://www.w3.org/2004/02/skos/core#example": "Example",
+            "http://www.w3.org/2004/02/skos/core#altLabel": "Alternative Label",
+            "http://www.w3.org/2004/02/skos/core#hiddenLabel": "Hidden Label",
+            "http://www.w3.org/2004/02/skos/core#notation": "Notation",
+            # DCTERMS
+            "http://purl.org/dc/terms/conformsTo": "Conforms To",
+            "http://purl.org/dc/terms/abstract": "Abstract",
+            "http://purl.org/dc/terms/identifier": "Identifier",
+            "http://purl.org/dc/terms/audience": "Audience",
+            "http://purl.org/dc/terms/publisher": "Publisher",
+            "http://purl.org/dc/terms/isRequiredBy": "Is Required By",
+            "http://purl.org/dc/terms/replaces": "Replaces",
+            "http://purl.org/dc/terms/provenance": "Provenance",
+            "http://purl.org/dc/terms/requires": "Requires",
+            "http://purl.org/dc/terms/language": "Language",
+            "http://purl.org/dc/terms/description": "Description",
+            "http://purl.org/dc/terms/title": "Title",
+            # DC
+            "http://purl.org/dc/elements/1.1/contributor": "Contributor",
+            "http://purl.org/dc/elements/1.1/coverage": "Coverage",
+            "http://purl.org/dc/elements/1.1/creator": "Creator",
+            "http://purl.org/dc/elements/1.1/date": "Date",
+            "http://purl.org/dc/elements/1.1/description": "Description",
+            "http://purl.org/dc/elements/1.1/format": "Format",
+            "http://purl.org/dc/elements/1.1/identifier": "Identifier",
+            "http://purl.org/dc/elements/1.1/language": "Language",
+            "http://purl.org/dc/elements/1.1/publisher": "Publisher",
+            "http://purl.org/dc/elements/1.1/relation": "Relation",
+            "http://purl.org/dc/elements/1.1/rights": "Rights",
+            "http://purl.org/dc/elements/1.1/source": "Source",
+            "http://purl.org/dc/elements/1.1/subject": "Subject",
+            "http://purl.org/dc/elements/1.1/title": "Title",
+            "http://purl.org/dc/elements/1.1/type": "Type",
+            # RDFS
+            "http://www.w3.org/2000/01/rdf-schema#label": "Label",
+            "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
+            "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also",
         }
-        annotations = {}
-        agent_types = [
-            'http://purl.org/dc/terms/contributor',
-            'http://purl.org/dc/terms/creator',
-            'http://purl.org/dc/terms/publisher',
-        ]
+        annotations = []
+        agent_types = {
+            'http://purl.org/dc/terms/contributor': "Contributor",
+            'http://purl.org/dc/terms/creator': "Creator",
+            'http://purl.org/dc/terms/publisher': "Publisher",
+        }
         agent = {}
         related_instance_types = {
             'http://www.w3.org/2004/02/skos/core#exactMatch': "Exact Match",
@@ -275,56 +317,100 @@ class Source:
             'http://www.w3.org/2004/02/skos/core#broadMatch': "Broad Match",
             'http://www.w3.org/2004/02/skos/core#narrowMatch': "Narrow Match",
             'http://www.w3.org/2004/02/skos/core#broader': "Broader",
-            'http://www.w3.org/2004/02/skos/core#narrower': "Narrower"
+            'http://www.w3.org/2004/02/skos/core#narrower': "Narrower",
+            "http://www.w3.org/2004/02/skos/core#related": "Related",
+            "http://purl.org/dc/terms/relation": "Relation",
         }
-        related_instances = {}
+        related_instances = []
+        other_property_types = {
+            "http://purl.org/dc/terms/date": "Date",
+            "http://purl.org/dc/terms/source": "Source",
+            "http://purl.org/dc/terms/references": "References",
+            "http://purl.org/dc/terms/isVersionOf": "Is Version Of",
+            "http://purl.org/dc/terms/isReplacedBy": "Is Replaced By",
+            "http://purl.org/dc/terms/modified": "Date Modified",
+            "http://purl.org/dc/terms/issued": "Date Issued",
+            "http://purl.org/dc/terms/format": "Format",
+            "http://purl.org/dc/terms/isReferencedBy": "Is Referenced By",
+            "http://purl.org/dc/terms/license": "License",
+            "http://purl.org/dc/terms/rights": "Rights",
+            "http://purl.org/dc/terms/isPartOf": "Is Part Of",
+            "http://purl.org/dc/terms/coverage": "Coverage",
+            "http://purl.org/dc/terms/medium": "Medium",
+            "http://purl.org/dc/terms/available": "Date Available",
+            "http://purl.org/dc/terms/spatial": "Spatial Coverage",
+            "http://purl.org/dc/terms/valid": "Date Valid",
+            "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Sub Class Of",
+            "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": "Is Defined By",
+        }
+        other_properties = []
+        found = False
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
-            if r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#prefLabel":
-                pl = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/2004/02/skos/core#definition":
-                d = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/provenance":
-                s["provenance"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://purl.org/dc/terms/source":
-                s["source"] = r["o"]["value"]
-            elif r["p"]["value"] == "http://www.w3.org/ns/prov#wasDerivedFrom":
-                s["wasDerivedFrom"] = r["o"]["value"]
+            prop = r["p"]["value"]
+            val = r["o"]["value"]
+            property_label = None
+            if r.get("ppl") is not None:
+                property_label = r["ppl"]["value"]
+            object_label = None
+            if r.get("opl") is not None:
+                object_label = r["opl"]["value"]
 
-            elif r["p"]["value"] in annotation_types.keys():
-                if r.get("ropl") is not None:
-                    # annotation value has a labe too
-                    annotations[r["p"]["value"]] = (annotation_types[r["p"]["value"]], r["o"]["value"], r["ropl"]["value"])
-                else:
-                    # no label
-                    annotations[r["p"]["value"]] = (annotation_types[r["p"]["value"]], r["o"]["value"])
+            found = True
+            if val == "http://www.w3.org/2004/02/skos/core#Concept":
+                pass
+            elif prop == "http://www.w3.org/2004/02/skos/core#prefLabel":
+                pl = val
+            elif prop == "http://www.w3.org/2004/02/skos/core#definition":
+                d = val
+            elif prop == "http://www.w3.org/2000/01/rdf-schema#comment":
+                c = val
+            elif prop == "http://purl.org/dc/terms/provenance":
+                s["provenance"] = val
+            elif prop == "http://purl.org/dc/terms/source":
+                s["source"] = val
+            elif prop == "http://www.w3.org/ns/prov#wasDerivedFrom":
+                s["wasDerivedFrom"] = val
 
-            elif r["p"]["value"] in related_instance_types.keys():
-                if related_instances.get(r["p"]["value"]) is None:
-                    related_instances[r["p"]["value"]] = {}
-                    related_instances[r["p"]["value"]] = {
-                        "instances": [],
-                        "label": related_instance_types[r["p"]["value"]]
-                    }
-                related_instances[r["p"]["value"]]["instances"].append(
-                    (r["o"]["value"], r["ropl"]["value"] if r["ropl"] is not None else None)
-                )
+            elif prop in annotation_types.keys():
+                if property_label is None:
+                    property_label = annotation_types.get(prop)
 
-            # TODO: Agents
+                if property_label is not None:
+                    annotations.append(Property(prop, property_label, val, object_label))
 
-            # TODO: more Annotations
+            elif prop in related_instance_types.keys():
+                if property_label is None:
+                    property_label = related_instance_types.get(prop)
+
+                if property_label is not None:
+                    related_instances.append(Property(prop, property_label, val, object_label))
+
+            else:  # other properties
+                if val != "http://www.w3.org/2004/02/skos/core#Concept" and prop not in suppressed_properties():
+                    if property_label is None:
+                        property_label = other_property_types.get(prop)
+
+                    if property_label is not None:
+                        other_properties.append(Property(prop, property_label, val, object_label))
+
+        if not found:
+            return None
 
         from vocprez.model.concept import Concept
 
+        if not d:
+            d = c
         return Concept(
-            self.vocab_uri,
+            vocab_uri,
             uri,
             pl,
             d,
             related_instances,
-            annotations
+            annotations,
+            other_properties=other_properties
         )
 
-    def get_concept_hierarchy(self):
+    def get_concept_hierarchy(self, vocab_uri):
         """
         Function to draw concept hierarchy for vocabulary
         """
@@ -369,7 +455,7 @@ class Source:
                              ] + build_hierarchy(bindings_list, concept, level)
             return hier
 
-        vocab = g.VOCABS[self.vocab_uri]
+        vocab = g.VOCABS[vocab_uri]
 
         query = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -401,7 +487,7 @@ class Source:
 
         hierarchy = build_hierarchy(bindings_list)
 
-        return draw_concept_hierarchy(hierarchy, self.request, self.vocab_uri)
+        return draw_concept_hierarchy(hierarchy, self.request, vocab_uri)
 
     def get_object_class(self):
         vocab = g.VOCABS[self.vocab_uri]
@@ -421,3 +507,4 @@ class Source:
                 return cls["c"]["value"]
 
         return None
+

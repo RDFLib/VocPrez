@@ -1,29 +1,17 @@
 ![](vocprez/view/style/VocPrez.300.png)  
 
-A read-only web delivery system for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies.
+VocPrez is a read-only web delivery system - web pages and API - for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies. It complies with [Content Negotiation by Profile](https://w3c.github.io/dx-connegp/connegp/).
 
 ## Introduction
 VocPrez is used by:
 
-![](vocprez/view/style/logo-gsq-200.jpg)
-
-* [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq)
-    * System link: <https://vocabs.gsq.digital> 
-
-![](vocprez/view/style/logo-ga-200.jpg)
-
-* [Geoscience Australia](https://www.ga.gov.au)
-    * System link (demo): <http://ga.surroundaustralia.com> 
-    
-![](vocprez/view/style/logo-cgi-200.jpg)
-
-* [Commission for the Management and Application of Geoscience Information (CGI)](http://www.cgi-iugs.org/)
-    * System link: <http://cgi.vocabs.ga.gov.au/>    
-     
-![](vocprez/view/style/logo-bgs-200.png) 
-
-* [British Geological Survey (BGS)](https://bgs.ac.uk/)
-    * System link: <https://devdata.bgs.ac.uk/vocprez/> - *dev only!*
+&nbsp; | &nbsp;  
+--- | ---  
+![](vocprez/view/style/logo-bodc-bw.png) | The [British Oceanographic Data Centre](https://www.bodc.ac.uk/) 's NERC Vocabulary Server<br /><br />System link: <http://vocab.nerc.ac.uk>  
+![](vocprez/view/style/logo-gsq-200.jpg) | [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq) <br /><br />System link: <https://vocabs.gsq.digital>  
+![](vocprez/view/style/logo-ga-200.jpg) | [Geoscience Australia](https://www.ga.gov.au) <br /><br />System link (demo): <http://ga.surroundaustralia.com>  
+![](vocprez/view/style/logo-cgi-200.jpg) | [Commission for the Management and Application of Geoscience Information (CGI)](http://www.cgi-iugs.org/) <br /><br />System link: <http://cgi.vocabs.ga.gov.au/>  
+![](vocprez/view/style/logo-bgs-200.png) | [British Geological Survey (BGS)](https://bgs.ac.uk/) <br /><br />System link: <https://data.bgs.ac.uk/vocprez/>  
     
 ## Documentation     
      
@@ -36,7 +24,7 @@ This code is licensed using the GPL v3 licence. See the [LICENSE file in this re
 Regarding attribution as per the license: please ensure that the VocPrez logo is visible on all public instance of VocPrez.
 
 ## Contacts
-*Author*:  
+*Lead Developer*:  
 **Nicholas Car**  
 *Data Systems Architect*  
 [SURROUND Australia Pty Ltd](http://surroundaustralia.com)  

@@ -1,0 +1,20 @@
+{% extends "page.html" %}
+{% block content %}
+  <div>
+    <h1>{{ title}}</h1>
+  </div>
+  <div id="maincontent">
+    <div>
+      {{ description|safe }}
+    </div>
+    <dl>
+      <dt>URI</dt>
+      <dd><a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a></dd>
+      <dt>Publisher</dt>
+      <dd>
+        <a href="{{ utils.get_content_uri(publisher[0]) }}">{{ publisher[1] }}</a>
+      </dd>
+    </dl>
+  </div>
+  {% include 'alt_link.html' %}
+{% endblock %}

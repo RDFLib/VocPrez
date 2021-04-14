@@ -5,11 +5,20 @@ from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import DCTERMS, RDF, SKOS
 from vocprez.model.profiles import profile_skos
 import vocprez._config as config
+from typing import List
+from vocprez.model.property import Property
 
 
 class Collection:
     def __init__(
-        self, vocab_uri, uri, prefLabel, definition, source, members,
+        self,
+        vocab_uri,
+        uri,
+        prefLabel,
+        definition,
+        source,
+        members,
+        other_properties: List[Property] = None
     ):
         self.vocab_uri = vocab_uri
         self.uri = uri
@@ -17,6 +26,8 @@ class Collection:
         self.definition = definition
         self.source = source
         self.members = members
+
+        self.other_properties = other_properties
 
 
 class CollectionRenderer(Renderer):
@@ -99,8 +110,12 @@ class CollectionRenderer(Renderer):
             g.add((
                 c,
                 SKOS.member,
-                URIRef(m[0]),
+                URIRef(m.value),
             ))
+
+        if self.collection.other_properties is not None:
+            for prop in self.collection.other_properties:
+                g.add((c, URIRef(prop.uri), prop.value))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
@@ -118,7 +133,7 @@ class CollectionRenderer(Renderer):
         _template_context = {
             "version": __version__,
             "vocab_uri": self.collection.vocab_uri if self.collection.vocab_uri is not None else self.request.values.get("vocab_uri"),
-            "vocab_title": g.VOCABS[self.collection.vocab_uri].title,
+            "vocab_title": g.VOCABS[self.collection.vocab_uri].title if self.collection.vocab_uri is not None else None,
             "uri": self.instance_uri,
             "collection": self.collection,
         }

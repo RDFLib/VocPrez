@@ -1,0 +1,9 @@
+# 1. Update RELEASE_NOTES.py
+
+# 2. change version no in pyldapi/__init__.py
+
+# 3. $ git commit changes
+
+# 4. $ git tag <VERSION_NO>
+
+# 5. $ git push --tags

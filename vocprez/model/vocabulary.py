@@ -3,31 +3,36 @@ from pyldapi import Renderer
 from flask import Response, render_template
 from rdflib import Graph, URIRef, Literal, XSD, RDF
 from rdflib.namespace import DCTERMS, OWL, SKOS, Namespace, NamespaceManager
-from vocprez.model.profiles import profile_skos, profile_dcat
+from vocprez.model.profiles import profile_skos, profile_dcat, profile_dd
+from typing import List
+from vocprez.model.property import Property
+import json as j
+from vocprez._config import *
 
 
 class Vocabulary:
     def __init__(
         self,
         id,
-        uri,                    # DCAT
-        title,                  # DCAT
-        description,            # DCAT
-        creator,                # DCAT
-        created,                # DCAT
-        modified,               # DCAT
+        uri,
+        title,
+        description,
+        creator,
+        created,
+        modified,
         versionInfo,
         source,
         hasTopConcept=None,
         concepts=None,
         concept_hierarchy=None,
         collections=None,
-        accessURL=None,         # DCAT
-        downloadURL=None,       # DCAT
-        sparql_endpoint=None,   # DCAT
+        accessURL=None,
+        downloadURL=None,
+        sparql_endpoint=None,
         collection_uris=None,
         sparql_username=None,
         sparql_password=None,
+        other_properties: List[Property] = None
     ):
         self.id = id
         self.uri = uri
@@ -49,7 +54,7 @@ class Vocabulary:
         self.hasTopConcepts = hasTopConcept
         self.concepts = concepts
         self.conceptHierarchy = concept_hierarchy
-        self.collection = collections
+        self.collections = collections
         self.accessURL = accessURL
         self.downloadURL = downloadURL
         self.sparql_endpoint = sparql_endpoint
@@ -57,11 +62,14 @@ class Vocabulary:
         self.sparql_username = sparql_username
         self.sparql_password = sparql_password
 
+        self.other_properties = other_properties
+
 
 class VocabularyRenderer(Renderer):
     def __init__(self, request, vocab, language="en"):
         self.profiles = {"dcat": profile_dcat}
         self.profiles.update({"skos": profile_skos})
+        self.profiles.update({"dd": profile_dd})
         self.vocab = vocab
         self.uri = self.vocab.uri
         self.language = language
@@ -83,6 +91,8 @@ class VocabularyRenderer(Renderer):
                 return self._render_skos_rdf()
             else:
                 return self._render_dcat_html()  # same as DCAT, for now
+        elif self.profile == "dd":
+            return self._render_dd_json()
 
     def _render_dcat_rdf(self):
         # get vocab RDF
@@ -94,8 +104,6 @@ class VocabularyRenderer(Renderer):
         g.namespace_manager.bind("dct", DCTERMS)
         g.namespace_manager.bind("owl", OWL)
         g.namespace_manager.bind("skos", SKOS)
-        VOID = Namespace("http://rdfs.org/ns/void")
-        g.namespace_manager.bind("void", VOID)
         s = URIRef(self.vocab.uri)
 
         g.add((s, RDF.type, DCAT.Dataset))
@@ -123,14 +131,25 @@ class VocabularyRenderer(Renderer):
             g.add((s, DCAT.accessURL, URIRef(self.vocab.accessURL)))
         if self.vocab.downloadURL:
             g.add((s, DCAT.downloadURL, URIRef(self.vocab.downloadURL)))
-        if self.vocab.sparql_endpoint:
-            g.add((s, VOID.sparqlEndpoint, URIRef(self.vocab.sparql_endpoint)))
+
+        sp = URIRef(SYSTEM_URI_BASE + "/sparql")
+        g.add((sp, DCAT.servesDataset, s))
+        g.add((sp, DCTERMS.title, Literal("VocPrez SPARQL Service")))
+        api = URIRef(SYSTEM_URI_BASE)
+        g.add((api, DCAT.servesDataset, s))
+        g.add((api, DCTERMS.title, Literal("VocPrez Linked Data API")))
+
+        if self.vocab.other_properties is not None:
+            for prop in self.vocab.other_properties:
+                # other properties from DCAT, DCTERMS only
+                if str(prop.uri).startswith(("https://www.w3.org/ns/dcat#", "http://purl.org/dc/terms/")):
+                    g.add((s, URIRef(prop.uri), prop.value))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
-            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype)
+            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype, headers=self.headers)
         else:
-            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
+            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype, headers=self.headers)
 
     def _render_skos_rdf(self):
         g = Graph()
@@ -150,20 +169,30 @@ class VocabularyRenderer(Renderer):
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
-            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype)
+            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype, headers=self.headers)
         else:
-            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype)
+            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype, headers=self.headers)
 
     def _render_dcat_html(self):
         _template_context = {
             "version": __version__,
             "uri": self.uri,
             "vocab": self.vocab,
-            # "navs": self.navs,
-            "title": "Voc: " + self.vocab.title,
+            "title": self.vocab.title,
         }
 
         return Response(
             render_template("vocabulary.html", **_template_context),
             headers=self.headers,
         )
+
+    def _render_dd_json(self):
+        concepts = []
+        if self.vocab.concepts:
+            for c in self.vocab.concepts:
+                concepts.append({
+                    "uri": c[0],
+                    "prefLabel": c[1],
+                    "broader": c[2],
+                })
+        return Response(j.dumps(concepts), mimetype="application/json", headers=self.headers)
