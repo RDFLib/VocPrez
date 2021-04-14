@@ -306,12 +306,12 @@ ul {
 /* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 250px;
+  width: 300px;
   text-align: center;
-  padding: 5px 0;
+  padding: 5px;
   border-radius: 6px;
   border:solid 1px black;
-  background-color: lightgrey;
+  background-color: #eee;
   font-weight: normal;
 
   /* Position the tooltip text - see examples below! */

@@ -23,25 +23,28 @@
   </div>
   <div style="grid-column: 1; grid-row: 2;">
     <dl>
-    <dt><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></dt>
-    <dd><h2>{{ vocab.title }}</h2></dd>
-    <dt>URI</dt>
-    <dd>
-      <a href="{{ utils.get_content_uri(uri) }}">{{ uri }}</a>
-      <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
-    </dd>
-  </dl>
+      <dt>
+        <span class="tooltip">Preferred Label<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a></span></span>
+      </dt>
+      <dd><h2>{{ vocab.title }}</h2></dd>
+      <dt>URI</dt>
+      <dd>
+        <a href="{{ utils.get_content_uri(uri) }}" id="uri">{{ uri }}</a>
+        <a href="{{ uri }}" class="tooltip">&#8599;<span class="tooltiptext" style="color:black;">Go to the persistent identifier link</span></a>
+      </dd>
+    </dl>
   </div>
   <div style="grid-column: 1; grid-row: 3;">
     <table class="metadata concept_scheme">
           {%  if vocab.description is not none  -%}
           <tr>
-            <th><a href="http://purl.org/dc/terms/description">Description</a></th><td>{{ vocab.description|safe }}</td>
+            <th><span class="tooltip">Definition<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#definition">skos:definition</a></span></span></th>
+            <td>{{ vocab.description|safe }}</td>
           </tr>
           {% endif -%}
           {%  if vocab.creator is not none  -%}
           <tr>
-            <th><a href="http://purl.org/dc/terms/creator">Creator</a></th>
+            <th><span class="tooltip">Creator<span class="tooltiptext"><a href="http://purl.org/dc/terms/creator">dcterms:creator</a></span></span></th>
             <td>
               {% if vocab.creator.startswith("http") %}
               <a href="{{ vocab.creator }}">{{ vocab.creator.split('/')[-1].split('#')[-1] }}</a>
@@ -64,17 +67,20 @@
           {% endif -%}
           {%  if vocab.created is not none  -%}
           <tr>
-            <th><a href="http://purl.org/dc/terms/created">Created</a></th><td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
+            <th><span class="tooltip">Created<span class="tooltiptext"><a href="http://purl.org/dc/terms/created">dcterms:created</a></span></span></th>
+            <td>{{ vocab.created.strftime('%Y-%m-%d') }}</td>
           </tr>
           {% endif -%}
           {%  if vocab.modified is not none  -%}
           <tr>
-            <th><a href="http://purl.org/dc/terms/modified">Modified</a></th><td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
+            <th><span class="tooltip">Modified<span class="tooltiptext"><a href="http://purl.org/dc/terms/modified">dcterms:modified</a></span></span></th>
+            <td>{{ vocab.modified.strftime('%Y-%m-%d') }}</td>
           </tr>
           {% endif -%}
           {%  if vocab.versionInfo is not none  -%}
           <tr>
-            <th><a href="http://www.w3.org/2002/07/owl#versionInfo">Version Info</a></th><td>{{ vocab.versionInfo }}</td>
+            <th><span class="tooltip">Version Info<span class="tooltiptext"><a href="http://www.w3.org/2002/07/owl#versionInfo">owl:versionInfo</a></span></span></th>
+            <td>{{ vocab.versionInfo }}</td>
           </tr>
           {% endif -%}
           {% if vocab.downloadURL -%}
@@ -87,7 +93,7 @@
           {% endif -%}
           {%  if vocab.concept_hierarchy is not none and vocab.concept_hierarchy|length > 0  -%}
           <tr>
-            <th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Concept Hierarchy</a></th>
+            <th><span class="tooltip">Concept Hierarchy<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">skos:hasTopConcept</a><br />then<br/><a href="http://www.w3.org/2004/02/skos/core#inScheme">skos:inScheme</a></span></span></th>
             <td>
                 {{ render_concept_hierarchy(vocab.concept_hierarchy)|safe }}
             </td>
@@ -114,7 +120,7 @@
             </tr>
           {% elif vocab.collections is not none and vocab.collections|length > 0  -%}
           <tr>
-            <th><a href="http://www.w3.org/2004/02/skos/core#Collection">Collections</a></th>
+            <th><span class="tooltip">Collections<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#Collection">skos:Collection</a> instances</span></span></th>
             <td>
               {% for collection in vocab.collections %}
                 <a href="{{ utils.get_content_uri(collection[0]) }}">{{ collection[1] }}</a><br />
