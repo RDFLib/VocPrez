@@ -22,7 +22,8 @@
     {% include 'nav.html' %}
   </div>
   <div id="content" style="grid-column:2;">
-      {% block content %}{% endblock %}
+    {% block breadcrumbs %}{% endblock %}
+    {% block content %}{% endblock %}
   </div><!-- #content -->
   <div id="footer" style="grid-column:2;"></div><!-- #footer -->
 </body>
