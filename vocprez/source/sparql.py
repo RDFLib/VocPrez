@@ -38,18 +38,20 @@ class SPARQL(Source):
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
             SELECT * 
             WHERE {{
-                ?cs a skos:ConceptScheme .
-                OPTIONAL {{ ?cs skos:prefLabel ?title .
-                    FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
-                OPTIONAL {{ ?cs dcterms:created ?created }}
-                OPTIONAL {{ ?cs dcterms:issued ?issued }}
-                OPTIONAL {{ ?cs dcterms:modified ?modified }}
-                OPTIONAL {{ ?cs dcterms:creator ?creator }}
-                OPTIONAL {{ ?cs dcterms:source ?source }}
-                OPTIONAL {{ ?cs dcterms:publisher ?publisher }}
-                OPTIONAL {{ ?cs owl:versionInfo ?version }}
-                OPTIONAL {{ ?cs skos:definition ?description .
-                    FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
+                GRAPH ?g {{
+                    ?cs a skos:ConceptScheme .
+                    OPTIONAL {{ ?cs skos:prefLabel ?title .
+                        FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
+                    OPTIONAL {{ ?cs dcterms:created ?created }}
+                    OPTIONAL {{ ?cs dcterms:issued ?issued }}
+                    OPTIONAL {{ ?cs dcterms:modified ?modified }}
+                    OPTIONAL {{ ?cs dcterms:creator ?creator }}
+                    OPTIONAL {{ ?cs dcterms:source ?source }}
+                    OPTIONAL {{ ?cs dcterms:publisher ?publisher }}
+                    OPTIONAL {{ ?cs owl:versionInfo ?version }}
+                    OPTIONAL {{ ?cs skos:definition ?description .
+                        FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
+                }}
             }} 
             ORDER BY ?title
             """.format(language=config.DEFAULT_LANGUAGE)
