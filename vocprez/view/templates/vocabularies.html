@@ -1,6 +1,7 @@
 {% extends "page.html" %}
 
 {% block content %}
+  <p style="font-size:small;"><a href="{{ url_for('index') }}">System Home</a> / <a href="{{ url_for('vocabularies') }}">Vocabularies</a></p>
     <div style="grid-column: 1; grid-row: 1;">
       <h1>{{ label }}</h1>
     </div>
@@ -50,8 +51,8 @@
       {{ pagination.links }}
       <div class="autopaginationinfo">
       <div><h4>Automated Pagination&nbsp;<span id="collapsible-toggle" class="collapsible" style="font-size: 14px;">(more)</span></h4></div>
+      <p>To page through these items, use query string arguments 'page' and 'per_page'.</p>
       <div id="content-pagination" class="collapsible-content">
-        <p>To page through these items, use query string arguments 'page' and 'per_page'.</p>
         <p>HTTP <code>Link</code> headers of <code>first</code>, <code>prev</code>, <code>next</code> &amp; <code>last</code> are given in web responses.</p>
             <p>Example: assuming 500 items, page 7, of 50 per page, is given by:</p>
             <pre>{{ request.url }}?page=7&amp;per_page=50</pre>

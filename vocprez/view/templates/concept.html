@@ -3,6 +3,7 @@
 {% set label = "Concept" %}
 
 {% block content %}
+  <p style="font-size:small;"><a href="{{ url_for('index') }}">System Home</a> / <a href="{{ url_for('vocabularies') }}">Vocabularies</a> / <a href="{{ utils.get_content_uri(vocab_uri) }}">{{ vocab_title }}</a> / <a href="{{ utils.get_content_uri(uri) }}">{{ concept.prefLabel }}</a></p>
   <div style="grid-column: 1; grid-row: 1;">
     <h1>{{ label }}</h1>
   </div>
@@ -17,7 +18,7 @@
       {% endif %}
     {% endfor %}
     <dl>
-      <dt>Preferred Label</dt>
+      <dt><span class="tooltip">Preferred Label<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a></span></span></dt>
       <dd><h2>{{ concept.prefLabel }}</h2></dd>
       <dt>URI</dt>
       <dd>
@@ -33,7 +34,7 @@
   <div style="grid-column: 1; grid-row: 3;">
     <table class="metadata concept">
     <tr>
-      <th><a href="http://www.w3.org/2004/02/skos/core#prefLabel">Preferred Label</a></th>
+      <th><span class="tooltip">Preferred Label<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a></span></span></th>
       <td>{{ concept.prefLabel }}</td>
     </tr>
     {% if concept.altLabels|length > 0 %}
@@ -47,13 +48,13 @@
     </tr>
     {% endif %}
     <tr id="row-definition">
-      <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th>
-        <td>{{ concept.definition|safe }}</td>
+      <th><span class="tooltip">Definition<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#definition">skos:definition</a></span></span></th>
+      <td>{{ concept.definition|safe }}</td>
     </tr>
     {% if concept.related_instances is not none %}
       {% for prop in concept.related_instances %}
         <tr>
-          <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+          <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
           <td>
             {% if prop.value.startswith('http') %}
               {% if prop.value_label is not none %}
@@ -71,7 +72,7 @@
     {% if concept.annotations is not none %}
       {% for prop in concept.annotations %}
         <tr>
-          <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+          <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
           <td>
             {% if prop.value.startswith('http') %}
               {% if prop.value_label is not none %}
@@ -89,7 +90,7 @@
     {% if concept.other_properties is not none %}
       {% for prop in concept.other_properties %}
         <tr>
-          <th><a href="{{ prop.uri }}">{{ prop.label }}</a></th>
+          <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
           <td>
             {% if prop.value.startswith('http') %}
               {% if prop.value_label is not none %}

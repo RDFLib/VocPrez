@@ -111,7 +111,7 @@ class VocabulariesRenderer(ContainerRenderer):
                 if p2 == RDFS.label:
                     g.remove((o, p2, o2))
                     g.add((o, DCTERMS.title, o2))
-                elif p == RDFS.comment:
+                elif p2 == RDFS.comment:
                     g.remove((o, p2, o2))
                     g.add((o, DCTERMS.description, o2))
 

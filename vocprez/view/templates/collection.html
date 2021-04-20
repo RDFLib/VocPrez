@@ -10,7 +10,7 @@
   </div>
   <div style="grid-column: 1; grid-row: 2;">
     <dl>
-    <dt>Preferred Label</dt>
+      <dt><span class="tooltip">Preferred Label<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a></span></span></dt>
     <dd><h2>{{ collection.prefLabel }}</h2></dd>
     <dt>URI</dt>
     <dd>
@@ -27,13 +27,14 @@
     <table class="metadata collection">
       {%  if collection.comment is not none  %}
       <tr>
-          <th><a href="http://www.w3.org/2004/02/skos/core#definition">Definition</a></th><td>{{ collection.definition|safe }}</td>
+        <th><span class="tooltip">Definition<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#definition">skos:definition</a></span></span></th>
+        <td>{{ collection.definition|safe }}</td>
       </tr>
       {% endif %}
       {% if collection.members|length > 0 %}
       <tr>
-        <th><a href="http://www.w3.org/2004/02/skos/core#member">Members</a></th>
-          <td class="list">
+        <th><span class="tooltip">Members<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#member">skos:member</a> instances</span></span></th>
+        <td class="list">
             <ul>
             {% for member in collection.members -%}
               <li><a href="{{ utils.get_content_uri(member.value) }}">{{ member.value_label }}</a></li>

@@ -404,20 +404,20 @@ def search():
             q = """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-                SELECT DISTINCT ?uri ?pl (SUM(?weight) AS ?weight)
+                SELECT DISTINCT ?uri ?pl (SUM(?w) AS ?weight)
                 WHERE {{
                     GRAPH <{grf}> {{
                         {{  # exact match on a prefLabel always wins
                             ?uri a skos:Concept ;
                                  skos:prefLabel ?pl .
-                            BIND (50 AS ?weight)
+                            BIND (50 AS ?w)
                             FILTER REGEX(?pl, "^{input}$", "i")
                         }}
                         UNION    
                         {{
                             ?uri a skos:Concept ;
                                  skos:prefLabel ?pl .
-                            BIND (10 AS ?weight)
+                            BIND (10 AS ?w)
                             FILTER REGEX(?pl, "{input}", "i")
                         }}
                         UNION
@@ -425,7 +425,7 @@ def search():
                             ?uri a skos:Concept ;
                                  skos:altLabel ?al ;
                                  skos:prefLabel ?pl .
-                            BIND (5 AS ?weight)
+                            BIND (5 AS ?w)
                             FILTER REGEX(?al, "{input}", "i")
                         }}
                         UNION
@@ -433,7 +433,7 @@ def search():
                             ?uri a skos:Concept ;
                                  skos:hiddenLabel ?hl ;
                                  skos:prefLabel ?pl .
-                            BIND (5 AS ?weight)
+                            BIND (5 AS ?w)
                             FILTER REGEX(?hl, "{input}", "i")
                         }}        
                         UNION
@@ -441,7 +441,7 @@ def search():
                             ?uri a skos:Concept ;
                                  skos:definition ?d ;
                                  skos:prefLabel ?pl .
-                            BIND (1 AS ?weight)
+                            BIND (1 AS ?w)
                             FILTER REGEX(?d, "{input}", "i")
                         }}        
                     }}
@@ -453,20 +453,20 @@ def search():
         else:
             q = """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                SELECT DISTINCT ?g ?uri ?pl (SUM(?weight) AS ?weight)
+                SELECT DISTINCT ?g ?uri ?pl (SUM(?w) AS ?weight)
                 WHERE {{
                     GRAPH ?g {{
                         {{  # exact match on a prefLabel always wins
                             ?uri a skos:Concept ;
                                  skos:prefLabel ?pl .
-                            BIND (50 AS ?weight)
+                            BIND (50 AS ?w)
                             FILTER REGEX(?pl, "^{input}$", "i")
                         }}
                         UNION    
                         {{
                             ?uri a skos:Concept ;
                                  skos:prefLabel ?pl .
-                            BIND (10 AS ?weight)
+                            BIND (10 AS ?w)
                             FILTER REGEX(?pl, "{input}", "i")
                         }}
                         UNION
@@ -474,7 +474,7 @@ def search():
                             ?uri a skos:Concept ;
                                  skos:altLabel ?al ;
                                  skos:prefLabel ?pl .
-                            BIND (5 AS ?weight)
+                            BIND (5 AS ?w)
                             FILTER REGEX(?al, "{input}", "i")
                         }}
                         UNION
@@ -482,7 +482,7 @@ def search():
                             ?uri a skos:Concept ;
                                  skos:hiddenLabel ?hl ;
                                  skos:prefLabel ?pl .
-                            BIND (5 AS ?weight)
+                            BIND (5 AS ?w)
                             FILTER REGEX(?hl, "{input}", "i")
                         }}        
                         UNION
@@ -490,7 +490,7 @@ def search():
                             ?uri a skos:Concept ;
                                  skos:definition ?d ;
                                  skos:prefLabel ?pl .
-                            BIND (1 AS ?weight)
+                            BIND (1 AS ?w)
                             FILTER REGEX(?d, "{input}", "i")
                         }}        
                     }}

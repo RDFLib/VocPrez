@@ -497,7 +497,7 @@ def get_content_uri(uri, qsas: dict = {}, system_uri_override=None):
 
 
 def get_alt_prof_uri(uri):
-    if hasattr(config, "USE_ABS_ALT_URI:"):
+    if hasattr(config, "USE_ABS_ALT_URI") and config.USE_ABS_ALT_URI:
         return get_absolute_uri(uri, qsas={"_profile": "alt"})
     else:
         return get_content_uri(uri, qsas={"_profile": "alt"})
