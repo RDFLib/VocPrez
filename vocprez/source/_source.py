@@ -241,12 +241,12 @@ class Source:
 
                 OPTIONAL {
                     ?p skos:prefLabel|rdfs:label ?ppl .
-                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                    FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
                 }
                 
                 OPTIONAL {
                     ?o skos:prefLabel|rdfs:label ?opl .
-                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                    FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
                 }
             }
             """.replace("xxxx", uri)
