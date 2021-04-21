@@ -2,7 +2,7 @@ import requests
 import json
 import re
 
-BASE_URL = "http://dawe.surroundaustralia.com"
+BASE_URL = "http://localhost:5000"
 # BASE_URL = "https://vocabs.gsq.digital/"
 VOCABS_LIST_URI_SEG = "/vocabulary/"
 
@@ -102,27 +102,28 @@ def test_vocab_list_mem_rdf():
 #
 def test_vocab_skos_html():
     # get the list of vocabs to get the URI of one vocab
-    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    vocabs_rdf = requests.get(BASE_URL + VOCABS_LIST_URI_SEG + "?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
     m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
     vocab_eg_uri = m[0][0]
 
     # get one vocab
     content = requests.get(
-        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri
+        BASE_URL + "/object?uri=" + vocab_eg_uri
     ).content.decode("utf-8")
 
-    assert '<th><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">Concept Hierarchy</a></th>' in content
+    assert 'Concept Hierarchy' in content
 
 
 def test_vocab_skos_rdf():
     # get the list of vocabs to get the URI of one vocab
-    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    vocabs_rdf = requests.get(
+        BASE_URL + VOCABS_LIST_URI_SEG + "?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
     m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
     vocab_eg_uri = m[0][0]
 
     # get one vocab
     r = requests.get(
-        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_mediatype=text/turtle"
+        BASE_URL + "/object?uri=" + vocab_eg_uri + "&_mediatype=text/turtle"
     )
     content = r.content.decode("utf-8")
 
@@ -132,13 +133,13 @@ def test_vocab_skos_rdf():
 
 def test_vocab_rdf_alt():
     # get the list of vocabs to get the URI of one vocab
-    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    vocabs_rdf = requests.get(BASE_URL + VOCABS_LIST_URI_SEG + "?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
     m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
     vocab_eg_uri = m[0][0]
 
     # get one vocab
     r = requests.get(
-        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=alt&_mediatype=text/turtle"
+        BASE_URL + "/object?uri=" + vocab_eg_uri + "&_profile=alt&_mediatype=text/turtle"
     )
     content = r.content.decode("utf-8")
 
@@ -148,13 +149,13 @@ def test_vocab_rdf_alt():
 
 def test_vocab_dd_json():
     # get the list of vocabs to get the URI of one vocab
-    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    vocabs_rdf = requests.get(BASE_URL + VOCABS_LIST_URI_SEG + "?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
     m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
     vocab_eg_uri = m[0][0]
 
     # get one vocab
     r = requests.get(
-        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+        BASE_URL + "/object?uri=" + vocab_eg_uri + "&_profile=dd"
     )
     content = r.json()
 
@@ -168,13 +169,13 @@ def test_vocab_dd_json():
 #
 def test_concept_skos_html():
     # get the list of vocabs to get the URI of one vocab
-    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    vocabs_rdf = requests.get(BASE_URL + VOCABS_LIST_URI_SEG + "?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
     m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
     vocab_eg_uri = m[0][0]
 
     # get one vocab
     r = requests.get(
-        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+        BASE_URL + "/object?uri=" + vocab_eg_uri + "&_profile=dd"
     )
     content = r.json()
 
@@ -190,13 +191,13 @@ def test_concept_skos_html():
 
 def test_concept_skos_rdf():
     # get the list of vocabs to get the URI of one vocab
-    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    vocabs_rdf = requests.get(BASE_URL + VOCABS_LIST_URI_SEG + "?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
     m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
     vocab_eg_uri = m[0][0]
 
     # get one vocab
     r = requests.get(
-        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+        BASE_URL + "/object?uri=" + vocab_eg_uri + "&_profile=dd"
     )
     content = r.json()
 
@@ -213,13 +214,13 @@ def test_concept_skos_rdf():
 
 def test_concept_rdf_alt():
     # get the list of vocabs to get the URI of one vocab
-    vocabs_rdf = requests.get(BASE_URL + "/vocab/?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
+    vocabs_rdf = requests.get(BASE_URL + VOCABS_LIST_URI_SEG + "?_profile=mem&_mediatype=text/turtle").content.decode("utf-8")
     m = re.findall(r"<(.*)> rdfs:label \"(.*)\" .", vocabs_rdf)
     vocab_eg_uri = m[0][0]
 
     # get one vocab
     r = requests.get(
-        BASE_URL + "/object?vocab_uri=" + vocab_eg_uri + "&_profile=dd"
+        BASE_URL + "/object?uri=" + vocab_eg_uri + "&_profile=dd"
     )
     content = r.json()
 
