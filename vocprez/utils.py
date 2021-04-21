@@ -93,7 +93,7 @@ def cache_reload():
     cache_load()
 
 
-def draw_concept_hierarchy(hierarchy, request, vocab_uri):
+def draw_concept_hierarchy(hierarchy):
         tab = "\t"
         previous_length = 1
 
@@ -118,19 +118,7 @@ def draw_concept_hierarchy(hierarchy, request, vocab_uri):
             if mult is None:  # else: # everything is normal
                 mult = item[0] - 1
 
-            # Default to showing local URLs unless told otherwise
-            if (not hasattr(config, "LOCAL_URLS")) or config.USE_SYSTEM_URIS:
-                uri = (
-                        request.url_root
-                        + "object?vocab_uri="
-                        + vocab_uri
-                        + "&uri="
-                        + url_encode(item[1])
-                )
-            else:
-                uri = item[1]
-
-            t = tab * mult + "* [" + item[2] + "](" + uri + ")\n"
+            t = tab * mult + "* [" + item[2] + "](" + get_content_uri(item[1]) + ")\n"
             text += t
             previous_length = mult
             tracked_items.append({"name": item[1], "indent": mult})
