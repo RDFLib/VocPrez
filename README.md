@@ -7,6 +7,7 @@ VocPrez is used by:
 
 &nbsp; | &nbsp;  
 --- | ---  
+![](vocprez/view/style/logo-ogc-200.png) | The [Open Geospatial Consortium](https://www.ogc.org/) 's Definitions Server<br /><br />System link: <https://defs.opengis.net/vocprez/>  
 ![](vocprez/view/style/logo-bodc-bw.png) | The [British Oceanographic Data Centre](https://www.bodc.ac.uk/) 's NERC Vocabulary Server<br /><br />System link: <http://vocab.nerc.ac.uk>  
 ![](vocprez/view/style/logo-gsq-200.jpg) | [Geological Survey of Queensland](https://www.business.qld.gov.au/industries/mining-energy-water/resources/geoscience-information/gsq) <br /><br />System link: <https://vocabs.gsq.digital>  
 ![](vocprez/view/style/logo-ga-200.jpg) | [Geoscience Australia](https://www.ga.gov.au) <br /><br />System link (demo): <http://ga.surroundaustralia.com>  
