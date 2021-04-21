@@ -1,3 +1,5 @@
+import sys
+
 import io
 import json
 import requests
@@ -116,14 +118,15 @@ def vocabulary(vocab_id):
             markdown.markdown(
                 "The 'vocab_id' you supplied, {}, is not known. Valid vocab_ids are:\n\n{}".format(
                     vocab_id,
-                    "\n".join(["* [{}]({}): {}".format(x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
+                    "\n".join(
+                        ["* [{}]({}): {}".format(x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
                 )
             )
         )
 
     for v in g.VOCABS.values():
         if v.id == vocab_id:
-            return return_vocab(v.uri)
+            return redirect(url_for("object") + "?uri=" + v.uri)
 # END ROUTE one vocab
 
 
@@ -137,16 +140,17 @@ def concepts(vocab_id):
             markdown.markdown(
                 "The 'vocab_id' you supplied, {}, is not known. Valid vocab_ids are:\n\n{}".format(
                     vocab_id,
-                    "\n".join(["* [{}]({}): {}".format(x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
+                    "\n".join(["* [{}]({}): {}".format(
+                        x.id, u.get_content_uri(x.uri), x.title) for x in g.VOCABS.values()])
                 )
             )
         )
 
     try:
         vocab_source = getattr(source, g.VOCABS[vocab_id].source)(vocab_id, request)
-        concepts = vocab_source.list_concepts()
+        cpts = vocab_source.list_concepts()
         # concepts.sort(key=lambda x: x["prefLabel"]) -- sort not needed when receiving pre-sorted tuples
-        total = len(concepts)
+        total = len(cpts)
 
         page = (
             int(request.values.get("page")) if request.values.get("page") is not None else 1
@@ -158,7 +162,7 @@ def concepts(vocab_id):
         )
         start = (page - 1) * per_page
         end = start + per_page
-        members = concepts[start:end]
+        members = cpts[start:end]
     except Exception as e:
         return Response(
             str(e),
@@ -179,82 +183,14 @@ def concepts(vocab_id):
 # END ROUTE concepts
 
 
-# FUNCTION return_vocab
-def return_vocab(uri):
-    if uri in g.VOCABS.keys():
-        # get vocab details using appropriate source handler
-        vocab = source.SPARQL(request).get_vocabulary(uri)
-        return VocabularyRenderer(request, vocab).render()
-    else:
-        return None
-# END FUNCTION return_vocab
-
-
-# FUNCTION return_collection_or_concept_from_main_cache
-# TODO: make this use the main cache directly, not via Vocab's source
-def return_collection_or_concept(uri, vocab_uri=None):
-    # if vocab_uri is set, this must be a Concept
-    try:
-        c = source.SPARQL(request).get_concept(vocab_uri, uri)
-        return ConceptRenderer(request, c)
-    except:
-        pass
-
-    # if vocab_uri is not set, this could either be a Concept or a Collection
-    # first find out which
-    q = """
-        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-        SELECT DISTINCT *
-        WHERE {{ 
-            <{uri}> a ?c .
-            OPTIONAL {{
-                {{ <{uri}> skos:inScheme ?cs . }}
-                UNION
-                {{ <{uri}> skos:topConceptOf ?cs . }}
-            }}           
-        }}
-        """.format(uri=uri)
-    this_types = []
-    cs = None
-    for r in u.sparql_query(q):
-        this_types.append(r["c"]["value"])
-        if r.get("cs"):
-            cs = r["cs"]["value"]
-    for this_type in this_types:
-        # if we find it and it's of a known class, return it
-        # since, for a Concept or a Collection, we know the relevant vocab as vocab ==  CS ==  graph
-        # in VocPrez's models of a vocabs
-        if this_type == "http://www.w3.org/2004/02/skos/core#Collection":
-            try:
-                c = source.OGCSPARQL(request).get_collection(uri)
-                return CollectionRenderer(request, c)
-            except Exception as e:
-                pass
-        elif this_type == "http://www.w3.org/2004/02/skos/core#Concept":
-            try:
-                c = source.SPARQL(request).get_concept(cs, uri)
-                return ConceptRenderer(request, c)
-            except:
-                pass
-    return None
-# END FUNCTION return_collection_or_concept_from_main_cache
-
-
-# FUNCTION return_collection_or_concept_from_vocab_source
-
-# END FUNCTION return_collection_or_concept_from_vocab_source
-
-
 # ROUTE object
 @app.route("/object")
 def object():
     """
     This is the general RESTful endpoint and corresponding Python function to handle requests for individual objects,
-    be they a Vocabulary, Concept Scheme, Collection or Concept. Only those 4 classes of object are supported for the
+    be they a Vocabulary (ConceptScheme), a Collection or Concept. Only those 3 classes of object are supported for the
     moment.
 
-    An HTTP URI query string argument parameter 'vocab_uri' may be supplied, indicating the vocab this object is within
     An HTTP URI query string argument parameter 'uri' must be supplied, indicating the URI of the object being requested
 
     :return: A Flask Response object
@@ -262,83 +198,66 @@ def object():
     """
 
     uri = request.values.get("uri")
-    vocab_uri = request.values.get("vocab_uri")
 
-    uri_is_empty = True if uri is None or uri == "" else False
-    vocab_uri_is_empty = True if vocab_uri is None or vocab_uri == "" else False
-
-    # must have a URI or Vocab URI supplied, for any scenario
-    if uri_is_empty and vocab_uri_is_empty:
+    # must have a URI or Vocab URI supplied
+    if uri is None:
         return return_vocprez_error(
             "Input Error",
             400,
-            "A Query String Argument of 'uri' and/or 'vocab_uri' must be supplied for this endpoint"
+            "A Query String Argument of 'uri' must be supplied for this endpoint"
         )
-    elif uri_is_empty and not vocab_uri_is_empty:
-        # we only have a vocab_uri, so it must be a vocab
-        v = return_vocab(vocab_uri)
-        if v is not None:
-            return v
-        # if we haven't returned already, the vocab_uri was unknown but that's all we have so error
-        return return_vocprez_error(
-            "vocab_uri error",
-            400,
-            markdown.markdown(
-                "You have supplied an unknown 'vocab_uri'. If one is supplied, "
-                "it must be one of:\n\n"
-                "{}".format("".join(["* " + str(x) + "   \n" for x in g.VOCABS.keys()]))
-            ),
-        )
-    elif not uri_is_empty and vocab_uri_is_empty:
-        if uri == config.VOCS_URI:
-            return vocabularies()
-        if uri == config.SYSTEM_URI_BASE or uri == config.SYSTEM_URI_BASE + "/":
-            return index()
-        # we have no vocab_uri so we must be able to return a result from the main cache or error
-        # if it's a vocab, return that
-        v = return_vocab(uri)
-        if v is not None:
-            return v
-        # if we get here, it's not a vocab so try to return a Collection or Concept
-        c = return_collection_or_concept(uri)
-        if c is not None:
-            return c.render()
-        # if we get here, it's neither a vocab nor a Concept or a Collection so return error
-        return return_vocprez_error(
-            "Input Error",
-            400,
-            "The 'uri' you supplied is not known to this instance of VocPrez. You may consider supplying a 'vocab_uri' "
-            "parameter with that same 'uri' to see if VocPrez can use that vocab URI to look up information about "
-            "the 'uri' object' from a remote source."
-        )
-    else:  # both uri & vocab_uri are set
-        # look up URI at vocab_uri source. If not found, return error
 
-        # we have a vocab_uri, so it must be a real one
-        if vocab_uri not in g.VOCABS.keys():
-            return return_vocprez_error(
-                "Input Error",
-                400,
-                markdown.markdown(
-                    "You have supplied an unknown 'vocab_uri'. If one is supplied, "
-                    "it must be one of:\n\n"
-                    "{}".format("".join(["* " + str(x) + "   \n" for x in g.VOCABS.keys()]))
-                ),
-            )
+    if uri == config.SYSTEM_URI_BASE or uri == config.SYSTEM_URI_BASE + "/":
+        return index()
 
-        # the vocab_uri is valid so query that vocab's source for the object
-        # the uri is either a Concept or Collection.
-        c = return_collection_or_concept(uri, vocab_uri=vocab_uri)
-        if c is not None:
-            return c.render()
+    if uri == config.VOCS_URI or uri == config.VOCS_URI + "/":
+        return vocabularies()
 
-        # if we get here, neither a Collection nor a Concept could be found at that vocab's source so error
-        return return_vocprez_error(
-            "Input Error",
-            400,
-            "You supplied a valid 'vocab_uri' but when VocPrez queried the relevant vocab, no information about the "
-            "object you identified with 'uri' was found.",
-        )
+    # get the class of the object
+    q = """
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+        SELECT DISTINCT ?c ?cs
+        WHERE {
+            GRAPH ?g {
+                <xxx> a ?c .
+                OPTIONAL {
+                    VALUES ?memberof { skos:inScheme skos:topConceptOf }
+                    <xxx> ?memberof ?cs .
+                }
+            }
+        }
+        """.replace("xxx", uri)
+    cs = None
+    for r in u.sparql_query(q):
+        if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#ConceptScheme":
+            if uri in g.VOCABS.keys():
+                # get vocab details using appropriate source handler
+                vocab = source.SPARQL(request).get_vocabulary(uri)
+                return VocabularyRenderer(request, vocab).render()
+            else:
+                return None
+        elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
+            try:
+                c = source.SPARQL(request).get_collection(uri)
+                return ConceptRenderer(request, c).render()
+            except:
+                return None
+        elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
+            try:
+                if r.get("cs"):
+                    cs = r["cs"]["value"]
+                c = source.SPARQL(request).get_concept(cs, uri)
+                return ConceptRenderer(request, c).render()
+            except:
+                return None
+
+    return return_vocprez_error(
+        "Input Error",
+        400,
+        "The object with URI {} is not of type skos:ConceptScheme, skos:Collection or skos:Concept "
+        "and only these classes of object are understood by VocPrez".format(uri)
+    )
 # END ROUTE object
 
 
@@ -533,7 +452,8 @@ def endpoint():
     TESTS
 
     Form POST:
-    curl -X POST -d query="PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0ASELECT%20*%20WHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%20.%7D" http://localhost:5000/endpoint
+    curl -X POST -d query="PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0ASELECT%20* \
+    %20WHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%20.%7D" http://localhost:5000/endpoint
 
     Raw POST:
     curl -X POST -H 'Content-Type: application/sparql-query' --data-binary @query.sparql http://localhost:5000/endpoint
@@ -542,30 +462,33 @@ def endpoint():
         SELECT * WHERE {?s a skos:ConceptScheme .}
 
     GET:
-    curl http://localhost:5000/endpoint?query=PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0ASELECT%20*%20WHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%20.%7D
+    curl http://localhost:5000/endpoint?query=PREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore \
+    %23%3E%0ASELECT%20*%20WHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%20.%7D
 
     GET CONSTRUCT:
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
         CONSTRUCT {?s a rdf:Resource}
         WHERE {?s a skos:ConceptScheme}
-    curl -H 'Accept: application/ld+json' http://localhost:5000/endpoint?query=PREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fco23%3E%0ACONSTRUCT%20%7B%3Fs%20a%20rdf%3AResource%7D%0AWHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%7D
+    curl -H 'Accept: application/ld+json' http://localhost:5000/endpoint?query=PREFIX%20rdf%3A%20%3Chttp%3A%2F%2F \
+    www.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2F \
+    skos%2Fco23%3E%0ACONSTRUCT%20%7B%3Fs%20a%20rdf%3AResource%7D%0AWHERE%20%7B%3Fs%20a%20skos%3AConceptScheme%7D
 
     """
     logging.debug("request: {}".format(request.__dict__))
 
-    def get_sparql_service_description(rdf_format="turtle"):
+    def get_sparql_service_description(rdf_fmt="turtle"):
         """Return an RDF description of PROMS' read only SPARQL endpoint in a requested format
 
-        :param rdf_format: 'turtle', 'n3', 'xml', 'json-ld'
+        :param rdf_fmt: 'turtle', 'n3', 'xml', 'json-ld'
         :return: string of RDF in the requested format
         """
         sd_ttl = """
             @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix sd:     <http://www.w3.org/ns/sparql-service-description#> .
             @prefix sdf:    <http://www.w3.org/ns/formats/> .
-            @prefix void: <http://rdfs.org/ns/void#> .
-            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+            @prefix void:   <http://rdfs.org/ns/void#> .
+            @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 
             <{0}>
                 a                       sd:Service ;
@@ -582,23 +505,23 @@ def endpoint():
                 ]
             .
         """.format(config.SYSTEM_URI_BASE + url_for("sparql"))
-        g = Graph().parse(io.StringIO(sd_ttl), format="turtle")
+        grf = Graph().parse(io.StringIO(sd_ttl), format="turtle")
         rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_TYPES_MAP]))
-        if rdf_format in rdf_formats:
-            return g.serialize(format=rdf_format)
+        if rdf_fmt in rdf_formats:
+            return grf.serialize(format=rdf_fmt)
         else:
             raise ValueError(
                 "Input parameter rdf_format must be one of: " + ", ".join(rdf_formats)
             )
 
-    def sparql_query2(query, format_mimetype="application/json"):
+    def sparql_query2(q, mimetype="application/json"):
         """ Make a SPARQL query"""
-        logging.debug("sparql_query2: {}".format(query))
-        data = query
+        logging.debug("sparql_query2: {}".format(q))
+        data = q
 
         headers = {
             "Content-Type": "application/sparql-query",
-            "Accept": format_mimetype,
+            "Accept": mimetype,
             "Accept-Encoding": "UTF-8",
         }
         if config.SPARQL_USERNAME is not None and config.SPARQL_PASSWORD is not None:
@@ -622,8 +545,8 @@ def endpoint():
                 )
             logging.debug("response: {}".format(r.__dict__))
             return r.content.decode("utf-8")
-        except Exception as e:
-            raise e
+        except Exception as ex:
+            raise ex
 
     format_mimetype = request.headers["ACCEPT"]
 
@@ -687,7 +610,7 @@ def endpoint():
                 format_mimetype = "text/turtle"
                 return Response(
                     sparql_query2(
-                        query, format_mimetype=format_mimetype
+                        query, mimetype=format_mimetype
                     ),
                     status=200,
                     mimetype=format_mimetype,
@@ -726,7 +649,7 @@ def endpoint():
                 acceptable_mimes = [x for x in Renderer.RDF_MEDIA_TYPES]
                 best = request.accept_mimetypes.best_match(acceptable_mimes)
                 query_result = sparql_query2(
-                    query, format_mimetype=best
+                    query, mimetype=best
                 )
                 file_ext = {
                     "text/turtle": "ttl",
@@ -772,7 +695,7 @@ def endpoint():
                         rdf_format = best
                         return Response(
                             get_sparql_service_description(
-                                rdf_format=rdf_format
+                                rdf_fmt=rdf_format
                             ),
                             status=200,
                             mimetype=best,
@@ -791,7 +714,6 @@ def endpoint():
 
 
 # FUNCTION return_vocrez_error
-# TODO: use for all errors
 # TODO: allow conneg - at least text v. HTML
 def return_vocprez_error(title, status, message):
     return render_template(
