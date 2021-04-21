@@ -491,7 +491,7 @@ class Source:
 
         hierarchy = build_hierarchy(bindings_list)
 
-        return draw_concept_hierarchy(hierarchy, self.request, vocab_uri)
+        return draw_concept_hierarchy(hierarchy)
 
     def get_object_class(self):
         vocab = g.VOCABS[self.vocab_uri]

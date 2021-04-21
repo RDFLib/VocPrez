@@ -549,7 +549,7 @@ class File(Source):
 
         hierarchy = build_hierarchy(bindings_list)
 
-        return vocprez.source.utils.draw_concept_hierarchy(hierarchy, self.request, self.vocab_id)
+        return vocprez.source.utils.draw_concept_hierarchy(hierarchy)
 
     def get_object_class(self):
         uri = vocprez.app.url_decode(self.request.values.get("uri"))
