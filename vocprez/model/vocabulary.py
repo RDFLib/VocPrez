@@ -92,7 +92,10 @@ class VocabularyRenderer(Renderer):
             else:
                 return self._render_dcat_html()  # same as DCAT, for now
         elif self.profile == "dd":
-            return self._render_dd_json()
+            if self.mediatype in Renderer.RDF_SERIALIZER_TYPES_MAP:
+                return self._render_dd_rdf()
+            else:
+                return self._render_dd_json()
 
     def _render_dcat_rdf(self):
         # get vocab RDF
@@ -185,6 +188,21 @@ class VocabularyRenderer(Renderer):
             render_template("vocabulary.html", **_template_context),
             headers=self.headers,
         )
+
+    def _render_dd_rdf(self):
+        g = Graph()
+        g.bind("skos", SKOS)
+        s = URIRef(self.vocab.uri)
+
+        if self.vocab.concepts:
+            for c in self.vocab.concepts:
+                g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
+
+        # serialise in the appropriate RDF format
+        if self.mediatype in ["application/rdf+json", "application/json"]:
+            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype, headers=self.headers)
+        else:
+            return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype, headers=self.headers)
 
     def _render_dd_json(self):
         concepts = []
