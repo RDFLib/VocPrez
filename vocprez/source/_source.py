@@ -234,19 +234,21 @@ class Source:
 
             SELECT DISTINCT *            
             WHERE {
-                <xxxx> a skos:Concept ;
-                       ?p ?o .
-
-                FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
-
-                OPTIONAL {
-                    ?p skos:prefLabel|rdfs:label ?ppl .
-                    FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
-                }
-                
-                OPTIONAL {
-                    ?o skos:prefLabel|rdfs:label ?opl .
-                    FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
+                GRAPH ?g {
+                    <xxxx> a skos:Concept ;
+                           ?p ?o .
+    
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+    
+                    OPTIONAL {
+                        ?p skos:prefLabel|rdfs:label ?ppl .
+                        FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
+                    }
+                    
+                    OPTIONAL {
+                        ?o skos:prefLabel|rdfs:label ?opl .
+                        FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
+                    }
                 }
             }
             """.replace("xxxx", uri)
@@ -463,17 +465,19 @@ class Source:
             
             SELECT distinct ?concept ?concept_preflabel ?broader_concept
             WHERE {{
-                {{ ?concept skos:inScheme <{vocab_uri}> . }}
-                UNION
-                {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
-                UNION
-                {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
-                ?concept skos:prefLabel ?concept_preflabel .
-                OPTIONAL {{ 
-                    ?concept skos:broader ?broader_concept .
-                    ?broader_concept skos:inScheme <{vocab_uri}> .
+                GRAPH ?g {{
+                    {{ ?concept skos:inScheme <{vocab_uri}> . }}
+                    UNION
+                    {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
+                    UNION
+                    {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
+                    ?concept skos:prefLabel ?concept_preflabel .
+                    OPTIONAL {{ 
+                        ?concept skos:broader ?broader_concept .
+                        ?broader_concept skos:inScheme <{vocab_uri}> .
+                    }}
+                    FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
                 }}
-                FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
             }}
             ORDER BY ?concept_preflabel
             """.format(
@@ -487,14 +491,16 @@ class Source:
 
         hierarchy = build_hierarchy(bindings_list)
 
-        return draw_concept_hierarchy(hierarchy, self.request, vocab_uri)
+        return draw_concept_hierarchy(hierarchy)
 
     def get_object_class(self):
         vocab = g.VOCABS[self.vocab_uri]
         q = """
             SELECT DISTINCT * 
             WHERE {{ 
-                <{uri}> a ?c .
+                GRAPH ?g {{
+                    <{uri}> a ?c .
+                }}
             }}
             """.format(
             uri=url_decode(self.request.values.get("uri"))

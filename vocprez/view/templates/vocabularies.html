@@ -1,7 +1,10 @@
 {% extends "page.html" %}
 
+{% block breadcrumbs %}
+  <p class="breadcrumbs"><a href="{{ url_for('index') }}">System Home</a> / <a href="{{ url_for('vocabularies') }}">Vocabularies</a></p>
+{% endblock %}
+
 {% block content %}
-  <p style="font-size:small;"><a href="{{ url_for('index') }}">System Home</a> / <a href="{{ url_for('vocabularies') }}">Vocabularies</a></p>
     <div style="grid-column: 1; grid-row: 1;">
       <h1>{{ label }}</h1>
     </div>
