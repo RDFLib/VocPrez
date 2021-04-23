@@ -162,7 +162,11 @@ def get_graph(endpoint, q, sparql_username=None, sparql_password=None):
     return result_graph
 
 
-def sparql_query(q, sparql_endpoint=config.SPARQL_ENDPOINT, sparql_username=None, sparql_password=None):
+def sparql_query(
+        q,
+        sparql_endpoint=config.SPARQL_ENDPOINT,
+        sparql_username=config.SPARQL_USERNAME,
+        sparql_password=config.SPARQL_PASSWORD):
     sparql = SPARQLWrapper(sparql_endpoint)
     sparql.setQuery(q)
     sparql.setReturnFormat(JSON)
