@@ -465,19 +465,21 @@ class Source:
             
             SELECT distinct ?concept ?concept_preflabel ?broader_concept
             WHERE {{
-                GRAPH ?g {{
+                
                     {{ ?concept skos:inScheme <{vocab_uri}> . }}
                     UNION
                     {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
                     UNION
                     {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
-                    ?concept skos:prefLabel ?concept_preflabel .
+                    OPTIONAL {{ ?concept skos:prefLabel ?preflabel . }}
+                    OPTIONAL {{ ?concept rdfs:label ?rdfslabel . }}
+                    BIND ( COALESCE( ?preflabel, ?rdfslabel, str(?concept)) AS ?concept_preflabel )
                     OPTIONAL {{ 
                         ?concept skos:broader ?broader_concept .
                         ?broader_concept skos:inScheme <{vocab_uri}> .
                     }}
                     FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
-                }}
+              
             }}
             ORDER BY ?concept_preflabel
             """.format(
