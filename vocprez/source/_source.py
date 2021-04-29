@@ -170,15 +170,16 @@ class Source:
                            ?p ?o .
     
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
-    
+                    OPTIONAL { <xxxx> skos:inScheme ?cs }
+                    BIND ( COALESCE( ?cs,?g) AS ?conceptscheme )
                     OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
-                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                        FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
                     }
     
                     OPTIONAL {
                         ?o skos:prefLabel|rdfs:label ?opl .
-                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                        FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
                     }
                 }
             }
@@ -196,7 +197,7 @@ class Source:
         m = []
         found = False
         for r in sparql_query(q, config.SPARQL_ENDPOINT, config.SPARQL_USERNAME, config.SPARQL_PASSWORD):
-            vocab_uri = r["g"]["value"]
+            vocab_uri = r["conceptscheme"]["value"]
             prop = r["p"]["value"]
             val = r["o"]["value"]
             found = True
