@@ -36,22 +36,31 @@ class SPARQL(Source):
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX dcterms: <http://purl.org/dc/terms/>
             PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            SELECT * 
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            SELECT DISTINCT * 
             WHERE {{
-                GRAPH ?g {{
+                
                     ?cs a skos:ConceptScheme .
                     OPTIONAL {{ ?cs skos:prefLabel ?title .
                         FILTER(lang(?title) = "{language}" || lang(?title) = "") }}
                     OPTIONAL {{ ?cs dcterms:created ?created }}
                     OPTIONAL {{ ?cs dcterms:issued ?issued }}
                     OPTIONAL {{ ?cs dcterms:modified ?modified }}
-                    OPTIONAL {{ ?cs dcterms:creator ?creator }}
+                    OPTIONAL {{ ?cs dcterms:creator ?creatornode 
+                        OPTIONAL {{ ?creatornode foaf:name|rdfs:label ?createnodename }}
+                        BIND( COALESCE ( ?createnodename, ?creatornode ) AS ?creator )
+                        }}
                     OPTIONAL {{ ?cs dcterms:source ?source }}
                     OPTIONAL {{ ?cs dcterms:publisher ?publisher }}
                     OPTIONAL {{ ?cs owl:versionInfo ?version }}
-                    OPTIONAL {{ ?cs skos:definition ?description .
-                        FILTER(lang(?description) = "{language}" || lang(?description) = "") }}
-                }}
+                    OPTIONAL {{ ?cs skos:definition ?skosdef .
+                        FILTER(lang(?skosdef) = "{language}" || lang(?skosdef) = "") }}
+                    OPTIONAL {{ ?cs dcterms:description ?dcdescription .
+                        FILTER(lang(?dcdescription) = "{language}" || lang(?dcdescription) = "") }}
+                    OPTIONAL {{ ?cs rdfs:comment ?comment .
+                        FILTER(lang(?comment) = "{language}" || lang(?comment) = "") }}
+                    BIND( COALESCE(?dcdescription, ?skosdef, ?comment, "Set dcterms:description or skos:definition to describe this vocabulary") AS ?description )
+                
             }} 
             ORDER BY ?title
             """.format(language=config.DEFAULT_LANGUAGE)
@@ -79,6 +88,7 @@ class SPARQL(Source):
                     id = id + "1"
 
             vocab_ids.append(id)
+
 
             sparql_vocabs[vocab_id] = Vocabulary(
                 id,
