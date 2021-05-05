@@ -466,8 +466,10 @@ class Source:
             
             SELECT distinct ?concept ?concept_preflabel ?broader_concept
             WHERE {{
-                
-                    {{ ?concept skos:inScheme <{vocab_uri}> . }}
+                    
+                    {{ ?concept a skos:Concept .
+                        ?concept skos:inScheme <{vocab_uri}> .
+                    }}
                     UNION
                     {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
                     UNION
