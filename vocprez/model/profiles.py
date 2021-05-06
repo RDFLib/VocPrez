@@ -66,7 +66,7 @@ profile_dd = Profile(
     comment="A simple data model to provide items for form drop-down lists. The basic information is an ID & name tuple "
             "and the optional extra value is an item's parent. For vocabularies, this is then URI, prefLabel or URI, "
             "prefLabel & broader Concept",
-    mediatypes=["application/json"],
+    mediatypes=["application/json"] + reduced_rdf_types,
     default_mediatype="application/json",
     languages=["en"],
     default_language="en",

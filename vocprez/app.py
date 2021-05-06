@@ -240,7 +240,7 @@ def object():
         elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
             try:
                 c = source.SPARQL(request).get_collection(uri)
-                return ConceptRenderer(request, c).render()
+                return CollectionRenderer(request, c).render()
             except:
                 return None
         elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":

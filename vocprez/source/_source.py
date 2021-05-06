@@ -170,15 +170,16 @@ class Source:
                            ?p ?o .
     
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
-    
+                    OPTIONAL { <xxxx> skos:inScheme ?cs }
+                    BIND ( COALESCE( ?cs,?g) AS ?conceptscheme )
                     OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
-                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                        FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
                     }
     
                     OPTIONAL {
                         ?o skos:prefLabel|rdfs:label ?opl .
-                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                        FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
                     }
                 }
             }
@@ -196,7 +197,7 @@ class Source:
         m = []
         found = False
         for r in sparql_query(q, config.SPARQL_ENDPOINT, config.SPARQL_USERNAME, config.SPARQL_PASSWORD):
-            vocab_uri = r["g"]["value"]
+            vocab_uri = r["conceptscheme"]["value"]
             prop = r["p"]["value"]
             val = r["o"]["value"]
             found = True
@@ -242,12 +243,12 @@ class Source:
     
                     OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
-                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                        FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
                     }
                     
                     OPTIONAL {
                         ?o skos:prefLabel|rdfs:label ?opl .
-                        FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+                        FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
                     }
                 }
             }
@@ -306,7 +307,7 @@ class Source:
             "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
             "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also",
         }
-        annotations = []
+        annotations = {}
         agent_types = {
             'http://purl.org/dc/terms/contributor': "Contributor",
             'http://purl.org/dc/terms/creator': "Creator",
@@ -323,7 +324,7 @@ class Source:
             "http://www.w3.org/2004/02/skos/core#related": "Related",
             "http://purl.org/dc/terms/relation": "Relation",
         }
-        related_instances = []
+        related_instances = {}
         other_property_types = {
             "http://purl.org/dc/terms/date": "Date",
             "http://purl.org/dc/terms/source": "Source",
@@ -345,7 +346,7 @@ class Source:
             "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Sub Class Of",
             "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": "Is Defined By",
         }
-        other_properties = []
+        other_properties = {}
         found = False
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
             prop = r["p"]["value"]
@@ -378,14 +379,14 @@ class Source:
                     property_label = annotation_types.get(prop)
 
                 if property_label is not None:
-                    annotations.append(Property(prop, property_label, val, object_label))
+                    annotations[prop] = (Property(prop, property_label, val, object_label))
 
             elif prop in related_instance_types.keys():
                 if property_label is None:
                     property_label = related_instance_types.get(prop)
 
                 if property_label is not None:
-                    related_instances.append(Property(prop, property_label, val, object_label))
+                    related_instances[prop] =(Property(prop, property_label, val, object_label))
 
             else:  # other properties
                 if val != "http://www.w3.org/2004/02/skos/core#Concept" and prop not in suppressed_properties():
@@ -393,7 +394,7 @@ class Source:
                         property_label = other_property_types.get(prop)
 
                     if property_label is not None:
-                        other_properties.append(Property(prop, property_label, val, object_label))
+                        other_properties[prop] =(Property(prop, property_label, val, object_label))
 
         if not found:
             return None
@@ -407,9 +408,9 @@ class Source:
             uri,
             pl,
             d,
-            related_instances,
-            annotations,
-            other_properties=other_properties
+            related_instances.values(),
+            annotations.values(),
+            other_properties=other_properties.values()
         )
 
     def get_concept_hierarchy(self, vocab_uri):
@@ -465,19 +466,23 @@ class Source:
             
             SELECT distinct ?concept ?concept_preflabel ?broader_concept
             WHERE {{
-                GRAPH ?g {{
-                    {{ ?concept skos:inScheme <{vocab_uri}> . }}
+                    
+                    {{ ?concept a skos:Concept .
+                        ?concept skos:inScheme <{vocab_uri}> .
+                    }}
                     UNION
                     {{ ?concept skos:topConceptOf <{vocab_uri}> . }}
                     UNION
                     {{ <{vocab_uri}> skos:hasTopConcept ?concept . }}  
-                    ?concept skos:prefLabel ?concept_preflabel .
+                    OPTIONAL {{ ?concept skos:prefLabel ?preflabel . }}
+                    OPTIONAL {{ ?concept rdfs:label ?rdfslabel . }}
+                    BIND ( COALESCE( ?preflabel, ?rdfslabel, str(?concept)) AS ?concept_preflabel )
                     OPTIONAL {{ 
                         ?concept skos:broader ?broader_concept .
                         ?broader_concept skos:inScheme <{vocab_uri}> .
                     }}
                     FILTER(lang(?concept_preflabel) = "{language}" || lang(?concept_preflabel) = "")
-                }}
+              
             }}
             ORDER BY ?concept_preflabel
             """.format(
