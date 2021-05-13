@@ -166,7 +166,7 @@ class Source:
 
             SELECT DISTINCT *            
             WHERE {
-                GRAPH ?g {
+                
                     <xxxx> a skos:Collection ;
                            ?p ?o .
     
@@ -174,7 +174,7 @@ class Source:
                     OPTIONAL { <xxxx> skos:inScheme ?cs }
                     BIND ( COALESCE( ?cs,?g) AS ?conceptscheme )
                    
-                }
+                
                  OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
                         FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
@@ -237,14 +237,14 @@ class Source:
 
             SELECT DISTINCT *            
             WHERE {
-                GRAPH ?g {
+            
                     <xxxx> a skos:Concept ;
                            ?p ?o .
     
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
     
                     
-                }
+                
                 OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
                         FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
