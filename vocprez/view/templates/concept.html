@@ -91,7 +91,8 @@
       {% endfor %}
     {% endif %}
     {% if concept.other_properties is not none %}
-      {% for prop in concept.other_properties %}
+      {% for proplist in concept.other_properties %}
+        {% for prop in proplist %}
         <tr>
           <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
           <td>
@@ -106,6 +107,7 @@
             {% endif %}
           </td>
         </tr>
+        {% endfor %}
       {% endfor %}
     {% endif %}
   </table>
