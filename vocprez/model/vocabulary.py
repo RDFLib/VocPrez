@@ -24,6 +24,7 @@ class Vocabulary:
         source,
         hasTopConcept=None,
         concepts=None,
+        imports=None,
         concept_hierarchy=None,
         collections=None,
         accessURL=None,
@@ -53,6 +54,7 @@ class Vocabulary:
             hasTopConcept.sort()
         self.hasTopConcepts = hasTopConcept
         self.concepts = concepts
+        self.imports = imports
         self.conceptHierarchy = concept_hierarchy
         self.collections = collections
         self.accessURL = accessURL
