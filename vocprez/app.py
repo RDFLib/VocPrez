@@ -219,13 +219,13 @@ def object():
 
         SELECT DISTINCT ?c ?cs
         WHERE {
-            GRAPH ?g {
+            
                 <xxx> a ?c .
                 OPTIONAL {
                     VALUES ?memberof { skos:inScheme skos:topConceptOf }
                     <xxx> ?memberof ?cs .
                 }
-            }
+            
         }
         """.replace("xxx", uri)
     cs = None
@@ -247,10 +247,13 @@ def object():
             try:
                 if r.get("cs"):
                     cs = r["cs"]["value"]
-                c = source.SPARQL(request).get_concept(cs, uri)
+                if cs:
+                    c = source.SPARQL(request).get_concept(cs, uri)
+                else:
+
                 return ConceptRenderer(request, c).render()
-            except:
-                return None
+            except Exception as e:
+                raise e
 
     return return_vocprez_error(
         "Input Error",
