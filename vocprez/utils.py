@@ -457,7 +457,7 @@ def get_system_uri(uri, qsas: dict = {}, system_uri_override=None):
     if system_uri_override is not None:
         return system_uri_override + all_qsas
     else:
-        return "{}/object".format(config.SYSTEM_URI_BASE) + all_qsas
+        return "{}/object".format(config.SYSTEM_BASE_URI) + all_qsas
 
 
 def get_absolute_uri(uri, qsas:dict = {}):

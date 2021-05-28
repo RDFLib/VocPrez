@@ -87,7 +87,7 @@ def context_processor():
 def index():
     return VocPrezRenderer(
         request,
-        config.SYSTEM_URI_BASE,
+        config.SYSTEM_BASE_URI,
         config.VOCS_URI,
         config.VOCS_TITLE,
         config.VOCS_DESC,
@@ -102,7 +102,7 @@ def vocabularies():
     return VocabulariesRenderer(
         request,
         g.VOCABS,
-        config.SYSTEM_URI_BASE,
+        config.SYSTEM_BASE_URI,
         config.VOCS_URI,
         config.VOCS_TITLE,
         config.VOCS_DESC
@@ -209,7 +209,7 @@ def object():
             "A Query String Argument of 'uri' must be supplied for this endpoint"
         )
 
-    if uri == config.SYSTEM_URI_BASE or uri == config.SYSTEM_URI_BASE + "/":
+    if uri == config.SYSTEM_BASE_URI or uri == config.SYSTEM_BASE_URI + "/":
         return index()
 
     if uri == config.VOCS_URI or uri == config.VOCS_URI + "/":
@@ -506,7 +506,7 @@ def endpoint():
                     ]
                 ]
             .
-        """.format(config.SYSTEM_URI_BASE + url_for("sparql"))
+        """.format(config.SYSTEM_BASE_URI + url_for("sparql"))
         grf = Graph().parse(io.StringIO(sd_ttl), format="turtle")
         rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_TYPES_MAP]))
         if rdf_fmt in rdf_formats:

@@ -30,7 +30,7 @@ class VocabSource:
 
 
 # BEGIN Instance Vars
-SYSTEM_URI_BASE = "http://localhost:{}".format(PORT)
+SYSTEM_BASE_URI = "http://localhost:{}".format(PORT)
 USE_SYSTEM_URIS = True
 USE_ABS_ALT_URI = False
 DEBUG = True
