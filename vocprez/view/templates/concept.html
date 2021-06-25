@@ -91,9 +91,16 @@
       {% endfor %}
     {% endif %}
     {% if concept.other_properties is not none %}
-      {% for prop in concept.other_properties %}
+      {% for proplist in concept.other_properties %}
+        {% set lastprop = namespace(lastprop="x") %}
+        {% for prop in proplist %}
         <tr>
-          <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
+          <th>
+            {% if prop.uri != lastprop.lastprop %}
+              <span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span>
+            {% endif %}
+          </th>
+          {% set lastprop.lastprop = prop.uri %}
           <td>
             {% if prop.value.startswith('http') %}
               {% if prop.value_label is not none %}
@@ -106,6 +113,7 @@
             {% endif %}
           </td>
         </tr>
+        {% endfor %}
       {% endfor %}
     {% endif %}
   </table>

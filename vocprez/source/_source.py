@@ -124,14 +124,15 @@ class Source:
                     ?c a skos:Concept ;
                          skos:prefLabel ?pl .
 
-                    OPTIONAL {{
+                    
+
+                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
+                }}
+                OPTIONAL {{
                         {{?c skos:broader ?broader}}
                         UNION 
                         {{?broader skos:narrower ?c}}
                     }}
-
-                    FILTER(lang(?pl) = "{language}" || lang(?pl) = "") 
-                }}
             }}
             ORDER BY ?pl
             """.format(vocab_uri=vocab.uri, language=self.language)
@@ -165,14 +166,16 @@ class Source:
 
             SELECT DISTINCT *            
             WHERE {
-                GRAPH ?g {
+                
                     <xxxx> a skos:Collection ;
                            ?p ?o .
     
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
                     OPTIONAL { <xxxx> skos:inScheme ?cs }
                     BIND ( COALESCE( ?cs,?g) AS ?conceptscheme )
-                    OPTIONAL {
+                   
+                
+                 OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
                         FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
                     }
@@ -181,7 +184,6 @@ class Source:
                         ?o skos:prefLabel|rdfs:label ?opl .
                         FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
                     }
-                }
             }
             """.replace("xxxx", collection_uri)
 
@@ -235,13 +237,15 @@ class Source:
 
             SELECT DISTINCT *            
             WHERE {
-                GRAPH ?g {
+            
                     <xxxx> a skos:Concept ;
                            ?p ?o .
     
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
     
-                    OPTIONAL {
+                    
+                
+                OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
                         FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
                     }
@@ -250,7 +254,6 @@ class Source:
                         ?o skos:prefLabel|rdfs:label ?opl .
                         FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
                     }
-                }
             }
             """.replace("xxxx", uri)
 
@@ -394,7 +397,10 @@ class Source:
                         property_label = other_property_types.get(prop)
 
                     if property_label is not None:
-                        other_properties[prop] =(Property(prop, property_label, val, object_label))
+                        if not prop in other_properties  :
+                            other_properties[prop] = []
+                        other_properties[prop].append((Property(prop, property_label, val, object_label)))
+
 
         if not found:
             return None
