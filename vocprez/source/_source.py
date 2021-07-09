@@ -424,7 +424,7 @@ class Source:
         Function to draw concept hierarchy for vocabulary
         """
 
-        def build_hierarchy(bindings_list, broader_concept=None, level=0):
+        def build_hierarchy(bindings_list, broader_concept=None, found = {} , level=0):
             """
             Recursive helper function to build hierarchy list from a bindings list
             Returns list of tuples: (<level>, <concept>, <concept_preflabel>, <broader_concept>)
@@ -452,16 +452,20 @@ class Source:
             )
             for binding_dict in narrower_list:
                 concept = binding_dict["concept"]["value"]
-                hier += [
-                                 (
-                                     level,
-                                     concept,
-                                     binding_dict["concept_preflabel"]["value"],
-                                     binding_dict["broader_concept"]["value"]
-                                     if binding_dict.get("broader_concept")
-                                     else None,
-                                 )
-                             ] + build_hierarchy(bindings_list, concept, level)
+                if concept in found:
+                    print ("cycle found at {} ".format(concept))
+                else:
+                    found[concept] = True
+                    hier += [
+                                     (
+                                         level,
+                                         concept,
+                                         binding_dict["concept_preflabel"]["value"],
+                                         binding_dict["broader_concept"]["value"]
+                                         if binding_dict.get("broader_concept")
+                                         else None,
+                                     )
+                                 ] + build_hierarchy(bindings_list, concept, found=found, level=level)
             return hier
 
         vocab = g.VOCABS[vocab_uri]

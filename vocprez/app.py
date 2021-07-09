@@ -23,7 +23,6 @@ import logging
 import vocprez.source as source
 import markdown
 from flask_compress import Compress
-from flaskext.markdown import Markdown
 
 logging.basicConfig(
     filename=config.LOGFILE,
@@ -44,7 +43,6 @@ app.config["COMPRESS_MIMETYPES"] = [
     'application/javascript',
 ] + Renderer.RDF_MEDIA_TYPES
 Compress(app)
-Markdown(app)
 
 
 # FUNCTION before_request
@@ -252,7 +250,7 @@ def object():
                 if cs:
                     c = source.SPARQL(request).get_concept(cs, uri)
                 else:
-
+                    raise Exception ("Cannot find Concept Scheme")
                 return ConceptRenderer(request, c).render()
             except Exception as e:
                 raise e
