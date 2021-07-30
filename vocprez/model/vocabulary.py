@@ -137,10 +137,10 @@ class VocabularyRenderer(Renderer):
         if self.vocab.downloadURL:
             g.add((s, DCAT.downloadURL, URIRef(self.vocab.downloadURL)))
 
-        sp = URIRef(SYSTEM_URI_BASE + "/sparql")
+        sp = URIRef(SYSTEM_BASE_URI + "/sparql")
         g.add((sp, DCAT.servesDataset, s))
         g.add((sp, DCTERMS.title, Literal("VocPrez SPARQL Service")))
-        api = URIRef(SYSTEM_URI_BASE)
+        api = URIRef(SYSTEM_BASE_URI)
         g.add((api, DCAT.servesDataset, s))
         g.add((api, DCTERMS.title, Literal("VocPrez Linked Data API")))
 

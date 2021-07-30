@@ -23,6 +23,7 @@ import logging
 import vocprez.source as source
 import markdown
 from flask_compress import Compress
+from flaskext.markdown import Markdown
 
 logging.basicConfig(
     filename=config.LOGFILE,
@@ -43,6 +44,7 @@ app.config["COMPRESS_MIMETYPES"] = [
     'application/javascript',
 ] + Renderer.RDF_MEDIA_TYPES
 Compress(app)
+Markdown(app)
 
 
 # FUNCTION before_request
@@ -85,7 +87,7 @@ def context_processor():
 def index():
     return VocPrezRenderer(
         request,
-        config.SYSTEM_URI_BASE,
+        config.SYSTEM_BASE_URI,
         config.VOCS_URI,
         config.VOCS_TITLE,
         config.VOCS_DESC,
@@ -100,7 +102,7 @@ def vocabularies():
     return VocabulariesRenderer(
         request,
         g.VOCABS,
-        config.SYSTEM_URI_BASE,
+        config.SYSTEM_BASE_URI,
         config.VOCS_URI,
         config.VOCS_TITLE,
         config.VOCS_DESC
@@ -207,7 +209,7 @@ def object():
             "A Query String Argument of 'uri' must be supplied for this endpoint"
         )
 
-    if uri == config.SYSTEM_URI_BASE or uri == config.SYSTEM_URI_BASE + "/":
+    if uri == config.SYSTEM_BASE_URI or uri == config.SYSTEM_BASE_URI + "/":
         return index()
 
     if uri == config.VOCS_URI or uri == config.VOCS_URI + "/":
@@ -219,13 +221,13 @@ def object():
 
         SELECT DISTINCT ?c ?cs
         WHERE {
-            
+            GRAPH ?g {
                 <xxx> a ?c .
                 OPTIONAL {
                     VALUES ?memberof { skos:inScheme skos:topConceptOf }
                     <xxx> ?memberof ?cs .
                 }
-            
+            }
         }
         """.replace("xxx", uri)
     cs = None
@@ -247,13 +249,10 @@ def object():
             try:
                 if r.get("cs"):
                     cs = r["cs"]["value"]
-                if cs:
-                    c = source.SPARQL(request).get_concept(cs, uri)
-                else:
-                    raise Exception ("Cannot find Concept Scheme")
+                c = source.SPARQL(request).get_concept(cs, uri)
                 return ConceptRenderer(request, c).render()
-            except Exception as e:
-                raise e
+            except:
+                return None
 
     return return_vocprez_error(
         "Input Error",
@@ -507,7 +506,7 @@ def endpoint():
                     ]
                 ]
             .
-        """.format(config.SYSTEM_URI_BASE + url_for("sparql"))
+        """.format(config.SYSTEM_BASE_URI + url_for("sparql"))
         grf = Graph().parse(io.StringIO(sd_ttl), format="turtle")
         rdf_formats = list(set([x for x in Renderer.RDF_SERIALIZER_TYPES_MAP]))
         if rdf_fmt in rdf_formats:

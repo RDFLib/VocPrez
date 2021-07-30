@@ -513,9 +513,9 @@ class Source:
         q = """
             SELECT DISTINCT * 
             WHERE {{ 
-                GRAPH ?g {{
+                
                     <{uri}> a ?c .
-                }}
+               
             }}
             """.format(
             uri=url_decode(self.request.values.get("uri"))

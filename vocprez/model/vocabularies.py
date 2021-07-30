@@ -6,8 +6,8 @@ from vocprez.model.profiles import profile_dcat
 
 
 class VocabulariesRenderer(ContainerRenderer):
-    def __init__(self, request, flask_vocs, system_uri_base, vocs_uri, vocs_title, vocs_desc):
-        self.system_uri_base = system_uri_base
+    def __init__(self, request, flask_vocs, system_base_uri, vocs_uri, vocs_title, vocs_desc):
+        self.system_base_uri = system_base_uri
         # work out stuff from request
         page = int(request.values.get("page")) if request.values.get("page") is not None else 1
         per_page = int(request.values.get("per_page")) \
@@ -79,7 +79,7 @@ class VocabulariesRenderer(ContainerRenderer):
                     g.remove((s, p, o))
                     g.add((s, DCTERMS.description, o))
 
-            api = URIRef(self.system_uri_base)
+            api = URIRef(self.system_base_uri)
             g.add((api, RDF.type, DCAT.DataService))
             g.add((api, DCTERMS.title, Literal("System ConnegP API")))
             g.add((api, DCTERMS.description, Literal("A Content Negotiation by Profile-compliant service that provides "
@@ -87,7 +87,7 @@ class VocabulariesRenderer(ContainerRenderer):
             g.add((api, DCTERMS.type, URIRef("http://purl.org/dc/dcmitype/Service")))
             g.add((api, DCAT.endpointURL, api))
 
-            sparql = URIRef(self.system_uri_base + "/sparql")
+            sparql = URIRef(self.system_base_uri + "/sparql")
             g.add((sparql, RDF.type, DCAT.DataService))
             g.add((sparql, DCTERMS.title, Literal("System SPARQL Service")))
             g.add((sparql, DCTERMS.description, Literal("A SPARQL Protocol-compliant service that provides access "
