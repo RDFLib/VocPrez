@@ -221,13 +221,13 @@ def object():
 
         SELECT DISTINCT ?c ?cs
         WHERE {
-            GRAPH ?g {
+
                 <xxx> a ?c .
                 OPTIONAL {
                     VALUES ?memberof { skos:inScheme skos:topConceptOf }
                     <xxx> ?memberof ?cs .
                 }
-            }
+
         }
         """.replace("xxx", uri)
     cs = None
