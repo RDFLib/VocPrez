@@ -389,7 +389,9 @@ class Source:
                     property_label = related_instance_types.get(prop)
 
                 if property_label is not None:
-                    related_instances[prop] =(Property(prop, property_label, val, object_label))
+                    if not prop in related_instances:
+                        related_instances[prop] = []
+                    related_instances[prop].append((Property(prop, property_label, val, object_label)))
 
             else:  # other properties
                 if val != "http://www.w3.org/2004/02/skos/core#Concept" and prop not in suppressed_properties():
