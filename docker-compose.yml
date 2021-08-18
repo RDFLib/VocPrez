@@ -1,9 +1,7 @@
 version: '2.0'
 services:
   vocprez:
-    build: 
-        context: .
-        dockerfile: -f Dockerfile
+    build: .
     image: vocprez:latest
     restart: unless-stopped
     ports:
