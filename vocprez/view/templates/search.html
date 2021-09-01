@@ -62,15 +62,14 @@
       {% endfor %}
       </dl>
     {% else %}
+      <p>Results from:</p>
       <dl>
       <dt>
-        Results from
         {% for v in vocabs %}
           {% if v[0] == selected_vocab %}
             <a href="{{ utils.get_content_uri(v[0]) }}">{{ v[1] }}</a>
           {% endif %}
         {% endfor %}
-        :
       </dt>
       <dd>
       {% for result in results %}
