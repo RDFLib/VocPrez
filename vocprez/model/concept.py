@@ -81,18 +81,20 @@ class ConceptRenderer(Renderer):
         ))
 
         if self.concept.related_instances is not None:
-            for prop in self.concept.related_instances:
-                if str(prop.value).startswith("http"):
-                    g.add((c, URIRef(prop.uri), URIRef(prop.value)))
-                else:
-                    g.add((c, URIRef(prop.uri), Literal(prop.value)))
+            for proplist in self.concept.related_instances:
+                for prop in proplist:
+                    if str(prop.value).startswith("http"):
+                        g.add((c, URIRef(prop.uri), URIRef(prop.value)))
+                    else:
+                        g.add((c, URIRef(prop.uri), Literal(prop.value)))
 
         if self.concept.other_properties is not None:
-            for prop in self.concept.other_properties:
-                if str(prop.value).startswith("http"):
-                    g.add((c, URIRef(prop.uri), URIRef(prop.value)))
-                else:
-                    g.add((c, URIRef(prop.uri), Literal(prop.value)))
+            for proplist in self.concept.other_properties:
+                for prop in proplist:
+                    if str(prop.value).startswith("http"):
+                        g.add((c, URIRef(prop.uri), URIRef(prop.value)))
+                    else:
+                        g.add((c, URIRef(prop.uri), Literal(prop.value)))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:
