@@ -322,12 +322,16 @@ def search():
     if request.values.get("search"):
         last_search = request.values.get("search")
         if request.values.get("from") and request.values.get("from") != "all":
+            schemefilter = """{ OPTIONAL { ?uri skos:inScheme ?scheme } 
+                                OPTIONAL { GRAPH ?graph { ?uri a skos:Concept } }
+                                BIND (COALESCE (?scheme,?graph) as ?g )
+                                FILTER (? 
+                                }"""
             q = """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
                 SELECT DISTINCT ?uri ?pl (SUM(?w) AS ?weight)
                 WHERE {{
-                    GRAPH <{grf}> {{
                         {{  # exact match on a prefLabel always wins
                             ?uri a skos:Concept ;
                                  skos:prefLabel ?pl .
@@ -365,11 +369,16 @@ def search():
                             BIND (1 AS ?w)
                             FILTER REGEX(?d, "{input}", "i")
                         }}        
-                    }}
+                    {{ 
+                        OPTIONAL {{ ?uri skos:inScheme ?scheme }} 
+                        OPTIONAL {{ GRAPH ?graph {{ ?uri a skos:Concept }} }}
+                        BIND (COALESCE (?scheme,?graph) as ?g )
+                        {filter} 
+                    }}            
                 }}
                 GROUP BY ?uri ?pl
                 ORDER BY DESC(?weight) 
-                """.format(**{"grf": request.values.get("from"), "input": request.values.get("search")})
+                """.format(**{"filter":"", "grf": request.values.get("from"), "input": request.values.get("search")})
             results = []
         else:
             q = """
