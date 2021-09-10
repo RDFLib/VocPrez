@@ -376,7 +376,7 @@ def search():
                         {filter} 
                     }}            
                 }}
-                GROUP BY ?uri ?pl
+                GROUP BY  ?uri ?pl
                 ORDER BY DESC(?weight) 
                 """.format(**{"filter":"", "grf": request.values.get("from"), "input": request.values.get("search")})
             results = []
@@ -385,7 +385,7 @@ def search():
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 SELECT DISTINCT ?g ?uri ?pl (SUM(?w) AS ?weight)
                 WHERE {{
-                    GRAPH ?g {{
+                    
                         {{  # exact match on a prefLabel always wins
                             ?uri a skos:Concept ;
                                  skos:prefLabel ?pl .
@@ -423,11 +423,17 @@ def search():
                             BIND (1 AS ?w)
                             FILTER REGEX(?d, "{input}", "i")
                         }}        
-                    }}
-                }}
+
+                    {{ 
+                        OPTIONAL {{ ?uri skos:inScheme ?scheme }} 
+                        OPTIONAL {{ GRAPH ?graph {{ ?uri a skos:Concept }} }}
+                        BIND (COALESCE (?scheme,?graph) as ?g )
+                        {filter} 
+                    }}  
+                }} 
                 GROUP BY ?g ?uri ?pl
                 ORDER BY DESC(?weight) 
-                """.format(**{"input": request.values.get("search")})
+                """.format(**{"filter":"", "input": request.values.get("search")})
             results = {}
 
         for r in u.sparql_query(q):
