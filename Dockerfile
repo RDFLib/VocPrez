@@ -15,4 +15,4 @@ COPY README.md .
 COPY wsgi.py .
 #COPY ./deploy ./vocprez
 
-CMD ["gunicorn", "-w", "5", "-b", "0.0.0.0:5000", "wsgi:application"]
+CMD ["gunicorn", "-w", "5", "-b", "0.0.0.0:5000",  "--access-logfile", "-", "--error-logfile", "-", "wsgi:application"]
