@@ -13,6 +13,6 @@ RUN pip install -r requirements.deploy.txt
 
 COPY README.md .
 COPY wsgi.py .
-#COPY ./deploy ./vocprez
+COPY ./vocprez ./vocprez
 
 CMD ["gunicorn", "-w", "5", "-b", "0.0.0.0:5000",  "--access-logfile", "-", "--error-logfile", "-", "wsgi:application"]
