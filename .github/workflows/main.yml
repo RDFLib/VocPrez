@@ -8,7 +8,7 @@ name: Create and publish a Docker image
 on:
   push:
     branches:
-      - main
+      - master
   release:
     types:
       - released
