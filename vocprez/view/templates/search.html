@@ -73,8 +73,8 @@
         :
       </dt>
       <dd>
-      {% for result in results %}
-        <a href="{{ utils.get_content_uri(result[0]) }}">{{ result[1] }}</a><br />
+      {% for k, v in results.items() %}
+        <a href="{{ utils.get_content_uri(v[1][0]) }}">{{ v[1][1] }}</a><br />
       {% endfor %}
       </dd>
       </dl>

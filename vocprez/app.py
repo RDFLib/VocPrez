@@ -322,114 +322,70 @@ def search():
     if request.values.get("search"):
         last_search = request.values.get("search")
         if request.values.get("from") and request.values.get("from") != "all":
-            q = """
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-                SELECT DISTINCT ?uri ?pl (SUM(?w) AS ?weight)
-                WHERE {{
-                    GRAPH <{grf}> {{
-                        {{  # exact match on a prefLabel always wins
-                            ?uri a skos:Concept ;
-                                 skos:prefLabel ?pl .
-                            BIND (50 AS ?w)
-                            FILTER REGEX(?pl, "^{input}$", "i")
-                        }}
-                        UNION    
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:prefLabel ?pl .
-                            BIND (10 AS ?w)
-                            FILTER REGEX(?pl, "{input}", "i")
-                        }}
-                        UNION
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:altLabel ?al ;
-                                 skos:prefLabel ?pl .
-                            BIND (5 AS ?w)
-                            FILTER REGEX(?al, "{input}", "i")
-                        }}
-                        UNION
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:hiddenLabel ?hl ;
-                                 skos:prefLabel ?pl .
-                            BIND (5 AS ?w)
-                            FILTER REGEX(?hl, "{input}", "i")
-                        }}        
-                        UNION
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:definition ?d ;
-                                 skos:prefLabel ?pl .
-                            BIND (1 AS ?w)
-                            FILTER REGEX(?d, "{input}", "i")
-                        }}        
-                    }}
-                }}
-                GROUP BY ?uri ?pl
-                ORDER BY DESC(?weight) 
-                """.format(**{"grf": request.values.get("from"), "input": request.values.get("search")})
-            results = []
+            grf = '<' + request.values.get("from") + '>'
+            bind = f"BIND ({grf} AS ?g)"
         else:
-            q = """
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                SELECT DISTINCT ?g ?uri ?pl (SUM(?w) AS ?weight)
-                WHERE {{
-                    GRAPH ?g {{
-                        {{  # exact match on a prefLabel always wins
-                            ?uri a skos:Concept ;
-                                 skos:prefLabel ?pl .
-                            BIND (50 AS ?w)
-                            FILTER REGEX(?pl, "^{input}$", "i")
-                        }}
-                        UNION    
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:prefLabel ?pl .
-                            BIND (10 AS ?w)
-                            FILTER REGEX(?pl, "{input}", "i")
-                        }}
-                        UNION
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:altLabel ?al ;
-                                 skos:prefLabel ?pl .
-                            BIND (5 AS ?w)
-                            FILTER REGEX(?al, "{input}", "i")
-                        }}
-                        UNION
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:hiddenLabel ?hl ;
-                                 skos:prefLabel ?pl .
-                            BIND (5 AS ?w)
-                            FILTER REGEX(?hl, "{input}", "i")
-                        }}        
-                        UNION
-                        {{
-                            ?uri a skos:Concept ;
-                                 skos:definition ?d ;
-                                 skos:prefLabel ?pl .
-                            BIND (1 AS ?w)
-                            FILTER REGEX(?d, "{input}", "i")
-                        }}        
+            grf = "?g"
+            bind = ""
+        q = """
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT DISTINCT ?g ?uri ?pl (SUM(?w) AS ?weight)
+            WHERE {{                
+                GRAPH {grf} {{
+                    {{  # exact match on a prefLabel always wins
+                        ?uri a skos:Concept ;
+                             skos:prefLabel ?pl .
+                        BIND (50 AS ?w)
+                        FILTER REGEX(?pl, "^{input}$", "i")
                     }}
+                    UNION    
+                    {{
+                        ?uri a skos:Concept ;
+                             skos:prefLabel ?pl .
+                        BIND (10 AS ?w)
+                        FILTER REGEX(?pl, "{input}", "i")
+                    }}
+                    UNION
+                    {{
+                        ?uri a skos:Concept ;
+                             skos:altLabel ?al ;
+                             skos:prefLabel ?pl .
+                        BIND (5 AS ?w)
+                        FILTER REGEX(?al, "{input}", "i")
+                    }}
+                    UNION
+                    {{
+                        ?uri a skos:Concept ;
+                             skos:hiddenLabel ?hl ;
+                             skos:prefLabel ?pl .
+                        BIND (5 AS ?w)
+                        FILTER REGEX(?hl, "{input}", "i")
+                    }}        
+                    UNION
+                    {{
+                        ?uri a skos:Concept ;
+                             skos:definition ?d ;
+                             skos:prefLabel ?pl .
+                        BIND (1 AS ?w)
+                        FILTER REGEX(?d, "{input}", "i")
+                    }}        
                 }}
-                GROUP BY ?g ?uri ?pl
-                ORDER BY DESC(?weight) 
-                """.format(**{"input": request.values.get("search")})
-            results = {}
+                
+                {bind}
+            }}
+            GROUP BY ?g ?uri ?pl
+            ORDER BY DESC(?weight) 
+            """.format(**{"grf": grf, "input": request.values.get("search"), "bind": bind})
+        results = {}
 
         for r in u.sparql_query(q):
             if r.get("uri") is None:
                 break  # must do this check as r["weight"] will appear at least once with value 0 for no results
-            if request.values.get("from") and request.values.get("from") != "all":
-                results.append((r["uri"]["value"], r["pl"]["value"]))
-            else:
-                if r["g"]["value"] not in results.keys():
-                    results[r["g"]["value"]] = []
-                results[r["g"]["value"]].append((r["uri"]["value"], r["pl"]["value"]))
+
+            if r["g"]["value"] not in results.keys():
+                results[r["g"]["value"]] = []
+            results[r["g"]["value"]].append((r["uri"]["value"], r["pl"]["value"]))
 
         return render_template(
             "search.html",
