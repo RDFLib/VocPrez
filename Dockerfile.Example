@@ -1,0 +1,4 @@
+FROM ghcr.io/RDFLib/VocPrez:latest
+
+COPY vocprez/_config/template.py /vocprez/_config/__init__.py
+
