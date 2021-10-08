@@ -393,7 +393,8 @@ class Source:
                     property_label = related_instance_types.get(prop)
 
                 if property_label is not None:
-                    related_instances[prop] = (Property(prop, property_label, val, object_label))
+                    related_instances.setdefault(prop, []).append((Property(prop, property_label, val, object_label)))
+                    # related_instances[prop] = (Property(prop, property_label, val, object_label))
 
             else:  # other properties
                 if val != "http://www.w3.org/2004/02/skos/core#Concept" and prop not in suppressed_properties():
@@ -403,7 +404,7 @@ class Source:
                     if property_label is not None:
                         if not prop in other_properties:
                             other_properties[prop] = []
-                        other_properties[prop] = Property(prop, property_label, val, object_label)
+                        other_properties[prop] = (Property(prop, property_label, val, object_label))
 
         if not found:
             return None
@@ -417,7 +418,7 @@ class Source:
             uri,
             pl,
             d,
-            related_instances.values(),
+            related_instances,
             annotations.values(),
             other_properties=other_properties.values()
         )
