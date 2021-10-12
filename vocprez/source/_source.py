@@ -219,7 +219,10 @@ class Source:
             elif prop == "http://www.w3.org/ns/prov#wasDerivedFrom":
                 s["wasDerivedFrom"] = val
             elif prop == "http://www.w3.org/2004/02/skos/core#member":
-                m.append(Property(prop, "Member", val, r["opl"]["value"]))
+                try:
+                    m.append(Property(prop, "Member", val, r["opl"]["value"]))
+                except:
+                    m.append(Property(prop, "Member", val, "(Missing label)"))
 
         if not found:
             return None
