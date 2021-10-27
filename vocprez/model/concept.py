@@ -80,6 +80,7 @@ class ConceptRenderer(Renderer):
             Literal(self.concept.definition, lang=config.DEFAULT_LANGUAGE)
         ))
 
+
         if self.concept.related_instances is not None:
             for proplist in self.concept.related_instances:
                 for prop in proplist:

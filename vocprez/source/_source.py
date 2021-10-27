@@ -9,6 +9,71 @@ __all__ = [
     "Source"
 ]
 
+WKPROP_LABELS = {
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "Object Type",
+            "http://purl.org/dc/terms/date": "Date",
+            "http://purl.org/dc/terms/source": "Source",
+            "http://purl.org/dc/terms/references": "References",
+            "http://purl.org/dc/terms/isVersionOf": "Is Version Of",
+            "http://purl.org/dc/terms/isReplacedBy": "Is Replaced By",
+            "http://purl.org/dc/terms/modified": "Date Modified",
+            "http://purl.org/dc/terms/issued": "Date Issued",
+            "http://purl.org/dc/terms/format": "Format",
+            "http://purl.org/dc/terms/isReferencedBy": "Is Referenced By",
+            "http://purl.org/dc/terms/license": "License",
+            "http://purl.org/dc/terms/rights": "Rights",
+            "http://purl.org/dc/terms/isPartOf": "Is Part Of",
+            "http://purl.org/dc/terms/coverage": "Coverage",
+            "http://purl.org/dc/terms/medium": "Medium",
+            "http://purl.org/dc/terms/available": "Date Available",
+            "http://purl.org/dc/terms/spatial": "Spatial Coverage",
+            "http://purl.org/dc/terms/valid": "Date Valid",
+            "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Sub Class Of",
+            "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": "Is Defined By",
+    "http://www.opengis.net/def/metamodel/ogc-na/status": "Status",
+    "http://www.w3.org/2004/02/skos/core#note": "Note",
+    "http://www.w3.org/2004/02/skos/core#changeNote": "Change Note",
+    "http://www.w3.org/2004/02/skos/core#historyNote": "History Note",
+    "http://www.w3.org/2004/02/skos/core#editorialNote": "Editorial Note",
+    "http://www.w3.org/2004/02/skos/core#scopeNote": "Scope Note",
+    "http://www.w3.org/2004/02/skos/core#example": "Example",
+    "http://www.w3.org/2004/02/skos/core#altLabel": "Alternative Label",
+    "http://www.w3.org/2004/02/skos/core#hiddenLabel": "Hidden Label",
+    "http://www.w3.org/2004/02/skos/core#notation": "Notation",
+    # DCTERMS
+    "http://purl.org/dc/terms/conformsTo": "Conforms To",
+    "http://purl.org/dc/terms/abstract": "Abstract",
+    "http://purl.org/dc/terms/identifier": "Identifier",
+    "http://purl.org/dc/terms/audience": "Audience",
+    "http://purl.org/dc/terms/publisher": "Publisher",
+    "http://purl.org/dc/terms/isRequiredBy": "Is Required By",
+    "http://purl.org/dc/terms/replaces": "Replaces",
+    "http://purl.org/dc/terms/provenance": "Provenance",
+    "http://purl.org/dc/terms/requires": "Requires",
+    "http://purl.org/dc/terms/language": "Language",
+    "http://purl.org/dc/terms/description": "Description",
+    "http://purl.org/dc/terms/title": "Title",
+    # DC
+    "http://purl.org/dc/elements/1.1/contributor": "Contributor",
+    "http://purl.org/dc/elements/1.1/coverage": "Coverage",
+    "http://purl.org/dc/elements/1.1/creator": "Creator",
+    "http://purl.org/dc/elements/1.1/date": "Date",
+    "http://purl.org/dc/elements/1.1/description": "Description",
+    "http://purl.org/dc/elements/1.1/format": "Format",
+    "http://purl.org/dc/elements/1.1/identifier": "Identifier",
+    "http://purl.org/dc/elements/1.1/language": "Language",
+    "http://purl.org/dc/elements/1.1/publisher": "Publisher",
+    "http://purl.org/dc/elements/1.1/relation": "Relation",
+    "http://purl.org/dc/elements/1.1/rights": "Rights",
+    "http://purl.org/dc/elements/1.1/source": "Source",
+    "http://purl.org/dc/elements/1.1/subject": "Subject",
+    "http://purl.org/dc/elements/1.1/title": "Title",
+    "http://purl.org/dc/elements/1.1/type": "Type",
+    # RDFS
+    "http://www.w3.org/2000/01/rdf-schema#label": "Label",
+    "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
+    "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also"
+        }
 
 class Source:
     VOC_TYPES = [
@@ -16,6 +81,7 @@ class Source:
         "http://www.w3.org/2004/02/skos/core#Collection",
         "http://www.w3.org/2004/02/skos/core#Concept",
     ]
+
 
     def __init__(self, request, language=None):
         self.request = request
@@ -246,8 +312,7 @@ class Source:
     
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
     
-                    
-                
+           
                 OPTIONAL {
                         ?p skos:prefLabel|rdfs:label ?ppl .
                         FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
@@ -331,27 +396,7 @@ class Source:
             "http://purl.org/dc/terms/relation": "Relation",
         }
         related_instances = {}
-        other_property_types = {
-            "http://purl.org/dc/terms/date": "Date",
-            "http://purl.org/dc/terms/source": "Source",
-            "http://purl.org/dc/terms/references": "References",
-            "http://purl.org/dc/terms/isVersionOf": "Is Version Of",
-            "http://purl.org/dc/terms/isReplacedBy": "Is Replaced By",
-            "http://purl.org/dc/terms/modified": "Date Modified",
-            "http://purl.org/dc/terms/issued": "Date Issued",
-            "http://purl.org/dc/terms/format": "Format",
-            "http://purl.org/dc/terms/isReferencedBy": "Is Referenced By",
-            "http://purl.org/dc/terms/license": "License",
-            "http://purl.org/dc/terms/rights": "Rights",
-            "http://purl.org/dc/terms/isPartOf": "Is Part Of",
-            "http://purl.org/dc/terms/coverage": "Coverage",
-            "http://purl.org/dc/terms/medium": "Medium",
-            "http://purl.org/dc/terms/available": "Date Available",
-            "http://purl.org/dc/terms/spatial": "Spatial Coverage",
-            "http://purl.org/dc/terms/valid": "Date Valid",
-            "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Sub Class Of",
-            "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": "Is Defined By",
-        }
+
         other_properties = {}
         found = False
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
@@ -379,7 +424,8 @@ class Source:
                 s["source"] = val
             elif prop == "http://www.w3.org/ns/prov#wasDerivedFrom":
                 s["wasDerivedFrom"] = val
-
+            elif prop == "http://www.w3.org/2000/01/rdf-schema#subClassOf" and r["o"]["type"] == "bnode":
+                continue
             elif prop in annotation_types.keys():
                 if property_label is None:
                     property_label = annotation_types.get(prop)
@@ -399,7 +445,7 @@ class Source:
             else:  # other properties
                 if val != "http://www.w3.org/2004/02/skos/core#Concept" and prop not in suppressed_properties():
                     if property_label is None:
-                        property_label = other_property_types.get(prop)
+                        property_label = WKPROP_LABELS.get(prop)
 
                     if property_label is not None:
                         if not prop in other_properties  :
@@ -424,12 +470,165 @@ class Source:
             other_properties=other_properties.values()
         )
 
+    def get_vocabprops(self,vocab_uri):
+        vocab = g.VOCABS[vocab_uri]
+        q = """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT ?p ?o ( SAMPLE(?pplx) AS ?ppl ) ( SAMPLE(?oplx) AS ?opl )            
+            WHERE {
+
+                    <xxxx> ?p ?o .
+
+                    FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
+
+
+                OPTIONAL {
+                        ?p skos:prefLabel ?spl .
+                        FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
+                    }
+                     OPTIONAL {
+                        ?p rdfs:label ?rpl .
+                        FILTER(!isLiteral(?rpl) || lang(?rpl) = "en" || lang(?rpl) = "")
+                    }
+                    BIND (COALESCE (?spl,?rpl) AS ?pplx )
+
+                    
+                    OPTIONAL {
+                        ?o skos:prefLabel ?sol.
+                        FILTER(!isLiteral(?sol) || lang(?sol) = "en" || lang(?sol) = "")
+                    }
+                    OPTIONAL {
+                        ?o rdfs:label ?ropl .
+                        FILTER(!isLiteral(?ropl) || lang(?ropl) = "en" || lang(?ropl) = "")
+                    }
+                    BIND (COALESCE (?sol,?ropl) AS ?oplx )
+            } GROUP BY ?p ?o
+            """.replace("xxxx", vocab_uri)
+
+
+        other_properties = {}
+        found = False
+        for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+            found =  True
+            prop = r["p"]["value"]
+            val = r["o"]["value"]
+            property_label = None
+            if r.get("ppl") is not None:
+                property_label = r["ppl"]["value"]
+            object_label = None
+            if r.get("opl") is not None:
+                object_label = r["opl"]["value"]
+
+            if prop not in suppressed_properties():
+                if property_label is None:
+                    property_label = WKPROP_LABELS.get(prop)
+
+                if property_label is not None:
+                    if not prop in other_properties:
+                        other_properties[prop] = []
+                    other_properties[prop].append((Property(prop, property_label, val, object_label)))
+
+        if not found:
+            return None
+
+        from vocprez.model.concept import Concept
+
+        return   other_properties.values()
+
+    def get_nestedobjects(self,uri, vocab_uri):
+        # get the properties of nested objects of the current object
+        # if these properties are further nested blank nodes then attempt to create a label for these instead of a node value
+        vocab = g.VOCABS[vocab_uri]
+        #
+        # Gets details of all nested objects not otherwise handled as SKOS entities - e.g. FOAF objects, owl:restrictions
+        #
+        #  (GROUP_CONCAT(?opttypestr) AS ?opttype)
+        #   OPTIONAL { ?nested a ?opttype1
+        #                      FILTER (  ?opttype1 not in ( skos:Concept, skos:Collection, skos:ConceptScheme ) )
+        #                       BIND ( str(?opttype1) AS ?opttypestr )
+        #                      }
+        #
+        #
+        q = """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            SELECT  ?nested ?p ?o  ( SAMPLE(?ppl) AS ?ppls ) ( SAMPLE(?opl) AS ?opls )         
+            WHERE {
+
+                    <xxxx> ?objectprop ?nested .
+                    FILTER NOT EXISTS { 
+                        { ?nested a skos:Concept } 
+                        UNION  
+                        { ?nested a skos:Collection }
+                        UNION
+                        { ?nested a skos:ConceptScheme }
+                    }
+                    ?nested ?p ?o .
+
+                    OPTIONAL {
+                        ?p skos:prefLabel|rdfs:label ?ppl .
+                        FILTER(!isLiteral(?ppl) || lang(?ppl) = "en" || lang(?ppl) = "")
+                    }
+
+                    OPTIONAL {
+                        ?o skos:prefLabel|rdfs:label ?opl .
+                        FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
+                    }
+                    OPTIONAL {
+                        ?o ?oprop ?ostr .
+                        FILTER(isLiteral(?ostr) )
+                    }
+
+            } GROUP BY  ?nested ?p ?o 
+            """.replace("xxxx", vocab_uri)
+
+
+
+        nested_objects = {}
+        found = False
+        for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
+            found =  True
+            obj = r ["nested"]["value"]
+            prop = r["p"]["value"]
+            val = r["o"]["value"]
+
+            property_label = None
+            if r.get("ppls") is not None:
+                property_label = r["ppls"]["value"]
+            object_label = None
+            if r.get("opls") is not None:
+                object_label = r["opls"]["value"]
+            #elif r.get("opttype") is not None:
+            #    object_label = "A " +  r["opttype"]["value"]
+
+
+            if prop not in suppressed_properties():
+                if property_label is None:
+                    property_label = WKPROP_LABELS.get(prop)
+
+                if property_label is not None:
+                    if not obj in nested_objects:
+                        nested_objects[obj] = {}
+                    if not prop in nested_objects[obj]:
+                        nested_objects[obj][prop] = []
+                    nested_objects[obj][prop].append((Property(prop, property_label, val, object_label)))
+
+        if not found:
+            return None
+
+        from vocprez.model.concept import Concept
+
+        return   nested_objects
+
     def get_concept_hierarchy(self, vocab_uri):
         """
         Function to draw concept hierarchy for vocabulary
         """
 
-        def build_hierarchy(bindings_list, broader_concept=None, found = {} , level=0):
+        def build_hierarchy(bindings_list,  broader_concept=None, vocab_uri=vocab_uri , found = {} , level=0):
             """
             Recursive helper function to build hierarchy list from a bindings list
             Returns list of tuples: (<level>, <concept>, <concept_preflabel>, <broader_concept>)
@@ -461,16 +660,19 @@ class Source:
                     print ("cycle found at {} ".format(concept))
                 else:
                     found[concept] = True
+                    vocabqualifier = ""
+                    if  not concept.startswith(vocab_uri) :
+                        vocabqualifier = ' ( ' + concept + ' ) '
                     hier += [
                                      (
                                          level,
                                          concept,
-                                         binding_dict["concept_preflabel"]["value"],
+                                         binding_dict["concept_preflabel"]["value"] + vocabqualifier,
                                          binding_dict["broader_concept"]["value"]
                                          if binding_dict.get("broader_concept")
                                          else None,
                                      )
-                                 ] + build_hierarchy(bindings_list, concept, found=found, level=level)
+                                 ] + build_hierarchy(bindings_list, broader_concept=concept,vocab_uri=vocab_uri, found=found, level=level)
             return hier
 
         vocab = g.VOCABS[vocab_uri]

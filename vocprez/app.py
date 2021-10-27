@@ -236,6 +236,8 @@ def object():
             if uri in g.VOCABS.keys():
                 # get vocab details using appropriate source handler
                 vocab = source.SPARQL(request).get_vocabulary(uri)
+                vocab.other_properties = source.SPARQL(request).get_vocabprops(uri)
+                vocab.nested_objects = source.SPARQL(request).get_nestedobjects(uri=uri,vocab_uri=uri)
                 return VocabularyRenderer(request, vocab).render()
             else:
                 return None

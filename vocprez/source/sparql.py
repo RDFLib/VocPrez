@@ -106,5 +106,6 @@ class SPARQL(Source):
                 sparql_username=details.get("sparql_username"),
                 sparql_password=details.get("sparql_password"),
             )
+
         g.VOCABS = {**g.VOCABS, **sparql_vocabs}
         logging.debug("SPARQL collect() complete.")

@@ -16,7 +16,7 @@
   <div style="grid-column: 2; grid-row: 3;">
     <div class="search">
     <h3>Search</h3>
-    <form action="{{ url_for("search") }}" method="get" style="">
+    <form action="{{ url_for('search') }}" method="get" style="">
       <input type="text" id="search" name="search" style="grid-column: 1;" />
       <input type="hidden" id="from" name="from" value="{{ uri }}" />
       <label for="voc" style="grid-column: 2;">Your search term</label><br />
@@ -103,13 +103,33 @@
           </tr>
           {% endif -%}
           {% if vocab.other_properties is not none %}
-            {% for prop in vocab.other_properties %}
-              <tr>
-                <th><a href="{{ prop.url }}">{{ prop.label }}</a></th>
-                <td>
-                  {% if prop.value[:4] == 'http' %}<a href="{{ prop.value }}">{{ prop.value }}</a>{% else %}{{ prop.value }}{% endif %}
-                </td>
-              </tr>
+            {% for proplist in vocab.other_properties %}
+                {% set lastprop = namespace(lastprop="x") %}
+                    {% for prop in proplist %}
+                  <tr>
+                    <th> {% if prop.uri != lastprop.lastprop %}<span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ utils.get_content_uri(prop.uri) }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span>
+                    {% endif %}</th>
+                      {% set lastprop.lastprop = prop.uri %}
+                    <td>
+
+                        {% if prop.value[:4] == 'http' %}<a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+                        {% elif prop.value[:4] == 'node' %}
+                        {% else %}{{ prop.value }}{% endif %}
+
+                        {% if prop.value in nested_objects and prop.uri != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'  %}
+                        <table>{% for nprop in nested_objects[prop.value] %}
+
+                        <tr><th>{{ nested_objects[prop.value][nprop][0].label }}</th><td>
+                            {% for npv in nested_objects[prop.value][nprop] %}
+                                 {% if npv.value_label %}{{ npv.value_label }}{% else %}{{ npv.value}}{% endif %}<br>
+                            {% endfor %}
+                        </td></tr>
+
+                         {% endfor %}</table>
+                        {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
             {% endfor %}
           {% endif %}
           {% if vocab.collections == "Collection" %}

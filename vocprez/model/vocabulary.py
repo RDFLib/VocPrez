@@ -33,7 +33,8 @@ class Vocabulary:
         collection_uris=None,
         sparql_username=None,
         sparql_password=None,
-        other_properties: List[Property] = None
+        other_properties: List[Property] = None,
+        nested_objects = {}
     ):
         self.id = id
         self.uri = uri
@@ -184,6 +185,8 @@ class VocabularyRenderer(Renderer):
             "uri": self.uri,
             "vocab": self.vocab,
             "title": self.vocab.title,
+            "other_properties": self.vocab.other_properties,
+            "nested_objects": self.vocab.nested_objects
         }
 
         return Response(
