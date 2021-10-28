@@ -535,7 +535,7 @@ class Source:
 
         from vocprez.model.concept import Concept
 
-        return   other_properties.values()
+        return   sorted(other_properties.values(),key=lambda x:x[0].label)
 
     def get_nestedobjects(self,uri, vocab_uri):
         # get the properties of nested objects of the current object
@@ -554,7 +554,9 @@ class Source:
         q = """
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
+            PREFIX prof: <http://www.w3.org/ns/dx/prof/>
+            prefix dct: <http://purl.org/dc/terms/> 
+            prefix foaf: <http://xmlns.com/foaf/0.1/>
             SELECT  ?nested ?p ?o  ( SAMPLE(?ppl) AS ?ppls ) ( SAMPLE(?opl) AS ?opls )         
             WHERE {
 
@@ -565,6 +567,10 @@ class Source:
                         { ?nested a skos:Collection }
                         UNION
                         { ?nested a skos:ConceptScheme }
+                         UNION
+                        { ?nested a prof:Profile }
+                        UNION 
+                         { ?nested a prof:ResourceDescriptor }
                     }
                     ?nested ?p ?o .
 
@@ -574,7 +580,7 @@ class Source:
                     }
 
                     OPTIONAL {
-                        ?o skos:prefLabel|rdfs:label ?opl .
+                        ?o skos:prefLabel|rdfs:label|foaf:name|dct:title ?opl .
                         FILTER(!isLiteral(?opl) || lang(?opl) = "en" || lang(?opl) = "")
                     }
                     OPTIONAL {

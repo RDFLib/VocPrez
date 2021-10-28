@@ -113,11 +113,11 @@
                     <td>
 
                         {% if prop.value[:4] == 'http' %}<a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
-                        {% elif prop.value[:4] == 'node' %}
+                        {% elif prop.value[:4] == 'node' %}{% if prop.value_label %}{{ prop.value_label }}{% endif %}
                         {% else %}{{ prop.value }}{% endif %}
 
                         {% if prop.value in nested_objects and prop.uri != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'  %}
-                        <table>{% for nprop in nested_objects[prop.value] %}
+                        <table>{% for nprop in nested_objects[prop.value]|sort %}
 
                         <tr><th>{{ nested_objects[prop.value][nprop][0].label }}</th><td>
                             {% for npv in nested_objects[prop.value][nprop] %}
