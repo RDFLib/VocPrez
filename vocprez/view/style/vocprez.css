@@ -323,3 +323,24 @@ ul {
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+/* support for embedded iframe content overrides */
+.iframe-embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    border: 0;
+}
+.iframe-embed-wrapper {
+    position: relative;
+    display: block;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.iframe-embed-responsive-16by9 {
+    padding-bottom: 56.25%;
+}

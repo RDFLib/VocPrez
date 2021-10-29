@@ -1,6 +1,6 @@
 from flask import g
 from ..utils import *
-from ..utils import suppressed_properties
+from ..utils import suppressed_properties, preferred_html_properties
 from ..model.property import Property
 import vocprez._config as config
 
@@ -399,6 +399,7 @@ class Source:
 
         other_properties = {}
         found = False
+        preferred_html = None
         for r in sparql_query(q, vocab.sparql_endpoint, vocab.sparql_username, vocab.sparql_password):
             prop = r["p"]["value"]
             val = r["o"]["value"]
@@ -446,7 +447,8 @@ class Source:
                 if val != "http://www.w3.org/2004/02/skos/core#Concept" and prop not in suppressed_properties():
                     if property_label is None:
                         property_label = WKPROP_LABELS.get(prop)
-
+                    if prop in preferred_html_properties():
+                        preferred_html = val
                     if property_label is not None:
                         if not prop in other_properties  :
                             other_properties[prop] = []
@@ -467,7 +469,8 @@ class Source:
             d,
             related_instances.values(),
             annotations.values(),
-            other_properties=other_properties.values()
+            other_properties=other_properties.values(),
+            preferred_html=preferred_html
         )
 
     def get_vocabprops(self,vocab_uri):

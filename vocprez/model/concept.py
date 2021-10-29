@@ -18,7 +18,8 @@ class Concept:
         definition,
         related_instances,
         annotations=None,
-        other_properties: List[Property] = None
+        other_properties: List[Property] = None,
+        preferred_html = None
     ):
         self.vocab_uri = vocab_uri
         self.uri = uri
@@ -27,7 +28,7 @@ class Concept:
         self.related_instances = related_instances
         self.annotations = annotations
         self.agents = None
-
+        self.preferred_html = preferred_html
         self.other_properties = other_properties
 
 
@@ -154,8 +155,12 @@ class ConceptRenderer(Renderer):
             "vocab_title": g.VOCABS[self.concept.vocab_uri].title,
             "uri": self.request.values.get("uri"),
             "concept": self.concept,
+            "framed": self.concept.preferred_html
         }
+        template = "concept.html"
+        if self.concept.preferred_html :
+            template = "framed_content.html"
 
         return Response(
-            render_template("concept.html", **_template_context), headers=self.headers
+            render_template(template, **_template_context), headers=self.headers
         )

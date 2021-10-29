@@ -531,3 +531,8 @@ def suppressed_properties():
         "http://www.w3.org/2004/02/skos/core#inScheme",
         "http://www.w3.org/2004/02/skos/core#topConceptOf",
     ]
+
+def preferred_html_properties():
+    return [
+           "http://www.w3.org/ns/dcat#landingPage"
+    ]

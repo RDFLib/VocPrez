@@ -1,0 +1,10 @@
+{% extends "page.html" %}
+
+
+{% block content %}
+<div>Source: <a href="{{ framed }}">{{ framed }}</a></div>
+
+<div class="iframe-embed-wrapper iframe-embed-responsive-16by9">
+    <iframe class="iframe-embed" src="{{ framed }}"></iframe>
+</div>
+{% endblock %}
