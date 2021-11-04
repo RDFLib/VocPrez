@@ -107,7 +107,10 @@
               {% if prop.value_label is not none %}
               <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
               {% else %}
-              <a href="{{ prop.value }}">{{ prop.value }}</a>
+              <a href="{{ prop.value }}">{% if prop.value[-4:] in ['.svg','.gif','jpeg', '.png' ] %}
+                              <img src="{{ prop.value }}"/>
+                            {% else %}
+                            {{ prop.value }} {% endif%}</a>
               {% endif %}
             {% elif prop.value[:4] == 'node' %}
                 {% if prop.value_label %}{{ prop.value_label }}{% endif %}
@@ -123,7 +126,12 @@
                         {% if npv.value_label is not none %}
                           <a href="{{ utils.get_content_uri(npv.value) }}">{{ npv.value_label }}</a>
                         {% else %}
-                          <a href="{{ npv.value }}">{{ npv.value }}</a>
+                          <a href="{{ npv.value }}">
+                            {% if npv.value[-4:] in ['.svg','.gif','jpeg', '.png' ] %}
+                              <img src="{{ npv.value }}"/>
+                            {% else %}
+                            {{ npv.value }} {% endif%}
+                          </a>
                         {% endif %}
                       {% else %}
                         {% if npv.value_label %}{{ npv.value_label }}{% else %}{{ npv.value}}{% endif %}
