@@ -324,6 +324,10 @@ ul {
   visibility: visible;
 }
 
+.nestedobject {
+ background-color: lightblue;
+}
+
 /* support for embedded iframe content overrides */
 .iframe-embed {
     position: absolute;
@@ -340,6 +344,7 @@ ul {
     height: 0;
     padding: 0;
     overflow: hidden;
+    grid-column-start: 1;
 }
 .iframe-embed-responsive-16by9 {
     padding-bottom: 56.25%;

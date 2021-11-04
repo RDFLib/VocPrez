@@ -252,8 +252,10 @@ def object():
                 if r.get("cs"):
                     cs = r["cs"]["value"]
                 c = source.SPARQL(request).get_concept(cs, uri)
+                c.nested_objects = source.SPARQL(request).get_nestedobjects(uri=uri, vocab_uri=cs)
                 return ConceptRenderer(request, c).render()
-            except:
+            except Exception as e:
+                print (e)
                 return None
 
     return return_vocprez_error(

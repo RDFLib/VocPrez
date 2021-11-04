@@ -63,14 +63,11 @@
           {% set lastprop.lastprop = prop.uri %}
           <td>
             {% if prop.value.startswith('http') %}
-              {% if prop.value_label is not none %}
               <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
-              {% else %}
-              <a href="{{ prop.value }}">{{ prop.value }}</a>
-              {% endif %}
             {% else %}
               {{ prop.value }}
             {% endif %}
+
           </td>
         </tr>
         {% endfor %}
@@ -112,8 +109,29 @@
               {% else %}
               <a href="{{ prop.value }}">{{ prop.value }}</a>
               {% endif %}
+            {% elif prop.value[:4] == 'node' %}
+                {% if prop.value_label %}{{ prop.value_label }}{% endif %}
             {% else %}
               {{ prop.value }}
+            {% endif %}
+
+                        {% if prop.value in nested_objects and prop.uri != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'  %}
+            <table class="nestedobject">{% for nprop in nested_objects[prop.value]|sort %}
+              <tr><th>{{ nested_objects[prop.value][nprop][0].label }}</th><td>
+                  {% for npv in nested_objects[prop.value][nprop] %}
+                      {% if npv.value.startswith('http') %}
+                        {% if npv.value_label is not none %}
+                          <a href="{{ utils.get_content_uri(npv.value) }}">{{ npv.value_label }}</a>
+                        {% else %}
+                          <a href="{{ npv.value }}">{{ npv.value }}</a>
+                        {% endif %}
+                      {% else %}
+                        {% if npv.value_label %}{{ npv.value_label }}{% else %}{{ npv.value}}{% endif %}
+                      {% endif %}
+                      <BR/>
+                  {% endfor %}
+              </td></tr>
+             {% endfor %}</table>
             {% endif %}
           </td>
         </tr>

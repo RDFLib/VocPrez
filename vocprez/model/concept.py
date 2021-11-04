@@ -19,7 +19,8 @@ class Concept:
         related_instances,
         annotations=None,
         other_properties: List[Property] = None,
-        preferred_html = None
+        preferred_html = None,
+        nested_objects={}
     ):
         self.vocab_uri = vocab_uri
         self.uri = uri
@@ -155,6 +156,7 @@ class ConceptRenderer(Renderer):
             "vocab_title": g.VOCABS[self.concept.vocab_uri].title,
             "uri": self.request.values.get("uri"),
             "concept": self.concept,
+            "nested_objects": self.concept.nested_objects,
             "framed": self.concept.preferred_html
         }
         template = "concept.html"

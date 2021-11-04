@@ -572,8 +572,7 @@ class Source:
                         { ?nested a skos:ConceptScheme }
                          UNION
                         { ?nested a prof:Profile }
-                        UNION 
-                         { ?nested a prof:ResourceDescriptor }
+                        
                     }
                     ?nested ?p ?o .
 
@@ -592,7 +591,7 @@ class Source:
                     }
 
             } GROUP BY  ?nested ?p ?o 
-            """.replace("xxxx", vocab_uri)
+            """.replace("xxxx", uri)
 
 
 
