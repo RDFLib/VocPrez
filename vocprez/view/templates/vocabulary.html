@@ -107,12 +107,14 @@
                 {% set lastprop = namespace(lastprop="x") %}
                     {% for prop in proplist %}
                   <tr>
-                    <th> {% if prop.uri != lastprop.lastprop %}<span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ utils.get_content_uri(prop.uri) }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span>
+                    <th> {% if prop.uri != lastprop.lastprop %}<span class="tooltip">{{ prop.label }}<span class="tooltiptext">
+                        <a href="{{ utils.get_content_uri(prop.uri) }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span>
                     {% endif %}</th>
                       {% set lastprop.lastprop = prop.uri %}
                     <td>
 
-                        {% if prop.value[:4] == 'http' %}<a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+                        {% if prop.value[:4] == 'http' %}<a href="{{ utils.get_content_uri(prop.value) }}">
+                                {% if prop.value_label %}{{ prop.value_label }}{% else %} {{ prop.value }}{% endif %}</a>
                         {% elif prop.value[:4] == 'node' %}{% if prop.value_label %}{{ prop.value_label }}{% endif %}
                         {% else %}{{ prop.value }}{% endif %}
 

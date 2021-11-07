@@ -9,15 +9,69 @@ __all__ = [
     "Source"
 ]
 
+
+vocab_meta_props = {
+    "http://purl.org/dc/terms/modified": "Date Modified",
+    "http://purl.org/dc/terms/issued": "Date Issued",
+    "http://purl.org/dc/elements/1.1/creator": "Creator",
+    "http://purl.org/dc/terms/source": "Source",
+    "http://purl.org/dc/terms/publisher": "Publisher",
+    "http://purl.org/dc/terms/description": "Description",
+    "http://www.w3.org/2004/02/skos/core#prefLabel": "Preferred Label",
+    "http://www.w3.org/2004/02/skos/core#defintion": "Definition",
+}
+annotation_types = {
+            "http://www.opengis.net/def/metamodel/ogc-na/status": "Status",
+            "http://www.w3.org/2004/02/skos/core#note": "Note",
+            "http://www.w3.org/2004/02/skos/core#changeNote": "Change Note",
+            "http://www.w3.org/2004/02/skos/core#historyNote": "History Note",
+            "http://www.w3.org/2004/02/skos/core#editorialNote": "Editorial Note",
+            "http://www.w3.org/2004/02/skos/core#scopeNote": "Scope Note",
+            "http://www.w3.org/2004/02/skos/core#example": "Example",
+            "http://www.w3.org/2004/02/skos/core#altLabel": "Alternative Label",
+            "http://www.w3.org/2004/02/skos/core#hiddenLabel": "Hidden Label",
+            "http://www.w3.org/2004/02/skos/core#notation": "Notation",
+            # DCTERMS
+            "http://purl.org/dc/terms/conformsTo": "Conforms To",
+            "http://purl.org/dc/terms/abstract": "Abstract",
+            "http://purl.org/dc/terms/identifier": "Identifier",
+            "http://purl.org/dc/terms/audience": "Audience",
+
+            "http://purl.org/dc/terms/isRequiredBy": "Is Required By",
+            "http://purl.org/dc/terms/replaces": "Replaces",
+            "http://purl.org/dc/terms/provenance": "Provenance",
+            "http://purl.org/dc/terms/requires": "Requires",
+            "http://purl.org/dc/terms/language": "Language",
+            "http://purl.org/dc/terms/description": "Description",
+            "http://purl.org/dc/terms/title": "Title",
+            # DC
+            "http://purl.org/dc/elements/1.1/contributor": "Contributor",
+            "http://purl.org/dc/elements/1.1/coverage": "Coverage",
+
+            "http://purl.org/dc/elements/1.1/date": "Date",
+            "http://purl.org/dc/elements/1.1/description": "Description",
+            "http://purl.org/dc/elements/1.1/format": "Format",
+            "http://purl.org/dc/elements/1.1/identifier": "Identifier",
+            "http://purl.org/dc/elements/1.1/language": "Language",
+            "http://purl.org/dc/elements/1.1/publisher": "Publisher",
+            "http://purl.org/dc/elements/1.1/relation": "Relation",
+            "http://purl.org/dc/elements/1.1/rights": "Rights",
+            "http://purl.org/dc/elements/1.1/source": "Source",
+            "http://purl.org/dc/elements/1.1/subject": "Subject",
+            "http://purl.org/dc/elements/1.1/title": "Title",
+            "http://purl.org/dc/elements/1.1/type": "Type",
+            # RDFS
+            "http://www.w3.org/2000/01/rdf-schema#label": "Label",
+            "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
+            "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also",
+        **vocab_meta_props }
+
 WKPROP_LABELS = {
             "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": "Object Type",
             "http://purl.org/dc/terms/date": "Date",
-            "http://purl.org/dc/terms/source": "Source",
             "http://purl.org/dc/terms/references": "References",
             "http://purl.org/dc/terms/isVersionOf": "Is Version Of",
             "http://purl.org/dc/terms/isReplacedBy": "Is Replaced By",
-            "http://purl.org/dc/terms/modified": "Date Modified",
-            "http://purl.org/dc/terms/issued": "Date Issued",
             "http://purl.org/dc/terms/format": "Format",
             "http://purl.org/dc/terms/isReferencedBy": "Is Referenced By",
             "http://purl.org/dc/terms/license": "License",
@@ -30,50 +84,8 @@ WKPROP_LABELS = {
             "http://purl.org/dc/terms/valid": "Date Valid",
             "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Sub Class Of",
             "http://www.w3.org/2000/01/rdf-schema#isDefinedBy": "Is Defined By",
-    "http://www.opengis.net/def/metamodel/ogc-na/status": "Status",
-    "http://www.w3.org/2004/02/skos/core#note": "Note",
-    "http://www.w3.org/2004/02/skos/core#changeNote": "Change Note",
-    "http://www.w3.org/2004/02/skos/core#historyNote": "History Note",
-    "http://www.w3.org/2004/02/skos/core#editorialNote": "Editorial Note",
-    "http://www.w3.org/2004/02/skos/core#scopeNote": "Scope Note",
-    "http://www.w3.org/2004/02/skos/core#example": "Example",
-    "http://www.w3.org/2004/02/skos/core#altLabel": "Alternative Label",
-    "http://www.w3.org/2004/02/skos/core#hiddenLabel": "Hidden Label",
-    "http://www.w3.org/2004/02/skos/core#notation": "Notation",
-    # DCTERMS
-    "http://purl.org/dc/terms/conformsTo": "Conforms To",
-    "http://purl.org/dc/terms/abstract": "Abstract",
-    "http://purl.org/dc/terms/identifier": "Identifier",
-    "http://purl.org/dc/terms/audience": "Audience",
-    "http://purl.org/dc/terms/publisher": "Publisher",
-    "http://purl.org/dc/terms/isRequiredBy": "Is Required By",
-    "http://purl.org/dc/terms/replaces": "Replaces",
-    "http://purl.org/dc/terms/provenance": "Provenance",
-    "http://purl.org/dc/terms/requires": "Requires",
-    "http://purl.org/dc/terms/language": "Language",
-    "http://purl.org/dc/terms/description": "Description",
-    "http://purl.org/dc/terms/title": "Title",
-    # DC
-    "http://purl.org/dc/elements/1.1/contributor": "Contributor",
-    "http://purl.org/dc/elements/1.1/coverage": "Coverage",
-    "http://purl.org/dc/elements/1.1/creator": "Creator",
-    "http://purl.org/dc/elements/1.1/date": "Date",
-    "http://purl.org/dc/elements/1.1/description": "Description",
-    "http://purl.org/dc/elements/1.1/format": "Format",
-    "http://purl.org/dc/elements/1.1/identifier": "Identifier",
-    "http://purl.org/dc/elements/1.1/language": "Language",
-    "http://purl.org/dc/elements/1.1/publisher": "Publisher",
-    "http://purl.org/dc/elements/1.1/relation": "Relation",
-    "http://purl.org/dc/elements/1.1/rights": "Rights",
-    "http://purl.org/dc/elements/1.1/source": "Source",
-    "http://purl.org/dc/elements/1.1/subject": "Subject",
-    "http://purl.org/dc/elements/1.1/title": "Title",
-    "http://purl.org/dc/elements/1.1/type": "Type",
-    # RDFS
-    "http://www.w3.org/2000/01/rdf-schema#label": "Label",
-    "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
-    "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also"
-        }
+        **annotation_types }
+
 
 class Source:
     VOC_TYPES = [
@@ -333,51 +345,7 @@ class Source:
             "source": None,
             "wasDerivedFrom": None,
         }
-        annotation_types = {
-            "http://www.opengis.net/def/metamodel/ogc-na/status": "Status",
-            "http://www.w3.org/2004/02/skos/core#note": "Note",
-            "http://www.w3.org/2004/02/skos/core#changeNote": "Change Note",
-            "http://www.w3.org/2004/02/skos/core#historyNote": "History Note",
-            "http://www.w3.org/2004/02/skos/core#editorialNote": "Editorial Note",
-            "http://www.w3.org/2004/02/skos/core#scopeNote": "Scope Note",
-            "http://www.w3.org/2004/02/skos/core#example": "Example",
-            "http://www.w3.org/2004/02/skos/core#altLabel": "Alternative Label",
-            "http://www.w3.org/2004/02/skos/core#hiddenLabel": "Hidden Label",
-            "http://www.w3.org/2004/02/skos/core#notation": "Notation",
-            # DCTERMS
-            "http://purl.org/dc/terms/conformsTo": "Conforms To",
-            "http://purl.org/dc/terms/abstract": "Abstract",
-            "http://purl.org/dc/terms/identifier": "Identifier",
-            "http://purl.org/dc/terms/audience": "Audience",
-            "http://purl.org/dc/terms/publisher": "Publisher",
-            "http://purl.org/dc/terms/isRequiredBy": "Is Required By",
-            "http://purl.org/dc/terms/replaces": "Replaces",
-            "http://purl.org/dc/terms/provenance": "Provenance",
-            "http://purl.org/dc/terms/requires": "Requires",
-            "http://purl.org/dc/terms/language": "Language",
-            "http://purl.org/dc/terms/description": "Description",
-            "http://purl.org/dc/terms/title": "Title",
-            # DC
-            "http://purl.org/dc/elements/1.1/contributor": "Contributor",
-            "http://purl.org/dc/elements/1.1/coverage": "Coverage",
-            "http://purl.org/dc/elements/1.1/creator": "Creator",
-            "http://purl.org/dc/elements/1.1/date": "Date",
-            "http://purl.org/dc/elements/1.1/description": "Description",
-            "http://purl.org/dc/elements/1.1/format": "Format",
-            "http://purl.org/dc/elements/1.1/identifier": "Identifier",
-            "http://purl.org/dc/elements/1.1/language": "Language",
-            "http://purl.org/dc/elements/1.1/publisher": "Publisher",
-            "http://purl.org/dc/elements/1.1/relation": "Relation",
-            "http://purl.org/dc/elements/1.1/rights": "Rights",
-            "http://purl.org/dc/elements/1.1/source": "Source",
-            "http://purl.org/dc/elements/1.1/subject": "Subject",
-            "http://purl.org/dc/elements/1.1/title": "Title",
-            "http://purl.org/dc/elements/1.1/type": "Type",
-            # RDFS
-            "http://www.w3.org/2000/01/rdf-schema#label": "Label",
-            "http://www.w3.org/2000/01/rdf-schema#comment": "Comment",
-            "http://www.w3.org/2000/01/rdf-schema#seeAlso": "See Also",
-        }
+
         annotations = {}
         agent_types = {
             'http://purl.org/dc/terms/contributor': "Contributor",
@@ -409,6 +377,8 @@ class Source:
             object_label = None
             if r.get("opl") is not None:
                 object_label = r["opl"]["value"]
+            else:
+                object_label = val
 
             found = True
             if val == "http://www.w3.org/2004/02/skos/core#Concept":
@@ -483,7 +453,7 @@ class Source:
             WHERE {
 
                     <xxxx> ?p ?o .
-
+                    FILTER ( ?p != rdf:type || ?o in ( skos:Concept, skos:Collection, skos:ConceptScheme ) )  
                     FILTER(!isLiteral(?o) || lang(?o) = "en" || lang(?o) = "")
 
 
