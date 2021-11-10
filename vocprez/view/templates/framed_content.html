@@ -3,6 +3,8 @@
 
 {% block content %}
 <div>Source: <a href="{{ framed }}">{{ framed }}</a></div>
+<div><a href="{{ utils.get_content_uri(uri,qsas={'_profile':'skos'}) }}">Metadata</a>&nbsp;<span class="tooltip" style="font-weight:bold;">?<span class="tooltiptext">Show metadata instead of preferred landing page</span></span>
+| {% include 'alt_link_min.html' %}</div>
 
 <div class="iframe-embed-wrapper iframe-embed-responsive-16by9">
     <iframe class="iframe-embed" src="{{ framed }}"></iframe>

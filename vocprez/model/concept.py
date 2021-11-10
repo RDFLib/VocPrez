@@ -42,14 +42,15 @@ class ConceptRenderer(Renderer):
         super().__init__(self.request, self.concept.uri, self.profiles, "skos")
 
     def _add_views(self):
-        return {"skos": profile_skos}
+        # default may override skos with preferred html = skos forces metadata view
+        return {"skos": profile_skos }
 
     def render(self):
         # try returning alt profile
         response = super().render()
         if response is not None:
             return response
-        elif self.profile == "skos":
+        elif self.profile == "skos" :
             if (
                 self.mediatype in Renderer.RDF_MEDIA_TYPES
                 or self.mediatype in Renderer.RDF_SERIALIZER_TYPES_MAP
@@ -160,7 +161,9 @@ class ConceptRenderer(Renderer):
             "framed": self.concept.preferred_html
         }
         template = "concept.html"
-        if self.concept.preferred_html :
+        askedfor = self._get_profiles_from_qsa()
+        askedfor = askedfor if askedfor else []
+        if self.concept.preferred_html and not ("skos" in  askedfor ) :
             template = "framed_content.html"
 
         return Response(
