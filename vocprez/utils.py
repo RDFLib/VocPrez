@@ -483,7 +483,8 @@ def get_absolute_uri(uri, qsas:dict = {}):
 
 def get_content_uri(uri, qsas: dict = {}, system_uri_override=None):
     if config.USE_SYSTEM_URIS:
-        return get_system_uri(uri, qsas=qsas, system_uri_override=system_uri_override)
+       #  return get_system_uri(uri, qsas=qsas, system_uri_override=system_uri_override)
+       return get_system_uri(uri, qsas={}, system_uri_override=system_uri_override)
     else:
         return get_absolute_uri(uri, qsas=qsas)
 
