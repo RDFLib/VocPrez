@@ -104,10 +104,10 @@
           {% set lastprop.lastprop = prop.uri %}
           <td>
             {% if prop.value.startswith('http') %}
-              {% if prop.value_label is not none %}
+              {% if prop.value_label is not none and prop.value_label != prop.value %}
               <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
               {% else %}
-              <a href="{{ prop.value }}">{% if prop.value[-4:] in ['.svg','.gif','jpeg', '.png' ] %}
+              <a href="{{ prop.value }}">{% if prop.value[-4:] in ['.svg','.gif','jpeg', '.png', 'jpg' ] or "_mediatype=image/" in prop.value %}
                               <img src="{{ prop.value }}"/>
                             {% else %}
                             {{ prop.value }} {% endif%}</a>
