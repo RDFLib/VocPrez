@@ -112,11 +112,21 @@
                     {% endif %}</th>
                       {% set lastprop.lastprop = prop.uri %}
                     <td>
+                         {% if prop.value.startswith('http') %}
+                                      {% if prop.value_label is not none and prop.value_label != prop.value %}
+                                      <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
+                                      {% else %}
+                                      <a href="{{ prop.value }}">{% if prop.value[-4:] in ['.svg','.gif','jpeg', '.png', 'jpg' ] or "_mediatype=image/" in prop.value %}
+                                                      <img src="{{ prop.value }}"/>
+                                                    {% else %}
+                                                    {{ prop.value }} {% endif%}</a>
+                                      {% endif %}
+                                    {% elif prop.value[:4] == 'node' %}
+                                        {% if prop.value_label %}{{ prop.value_label }}{% endif %}
+                                    {% else %}
+                                      {{ prop.value }}
+                                    {% endif %}
 
-                        {% if prop.value[:4] == 'http' %}<a href="{{ utils.get_content_uri(prop.value) }}">
-                                {% if prop.value_label %}{{ prop.value_label }}{% else %} {{ prop.value }}{% endif %}</a>
-                        {% elif prop.value[:4] == 'node' %}{% if prop.value_label %}{{ prop.value_label }}{% endif %}
-                        {% else %}{{ prop.value }}{% endif %}
 
                         {% if prop.value in nested_objects and prop.uri != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'  %}
                         <table class="nestedobject">{% for nprop in nested_objects[prop.value]|sort %}
