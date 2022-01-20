@@ -3,7 +3,7 @@ from pyldapi import Renderer
 from flask import Response, render_template, g
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import DCTERMS, RDF, RDFS, SKOS
-from vocprez.model.profiles import profile_skos
+from vocprez.model.profiles import profile_skos, profile_describe, profile_dd
 import vocprez._config as config
 from typing import List
 from vocprez.model.property import Property
@@ -43,23 +43,23 @@ class ConceptRenderer(Renderer):
 
     def _add_views(self):
         # default may override skos with preferred html = skos forces metadata view
-        return {"skos": profile_skos }
+        return {"skos": profile_skos, "dd": profile_dd, "describe": profile_describe }
 
     def render(self):
         # try returning alt profile
         response = super().render()
         if response is not None:
             return response
-        elif self.profile == "skos" :
+        elif self.profile in ["skos", "describe", "dd" ] :
             if (
                 self.mediatype in Renderer.RDF_MEDIA_TYPES
                 or self.mediatype in Renderer.RDF_SERIALIZER_TYPES_MAP
             ):
-                return self._render_skos_rdf()
+                return self._render_rdf(self.profile)
             else:
                 return self._render_skos_html()
 
-    def _render_skos_rdf(self):
+    def _render_rdf(self,profile):
         g = Graph()
         g.bind("dct", DCTERMS)
         g.bind("skos", SKOS)
@@ -83,22 +83,19 @@ class ConceptRenderer(Renderer):
             Literal(self.concept.definition, lang=config.DEFAULT_LANGUAGE)
         ))
 
+        if profile != "dd":
+            for propset in [ self.concept.annotations, self.concept.related_instances, self.concept.other_properties ]:
+                if propset is not None:
+                    for proplist in propset:
+                        if isinstance(proplist, Property):
+                            proplist = [proplist]
+                        for prop in proplist:
+                            if str(prop.value).startswith("http"):
+                                g.add((c, URIRef(prop.uri), URIRef(prop.value)))
+                            else:
+                                g.add((c, URIRef(prop.uri), Literal(prop.value)))
 
-        if self.concept.related_instances is not None:
-            for proplist in self.concept.related_instances:
-                for prop in proplist:
-                    if str(prop.value).startswith("http"):
-                        g.add((c, URIRef(prop.uri), URIRef(prop.value)))
-                    else:
-                        g.add((c, URIRef(prop.uri), Literal(prop.value)))
 
-        if self.concept.other_properties is not None:
-            for proplist in self.concept.other_properties:
-                for prop in proplist:
-                    if str(prop.value).startswith("http"):
-                        g.add((c, URIRef(prop.uri), URIRef(prop.value)))
-                    else:
-                        g.add((c, URIRef(prop.uri), Literal(prop.value)))
 
         # serialise in the appropriate RDF format
         if self.mediatype in ["application/rdf+json", "application/json"]:

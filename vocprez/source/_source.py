@@ -13,6 +13,9 @@ __all__ = [
 vocab_meta_props = {
     "http://purl.org/dc/terms/modified": "Date Modified",
     "http://purl.org/dc/terms/issued": "Date Issued",
+    "http://purl.org/dc/terms/dateSubmitted": "Date Submitted",
+    "http://purl.org/dc/terms/dateAccepted": "Date Accepted",
+    "http://purl.org/dc/terms/creator": "Creator",
     "http://purl.org/dc/elements/1.1/creator": "Creator",
     "http://purl.org/dc/terms/source": "Source",
     "http://purl.org/dc/terms/publisher": "Publisher",
@@ -419,10 +422,11 @@ class Source:
                         property_label = WKPROP_LABELS.get(prop)
                     if prop in preferred_html_properties():
                         preferred_html = val
-                    if property_label is not None:
-                        if not prop in other_properties  :
-                            other_properties[prop] = []
-                        other_properties[prop].append((Property(prop, property_label, val, object_label)))
+                    if property_label is None:
+                        property_label = prop
+                    if not prop in other_properties  :
+                        other_properties[prop] = []
+                    other_properties[prop].append((Property(prop, property_label, val, object_label)))
 
 
         if not found:
