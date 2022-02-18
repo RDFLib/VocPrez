@@ -231,32 +231,34 @@ def object():
         }
         """.replace("xxx", uri)
     cs = None
+    otypes = {}
     for r in u.sparql_query(q):
-        if r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#ConceptScheme":
-            if uri in g.VOCABS.keys():
-                # get vocab details using appropriate source handler
-                vocab = source.SPARQL(request).get_vocabulary(uri)
-                vocab.other_properties = source.SPARQL(request).get_vocabprops(uri)
-                vocab.nested_objects = source.SPARQL(request).get_nestedobjects(uri=uri,vocab_uri=uri)
-                return VocabularyRenderer(request, vocab).render()
-            else:
-                return None
-        elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Collection":
-            try:
-                c = source.SPARQL(request).get_collection(uri)
-                return CollectionRenderer(request, c).render()
-            except:
-                return None
-        elif r["c"]["value"] == "http://www.w3.org/2004/02/skos/core#Concept":
-            try:
-                if r.get("cs"):
-                    cs = r["cs"]["value"]
-                c = source.SPARQL(request).get_concept(cs, uri)
-                c.nested_objects = source.SPARQL(request).get_nestedobjects(uri=uri, vocab_uri=cs)
-                return ConceptRenderer(request, c).render()
-            except Exception as e:
-                print (e)
-                return None
+        otypes [ r["c"]["value"] ] =  r.get("cs")
+
+    if "http://www.w3.org/2004/02/skos/core#ConceptScheme" in otypes:
+        if uri in g.VOCABS.keys():
+            # get vocab details using appropriate source handler
+            vocab = source.SPARQL(request).get_vocabulary(uri)
+            vocab.other_properties = source.SPARQL(request).get_vocabprops(uri)
+            vocab.nested_objects = source.SPARQL(request).get_nestedobjects(uri=uri,vocab_uri=uri)
+            return VocabularyRenderer(request, vocab).render()
+        else:
+            return None
+    elif "http://www.w3.org/2004/02/skos/core#Collection" in otypes :
+        try:
+            c = source.SPARQL(request).get_collection(uri)
+            return CollectionRenderer(request, c).render()
+        except:
+            return None
+    elif "http://www.w3.org/2004/02/skos/core#Concept" in otypes:
+        try:
+            cs = otypes[ "http://www.w3.org/2004/02/skos/core#Concept" ]
+            c = source.SPARQL(request).get_concept(cs, uri)
+            c.nested_objects = source.SPARQL(request).get_nestedobjects(uri=uri, vocab_uri=cs)
+            return ConceptRenderer(request, c).render()
+        except Exception as e:
+            print (e)
+            return None
 
     return return_vocprez_error(
         "Input Error",
