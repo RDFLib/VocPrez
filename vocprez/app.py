@@ -233,11 +233,10 @@ def object():
     cs = None
     otypes = {}
     for r in u.sparql_query(q):
-        cs = r.get("c")
-        if cs:
-            otypes [ r["c"]["value"] ] =  r.get("c")['value']
-        else:
-            pass
+        try:
+            otypes [ r["c"]["value"] ] =  r.get("cs")['value']
+        except:
+            otypes [ r["c"]["value"] ] = None
 
     if "http://www.w3.org/2004/02/skos/core#ConceptScheme" in otypes:
         if uri in g.VOCABS.keys():
