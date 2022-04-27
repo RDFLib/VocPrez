@@ -434,6 +434,14 @@ class Source:
 
         from vocprez.model.concept import Concept
 
+        concept_hierarchy = None
+        try:
+            vocab = g.VOCABS[uri]
+            # if a vocab as well get nested hierarchy
+            concept_hierarchy = self.get_concept_hierarchy(uri)
+        except:
+            pass
+
         if not d:
             d = c
         return Concept(
@@ -444,7 +452,8 @@ class Source:
             related_instances.values(),
             annotations.values(),
             other_properties=other_properties.values(),
-            preferred_html=preferred_html
+            preferred_html=preferred_html,
+            concept_hierarchy=concept_hierarchy
         )
 
     def get_vocabprops(self,vocab_uri):

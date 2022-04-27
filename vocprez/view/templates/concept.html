@@ -1,4 +1,5 @@
 {% extends "page.html" %}
+{% from "_concept_hierarchy.html" import render_concept_hierarchy with context -%}
 {% from "_format.html" import format with context -%}
 {% set label = "Concept" %}
 
@@ -34,6 +35,7 @@
       {% endif %}
     </dl>
   </div>
+
   <div style="grid-column: 1; grid-row: 3;">
     <table class="metadata concept">
     {% if concept.altLabels|length > 0 %}
@@ -50,6 +52,14 @@
       <th><span class="tooltip">Definition<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#definition">skos:definition</a></span></span></th>
       <td>{{ concept.definition|safe }}</td>
     </tr>
+     {%  if concept.concept_hierarchy is not none  -%}
+      <tr>
+        <th><span class="tooltip">Concept Hierarchy<span class="tooltiptext"><a href="http://www.w3.org/2004/02/skos/core#hasTopConcept">skos:hasTopConcept</a><br />then<br/><a href="http://www.w3.org/2004/02/skos/core#inScheme">skos:inScheme</a></span></span></th>
+        <td>
+            {{ render_concept_hierarchy(concept.concept_hierarchy)|safe }}
+        </td>
+      </tr>
+      {% endif -%}
     {% if concept.related_instances is not none %}
       {% for proplist in concept.related_instances %}
         {% set lastprop = namespace(lastprop="x") %}
