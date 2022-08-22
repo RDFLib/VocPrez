@@ -1,3 +1,5 @@
+ARCHIVED: VocPrez is now incorporated into [Prez!](https://github.com/RDFLib/Prez)
+
 ![](vocprez/view/style/VocPrez.300.png)  
 
 VocPrez is a read-only web delivery system - web pages and API - for Simple Knowledge Organization System (SKOS)-formulated RDF vocabularies. It complies with [Content Negotiation by Profile](https://w3c.github.io/dx-connegp/connegp/).
