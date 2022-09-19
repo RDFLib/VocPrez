@@ -89,7 +89,7 @@
           <th><span class="tooltip">{{ prop.label }}<span class="tooltiptext"><a href="{{ prop.uri }}">{{ prop.uri.split('#')[-1].split('/')[-1] }}</a></span></span></th>
           <td>
             {% if prop.value.startswith('http') %}
-              {% if prop.value_label is not none %}
+              {% if prop.value_label is not none and prop.value_label != prop.value %}
               <a href="{{ utils.get_content_uri(prop.value) }}">{{ prop.value_label }}</a>
               {% else %}
               <a href="{{ prop.value }}">{{ prop.value }}</a>
