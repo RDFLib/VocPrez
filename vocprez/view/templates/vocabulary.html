@@ -128,7 +128,7 @@
                                     {% endif %}
 
 
-                        {% if prop.value in nested_objects and prop.uri != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'  %}
+                        {% if nested_objects and prop.value in nested_objects and prop.uri != 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'  %}
                         <table class="nestedobject">{% for nprop in nested_objects[prop.value]|sort %}
 
                         <tr><th>{{ nested_objects[prop.value][nprop][0].label }}</th><td>
