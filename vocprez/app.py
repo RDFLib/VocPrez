@@ -251,8 +251,8 @@ def object():
                     cs = r["cs"]["value"]
                 c = source.SPARQL(request).get_concept(cs, uri)
                 return ConceptRenderer(request, c).render()
-            except:
-                return None
+            except Exception as e:
+                return Response(str(e), mimetype="text/plain")
 
     return return_vocprez_error(
         "Input Error",

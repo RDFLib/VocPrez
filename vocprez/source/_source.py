@@ -404,7 +404,7 @@ class Source:
                     if property_label is not None:
                         if not prop in other_properties:
                             other_properties[prop] = []
-                        other_properties[prop] = (Property(prop, property_label, val, object_label))
+                        other_properties.setdefault(prop, []).append((Property(prop, property_label, val, object_label)))
 
         if not found:
             return None
