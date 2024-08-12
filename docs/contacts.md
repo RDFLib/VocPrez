@@ -4,6 +4,6 @@ VocPrez Documentation
 
 *Author*:  
 **Nicholas Car**  
-*Data Systems Architect*  
-[SURROUND Australia Pty Ltd](http://surroundaustralia.com)  
-<nicholas.car@surroundaustralia.com>
+*Data Architect*  
+[KurrawongAI](https://kurrawong.ai)  
+<nick@kurrawong.ai>

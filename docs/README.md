@@ -25,7 +25,7 @@ VocPrez is used by:
 ![](_media/logo-ga-200.jpg) 
 
 * [Geoscience Australia](https://www.ga.gov.au)
-    * System link (demo): <http://ga.surroundaustralia.com> 
+    * System link (demo): <https://vocabs.ga.gov.au> 
     
 ![](_media/logo-cgi-200.jpg) 
 
@@ -248,8 +248,8 @@ To run the container we need to copy the settings from `_config/template.py` to 
  `docker run -it -v $PWD/vocprez/_config/template.py:/vocprez/_config/__init__.py -p 5000:5000 vocprez`
 
 # Contacts
-*Author*:  
+*Author*:
 **Nicholas Car**  
-*Data Systems Architect*  
-[SURROUND Australia Pty Ltd](http://surroundaustralia.com)  
-<nicholas.car@surroundaustralia.com>
+*Data Architect*  
+[KurrawongAI](https://kurrawong.ai)  
+<nick@kurrawong.ai>
