@@ -26,6 +26,8 @@ Run the WSGI application on a Linux/Mac command line from the repository root di
 gunicorn wsgi:application
 ```
 
+To do that you will have to have installed the Python package _gunicorn_, as per the listed requirement in `requirements.deploy.txt`
+
 ### Full documentation
      
 See the documentation at <https://rdflib.dev/VocPrez/>.
