@@ -1,5 +1,5 @@
 bs4==0.0.1
-Flask==2.3.1
+Flask==2.3.2
 flask_compress==1.8.0
 flask-markdown==0.3
 markdown==3.2.1
