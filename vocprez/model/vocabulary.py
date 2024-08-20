@@ -149,8 +149,8 @@ class VocabularyRenderer(Renderer):
                     g.add((s, URIRef(prop.uri), prop.value))
 
         # serialise in the appropriate RDF format
-        if self.mediatype in ["application/rdf+json", "application/json"]:
-            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype, headers=self.headers)
+        if self.mediatype in ["application/ld+json", "application/json"]:
+            return Response(g.serialize(format="turtle"), mimetype="text/turtle", headers=self.headers)
         else:
             return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype, headers=self.headers)
 
@@ -171,8 +171,8 @@ class VocabularyRenderer(Renderer):
                 g.add((URIRef(c[0]), SKOS.prefLabel, Literal(c[1])))
 
         # serialise in the appropriate RDF format
-        if self.mediatype in ["application/rdf+json", "application/json"]:
-            return Response(g.serialize(format="json-ld"), mimetype=self.mediatype, headers=self.headers)
+        if self.mediatype in ["application/ld+json", "application/json"]:
+            return Response(g.serialize(format="turtle"), mimetype="text/turtle", headers=self.headers)
         else:
             return Response(g.serialize(format=self.mediatype), mimetype=self.mediatype, headers=self.headers)
 
